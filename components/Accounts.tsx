@@ -1,3 +1,4 @@
+import { DeleteButton } from "@/components/ui/delete-button";
 import type { Conta, Republica } from "@/types/resume"; // ajuste path
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
@@ -105,6 +106,30 @@ export function AccountsTab({ republica, setRepublica }: AccountsTabProps) {
     setContaParaEditar(null);
   };
 
+  const deletarConta = (conta: Conta) => {
+    Alert.alert(
+      "Confirmar exclusão",
+      `Tem certeza que deseja excluir a conta "${conta.descricao}"?`,
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: () => {
+            setRepublica({
+              ...republica,
+              contas: republica.contas.filter((c) => c.id !== conta.id),
+            });
+            Alert.alert("Sucesso", "Conta excluída com sucesso!");
+          },
+        },
+      ]
+    );
+  };
+
   const contasOrdenadas = [...republica.contas]
     .filter((conta) => {
       if (mesSelecionado === "todos") return true;
@@ -201,8 +226,9 @@ export function AccountsTab({ republica, setRepublica }: AccountsTabProps) {
               </View>
             </View>
 
-            {/* Valor à direita */}
-            <View className="ml-2 items-end">
+            {/* Valor e Ações à direita */}
+            <View className="ml-2 items-end gap-2">
+              <DeleteButton onPress={() => deletarConta(conta)} size={18} />
               <Text className="font-semibold text-indigo-600">
                 R$ {conta.valor.toFixed(2)}
               </Text>
