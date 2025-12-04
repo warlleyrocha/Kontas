@@ -35,6 +35,7 @@ interface UseAddContaParams {
   setRepublica: (r: Republica) => void;
   onClose?: () => void;
   visible?: boolean;
+  contaParaEditar?: Conta | null;
 }
 
 export interface UseAddContaReturn {
@@ -71,6 +72,7 @@ export default function useAddConta({
   setRepublica,
   onClose,
   visible = false,
+  contaParaEditar,
 }: UseAddContaParams): UseAddContaReturn {
   const [descricao, setDescricao] = useState("");
   const [valorStr, setValorStr] = useState("");
@@ -88,6 +90,27 @@ export default function useAddConta({
   const [valoresByMorador, setValoresByMorador] = useState<
     Record<string, string>
   >({});
+
+  // Preencher dados quando for edição
+  useEffect(() => {
+    if (contaParaEditar && visible) {
+      setDescricao(contaParaEditar.descricao);
+      setValorStr(contaParaEditar.valor.toString());
+      setVencimento(new Date(contaParaEditar.vencimento));
+      setMetodoPagamento(contaParaEditar.metodoPagamento || "PIX");
+      setResponsavelId(contaParaEditar.responsavelId);
+
+      const ids = contaParaEditar.responsaveis.map((r) => r.moradorId);
+      setSelectedIds(ids);
+
+      const valores: Record<string, string> = {};
+      contaParaEditar.responsaveis.forEach((r) => {
+        valores[r.moradorId] = r.valor.toFixed(2);
+      });
+      setValoresByMorador(valores);
+      setTipoDivisao("custom");
+    }
+  }, [contaParaEditar, visible]);
 
   /* Recalcula valores por morador quando necessário.
      Mantém lógica de 'equal' vs 'custom' aqui. */
@@ -191,23 +214,34 @@ export default function useAddConta({
     }
 
     const novaConta: Conta = {
-      id: Date.now().toString(),
+      id: contaParaEditar?.id || Date.now().toString(),
       descricao: descricao.trim(),
       valor: Number(valor.toFixed(2)),
       vencimento: vencimento.toISOString(),
-      pago: false,
+      pago: contaParaEditar?.pago || false,
+      pagoEm: contaParaEditar?.pagoEm,
       responsavelId: responsavelId!,
       responsaveis,
       metodoPagamento: metodoPagamento || undefined,
     };
 
-    setRepublica({
-      ...republica,
-      contas: [...republica.contas, novaConta],
-    });
-
-    // UX: feedback e reset
-    Alert.alert("Conta adicionada");
+    if (contaParaEditar) {
+      // Modo edição: atualizar conta existente
+      setRepublica({
+        ...republica,
+        contas: republica.contas.map((c) =>
+          c.id === contaParaEditar.id ? novaConta : c
+        ),
+      });
+      Alert.alert("Conta atualizada");
+    } else {
+      // Modo criação: adicionar nova conta
+      setRepublica({
+        ...republica,
+        contas: [...republica.contas, novaConta],
+      });
+      Alert.alert("Conta adicionada");
+    }
     limpar();
     try {
       onClose?.();
@@ -227,6 +261,7 @@ export default function useAddConta({
     setRepublica,
     limpar,
     onClose,
+    contaParaEditar,
   ]);
 
   const handleDateChange = useCallback((_: any, date?: Date) => {

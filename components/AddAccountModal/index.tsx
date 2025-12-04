@@ -1,5 +1,5 @@
 import useAddAccount from "@/components/AddAccountModal/useAccountModal";
-import type { Republica } from "@/types/resume";
+import type { Conta, Republica } from "@/types/resume";
 import { Feather } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React from "react";
@@ -19,6 +19,7 @@ interface AddAccountModalProps {
   onClose: () => void;
   republica: Republica;
   setRepublica: (r: Republica) => void;
+  contaParaEditar?: Conta | null;
 }
 
 export const AddAccountModal: React.FC<AddAccountModalProps> = ({
@@ -26,6 +27,7 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({
   onClose,
   republica,
   setRepublica,
+  contaParaEditar,
 }) => {
   const {
     descricao,
@@ -54,6 +56,7 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({
     setRepublica,
     onClose,
     visible,
+    contaParaEditar,
   });
 
   return (
@@ -66,9 +69,13 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({
             {/* header */}
             <View className="mb-3 flex-row items-center justify-between">
               <View style={{ flex: 1, alignItems: "center" }}>
-                <Text className="text-lg font-semibold">Nova Conta</Text>
+                <Text className="text-lg font-semibold">
+                  {contaParaEditar ? "Editar Conta" : "Nova Conta"}
+                </Text>
                 <Text className="mt-1 text-sm text-gray-500">
-                  Adicione uma nova conta para a república
+                  {contaParaEditar
+                    ? "Modifique os dados da conta"
+                    : "Adicione uma nova conta para a república"}
                 </Text>
               </View>
               <TouchableOpacity

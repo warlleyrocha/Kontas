@@ -3,6 +3,7 @@ import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import React, { useState } from "react";
 import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { AddAccountModal } from "./AddAccountModal";
 
 interface AccountsTabProps {
   readonly republica: Republica;
@@ -12,6 +13,39 @@ interface AccountsTabProps {
 export function AccountsTab({ republica, setRepublica }: AccountsTabProps) {
   const [copiadoId, setCopiadoId] = useState<string | null>(null);
   const [expandidaId, setExpandidaId] = useState<string | null>(null);
+  const [mesSelecionado, setMesSelecionado] = useState<string>("todos");
+  const [contaParaEditar, setContaParaEditar] = useState<Conta | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  // Obter meses únicos das contas
+  const mesesDisponiveis = React.useMemo(() => {
+    const meses = new Set<string>();
+    republica.contas.forEach((conta) => {
+      const data = new Date(conta.vencimento);
+      const mesAno = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, "0")}`;
+      meses.add(mesAno);
+    });
+    return Array.from(meses).sort().reverse();
+  }, [republica.contas]);
+
+  const formatarMesAno = (mesAno: string) => {
+    const [ano, mes] = mesAno.split("-");
+    const meses = [
+      "Janeiro",
+      "Fevereiro",
+      "Março",
+      "Abril",
+      "Maio",
+      "Junho",
+      "Julho",
+      "Agosto",
+      "Setembro",
+      "Outubro",
+      "Novembro",
+      "Dezembro",
+    ];
+    return `${meses[parseInt(mes) - 1]} ${ano}`;
+  };
 
   const marcarComoPago = (contaId: string) => {
     setRepublica({
@@ -43,10 +77,29 @@ export function AccountsTab({ republica, setRepublica }: AccountsTabProps) {
     }
   };
 
-  const contasOrdenadas = [...republica.contas].sort((a, b) => {
-    if (a.pago !== b.pago) return a.pago ? 1 : -1;
-    return new Date(a.vencimento).getTime() - new Date(b.vencimento).getTime();
-  });
+  const abrirEdicao = (conta: Conta) => {
+    setContaParaEditar(conta);
+    setShowEditModal(true);
+  };
+
+  const fecharEdicao = () => {
+    setShowEditModal(false);
+    setContaParaEditar(null);
+  };
+
+  const contasOrdenadas = [...republica.contas]
+    .filter((conta) => {
+      if (mesSelecionado === "todos") return true;
+      const data = new Date(conta.vencimento);
+      const mesAno = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, "0")}`;
+      return mesAno === mesSelecionado;
+    })
+    .sort((a, b) => {
+      if (a.pago !== b.pago) return a.pago ? 1 : -1;
+      return (
+        new Date(a.vencimento).getTime() - new Date(b.vencimento).getTime()
+      );
+    });
 
   const renderContaCard = (conta: Conta) => {
     const vencimento = new Date(conta.vencimento);
@@ -57,184 +110,200 @@ export function AccountsTab({ republica, setRepublica }: AccountsTabProps) {
     );
 
     return (
-      <View
+      <TouchableOpacity
         key={conta.id}
-        className={`mb-3 rounded-lg bg-white p-4 shadow-sm ${
-          vencida ? "border border-orange-300 bg-orange-50" : ""
-        }`}
+        onPress={() => abrirEdicao(conta)}
+        activeOpacity={0.7}
       >
-        {/* Header */}
-        <View className="flex-row items-start justify-between">
-          <View className="flex-1">
-            {/* Linha: checkbox + título */}
-            <TouchableOpacity
-              className="mb-2 flex-row items-center gap-2"
-              onPress={() => marcarComoPago(conta.id)}
-            >
-              <MaterialCommunityIcons
-                name={conta.pago ? "checkbox-marked" : "checkbox-blank-outline"}
-                size={24}
-                color={conta.pago ? "#16a34a" : "#6b7280"}
-              />
-
-              <Text
-                className={`text-base font-semibold ${
-                  conta.pago ? "text-gray-400 line-through" : ""
-                }`}
+        <View
+          className={`mb-3 rounded-lg bg-white p-4 shadow-sm ${
+            vencida ? "border border-orange-300 bg-orange-50" : ""
+          }`}
+        >
+          {/* Header */}
+          <View className="flex-row items-start justify-between">
+            <View className="flex-1">
+              {/* Linha: checkbox + título */}
+              <TouchableOpacity
+                className="mb-2 flex-row items-center gap-2"
+                onPress={(e) => {
+                  e.stopPropagation();
+                  marcarComoPago(conta.id);
+                }}
               >
-                {conta.descricao}
-              </Text>
-            </TouchableOpacity>
+                <MaterialCommunityIcons
+                  name={
+                    conta.pago ? "checkbox-marked" : "checkbox-blank-outline"
+                  }
+                  size={24}
+                  color={conta.pago ? "#16a34a" : "#6b7280"}
+                />
 
-            {/* Infos secundárias */}
-            <View className="mt-1 flex-row flex-wrap gap-3">
-              {/* Data */}
-              <View className="flex-row items-center gap-1">
-                <Ionicons name="calendar-outline" size={16} color="#4b5563" />
-                <Text className="text-sm text-gray-600">
-                  {vencimento.toLocaleDateString("pt-BR")}
+                <Text
+                  className={`text-base font-semibold ${
+                    conta.pago ? "text-gray-400 line-through" : ""
+                  }`}
+                >
+                  {conta.descricao}
                 </Text>
-              </View>
+              </TouchableOpacity>
 
-              {/* Responsável */}
-              {responsavel && (
-                <View className="rounded-md border border-indigo-600 px-2 py-1">
-                  <Text className="text-xs text-indigo-600">
-                    Responsável: {responsavel.nome}
+              {/* Infos secundárias */}
+              <View className="mt-1 flex-row flex-wrap gap-3">
+                {/* Data */}
+                <View className="flex-row items-center gap-1">
+                  <Ionicons name="calendar-outline" size={16} color="#4b5563" />
+                  <Text className="text-sm text-gray-600">
+                    {vencimento.toLocaleDateString("pt-BR")}
                   </Text>
                 </View>
-              )}
 
-              {/* Vencida */}
-              {!conta.pago && vencida && (
-                <View className="rounded-md bg-orange-600 px-2 py-1">
-                  <Text className="text-xs text-white">Vencida</Text>
-                </View>
-              )}
+                {/* Responsável */}
+                {responsavel && (
+                  <View className="rounded-md border border-indigo-600 px-2 py-1">
+                    <Text className="text-xs text-indigo-600">
+                      Responsável: {responsavel.nome}
+                    </Text>
+                  </View>
+                )}
 
-              {/* Pago */}
-              {conta.pago && (
-                <View className="rounded-md border border-green-600 px-2 py-1">
-                  <Text className="text-xs text-green-600">Pago</Text>
-                </View>
+                {/* Vencida */}
+                {!conta.pago && vencida && (
+                  <View className="rounded-md bg-orange-600 px-2 py-1">
+                    <Text className="text-xs text-white">Vencida</Text>
+                  </View>
+                )}
+
+                {/* Pago */}
+                {conta.pago && (
+                  <View className="rounded-md border border-green-600 px-2 py-1">
+                    <Text className="text-xs text-green-600">Pago</Text>
+                  </View>
+                )}
+              </View>
+            </View>
+
+            {/* Valor à direita */}
+            <View className="ml-2 items-end">
+              <Text className="font-semibold text-indigo-600">
+                R$ {conta.valor.toFixed(2)}
+              </Text>
+              {conta.metodoPagamento && (
+                <Text className="mt-1 text-xs text-gray-500">
+                  {conta.metodoPagamento}
+                </Text>
               )}
             </View>
           </View>
 
-          {/* Valor à direita */}
-          <View className="ml-2 items-end">
-            <Text className="font-semibold text-indigo-600">
-              R$ {conta.valor.toFixed(2)}
-            </Text>
-            {conta.metodoPagamento && (
-              <Text className="mt-1 text-xs text-gray-500">
-                {conta.metodoPagamento}
+          {/* Conteúdo */}
+          <View className="mt-4 space-y-3">
+            {/* Divisão - Dropdown */}
+            <View className="mb-4 rounded-lg bg-gray-50 p-0">
+              <TouchableOpacity
+                onPress={(e) => {
+                  e.stopPropagation();
+                  setExpandidaId(expandidaId === conta.id ? null : conta.id);
+                }}
+                className="flex-row items-center justify-between px-4 py-3"
+              >
+                <Text className="font-semibold text-gray-700">Divisão:</Text>
+                <View className="flex-row items-center gap-2">
+                  <Text className="text-sm text-gray-500">
+                    {conta.responsaveis.length}{" "}
+                    {conta.responsaveis.length === 1 ? "pessoa" : "pessoas"}
+                  </Text>
+                  <MaterialCommunityIcons
+                    name={
+                      expandidaId === conta.id ? "chevron-up" : "chevron-down"
+                    }
+                    size={24}
+                    color="#6b7280"
+                  />
+                </View>
+              </TouchableOpacity>
+
+              {/* Conteúdo do Dropdown */}
+              {expandidaId === conta.id && (
+                <View className="border-t border-gray-200 px-4 py-3">
+                  <View className="space-y-2">
+                    {conta.responsaveis.map((resp) => {
+                      const morador = republica.moradores.find(
+                        (m) => m.id === resp.moradorId
+                      );
+
+                      return (
+                        <View
+                          key={resp.moradorId}
+                          className="flex-row items-center justify-between rounded-lg bg-white p-3"
+                        >
+                          <View className="flex-1">
+                            <Text className="font-medium text-gray-800">
+                              {morador?.nome}
+                            </Text>
+                          </View>
+                          <Text className="font-bold text-indigo-600">
+                            R$ {resp.valor.toFixed(2)}
+                          </Text>
+                        </View>
+                      );
+                    })}
+
+                    {/* Total da divisão */}
+                    <View className="mt-3 border-t border-gray-200 pt-3">
+                      <View className="flex-row items-center justify-between rounded-lg bg-indigo-50 p-3">
+                        <Text className="font-bold text-indigo-900">
+                          Total:
+                        </Text>
+                        <Text className="text-lg font-bold text-indigo-600">
+                          R${" "}
+                          {conta.responsaveis
+                            .reduce((acc, r) => acc + r.valor, 0)
+                            .toFixed(2)}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              )}
+            </View>
+
+            {/* Copiar PIX */}
+            {!conta.pago && responsavel?.chavePix && (
+              <TouchableOpacity
+                onPress={(e) => {
+                  e.stopPropagation();
+                  copiarChavePix(conta);
+                }}
+                className="flex-row items-center justify-center rounded-md border border-indigo-600 px-4 py-2"
+              >
+                {copiadoId === conta.id ? (
+                  <>
+                    <Ionicons name="checkmark" size={18} color="#16a34a" />
+                    <Text className="ml-2 text-green-600">Copiado!</Text>
+                  </>
+                ) : (
+                  <>
+                    <Feather name="copy" size={18} color="#4b5563" />
+                    <Text className="ml-2 text-gray-700">Copiar Chave PIX</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            )}
+
+            {/* Pago em */}
+            {conta.pago && conta.pagoEm && (
+              <Text className="text-sm text-gray-500">
+                Pago em: {new Date(conta.pagoEm).toLocaleDateString("pt-BR")}
               </Text>
             )}
           </View>
         </View>
-
-        {/* Conteúdo */}
-        <View className="mt-4 space-y-3">
-          {/* Divisão - Dropdown */}
-          <View className="mb-4 rounded-lg bg-gray-50 p-0">
-            <TouchableOpacity
-              onPress={() =>
-                setExpandidaId(expandidaId === conta.id ? null : conta.id)
-              }
-              className="flex-row items-center justify-between px-4 py-3"
-            >
-              <Text className="font-semibold text-gray-700">Divisão:</Text>
-              <View className="flex-row items-center gap-2">
-                <Text className="text-sm text-gray-500">
-                  {conta.responsaveis.length}{" "}
-                  {conta.responsaveis.length === 1 ? "pessoa" : "pessoas"}
-                </Text>
-                <MaterialCommunityIcons
-                  name={
-                    expandidaId === conta.id ? "chevron-up" : "chevron-down"
-                  }
-                  size={24}
-                  color="#6b7280"
-                />
-              </View>
-            </TouchableOpacity>
-
-            {/* Conteúdo do Dropdown */}
-            {expandidaId === conta.id && (
-              <View className="border-t border-gray-200 px-4 py-3">
-                <View className="space-y-2">
-                  {conta.responsaveis.map((resp) => {
-                    const morador = republica.moradores.find(
-                      (m) => m.id === resp.moradorId
-                    );
-
-                    return (
-                      <View
-                        key={resp.moradorId}
-                        className="flex-row items-center justify-between rounded-lg bg-white p-3"
-                      >
-                        <View className="flex-1">
-                          <Text className="font-medium text-gray-800">
-                            {morador?.nome}
-                          </Text>
-                        </View>
-                        <Text className="font-bold text-indigo-600">
-                          R$ {resp.valor.toFixed(2)}
-                        </Text>
-                      </View>
-                    );
-                  })}
-
-                  {/* Total da divisão */}
-                  <View className="mt-3 border-t border-gray-200 pt-3">
-                    <View className="flex-row items-center justify-between rounded-lg bg-indigo-50 p-3">
-                      <Text className="font-bold text-indigo-900">Total:</Text>
-                      <Text className="text-lg font-bold text-indigo-600">
-                        R${" "}
-                        {conta.responsaveis
-                          .reduce((acc, r) => acc + r.valor, 0)
-                          .toFixed(2)}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            )}
-          </View>
-
-          {/* Copiar PIX */}
-          {!conta.pago && responsavel?.chavePix && (
-            <TouchableOpacity
-              onPress={() => copiarChavePix(conta)}
-              className="flex-row items-center justify-center rounded-md border border-indigo-600 px-4 py-2"
-            >
-              {copiadoId === conta.id ? (
-                <>
-                  <Ionicons name="checkmark" size={18} color="#16a34a" />
-                  <Text className="ml-2 text-green-600">Copiado!</Text>
-                </>
-              ) : (
-                <>
-                  <Feather name="copy" size={18} color="#4b5563" />
-                  <Text className="ml-2 text-gray-700">Copiar Chave PIX</Text>
-                </>
-              )}
-            </TouchableOpacity>
-          )}
-
-          {/* Pago em */}
-          {conta.pago && conta.pagoEm && (
-            <Text className="text-sm text-gray-500">
-              Pago em: {new Date(conta.pagoEm).toLocaleDateString("pt-BR")}
-            </Text>
-          )}
-        </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
-  if (contasOrdenadas.length === 0) {
+  if (contasOrdenadas.length === 0 && mesSelecionado === "todos") {
     return (
       <View className="mt-6 items-center rounded-lg bg-white p-6 shadow-sm">
         <Feather name="dollar-sign" size={48} color="#9ca3af" />
@@ -248,7 +317,75 @@ export function AccountsTab({ republica, setRepublica }: AccountsTabProps) {
 
   return (
     <ScrollView contentContainerStyle={{ paddingVertical: 12 }}>
-      {contasOrdenadas.map(renderContaCard)}
+      {/* Filtro de Mês */}
+      <View className="mb-4 px-4">
+        <Text className="mb-2 text-sm font-semibold text-gray-700">
+          Filtrar por mês:
+        </Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ gap: 8 }}
+        >
+          <TouchableOpacity
+            onPress={() => setMesSelecionado("todos")}
+            className={`rounded-full px-4 py-2 ${
+              mesSelecionado === "todos"
+                ? "bg-indigo-600"
+                : "border border-gray-300 bg-white"
+            }`}
+          >
+            <Text
+              className={`font-medium ${
+                mesSelecionado === "todos" ? "text-white" : "text-gray-700"
+              }`}
+            >
+              Todos
+            </Text>
+          </TouchableOpacity>
+
+          {mesesDisponiveis.map((mesAno) => (
+            <TouchableOpacity
+              key={mesAno}
+              onPress={() => setMesSelecionado(mesAno)}
+              className={`rounded-full px-4 py-2 ${
+                mesSelecionado === mesAno
+                  ? "bg-indigo-600"
+                  : "border border-gray-300 bg-white"
+              }`}
+            >
+              <Text
+                className={`font-medium ${
+                  mesSelecionado === mesAno ? "text-white" : "text-gray-700"
+                }`}
+              >
+                {formatarMesAno(mesAno)}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+
+      {/* Mensagem quando não há contas no mês selecionado */}
+      {contasOrdenadas.length === 0 && mesSelecionado !== "todos" ? (
+        <View className="mx-4 mt-6 items-center rounded-lg bg-white p-6 shadow-sm">
+          <Feather name="calendar" size={48} color="#9ca3af" />
+          <Text className="mt-4 text-center text-gray-500">
+            Nenhuma conta encontrada para {formatarMesAno(mesSelecionado)}.
+          </Text>
+        </View>
+      ) : (
+        <View className="px-4">{contasOrdenadas.map(renderContaCard)}</View>
+      )}
+
+      {/* Modal de Edição */}
+      <AddAccountModal
+        visible={showEditModal}
+        onClose={fecharEdicao}
+        republica={republica}
+        setRepublica={setRepublica}
+        contaParaEditar={contaParaEditar}
+      />
     </ScrollView>
   );
 }
