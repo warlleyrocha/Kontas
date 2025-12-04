@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -13,6 +13,7 @@ import { ResidentsTab } from "@/components/ResidentsPage";
 import { ResumeTab } from "@/components/Resume";
 import Tabs from "@/components/Tabs";
 import { useAsyncStorage } from "@/hooks/useAsyncStorage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import type { Republica } from "@/types/resume";
 import type { TabKey } from "@/types/tabs";
@@ -27,6 +28,9 @@ const initialRepublica: Republica = {
 
 export default function Dashboard() {
   const [tab, setTab] = useState<TabKey>("resumo");
+  const [republicImage, setRepublicImage] = useState<string | undefined>(
+    undefined
+  );
 
   // Usar AsyncStorage para persistir dados
   const {
@@ -35,6 +39,15 @@ export default function Dashboard() {
     isLoading,
   } = useAsyncStorage<Republica>(initialRepublica);
   const [showAddModal, setShowAddModal] = useState(false);
+
+  // Carregar imagem da república
+  useEffect(() => {
+    const loadImage = async () => {
+      const image = await AsyncStorage.getItem("@republica_imagem");
+      if (image) setRepublicImage(image);
+    };
+    loadImage();
+  }, []);
 
   // Mostrar loading enquanto carrega dados
   if (isLoading) {
@@ -51,10 +64,22 @@ export default function Dashboard() {
       {/* HEADER */}
       <View className="mt-[32px] flex-row gap-3 border-b border-b-black/10 bg-[#FAFAFA] px-[16px] py-4">
         <View className="h-[50px] w-[50px] items-center justify-center rounded-full bg-black">
-          <Image
-            source={ImageHeader}
-            style={{ width: 50, height: 50, resizeMode: "contain" }}
-          />
+          {republicImage ? (
+            <Image
+              source={{ uri: republicImage }}
+              style={{
+                width: 50,
+                height: 50,
+                resizeMode: "cover",
+                borderRadius: 25,
+              }}
+            />
+          ) : (
+            <Image
+              source={ImageHeader}
+              style={{ width: 50, height: 50, resizeMode: "contain" }}
+            />
+          )}
         </View>
 
         <View className="flex-1 justify-center">

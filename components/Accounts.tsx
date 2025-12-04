@@ -62,6 +62,24 @@ export function AccountsTab({ republica, setRepublica }: AccountsTabProps) {
     });
   };
 
+  const marcarResponsavelComoPago = (contaId: string, moradorId: string) => {
+    setRepublica({
+      ...republica,
+      contas: republica.contas.map((conta) =>
+        conta.id === contaId
+          ? {
+              ...conta,
+              responsaveis: conta.responsaveis.map((resp) =>
+                resp.moradorId === moradorId
+                  ? { ...resp, pago: !resp.pago }
+                  : resp
+              ),
+            }
+          : conta
+      ),
+    });
+  };
+
   const copiarChavePix = async (conta: Conta) => {
     const responsavel = republica.moradores.find(
       (m) => m.id === conta.responsavelId
@@ -237,12 +255,40 @@ export function AccountsTab({ republica, setRepublica }: AccountsTabProps) {
                           key={resp.moradorId}
                           className="flex-row items-center justify-between rounded-lg bg-white p-3"
                         >
-                          <View className="flex-1">
-                            <Text className="font-medium text-gray-800">
+                          <TouchableOpacity
+                            onPress={(e) => {
+                              e.stopPropagation();
+                              marcarResponsavelComoPago(
+                                conta.id,
+                                resp.moradorId
+                              );
+                            }}
+                            className="flex-1 flex-row items-center gap-2"
+                          >
+                            <MaterialCommunityIcons
+                              name={
+                                resp.pago
+                                  ? "checkbox-marked"
+                                  : "checkbox-blank-outline"
+                              }
+                              size={20}
+                              color={resp.pago ? "#16a34a" : "#6b7280"}
+                            />
+                            <Text
+                              className={`font-medium ${
+                                resp.pago
+                                  ? "text-gray-400 line-through"
+                                  : "text-gray-800"
+                              }`}
+                            >
                               {morador?.nome}
                             </Text>
-                          </View>
-                          <Text className="font-bold text-indigo-600">
+                          </TouchableOpacity>
+                          <Text
+                            className={`font-bold ${
+                              resp.pago ? "text-gray-400" : "text-indigo-600"
+                            }`}
+                          >
                             R$ {resp.valor.toFixed(2)}
                           </Text>
                         </View>

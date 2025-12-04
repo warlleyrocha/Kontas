@@ -8,6 +8,7 @@ export type Morador = {
 export type Responsavel = {
   moradorId: string;
   valor: number;
+  pago?: boolean;
 };
 
 export type Conta = {
@@ -24,6 +25,7 @@ export type Conta = {
 
 export type Republica = {
   nome: string;
+  imagemRepublica?: string;
   moradores: Morador[];
   contas: Conta[];
 };
