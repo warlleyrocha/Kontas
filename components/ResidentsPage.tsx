@@ -239,7 +239,7 @@ export const ResidentsTab: React.FC<ResidentsTabProps> = ({
         keyExtractor={(m) => m.id}
         renderItem={renderMorador}
         ItemSeparatorComponent={() => <View className="h-5" />}
-        contentContainerStyle={{ paddingBottom: 24 }}
+        contentContainerStyle={{ paddingBottom: 130 }}
       />
     </View>
   );
