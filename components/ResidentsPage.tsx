@@ -122,7 +122,7 @@ export const ResidentsTab: React.FC<ResidentsTabProps> = ({
 
         {/* conteúdo */}
         <View className="mt-3 space-y-3">
-          <View className="rounded-lg bg-gray-50 p-3">
+          <View className="mt-2 flex-row justify-between rounded-lg bg-gray-50 p-3">
             <Text className="mb-1 text-sm text-gray-600">Valor Pendente</Text>
             <Text
               className={
@@ -136,7 +136,7 @@ export const ResidentsTab: React.FC<ResidentsTabProps> = ({
           </View>
 
           {morador.chavePix ? (
-            <View>
+            <View className="mt-4">
               <Text className="mb-2 text-sm text-gray-600">Chave PIX</Text>
 
               <View className="flex-row items-center gap-2">
@@ -168,7 +168,7 @@ export const ResidentsTab: React.FC<ResidentsTabProps> = ({
       {!adicionando ? (
         <TouchableOpacity
           onPress={() => setAdicionando(true)}
-          className="items-center rounded-md bg-indigo-600 py-3"
+          className="mb-5 mt-2 items-center rounded-md bg-indigo-600 py-3"
         >
           <View className="flex-row items-center">
             <Feather name="plus" size={16} color="#fff" />
@@ -238,7 +238,7 @@ export const ResidentsTab: React.FC<ResidentsTabProps> = ({
         data={republica.moradores}
         keyExtractor={(m) => m.id}
         renderItem={renderMorador}
-        ItemSeparatorComponent={() => <View className="h-2" />}
+        ItemSeparatorComponent={() => <View className="h-5" />}
         contentContainerStyle={{ paddingBottom: 24 }}
       />
     </View>
