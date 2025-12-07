@@ -25,13 +25,19 @@ export default function Residents() {
   const [pixKey, setPixKey] = useState("");
   const [residents, setResidents] = useState<Resident[]>([]);
   const [republicName, setRepublicName] = useState("");
+  const [republicImage, setRepublicImage] = useState<string | undefined>(
+    undefined
+  );
 
   useEffect(() => {
-    const loadRepublicName = async () => {
-      const nome = await AsyncStorage.getItem("@republica_nome");
+    const loadTempData = async () => {
+      const nome = await AsyncStorage.getItem("@temp_republica_nome");
+      const imagem = await AsyncStorage.getItem("@temp_republica_imagem");
+
       if (nome) setRepublicName(nome);
+      if (imagem) setRepublicImage(imagem);
     };
-    loadRepublicName();
+    loadTempData();
   }, []);
 
   const handleAddResident = () => {
@@ -58,6 +64,7 @@ export default function Residents() {
     try {
       const republica: Republica = {
         nome: republicName,
+        imagemRepublica: republicImage,
         moradores: residents.map((r) => ({
           id: r.id,
           nome: r.name,
@@ -66,7 +73,13 @@ export default function Residents() {
         contas: [],
       };
 
+      // Salva os dados consolidados
       await AsyncStorage.setItem("@republica_data", JSON.stringify(republica));
+
+      // Remove os dados temporários
+      await AsyncStorage.removeItem("@temp_republica_nome");
+      await AsyncStorage.removeItem("@temp_republica_imagem");
+
       router.replace("/dashboard");
     } catch (error) {
       console.error("Error saving republic data:", error);

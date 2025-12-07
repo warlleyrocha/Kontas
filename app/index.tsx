@@ -1,4 +1,6 @@
+import { checkRepublicaData } from "@/hooks/useAsyncStorage";
 import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import { Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
 import "../global.css";
 
@@ -6,10 +8,37 @@ const { height } = Dimensions.get("window");
 
 export default function App() {
   const router = useRouter();
+  const [isChecking, setIsChecking] = useState(true);
+
+  useEffect(() => {
+    const checkExistingData = async () => {
+      const { isComplete } = await checkRepublicaData();
+
+      if (isComplete) {
+        // Se os dados já estão completos, redireciona para o dashboard
+        router.replace("/dashboard");
+      } else {
+        setIsChecking(false);
+      }
+    };
+
+    checkExistingData();
+  }, []);
 
   const handlePress = () => {
     router.push("/register");
   };
+
+  // Mostra uma tela em branco enquanto verifica os dados
+  if (isChecking) {
+    return (
+      <View className="flex-1 items-center justify-center bg-white">
+        <Text className="font-inter-medium text-lg text-gray-600">
+          Carregando...
+        </Text>
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 items-center bg-white">

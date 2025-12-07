@@ -54,9 +54,10 @@ export default function Register() {
     }
 
     try {
-      await AsyncStorage.setItem("@republica_nome", republicName.trim());
+      // Salva temporariamente o nome e imagem para usar na próxima tela
+      await AsyncStorage.setItem("@temp_republica_nome", republicName.trim());
       if (republicImage) {
-        await AsyncStorage.setItem("@republica_imagem", republicImage);
+        await AsyncStorage.setItem("@temp_republica_imagem", republicImage);
       }
       router.push("/residents");
     } catch (error) {
