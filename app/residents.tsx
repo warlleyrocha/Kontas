@@ -152,7 +152,7 @@ export default function Residents() {
       </ScrollView>
 
       {/* Botão fixo no rodapé */}
-      <View className="pb-6">
+      <View className="pb-[30px]">
         <TouchableOpacity
           className="w-full rounded-lg bg-indigo-600 px-4 py-3"
           onPress={handlePress}

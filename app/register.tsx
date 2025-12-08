@@ -69,13 +69,14 @@ export default function Register() {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
       keyboardVerticalOffset={0}
     >
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        bounces={false}
       >
         <ImageBackground
           source={require("@/assets/images/image-register.jpg")}
@@ -107,7 +108,7 @@ export default function Register() {
         </ImageBackground>
 
         <View
-          className="flex-1 items-center rounded-t-[24px] bg-[#FAFAFA] px-4"
+          className="flex-1 items-center rounded-t-[24px] bg-[#FAFAFA] px-4 pb-8"
           style={{
             width: width,
             marginTop: -25,
@@ -149,10 +150,10 @@ export default function Register() {
           </View>
 
           {/* Spacer - empurra o botão para baixo */}
-          <View className="flex-1" />
+          <View className="min-h-[20px] flex-1" />
 
           <TouchableOpacity
-            className="mb-8 w-full rounded-lg bg-indigo-600 px-4 py-3"
+            className="w-full rounded-lg bg-indigo-600 px-4 py-3"
             onPress={handlePress}
           >
             <Text className="text-center font-inter-medium text-lg text-white">

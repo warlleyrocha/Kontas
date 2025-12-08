@@ -23,7 +23,7 @@ export default function App() {
     };
 
     checkExistingData();
-  }, []);
+  }, [router]);
 
   const handlePress = () => {
     router.push("/register");
@@ -52,7 +52,7 @@ export default function App() {
       />
 
       <View
-        className="mt-8 w-full  items-center justify-between overflow-hidden rounded-t-[24px] bg-white px-6 py-8 shadow-lg"
+        className="mt-8 w-full flex-1 items-center justify-between overflow-hidden rounded-t-[24px] bg-white px-6 py-8 shadow-lg"
         style={{
           marginTop: -25, // Sobreposição sobre o background
           paddingTop: 40, // Espaço para compensar a sobreposição
@@ -69,7 +69,7 @@ export default function App() {
         </View>
 
         <TouchableOpacity
-          className="mt-6 w-full rounded-lg bg-indigo-600 px-4 py-2"
+          className="mt-6 w-full rounded-lg bg-indigo-600 px-4 py-3"
           onPress={handlePress}
         >
           <Text className="text-center font-inter-medium text-lg text-white">
