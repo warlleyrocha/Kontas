@@ -47,18 +47,19 @@ export const useResidentsPage = ({
   };
 
   const calcularDividaPorMorador = (moradorId: string) => {
-    return republica.contas
-      .filter((conta) => !conta.pago)
-      .reduce((total, conta) => {
-        const resp = conta.responsaveis.find((r) => r.moradorId === moradorId);
-        return total + (resp?.valor || 0);
-      }, 0);
+    return republica.contas.reduce((total, conta) => {
+      const resp = conta.responsaveis.find((r) => r.moradorId === moradorId);
+      // Só conta como dívida se o responsável específico não pagou
+      if (resp && !resp.pago) {
+        return total + resp.valor;
+      }
+      return total;
+    }, 0);
   };
 
   const quantidadeContasPendentes = (moradorId: string) => {
-    return republica.contas.filter(
-      (conta) =>
-        !conta.pago && conta.responsaveis.some((r) => r.moradorId === moradorId)
+    return republica.contas.filter((conta) =>
+      conta.responsaveis.some((r) => r.moradorId === moradorId && !r.pago)
     ).length;
   };
 

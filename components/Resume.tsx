@@ -26,11 +26,12 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({ republica }) => {
     });
 
     republica.contas.forEach((conta) => {
-      if (!conta.pago) {
-        conta.responsaveis.forEach((resp) => {
+      conta.responsaveis.forEach((resp) => {
+        // Só conta como dívida se o responsável específico não pagou
+        if (!resp.pago) {
           dividas[resp.moradorId] = (dividas[resp.moradorId] || 0) + resp.valor;
-        });
-      }
+        }
+      });
     });
 
     return dividas;
