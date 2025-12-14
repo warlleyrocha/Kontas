@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "StickerSmash",
-    "slug": "StickerSmash",
+    "name": "Kontas",
+    "slug": "Kontas",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/fav-icon-kontas.png",
-    "scheme": "stickersmash",
+    "scheme": "kontas",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.warlleyrocha.StickerSmash",
+      "bundleIdentifier": "com.warlleyrocha.Kontas",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -24,7 +24,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.warlleyrocha.StickerSmash"
+      "package": "com.warlleyrocha.Kontas"
     },
     "web": {
       "output": "static",
