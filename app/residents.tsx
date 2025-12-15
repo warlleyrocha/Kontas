@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import InputField from "@/components/ui/input-field";
+import { useAuth } from "@/contexts";
 import type { Republica } from "@/types/resume";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
@@ -20,10 +21,23 @@ interface Resident {
 }
 
 export default function Residents() {
+  const { user } = useAuth();
   const router = useRouter();
   const [residentName, setResidentName] = useState("");
   const [pixKey, setPixKey] = useState("");
-  const [residents, setResidents] = useState<Resident[]>([]);
+  const [residents, setResidents] = useState<Resident[]>(() => {
+    // Inicializa o array com o usuário logado
+    if (user?.user) {
+      return [
+        {
+          id: user.user.id,
+          name: user.user.name || "",
+          pixKey: user.user.email, // Usa o email como chave PIX padrão
+        },
+      ];
+    }
+    return [];
+  });
   const [republicName, setRepublicName] = useState("");
   const [republicImage, setRepublicImage] = useState<string | undefined>(
     undefined
