@@ -4,13 +4,13 @@
     "slug": "kontas",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/fav-icon-kontas.png",
+    "icon": "./assets/images/android/play_store_512.png",
     "scheme": "kontas",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.warlleyrocha.Kontas",
+      "bundleIdentifier": "com.googleauth.ios",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -18,9 +18,9 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "foregroundImage": "./assets/images/android/res/mipmap-xxxhdpi/ic_launcher_foreground.png",
+        "backgroundImage": "./assets/images/android/res/mipmap-xxxhdpi/ic_launcher_background.png",
+        "monochromeImage": "./assets/images/android/res/mipmap-xxxhdpi/ic_launcher_monochrome.png"
       },
       "splash": {
         "image": "./assets/images/splash-icon-kontas.png",
@@ -29,7 +29,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.warlleyrocha.Kontas"
+      "package": "com.googleauth.kontas"
     },
     "web": {
       "output": "static",
@@ -44,6 +44,12 @@
           "image": "./assets/images/splash-icon-kontas.png",
           "resizeMode": "cover",
           "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.475215012202-oq93e4s85f7uuhfji6k2nkhdb7i2dfm3"
         }
       ]
     ],
