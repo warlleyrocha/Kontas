@@ -1,50 +1,100 @@
-# Welcome to your Expo app 👋
+# Kontas 👋
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Um aplicativo mobile para gestão financeira de repúblicas e moradia compartilhada, desenvolvido com React Native e Expo. O Kontas facilita o controle de contas, divisão de despesas e gerenciamento de moradores.
 
-## Get started
+## 🚀 Começando
 
-1. Install dependencies
+Essas instruções permitirão que você obtenha uma cópia do projeto em operação na sua máquina local para fins de desenvolvimento e teste.
 
-   ```bash
-   npm install
-   ```
+Consulte **[Implantação](#-implantação)** para saber como implantar o projeto.
 
-2. Start the app
+### 📋 Pré-requisitos
 
-   ```bash
-   npx expo start
-   ```
+De que coisas você precisa para instalar o software e como instalá-lo?
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+Node.js (versão 18 ou superior)
+npm ou yarn
+Expo CLI
+Android Studio (para emulador Android) ou Xcode (para iOS)
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 🔧 Instalação
 
-## Learn more
+Uma série de exemplos passo-a-passo que informam o que você deve executar para ter um ambiente de desenvolvimento em execução.
 
-To learn more about developing your project with Expo, look at the following resources:
+Primeiro, clone o repositório e instale as dependências:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+git clone https://github.com/warlleyrocha/Kontas.git
+cd Kontas
+npm install
+```
 
-## Join the community
+Configure o arquivo de ambiente (se necessário):
 
-Join our community of developers creating universal apps.
+```bash
+# Adicione suas credenciais do Google OAuth no diretório keys/
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Inicie o servidor de desenvolvimento:
+
+```bash
+npx expo start
+```
+
+Escolha uma das opções disponíveis:
+
+- Pressione `a` para abrir no emulador Android
+- Pressione `i` para abrir no simulador iOS
+- Escaneie o QR code com o Expo Go no seu dispositivo físico
+
+## 📦 Implantação
+
+Para fazer o build de produção do aplicativo:
+
+**Android:**
+
+```bash
+npm run android
+```
+
+**iOS:**
+
+```bash
+npm run ios
+```
+
+**Web:**
+
+```bash
+npm run web
+```
+
+Para builds de produção com EAS (Expo Application Services), consulte a configuração em `eas.json`.
+
+## 🛠️ Construído com
+
+Ferramentas e tecnologias utilizadas no projeto:
+
+- [Expo](https://expo.dev/) - Framework e plataforma para React Native
+- [React Native](https://reactnative.dev/) - Framework mobile multiplataforma
+- [TypeScript](https://www.typescriptlang.org/) - Superset JavaScript com tipagem
+- [NativeWind](https://www.nativewind.dev/) - Tailwind CSS para React Native
+- [Expo Router](https://docs.expo.dev/router/introduction/) - Sistema de roteamento baseado em arquivos
+- [AsyncStorage](https://react-native-async-storage.github.io/async-storage/) - Armazenamento local persistente
+- [Google Sign-In](https://github.com/react-native-google-signin/google-signin) - Autenticação Google
+
+## ✒️ Autores
+
+Mencione todos aqueles que ajudaram a levantar o projeto desde o seu início
+
+- **Warlley Rocha** - _Trabalho Inicial_ - [warlleyrocha](https://github.com/warlleyrocha)
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT - veja o arquivo [LICENSE.md](LICENSE.md) para detalhes.
+
+---
+
+⌨️ com ❤️ por [Warlley Rocha](https://github.com/warlleyrocha) 😊

@@ -14,6 +14,8 @@ export function useAccounts({ republica, setRepublica }: UseAccountsProps) {
   const [mesSelecionado, setMesSelecionado] = useState<string>("todos");
   const [contaParaEditar, setContaParaEditar] = useState<Conta | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [mostrarContasPagas, setMostrarContasPagas] = useState(false);
+  const [mostrarContasAbertas, setMostrarContasAbertas] = useState(true);
 
   // Obter meses únicos das contas
   const mesesDisponiveis = useMemo(() => {
@@ -130,19 +132,28 @@ export function useAccounts({ republica, setRepublica }: UseAccountsProps) {
   };
 
   const contasOrdenadas = useMemo(() => {
-    return [...republica.contas]
-      .filter((conta) => {
-        if (mesSelecionado === "todos") return true;
-        const data = new Date(conta.vencimento);
-        const mesAno = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, "0")}`;
-        return mesAno === mesSelecionado;
-      })
-      .sort((a, b) => {
-        if (a.pago !== b.pago) return a.pago ? 1 : -1;
-        return (
+    const contas = [...republica.contas].filter((conta) => {
+      if (mesSelecionado === "todos") return true;
+      const data = new Date(conta.vencimento);
+      const mesAno = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, "0")}`;
+      return mesAno === mesSelecionado;
+    });
+
+    const abertas = contas
+      .filter((c) => !c.pago)
+      .sort(
+        (a, b) =>
           new Date(a.vencimento).getTime() - new Date(b.vencimento).getTime()
-        );
-      });
+      );
+
+    const pagas = contas
+      .filter((c) => c.pago)
+      .sort(
+        (a, b) =>
+          new Date(b.vencimento).getTime() - new Date(a.vencimento).getTime()
+      );
+
+    return { abertas, pagas };
   }, [republica.contas, mesSelecionado]);
 
   return {
@@ -155,6 +166,10 @@ export function useAccounts({ republica, setRepublica }: UseAccountsProps) {
     showEditModal,
     mesesDisponiveis,
     contasOrdenadas,
+    mostrarContasPagas,
+    setMostrarContasPagas,
+    mostrarContasAbertas,
+    setMostrarContasAbertas,
     formatarMesAno,
     marcarComoPago,
     marcarResponsavelComoPago,

@@ -61,11 +61,11 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
-      <View className="min-h-screen flex-1 justify-end bg-black/40 px-[16px]">
+      <View className="min-h-screen flex-1 justify-center bg-black/40 px-[16px] pt-[100px]">
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
-          <View className="max-h-[90%] rounded-xl bg-white px-6 pt-6">
+          <View className="max-h-[100%] rounded-xl bg-white px-6 pt-6">
             {/* header */}
             <View className="mb-3 flex-row items-center justify-between">
               <View>

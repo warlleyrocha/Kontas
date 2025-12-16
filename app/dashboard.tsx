@@ -1,15 +1,10 @@
 import React, { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  Image,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 
 import { AccountsTab } from "@/components/Accounts";
 import { AddAccountModal } from "@/components/AddAccountModal";
 import { EditRepublicModal } from "@/components/EditRepublicModal";
+
 import { ResidentsTab } from "@/components/ResidentsPage";
 import { ResumeTab } from "@/components/Resume";
 import Tabs from "@/components/Tabs";
@@ -34,11 +29,8 @@ export default function Dashboard() {
   );
 
   // Usar AsyncStorage para persistir dados
-  const {
-    data: republica,
-    setData: setRepublica,
-    isLoading,
-  } = useAsyncStorage<Republica>(initialRepublica);
+  const { data: republica, setData: setRepublica } =
+    useAsyncStorage<Republica>(initialRepublica);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
@@ -56,16 +48,6 @@ export default function Dashboard() {
     setRepublica({ ...republica, nome, imagemRepublica: imagem });
     setRepublicImage(imagem);
   };
-
-  // Mostrar loading enquanto carrega dados
-  if (isLoading) {
-    return (
-      <View className="flex-1 items-center justify-center bg-[#FAFAFA]">
-        <ActivityIndicator size="large" color="#000" />
-        <Text className="mt-4 text-gray-600">Carregando...</Text>
-      </View>
-    );
-  }
 
   return (
     <View className="flex-1 bg-[#FAFAFA]">

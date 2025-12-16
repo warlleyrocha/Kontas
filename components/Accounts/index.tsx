@@ -21,6 +21,10 @@ export function AccountsTab({ republica, setRepublica }: AccountsTabProps) {
     showEditModal,
     mesesDisponiveis,
     contasOrdenadas,
+    mostrarContasPagas,
+    setMostrarContasPagas,
+    mostrarContasAbertas,
+    setMostrarContasAbertas,
     formatarMesAno,
     marcarComoPago,
     marcarResponsavelComoPago,
@@ -32,6 +36,7 @@ export function AccountsTab({ republica, setRepublica }: AccountsTabProps) {
 
   const renderContaCard = (conta: Conta) => {
     const vencimento = new Date(conta.vencimento);
+    vencimento.setHours(23, 59, 59, 999); // Fim do dia do vencimento
     const hoje = new Date();
     const vencida = vencimento < hoje && !conta.pago;
     const emAberto = vencimento >= hoje && !conta.pago;
@@ -266,7 +271,11 @@ export function AccountsTab({ republica, setRepublica }: AccountsTabProps) {
     );
   };
 
-  if (contasOrdenadas.length === 0 && mesSelecionado === "todos") {
+  if (
+    contasOrdenadas.abertas.length === 0 &&
+    contasOrdenadas.pagas.length === 0 &&
+    mesSelecionado === "todos"
+  ) {
     return (
       <View className="mt-6 items-center rounded-lg bg-white p-6 shadow-sm">
         <Feather name="dollar-sign" size={48} color="#9ca3af" />
@@ -330,7 +339,9 @@ export function AccountsTab({ republica, setRepublica }: AccountsTabProps) {
       </View>
 
       {/* Mensagem quando não há contas no mês selecionado */}
-      {contasOrdenadas.length === 0 && mesSelecionado !== "todos" ? (
+      {contasOrdenadas.abertas.length === 0 &&
+      contasOrdenadas.pagas.length === 0 &&
+      mesSelecionado !== "todos" ? (
         <View className="mx-4 mt-6 items-center rounded-lg bg-white p-6 shadow-sm">
           <Feather name="calendar" size={48} color="#9ca3af" />
           <Text className="mt-4 text-center text-gray-500">
@@ -338,7 +349,50 @@ export function AccountsTab({ republica, setRepublica }: AccountsTabProps) {
           </Text>
         </View>
       ) : (
-        <View className="px-4">{contasOrdenadas.map(renderContaCard)}</View>
+        <View className="px-4">
+          {/* Dropdown de Contas em Aberto */}
+          {contasOrdenadas.abertas.length > 0 && (
+            <View className="mb-4">
+              <TouchableOpacity
+                onPress={() => setMostrarContasAbertas(!mostrarContasAbertas)}
+                className="mb-3 flex-row items-center justify-between rounded-lg bg-blue-50 p-4"
+              >
+                <Text className="text-lg font-semibold text-blue-800">
+                  Em Aberto ({contasOrdenadas.abertas.length})
+                </Text>
+                <MaterialCommunityIcons
+                  name={mostrarContasAbertas ? "chevron-up" : "chevron-down"}
+                  size={24}
+                  color="#1e40af"
+                />
+              </TouchableOpacity>
+
+              {mostrarContasAbertas &&
+                contasOrdenadas.abertas.map(renderContaCard)}
+            </View>
+          )}
+
+          {/* Dropdown de Contas Pagas */}
+          {contasOrdenadas.pagas.length > 0 && (
+            <View className="mb-4">
+              <TouchableOpacity
+                onPress={() => setMostrarContasPagas(!mostrarContasPagas)}
+                className="mb-3 flex-row items-center justify-between rounded-lg bg-green-50 p-4"
+              >
+                <Text className="text-lg font-semibold text-green-800">
+                  Contas Pagas ({contasOrdenadas.pagas.length})
+                </Text>
+                <MaterialCommunityIcons
+                  name={mostrarContasPagas ? "chevron-up" : "chevron-down"}
+                  size={24}
+                  color="#166534"
+                />
+              </TouchableOpacity>
+
+              {mostrarContasPagas && contasOrdenadas.pagas.map(renderContaCard)}
+            </View>
+          )}
+        </View>
       )}
 
       {/* Modal de Edição */}

@@ -21,17 +21,18 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({ republica }) => {
   const calcularDividaPorMorador = () => {
     const dividas: Record<string, number> = {};
 
-    republica.moradores.forEach((morador) => {
+    for (const morador of republica.moradores) {
       dividas[morador.id] = 0;
-    });
+    }
 
-    republica.contas.forEach((conta) => {
-      if (!conta.pago) {
-        conta.responsaveis.forEach((resp) => {
+    for (const conta of republica.contas) {
+      for (const resp of conta.responsaveis) {
+        // Só conta como dívida se o responsável específico não pagou
+        if (!resp.pago) {
           dividas[resp.moradorId] = (dividas[resp.moradorId] || 0) + resp.valor;
-        });
+        }
       }
-    });
+    }
 
     return dividas;
   };

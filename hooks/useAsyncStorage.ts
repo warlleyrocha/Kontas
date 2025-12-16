@@ -1,3 +1,4 @@
+import type { Republica } from "@/types/resume";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 
@@ -42,4 +43,32 @@ export function useAsyncStorage<T>(initialValue: T) {
   }, [data, isLoading]);
 
   return { data, setData, isLoading };
+}
+
+// Função utilitária para verificar se os dados da república estão completos
+export async function checkRepublicaData(): Promise<{
+  isComplete: boolean;
+  data: Republica | null;
+}> {
+  try {
+    const stored = await AsyncStorage.getItem(STORAGE_KEY);
+    if (!stored) {
+      return { isComplete: false, data: null };
+    }
+
+    const data: Republica = JSON.parse(stored);
+
+    // Verifica se todos os dados essenciais estão presentes
+    const isComplete = !!(
+      data.nome &&
+      data.nome.trim() !== "" &&
+      data.moradores &&
+      data.moradores.length > 0
+    );
+
+    return { isComplete, data: isComplete ? data : null };
+  } catch (error) {
+    console.error("Erro ao verificar dados da república:", error);
+    return { isComplete: false, data: null };
+  }
 }
