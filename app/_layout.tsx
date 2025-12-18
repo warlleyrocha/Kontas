@@ -28,8 +28,6 @@ SplashScreen.preventAutoHideAsync();
 
 // Configura o Google Sign In
 GoogleSignin.configure({
-  webClientId:
-    "475215012202-iq7lcif9kshpnn3g0i8obrlcbc645n7t.apps.googleusercontent.com", // Obrigatório para Android
   iosClientId:
     "475215012202-oq93e4s85f7uuhfji6k2nkhdb7i2dfm3.apps.googleusercontent.com",
 });
