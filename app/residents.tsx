@@ -134,6 +134,11 @@ export default function Residents() {
       // Salva os dados consolidados
       await AsyncStorage.setItem("@republica_data", JSON.stringify(republica));
 
+      // Salva a imagem da república separadamente
+      if (republicImage) {
+        await AsyncStorage.setItem("@republica_imagem", republicImage);
+      }
+
       // Remove os dados temporários
       await AsyncStorage.removeItem("@temp_republica_nome");
       await AsyncStorage.removeItem("@temp_republica_imagem");

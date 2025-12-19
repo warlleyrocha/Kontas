@@ -39,6 +39,7 @@ export default function Dashboard() {
     const loadImage = async () => {
       const image = await AsyncStorage.getItem("@republica_imagem");
       if (image) setRepublicImage(image);
+      console.log("Imagem carregada:", image);
     };
     loadImage();
   }, []);
