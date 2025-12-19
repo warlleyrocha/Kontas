@@ -1,6 +1,7 @@
-import type { Republica } from "@/types/resume";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
+
+import type { Republica } from "@/types/resume";
 
 const STORAGE_KEY = "@republica_data";
 
