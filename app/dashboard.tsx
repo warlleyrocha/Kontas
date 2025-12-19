@@ -16,7 +16,7 @@ import type { Republica } from "@/types/resume";
 import type { TabKey } from "@/types/tabs";
 import { useRouter } from "expo-router";
 
-const ImageHeader = require("@/assets/images/icon.png");
+const ImageHeader = require("@/assets/images/android/res/mipmap-xxxhdpi/ic_launcher.png");
 
 const initialRepublica: Republica = {
   nome: "",
