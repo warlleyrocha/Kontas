@@ -1,20 +1,10 @@
-import type { TabKey } from "@/types/tabs";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { JSX } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
-export interface TabsContextType {
-  readonly value: TabKey;
-  readonly setValue: (v: TabKey) => void;
-}
+import type { Tab, TabsProps } from "@/types/tabs";
 
-type Tab = {
-  readonly key: TabKey;
-  readonly label: string;
-  readonly icon: (color: string) => React.ReactElement;
-};
-
-/** Tabs definidas */
+/* Tabs definidas */
 const tabs: Tab[] = [
   {
     key: "resumo",
@@ -37,13 +27,7 @@ const tabs: Tab[] = [
   },
 ];
 
-/** Props do componente */
-interface TabsProps {
-  value: TabKey;
-  onChange: (v: TabKey) => void;
-}
-
-/** Componente tipado */
+/** Componente que renderiza as abas de navegação do dashboard (Resumo, Contas, Moradores) */
 export default function Tabs({
   value,
   onChange,
