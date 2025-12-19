@@ -1,4 +1,2 @@
-/**
- * Arquivo de exportação centralizada dos contextos da aplicação
- */
+// arquivo centralizado do contexto do app
 export { AuthProvider, useAuth } from "./AuthContext";

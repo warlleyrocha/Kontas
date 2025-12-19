@@ -13,9 +13,7 @@ import {
   useState,
 } from "react";
 
-/**
- * Interface que define o tipo de dados do usuário autenticado
- */
+// Interface que define o tipo de dados do usuário autenticado
 interface AuthContextData {
   user: User | null; // Dados do usuário logado (null se não estiver logado)
   isLoading: boolean; // Indica se está verificando a autenticação
@@ -23,22 +21,14 @@ interface AuthContextData {
   signOut: () => Promise<void>; // Função para fazer logout
 }
 
-/**
- * Cria o contexto de autenticação
- * Este contexto será usado para compartilhar os dados de autenticação
- * em toda a aplicação
- */
+/* Cria o contexto de autenticação
+Este contexto será usado para compartilhar os dados de autenticação em toda a aplicação*/
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
-/**
- * Chave usada para salvar os dados do usuário no AsyncStorage
- */
+// Chave usada para salvar os dados do usuário no AsyncStorage
 const USER_STORAGE_KEY = "@kontas:user";
 
-/**
- * Hook personalizado para acessar o contexto de autenticação
- * Use este hook em qualquer componente para acessar os dados de autenticação
- */
+// Hook personalizado para acessar o contexto de autenticação, para acessar os dados de autenticação use este hook em qualquer componente
 export function useAuth() {
   const context = useContext(AuthContext);
 
@@ -49,26 +39,21 @@ export function useAuth() {
   return context;
 }
 
-/**
- * Props do AuthProvider
- */
+// Props do AuthProvider
 interface AuthProviderProps {
   readonly children: ReactNode;
 }
 
-/**
- * Provider de autenticação
- * Envolve a aplicação e fornece os dados de autenticação para todos os componentes
- */
+/* - Provider de autenticação
+ - Envolve a aplicação e fornece os dados de autenticação para todos os componentes */
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  /**
-   * Efeito que roda ao montar o componente
-   * Verifica se existe um usuário salvo no AsyncStorage
-   * e se ele ainda está logado no Google
-   */
+  /* 
+    - Efeito que roda ao montar o componente
+    - Verifica se existe um usuário salvo no AsyncStorage e se ele ainda está logado no Google
+  */
   useEffect(() => {
     async function loadStoredUser() {
       try {
@@ -114,11 +99,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   /**
-   * Função para fazer login com Google
-   * 1. Verifica se os serviços do Google estão disponíveis (Android)
-   * 2. Inicia o fluxo de login do Google
-   * 3. Salva os dados do usuário no estado e no AsyncStorage
-   */
+    - Função para fazer login com Google
+    1. Verifica se os serviços do Google estão disponíveis (Android)
+    2. Inicia o fluxo de login do Google
+    3. Salva os dados do usuário no estado e no AsyncStorage
+  */
   async function signIn() {
     try {
       // Importante para Android - verifica se os Google Play Services estão disponíveis
@@ -143,11 +128,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   /**
-   * Função para fazer logout
-   * 1. Faz logout no Google
-   * 2. Limpa os dados do AsyncStorage
-   * 3. Limpa o estado do usuário
-   */
+   - Função para fazer logout
+    1. Faz logout no Google
+    2. Limpa os dados do AsyncStorage
+    3. Limpa o estado do usuário
+  */
   async function signOut() {
     try {
       // Faz logout no Google
