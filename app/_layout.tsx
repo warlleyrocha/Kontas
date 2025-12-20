@@ -1,4 +1,5 @@
 import LoadingScreen from "@/components/ui/loading-screen";
+import { ONBOARDING_STORAGE_KEY } from "@/constants/storageKeys";
 import { AuthProvider, useAuth } from "@/contexts";
 import {
   Inter_300Light,
@@ -27,8 +28,6 @@ import "../global.css";
 // Previne a splash screen de ocultar automaticamente
 SplashScreen.preventAutoHideAsync();
 
-const ONBOARDING_KEY = "@kontas:onboarding_complete";
-
 // Configura o Google Sign In
 GoogleSignin.configure({
   iosClientId:
@@ -49,7 +48,9 @@ function AppNavigator() {
       if (isLoading) return;
 
       if (user) {
-        const onboardingComplete = await AsyncStorage.getItem(ONBOARDING_KEY);
+        const onboardingComplete = await AsyncStorage.getItem(
+          ONBOARDING_STORAGE_KEY
+        );
         if (onboardingComplete === "true") {
           router.replace("/(userProfile)/profile");
         } else {
