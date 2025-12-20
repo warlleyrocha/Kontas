@@ -53,17 +53,16 @@ export default function SetupProfile() {
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
 
   // Estado local para dados do perfil usando hook genérico
-  const {
-    data: profile,
-    setData: setProfile,
-    isLoading: isProfileLoading,
-  } = useAsyncStorage<ProfileData>(USER_PROFILE_STORAGE_KEY, {
-    name: user?.user.name ?? "",
-    email: user?.user.email ?? "",
-    pixKey: "",
-    photo: user?.user.photo ?? undefined,
-    phone: "",
-  });
+  const { data: profile, setData: setProfile } = useAsyncStorage<ProfileData>(
+    USER_PROFILE_STORAGE_KEY,
+    {
+      name: user?.user.name ?? "",
+      email: user?.user.email ?? "",
+      pixKey: "",
+      photo: user?.user.photo ?? undefined,
+      phone: "",
+    }
+  );
 
   // Estado para flag de perfil completo
   const [profileComplete, setProfileComplete] = useState(false);
@@ -136,14 +135,16 @@ export default function SetupProfile() {
   ) => {
     const newProfile = { name, email, pixKey: pixKey ?? "", photo, phone };
     setProfile(newProfile);
+
+    // Salva perfil no AsyncStorage
+    await AsyncStorage.setItem(
+      USER_PROFILE_STORAGE_KEY,
+      JSON.stringify(newProfile)
+    );
+
     // Se telefone e chave Pix preenchidos, salva a flag de perfil completo
     if (phone && pixKey) {
-      // AsyncStorage direto pois a flag é simples
-      await import("@react-native-async-storage/async-storage").then(
-        async ({ default: AsyncStorage }) => {
-          await AsyncStorage.setItem(PROFILE_COMPLETE_STORAGE_KEY, "true");
-        }
-      );
+      await AsyncStorage.setItem(PROFILE_COMPLETE_STORAGE_KEY, "true");
       setProfileComplete(true);
     }
     setShowEditProfileModal(false);
