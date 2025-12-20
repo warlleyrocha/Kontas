@@ -1,6 +1,5 @@
 import LoadingScreen from "@/components/ui/loading-screen";
 import { AuthProvider, useAuth } from "@/contexts";
-import { checkRepublicaData } from "@/hooks/useAsyncStorage";
 import {
   Inter_300Light,
   Inter_400Regular,
@@ -17,6 +16,7 @@ import {
   Mulish_700Bold,
   Mulish_900Black,
 } from "@expo-google-fonts/mulish";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useFonts } from "expo-font";
 import { router, Stack } from "expo-router";
@@ -26,6 +26,8 @@ import "../global.css";
 
 // Previne a splash screen de ocultar automaticamente
 SplashScreen.preventAutoHideAsync();
+
+const ONBOARDING_KEY = "@kontas:onboarding_complete";
 
 // Configura o Google Sign In
 GoogleSignin.configure({
@@ -44,15 +46,12 @@ function AppNavigator() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      // Se ainda está carregando, não faz nada
       if (isLoading) return;
 
-      // Se há um usuário logado
       if (user) {
-        const { isComplete } = await checkRepublicaData();
-
-        if (isComplete) {
-          router.replace("/home");
+        const onboardingComplete = await AsyncStorage.getItem(ONBOARDING_KEY);
+        if (onboardingComplete === "true") {
+          router.replace("/(userProfile)/profile");
         } else {
           router.replace("/onboarding");
         }
@@ -60,7 +59,6 @@ function AppNavigator() {
         router.replace("/(auth)/login");
       }
     };
-
     checkAuth();
   }, [user, isLoading]);
 
@@ -120,7 +118,7 @@ const RootLayout = () => {
 
   useEffect(() => {
     if (loaded) {
-      SplashScreen.hideAsync();
+      SplashScreen.hideAsync(); // Oculta a splash screen quando as fontes estiverem carregadas
     }
   }, [loaded]);
 
