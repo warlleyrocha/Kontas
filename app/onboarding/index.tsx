@@ -88,10 +88,7 @@ export default function Onboarding() {
     });
 
     return (
-      <View
-        className="flex-1 items-center justify-center px-6"
-        style={{ width }}
-      >
+      <View className="flex-1 items-center px-6" style={{ width }}>
         <Animated.View
           style={{
             transform: [{ scale }],
@@ -111,10 +108,7 @@ export default function Onboarding() {
         </Animated.View>
 
         <View className="items-center px-4">
-          <Text
-            className="mb-3 text-center text-3xl font-bold"
-            style={{ color: item.color }}
-          >
+          <Text className="mb-3 text-center text-3xl font-bold">
             {item.title}
           </Text>
           <Text className="text-center text-lg leading-7 text-gray-500">
@@ -149,11 +143,10 @@ export default function Onboarding() {
         return (
           <View key={slide.id} className="mx-1.5 items-center justify-center">
             <Animated.View
-              className="h-2 w-2 rounded-full"
+              className="h-2 w-2 rounded-full bg-indigo-600"
               style={{
                 transform: [{ scaleX: dotScaleX }],
                 opacity: dotOpacity,
-                backgroundColor: slide.color,
               }}
             />
           </View>
@@ -207,8 +200,7 @@ export default function Onboarding() {
         {renderDots()}
 
         <TouchableOpacity
-          className="flex-row items-center justify-center rounded-2xl py-4 shadow-lg"
-          style={{ backgroundColor: slides[currentIndex].color }}
+          className="flex-row items-center justify-center rounded-2xl bg-indigo-600 py-4 shadow-lg"
           onPress={handleNext}
           activeOpacity={0.9}
         >

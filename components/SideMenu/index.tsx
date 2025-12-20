@@ -10,9 +10,10 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const MENU_WIDTH = Math.min(SCREEN_WIDTH * 0.75, 300);
+const MENU_WIDTH = Math.min(SCREEN_WIDTH * 0.65, 300);
 
 export interface MenuItem {
   id: string;
@@ -108,62 +109,35 @@ export function SideMenu({
 
         {/* Menu */}
         <Animated.View
-          className="absolute right-0 h-full bg-white pt-[60px] shadow-lg"
+          className="h-full bg-white shadow-lg"
           style={{
             width: MENU_WIDTH,
+            height: "100%",
             transform: [{ translateX: slideAnim }],
           }}
         >
-          {/* User Header */}
-          <View className="border-b border-gray-100 px-4 pb-4">
-            <View className="mb-3 h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-gray-200">
-              {user.photo ? (
-                <Image
-                  source={{ uri: user.photo }}
-                  style={{ width: 64, height: 64, borderRadius: 32 }}
-                  resizeMode="cover"
-                />
-              ) : (
-                <Text className="text-2xl font-bold text-gray-500">
-                  {user.name.charAt(0).toUpperCase()}
-                </Text>
-              )}
-            </View>
-            <Text className="text-lg font-semibold">{user.name}</Text>
-          </View>
-
-          {/* Menu Items */}
-          <View className="flex-1 py-2">
-            {menuItems.map((item) => (
-              <TouchableOpacity
-                key={item.id}
-                className="flex-row items-center px-4 py-3"
-                onPress={() => {
-                  handleClose();
-                  setTimeout(item.onPress, 250);
-                }}
-              >
-                {item.icon && (
-                  <Ionicons
-                    name={item.icon}
-                    size={20}
-                    color={item.danger ? "#ef4444" : "#374151"}
-                    style={{ marginRight: 12 }}
+          <SafeAreaView className="flex-1">
+            {/* User Header */}
+            <View className="border-b border-gray-100 pb-4 pl-[18px]">
+              <View className="mb-3 h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-gray-200">
+                {user.photo ? (
+                  <Image
+                    source={{ uri: user.photo }}
+                    style={{ width: 64, height: 64, borderRadius: 32 }}
+                    resizeMode="cover"
                   />
+                ) : (
+                  <Text className="text-2xl font-bold text-gray-500">
+                    {user.name.charAt(0).toUpperCase()}
+                  </Text>
                 )}
-                <Text
-                  className={`text-base ${item.danger ? "text-red-500" : "text-gray-700"}`}
-                >
-                  {item.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+              </View>
+              <Text className="text-lg font-semibold">{user.name}</Text>
+            </View>
 
-          {/* Footer Items */}
-          {footerItems && footerItems.length > 0 && (
-            <View className="border-t border-gray-100 py-2">
-              {footerItems.map((item) => (
+            {/* Menu Items */}
+            <View className="flex-1 py-2 pl-1">
+              {menuItems.map((item) => (
                 <TouchableOpacity
                   key={item.id}
                   className="flex-row items-center px-4 py-3"
@@ -188,7 +162,37 @@ export function SideMenu({
                 </TouchableOpacity>
               ))}
             </View>
-          )}
+
+            {/* Footer Items */}
+            {footerItems && footerItems.length > 0 && (
+              <View className="border-t border-gray-100 py-2">
+                {footerItems.map((item) => (
+                  <TouchableOpacity
+                    key={item.id}
+                    className="flex-row items-center px-4 py-3"
+                    onPress={() => {
+                      handleClose();
+                      setTimeout(item.onPress, 250);
+                    }}
+                  >
+                    {item.icon && (
+                      <Ionicons
+                        name={item.icon}
+                        size={20}
+                        color={item.danger ? "#ef4444" : "#374151"}
+                        style={{ marginRight: 12 }}
+                      />
+                    )}
+                    <Text
+                      className={`text-base ${item.danger ? "text-red-500" : "text-gray-700"}`}
+                    >
+                      {item.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+          </SafeAreaView>
         </Animated.View>
       </View>
     </Modal>
