@@ -24,7 +24,7 @@ const initialRepublica: Republica = {
   contas: [],
 };
 
-export default function Dashboard() {
+export default function Home() {
   const { signOut } = useAuth();
   const router = useRouter();
   const [tab, setTab] = useState<TabKey>("resumo");

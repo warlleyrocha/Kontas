@@ -22,6 +22,7 @@ import { useFonts } from "expo-font";
 import { router, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
+import "../global.css";
 
 // Previne a splash screen de ocultar automaticamente
 SplashScreen.preventAutoHideAsync();
@@ -46,18 +47,17 @@ function AppNavigator() {
       // Se ainda está carregando, não faz nada
       if (isLoading) return;
 
-      // Se há um usuário logado, verifica os dados da república
+      // Se há um usuário logado
       if (user) {
         const { isComplete } = await checkRepublicaData();
 
         if (isComplete) {
-          router.replace("/dashboard");
+          router.replace("/home");
         } else {
           router.replace("/register");
         }
       } else {
-        // Se não há usuário logado, vai para a tela de login
-        router.replace("/");
+        router.replace("/login");
       }
     };
 
@@ -71,10 +71,11 @@ function AppNavigator() {
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" options={{ headerTitle: "Home" }} />
+      <Stack.Screen name="index" options={{ headerTitle: "Index" }} />
+      <Stack.Screen name="login" options={{ headerTitle: "Login" }} />
       <Stack.Screen name="register" options={{ headerTitle: "Register" }} />
       <Stack.Screen name="residents" options={{ headerTitle: "Residents" }} />
-      <Stack.Screen name="dashboard" options={{ headerTitle: "Dashboard" }} />
+      <Stack.Screen name="home" options={{ headerTitle: "Home" }} />
     </Stack>
   );
 }

@@ -27,7 +27,7 @@ const tabs: Tab[] = [
   },
 ];
 
-/** Componente que renderiza as abas de navegação do dashboard (Resumo, Contas, Moradores) */
+/** Componente que renderiza as abas de navegação do home (Resumo, Contas, Moradores) */
 export default function Tabs({
   value,
   onChange,

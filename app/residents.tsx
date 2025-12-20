@@ -143,7 +143,7 @@ export default function Residents() {
       await AsyncStorage.removeItem("@temp_republica_nome");
       await AsyncStorage.removeItem("@temp_republica_imagem");
 
-      router.replace("/dashboard");
+      router.replace("/home");
     } catch (error) {
       console.error("Error saving republic data:", error);
       Alert.alert("Erro", "Não foi possível salvar. Tente novamente.");
