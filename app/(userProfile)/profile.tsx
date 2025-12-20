@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
+import { EditProfileModal } from "@/components/EditProfileModal";
 import { MenuButton, SideMenu } from "@/components/SideMenu";
 import { useAuth } from "@/contexts";
 
@@ -79,16 +80,30 @@ function RepublicaCard({ republica, onEdit, onSelect }: RepublicaCardProps) {
   );
 }
 
+interface ProfileData {
+  name: string;
+  email: string;
+  photo?: string;
+  pixKey: string;
+}
+
 export default function SetupProfile() {
   const { user, signOut } = useAuth();
   const router = useRouter();
+
   const [menuVisible, setMenuVisible] = useState(false);
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
 
   // Simula se o usuário tem repúblicas (mude para [] para testar estado vazio)
-  const [republicas] = useState(mockRepublicas);
+  const [republicas] = useState<any[]>(mockRepublicas);
 
-  const userName = user?.user?.name ?? "Usuário";
-  const userPhoto = user?.user?.photo;
+  // Estado local para dados do perfil
+  const [profile, setProfile] = useState<ProfileData>({
+    name: user?.user.name ?? "",
+    email: user?.user.email ?? "",
+    pixKey: "",
+    photo: user?.user.photo ?? undefined,
+  });
 
   const handleCreateRepublic = () => {
     router.push("/register/republic");
@@ -139,14 +154,25 @@ export default function SetupProfile() {
     },
   ];
 
+  // Função para salvar perfil editado
+  const handleSaveProfile = (
+    name: string,
+    email: string,
+    pixKey?: string,
+    photo?: string
+  ) => {
+    setProfile({ name, email, pixKey: pixKey ?? "", photo });
+    setShowEditProfileModal(false);
+  };
+
   return (
     <View className="flex-1 bg-[#FAFAFA]">
       {/* HEADER */}
       <View className="mt-[24px] flex-row items-center gap-3 border-b border-b-black/10 bg-[#FAFAFA]  px-[16px] py-4">
         <View className="h-[50px] w-[50px] items-center justify-center overflow-hidden rounded-full bg-gray-200">
-          {userPhoto ? (
+          {profile.photo ? (
             <Image
-              source={{ uri: userPhoto }}
+              source={{ uri: profile.photo }}
               style={{
                 width: 50,
                 height: 50,
@@ -156,15 +182,18 @@ export default function SetupProfile() {
             />
           ) : (
             <Text className="text-xl font-bold text-gray-500">
-              {userName.charAt(0).toUpperCase()}
+              {profile.name.charAt(0).toUpperCase()}
             </Text>
           )}
         </View>
 
-        <View className="flex-1">
-          <Text className="text-base font-semibold">{userName}</Text>
+        <TouchableOpacity
+          className="flex-1"
+          onPress={() => setShowEditProfileModal(true)}
+        >
+          <Text className="text-base font-semibold">{profile.name}</Text>
           <Text className="text-sm text-gray-500">Configurar perfil</Text>
-        </View>
+        </TouchableOpacity>
 
         <MenuButton onPress={() => setMenuVisible(true)} />
       </View>
@@ -229,9 +258,20 @@ export default function SetupProfile() {
       <SideMenu
         visible={menuVisible}
         onClose={() => setMenuVisible(false)}
-        user={{ name: userName, photo: userPhoto }}
+        user={{ name: profile.name, photo: profile.photo }}
         menuItems={menuItems}
         footerItems={footerItems}
+      />
+
+      {/* MODAL CONFIGURAR PERFIL */}
+      <EditProfileModal
+        visible={showEditProfileModal}
+        onClose={() => setShowEditProfileModal(false)}
+        currentName={profile.name}
+        currentEmail={profile.email}
+        currentPixKey={profile.pixKey}
+        currentPhoto={profile.photo}
+        onSave={handleSaveProfile}
       />
     </View>
   );
