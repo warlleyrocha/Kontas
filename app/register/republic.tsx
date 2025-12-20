@@ -1,4 +1,8 @@
 import InputField from "@/components/ui/input-field";
+import {
+  REPUBLIC_STORAGE_KEY,
+  USER_PROFILE_STORAGE_KEY,
+} from "@/constants/storageKeys";
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
@@ -16,6 +20,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import uuid from "react-native-uuid";
 
 export default function Register() {
   const { width, height } = Dimensions.get("window");
@@ -54,12 +59,46 @@ export default function Register() {
     }
 
     try {
-      // Salva temporariamente o nome e imagem para usar na próxima tela
-      await AsyncStorage.setItem("@temp_republica_nome", republicName.trim());
-      if (republicImage) {
-        await AsyncStorage.setItem("@temp_republica_imagem", republicImage);
+      // Busca dados do perfil do usuário
+      const profileStr = await AsyncStorage.getItem(USER_PROFILE_STORAGE_KEY);
+      console.log("Dados do perfil recuperados:", profileStr);
+
+      if (!profileStr) {
+        Alert.alert("Erro", "Não foi possível obter os dados do usuário.");
+        console.log(
+          "Perfil do usuário não encontrado no AsyncStorage.",
+          profileStr
+        );
+        return;
       }
-      router.push("/register/residents");
+      const profile = JSON.parse(profileStr);
+
+      // Cria o morador admin
+      const moradorAdmin = {
+        id: uuid.v4(),
+        nome: profile.name,
+        chavePix: profile.pixKey,
+        fotoPerfil: profile.photo,
+        telefone: profile.phone,
+      };
+
+      // Cria a república
+      const republica = {
+        id: uuid.v4(),
+        nome: republicName.trim(),
+        imagemRepublica: republicImage,
+        moradores: [moradorAdmin],
+        contas: [],
+      };
+
+      // Salva a república no AsyncStorage
+      await AsyncStorage.setItem(
+        REPUBLIC_STORAGE_KEY,
+        JSON.stringify(republica)
+      );
+      console.log("República salva com sucesso:", republica);
+      // Redireciona para a home
+      router.replace("/home");
     } catch (error) {
       console.error("Erro ao salvar república:", error);
       Alert.alert("Erro", "Não foi possível salvar. Tente novamente.");
@@ -157,7 +196,7 @@ export default function Register() {
             onPress={handlePress}
           >
             <Text className="text-center font-inter-medium text-lg text-white">
-              Avançar
+              Cadastrar
             </Text>
           </TouchableOpacity>
         </View>

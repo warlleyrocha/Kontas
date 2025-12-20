@@ -1,5 +1,6 @@
 import {
   PROFILE_COMPLETE_STORAGE_KEY,
+  REPUBLIC_STORAGE_KEY,
   USER_PROFILE_STORAGE_KEY,
 } from "@/constants/storageKeys";
 import { useAsyncStorage } from "@/hooks/useAsyncStorage";
@@ -47,8 +48,36 @@ export default function SetupProfile() {
   const { user, signOut } = useAuth();
   const router = useRouter();
 
-  // Simula se o usuário tem repúblicas (mude para [] para testar estado vazio)
-  const [republicas] = useState<any[]>([]);
+  // Estado para repúblicas do usuário
+  const [republicas, setRepublicas] = useState<any[]>([]);
+
+  // Carrega república salva no AsyncStorage ao montar
+  useEffect(() => {
+    const loadRepublica = async () => {
+      try {
+        const republicaStr = await AsyncStorage.getItem(REPUBLIC_STORAGE_KEY);
+        console.log("Dados da república recuperados:", republicaStr);
+        if (republicaStr) {
+          const republica = JSON.parse(republicaStr);
+          // Adapta para o formato esperado pela RepublicList
+          setRepublicas([
+            {
+              id: republica.id,
+              nome: republica.nome,
+              imagem: republica.imagemRepublica,
+              moradores: republica.moradores?.length || 0,
+            },
+          ]);
+        } else {
+          setRepublicas([]);
+        }
+      } catch (e) {
+        console.error("Erro ao carregar república:", e);
+        setRepublicas([]);
+      }
+    };
+    loadRepublica();
+  }, []);
   const [menuVisible, setMenuVisible] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
 
