@@ -115,6 +115,21 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
               />
             </View>
 
+            {/* Telefone */}
+            <View className="mb-4">
+              <Text className="mb-2 text-sm font-semibold text-gray-700">
+                Telefone
+              </Text>
+              <TextInput
+                value={phone}
+                onChangeText={setPhone}
+                placeholder="Seu telefone"
+                keyboardType="phone-pad"
+                className="rounded-lg border border-gray-300 bg-white px-4 py-3"
+                editable={!isUploading}
+              />
+            </View>
+
             {/* Chave Pix */}
             <View className="mb-4">
               <Text className="mb-2 text-sm font-semibold text-gray-700">
@@ -124,21 +139,6 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
                 value={pixKey}
                 onChangeText={setPixKey}
                 placeholder="Sua chave Pix"
-                className="rounded-lg border border-gray-300 bg-white px-4 py-3"
-                editable={!isUploading}
-              />
-            </View>
-
-            {/* Telefone */}
-            <View className="mb-6">
-              <Text className="mb-2 text-sm font-semibold text-gray-700">
-                Telefone
-              </Text>
-              <TextInput
-                value={phone}
-                onChangeText={setPhone}
-                placeholder="Seu telefone"
-                keyboardType="phone-pad"
                 className="rounded-lg border border-gray-300 bg-white px-4 py-3"
                 editable={!isUploading}
               />
