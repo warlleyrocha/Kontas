@@ -30,7 +30,7 @@ export function useAsyncStorage<T>(key: string, initialValue: T) {
   useEffect(() => {
     const saveData = async () => {
       try {
-        await AsyncStorage.setItem(REPUBLIC_STORAGE_KEY, JSON.stringify(data));
+        await AsyncStorage.setItem(key, JSON.stringify(data));
       } catch (error) {
         console.error("Erro ao salvar dados:", error);
       }
@@ -40,7 +40,7 @@ export function useAsyncStorage<T>(key: string, initialValue: T) {
     if (!isLoading) {
       saveData();
     }
-  }, [data, isLoading]);
+  }, [data, isLoading, key]);
 
   return { data, setData, isLoading };
 }

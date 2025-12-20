@@ -86,7 +86,7 @@ export default function Home() {
             {republica.nome || "República"}
           </Text>
           <Text className="text-sm text-gray-500">
-            {republica.moradores.length} moradores
+            {republica.moradores?.length || 0} moradores
           </Text>
         </TouchableOpacity>
 
