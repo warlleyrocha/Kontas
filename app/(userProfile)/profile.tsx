@@ -1,11 +1,16 @@
-import { PROFILE_COMPLETE_STORAGE_KEY } from "@/constants/storageKeys";
+import {
+  PROFILE_COMPLETE_STORAGE_KEY,
+  USER_PROFILE_STORAGE_KEY,
+} from "@/constants/storageKeys";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import { EditProfileModal } from "@/components/Modals/EditProfileModal";
+import RepublicCard from "@/components/RepublicCard";
 import { MenuButton, SideMenu } from "@/components/SideMenu";
 import { useAuth } from "@/contexts";
 
@@ -25,62 +30,6 @@ const mockRepublicas = [
     moradores: 3,
   },
 ];
-
-interface RepublicaCardProps {
-  readonly republica: {
-    readonly id: string;
-    readonly nome: string;
-    readonly imagem: string | null;
-    readonly moradores: number;
-  };
-  readonly onEdit: () => void;
-  readonly onSelect: () => void;
-}
-
-function RepublicaCard({ republica, onEdit, onSelect }: RepublicaCardProps) {
-  return (
-    <TouchableOpacity
-      onPress={onSelect}
-      activeOpacity={0.9}
-      className="mb-4 w-44 overflow-hidden rounded-3xl bg-white shadow-sm"
-    >
-      {/* Imagem */}
-      <View className="h-36 w-full items-center justify-center overflow-hidden bg-gray-100">
-        {republica.imagem ? (
-          <Image
-            source={{ uri: republica.imagem }}
-            style={{ width: "100%", height: "100%" }}
-            resizeMode="cover"
-          />
-        ) : (
-          <Text className="text-5xl">🏠</Text>
-        )}
-      </View>
-
-      {/* Info */}
-      <View className="p-4">
-        <Text className="text-lg font-bold text-gray-800" numberOfLines={2}>
-          {republica.nome}
-        </Text>
-
-        <View className="mt-2 flex-row items-center justify-between">
-          <Text className="text-sm font-medium text-blue-500">
-            {republica.moradores}{" "}
-            {republica.moradores === 1 ? "morador" : "moradores"}
-          </Text>
-
-          <TouchableOpacity
-            onPress={onEdit}
-            className="rounded-full bg-blue-100 p-2"
-            activeOpacity={0.7}
-          >
-            <Ionicons name="pencil" size={16} color="#3B82F6" />
-          </TouchableOpacity>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
-}
 
 interface ProfileData {
   name: string;
@@ -106,8 +55,27 @@ export default function SetupProfile() {
     email: user?.user.email ?? "",
     pixKey: "",
     photo: user?.user.photo ?? undefined,
-    phone: "", // Inicializa como string vazia, pois não existe em user.user
+    phone: "",
   });
+
+  // Carrega dados do perfil do AsyncStorage ao montar
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const stored = await AsyncStorage.getItem(USER_PROFILE_STORAGE_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          setProfile((prev) => ({
+            ...prev,
+            ...parsed,
+          }));
+        }
+      } catch (e) {
+        // erro ao carregar perfil
+      }
+    };
+    loadProfile();
+  }, []);
 
   // Estado para flag de perfil completo
   const [profileComplete, setProfileComplete] = useState(false);
@@ -156,7 +124,7 @@ export default function SetupProfile() {
       id: "3",
       label: "Configurações",
       icon: "settings-outline" as const,
-      onPress: () => router.push("/register/republic"),
+      onPress: () => router.push("/(userProfile)/settings"),
     },
   ];
 
@@ -178,7 +146,13 @@ export default function SetupProfile() {
     photo?: string,
     phone?: string
   ) => {
-    setProfile({ name, email, pixKey: pixKey ?? "", photo, phone });
+    const newProfile = { name, email, pixKey: pixKey ?? "", photo, phone };
+    setProfile(newProfile);
+    // Salva dados do perfil no AsyncStorage
+    await AsyncStorage.setItem(
+      USER_PROFILE_STORAGE_KEY,
+      JSON.stringify(newProfile)
+    );
     // Se telefone e chave Pix preenchidos, salva a flag de perfil completo
     if (phone && pixKey) {
       await AsyncStorage.setItem(PROFILE_COMPLETE_STORAGE_KEY, "true");
@@ -262,7 +236,7 @@ export default function SetupProfile() {
 
           <View className="flex-row flex-wrap gap-4">
             {republicas.map((republica) => (
-              <RepublicaCard
+              <RepublicCard
                 key={republica.id}
                 republica={republica}
                 onEdit={() => handleEditRepublic(republica.id)}
