@@ -12,6 +12,7 @@ import { ResumeTab } from "@/components/Tabs/Resume";
 import { useAuth } from "@/contexts";
 import { useAsyncStorage } from "@/hooks/useAsyncStorage";
 
+import { REPUBLIC_STORAGE_KEY } from "@/constants/storageKeys";
 import type { Republica } from "@/types/resume";
 import type { TabKey } from "@/types/tabs";
 import { useRouter } from "expo-router";
@@ -33,8 +34,10 @@ export default function Home() {
   );
 
   // Usar AsyncStorage para persistir dados
-  const { data: republica, setData: setRepublica } =
-    useAsyncStorage<Republica>(initialRepublica);
+  const { data: republica, setData: setRepublica } = useAsyncStorage<Republica>(
+    REPUBLIC_STORAGE_KEY,
+    initialRepublica
+  );
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 

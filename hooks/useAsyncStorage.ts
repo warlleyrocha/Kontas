@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 import type { Republica } from "@/types/resume";
 
-export function useAsyncStorage<T>(initialValue: T) {
+export function useAsyncStorage<T>(key: string, initialValue: T) {
   const [data, setData] = useState<T>(initialValue);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -12,7 +12,7 @@ export function useAsyncStorage<T>(initialValue: T) {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const stored = await AsyncStorage.getItem(REPUBLIC_STORAGE_KEY);
+        const stored = await AsyncStorage.getItem(key);
         if (stored) {
           setData(JSON.parse(stored));
         }
@@ -24,7 +24,7 @@ export function useAsyncStorage<T>(initialValue: T) {
     };
 
     loadData();
-  }, []);
+  }, [key]);
 
   // Salvar dados no AsyncStorage sempre que mudarem
   useEffect(() => {
