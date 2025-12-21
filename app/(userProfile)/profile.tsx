@@ -165,12 +165,6 @@ export default function SetupProfile() {
     const newProfile = { name, email, pixKey: pixKey ?? "", photo, phone };
     setProfile(newProfile);
 
-    // Salva perfil no AsyncStorage
-    await AsyncStorage.setItem(
-      USER_PROFILE_STORAGE_KEY,
-      JSON.stringify(newProfile)
-    );
-
     // Se telefone e chave Pix preenchidos, salva a flag de perfil completo
     if (phone && pixKey) {
       await AsyncStorage.setItem(PROFILE_COMPLETE_STORAGE_KEY, "true");
