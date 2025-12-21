@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   Animated,
   Dimensions,
@@ -39,6 +39,47 @@ interface SideMenuProps {
   readonly footerItems?: MenuItem[];
 }
 
+interface MenuItemComponentProps {
+  readonly item: MenuItem;
+  readonly onClose: () => void;
+}
+
+function MenuItemComponent({ item, onClose }: MenuItemComponentProps) {
+  const handlePress = useCallback(() => {
+    onClose();
+    setTimeout(item.onPress, 250);
+  }, [item.onPress, onClose]);
+
+  const iconColor = useMemo(
+    () => (item.danger ? "#ef4444" : "#374151"),
+    [item.danger]
+  );
+
+  const textClassName = useMemo(
+    () => `text-base ${item.danger ? "text-red-500" : "text-gray-700"}`,
+    [item.danger]
+  );
+
+  return (
+    <TouchableOpacity
+      className="flex-row items-center px-4 py-3"
+      onPress={handlePress}
+    >
+      {item.icon && (
+        <Ionicons
+          name={item.icon}
+          size={20}
+          color={iconColor}
+          style={{ marginRight: 12 }}
+        />
+      )}
+      <Text className={textClassName}>{item.label}</Text>
+    </TouchableOpacity>
+  );
+}
+
+const MemoizedMenuItem = React.memo(MenuItemComponent);
+
 export function SideMenu({
   isOpen,
   onRequestClose,
@@ -49,10 +90,12 @@ export function SideMenu({
   const slideAnim = useRef(new Animated.Value(-MENU_WIDTH)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  // Efeito para controlar animações baseado em isOpen
+  const handleClose = useCallback(() => {
+    onRequestClose();
+  }, [onRequestClose]);
+
   useEffect(() => {
     if (isOpen) {
-      // Abrir menu
       Animated.parallel([
         Animated.timing(slideAnim, {
           toValue: 0,
@@ -66,7 +109,6 @@ export function SideMenu({
         }),
       ]).start();
     } else {
-      // Fechar menu
       Animated.parallel([
         Animated.timing(slideAnim, {
           toValue: -MENU_WIDTH,
@@ -82,9 +124,10 @@ export function SideMenu({
     }
   }, [isOpen, slideAnim, fadeAnim]);
 
-  const handleClose = () => {
-    onRequestClose();
-  };
+  const userInitial = useMemo(
+    () => user.name.charAt(0).toUpperCase(),
+    [user.name]
+  );
 
   return (
     <Modal
@@ -94,7 +137,6 @@ export function SideMenu({
       onRequestClose={handleClose}
     >
       <View className="flex-1 flex-row">
-        {/* Overlay */}
         <TouchableWithoutFeedback onPress={handleClose}>
           <Animated.View
             className="flex-1 bg-black/50"
@@ -102,7 +144,6 @@ export function SideMenu({
           />
         </TouchableWithoutFeedback>
 
-        {/* Menu */}
         <Animated.View
           className="h-full bg-white shadow-lg"
           style={{
@@ -123,7 +164,7 @@ export function SideMenu({
                   />
                 ) : (
                   <Text className="text-2xl font-bold text-gray-500">
-                    {user.name.charAt(0).toUpperCase()}
+                    {userInitial}
                   </Text>
                 )}
               </View>
@@ -142,28 +183,11 @@ export function SideMenu({
             {/* Menu Items */}
             <View className="flex-1 py-2 pl-1">
               {menuItems.map((item) => (
-                <TouchableOpacity
+                <MemoizedMenuItem
                   key={item.id}
-                  className="flex-row items-center px-4 py-3"
-                  onPress={() => {
-                    handleClose();
-                    setTimeout(item.onPress, 250);
-                  }}
-                >
-                  {item.icon && (
-                    <Ionicons
-                      name={item.icon}
-                      size={20}
-                      color={item.danger ? "#ef4444" : "#374151"}
-                      style={{ marginRight: 12 }}
-                    />
-                  )}
-                  <Text
-                    className={`text-base ${item.danger ? "text-red-500" : "text-gray-700"}`}
-                  >
-                    {item.label}
-                  </Text>
-                </TouchableOpacity>
+                  item={item}
+                  onClose={handleClose}
+                />
               ))}
             </View>
 
@@ -171,28 +195,11 @@ export function SideMenu({
             {footerItems && footerItems.length > 0 && (
               <View className="border-t border-gray-100 py-2">
                 {footerItems.map((item) => (
-                  <TouchableOpacity
+                  <MemoizedMenuItem
                     key={item.id}
-                    className="flex-row items-center px-4 py-3"
-                    onPress={() => {
-                      handleClose();
-                      setTimeout(item.onPress, 250);
-                    }}
-                  >
-                    {item.icon && (
-                      <Ionicons
-                        name={item.icon}
-                        size={20}
-                        color={item.danger ? "#ef4444" : "#374151"}
-                        style={{ marginRight: 12 }}
-                      />
-                    )}
-                    <Text
-                      className={`text-base ${item.danger ? "text-red-500" : "text-gray-700"}`}
-                    >
-                      {item.label}
-                    </Text>
-                  </TouchableOpacity>
+                    item={item}
+                    onClose={handleClose}
+                  />
                 ))}
               </View>
             )}
