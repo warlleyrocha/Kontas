@@ -29,17 +29,17 @@ export function useEditProfile({
 }: EditProfileFormValues) {
   const [name, setName] = useState(currentName);
   const [email, setEmail] = useState(currentEmail);
-  const [pixKey, setPixKey] = useState(currentPixKey || "");
+  const [pixKey, setPixKey] = useState(currentPixKey ?? "");
   const [photoUri, setPhotoUri] = useState(currentPhoto);
-  const [phone, setPhone] = useState(currentPhone || "");
+  const [phone, setPhone] = useState(currentPhone ?? "");
   const [isUploading, setIsUploading] = useState(false);
 
   const handleClose = () => {
     setName(currentName);
     setEmail(currentEmail);
-    setPixKey(currentPixKey || "");
+    setPixKey(currentPixKey ?? "");
     setPhotoUri(currentPhoto);
-    setPhone(currentPhone || "");
+    setPhone(currentPhone ?? "");
     setIsUploading(false); // ✅ Reset o estado de loading
     onClose();
   };

@@ -83,7 +83,7 @@ export default function Residents() {
         imagemRepublica: republicImage,
         moradores: [
           {
-            id: user?.user?.id || Date.now().toString(),
+            id: user?.user?.id ?? Date.now().toString(),
             nome: residentName,
             chavePix: pixKey || undefined,
             telefone: phone || undefined,

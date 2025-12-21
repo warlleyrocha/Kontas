@@ -130,13 +130,11 @@ export default function Invites() {
     setInvites(invites.filter((invite) => invite.id !== id));
     // Redireciona para a tela de residents para completar os dados
     router.push("/register/residents");
-    // TODO: Lógica para aceitar convite (API, etc)
   };
 
   const handleRejectInvite = (id: string) => {
     console.log("Recusar convite:", id);
     setInvites(invites.filter((invite) => invite.id !== id));
-    // TODO: Lógica para recusar convite
   };
 
   const handleSignOut = async () => {
