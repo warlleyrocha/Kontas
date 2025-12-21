@@ -32,7 +32,6 @@ interface UserInfo {
 }
 
 interface SideMenuProps {
-  readonly isOpen: boolean;
   readonly onRequestClose: () => void;
   readonly user: UserInfo;
   readonly menuItems: MenuItem[];
@@ -81,7 +80,6 @@ function MenuItemComponent({ item, onClose }: MenuItemComponentProps) {
 const MemoizedMenuItem = React.memo(MenuItemComponent);
 
 export function SideMenu({
-  isOpen,
   onRequestClose,
   user,
   menuItems,
@@ -89,10 +87,6 @@ export function SideMenu({
 }: SideMenuProps) {
   const slideAnim = useRef(new Animated.Value(-MENU_WIDTH)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
-
-  const handleClose = useCallback(() => {
-    onRequestClose();
-  }, [onRequestClose]);
 
   const openMenu = useCallback(() => {
     Animated.parallel([
@@ -113,24 +107,21 @@ export function SideMenu({
     Animated.parallel([
       Animated.timing(slideAnim, {
         toValue: -MENU_WIDTH,
-        duration: 300,
+        duration: 250,
         useNativeDriver: true,
       }),
       Animated.timing(fadeAnim, {
         toValue: 0,
-        duration: 300,
+        duration: 250,
         useNativeDriver: true,
       }),
-    ]).start();
-  }, [slideAnim, fadeAnim]);
+    ]).start(onRequestClose);
+  }, [slideAnim, fadeAnim, onRequestClose]);
 
   useEffect(() => {
-    if (isOpen) {
-      openMenu();
-    } else {
-      closeMenu();
-    }
-  }, [isOpen, openMenu, closeMenu]);
+    openMenu();
+    return () => closeMenu();
+  }, [openMenu, closeMenu]);
 
   const userInitial = useMemo(
     () => user.name.charAt(0).toUpperCase(),
@@ -138,14 +129,9 @@ export function SideMenu({
   );
 
   return (
-    <Modal
-      visible={isOpen}
-      transparent
-      animationType="none"
-      onRequestClose={handleClose}
-    >
+    <Modal transparent animationType="none">
       <View className="flex-1 flex-row">
-        <TouchableWithoutFeedback onPress={handleClose}>
+        <TouchableWithoutFeedback onPress={closeMenu}>
           <Animated.View
             className="flex-1 bg-black/50"
             style={{ opacity: fadeAnim }}
@@ -156,7 +142,6 @@ export function SideMenu({
           className="h-full bg-white shadow-lg"
           style={{
             width: MENU_WIDTH,
-            height: "100%",
             transform: [{ translateX: slideAnim }],
           }}
         >
@@ -176,6 +161,7 @@ export function SideMenu({
                   </Text>
                 )}
               </View>
+
               <Text className="text-lg font-semibold">{user.name}</Text>
               {user.email && (
                 <Text className="text-sm text-gray-500">{user.email}</Text>
@@ -194,7 +180,7 @@ export function SideMenu({
                 <MemoizedMenuItem
                   key={item.id}
                   item={item}
-                  onClose={handleClose}
+                  onClose={closeMenu}
                 />
               ))}
             </View>
@@ -206,7 +192,7 @@ export function SideMenu({
                   <MemoizedMenuItem
                     key={item.id}
                     item={item}
-                    onClose={handleClose}
+                    onClose={closeMenu}
                   />
                 ))}
               </View>

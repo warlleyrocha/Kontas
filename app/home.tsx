@@ -172,13 +172,14 @@ export default function Home() {
         onSave={handleSaveRepublica}
       />
 
-      <SideMenu
-        isOpen={isMenuOpen}
-        onRequestClose={() => setIsMenuOpen(false)}
-        user={userMenu}
-        menuItems={menuItems}
-        footerItems={footerItems}
-      />
+      {isMenuOpen && (
+        <SideMenu
+          onRequestClose={() => setIsMenuOpen(false)}
+          user={userMenu}
+          menuItems={menuItems}
+          footerItems={footerItems}
+        />
+      )}
     </View>
   );
 }

@@ -221,19 +221,20 @@ export default function SetupProfile() {
       })()}
 
       {/* MENU LATERAL */}
-      <SideMenu
-        isOpen={isMenuOpen}
-        onRequestClose={() => setIsMenuOpen(false)}
-        user={{
-          name: profile.name,
-          photo: profile.photo,
-          email: profile.email,
-          pixKey: profile.pixKey,
-          phone: profile.phone,
-        }}
-        menuItems={menuItems}
-        footerItems={footerItems}
-      />
+      {isMenuOpen && (
+        <SideMenu
+          onRequestClose={() => setIsMenuOpen(false)}
+          user={{
+            name: profile.name,
+            photo: profile.photo,
+            email: profile.email,
+            pixKey: profile.pixKey,
+            phone: profile.phone,
+          }}
+          menuItems={menuItems}
+          footerItems={footerItems}
+        />
+      )}
 
       {/* MODAL CONFIGURAR PERFIL */}
       <EditProfileModal

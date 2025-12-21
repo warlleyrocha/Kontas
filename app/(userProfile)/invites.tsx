@@ -221,13 +221,14 @@ export default function Invites() {
       )}
 
       {/* MENU LATERAL */}
-      <SideMenu
-        isOpen={isMenuOpen}
-        onRequestClose={() => setIsMenuOpen(false)}
-        user={{ name: userName, photo: userPhoto }}
-        menuItems={menuItems}
-        footerItems={footerItems}
-      />
+      {isMenuOpen && (
+        <SideMenu
+          onRequestClose={() => setIsMenuOpen(false)}
+          user={{ name: userName, photo: userPhoto }}
+          menuItems={menuItems}
+          footerItems={footerItems}
+        />
+      )}
     </View>
   );
 }
