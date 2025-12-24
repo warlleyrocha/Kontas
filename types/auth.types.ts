@@ -7,6 +7,7 @@ export interface User {
   nome: string;
   email: string;
   fotoPerfil: string;
+  perfilCompleto: boolean;
 }
 
 export interface AuthResponse {
