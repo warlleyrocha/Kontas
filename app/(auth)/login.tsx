@@ -1,45 +1,57 @@
-import LoadingScreen from "@/components/ui/loading-screen";
-import { useAuth } from "@/contexts";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Dimensions,
   Image,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import IconGoogle from "../../assets/images/google-icon.svg";
+
+import { useAuth } from "@/hooks/useAuth";
+
+import IconGoogle from "@/assets/images/google-icon.svg";
 
 const { height } = Dimensions.get("window");
 
 export default function LoginScreen() {
-  const { signIn, isLoading } = useAuth();
+  const router = useRouter();
   const [isSigningIn, setIsSigningIn] = useState(false);
+  const { loginWithGoogle, error } = useAuth();
 
-  async function handleGoogleSignIn() {
+  const handleGoogleLogin = async () => {
     if (isSigningIn) return; // Previne múltiplos cliques
 
     setIsSigningIn(true); // Desabilita o botão e mostra o loading
     try {
-      await signIn(); // Chama a função de login do contexto
+      await GoogleSignin.hasPlayServices();
 
-      // Navegação é feita automaticamente pelo AppNavigator no _layout.tsx
-    } catch (error) {
-      console.error("Erro ao fazer login com Google:", error);
-      Alert.alert(
-        "Erro no Login",
-        "Não foi possível fazer login com Google. Tente novamente."
-      );
+      const userInfo = await GoogleSignin.signIn();
+
+      const googleToken = userInfo.data?.idToken;
+
+      if (!googleToken) {
+        throw new Error("Não foi possível obter o token do Google");
+      }
+
+      // Enviar para seu backend
+      const result = await loginWithGoogle(googleToken);
+      console.log("🔵 Resultado do backend:", result);
+
+      if (result) {
+        console.log("Login bem-sucedido:", result.user);
+        // Navegar para tela principal
+        router.replace("/onboarding");
+      }
+    } catch (err) {
+      console.error("Erro no login:", err);
+    } finally {
+      console.log("🔵 Finalizando login...");
       setIsSigningIn(false);
     }
-  }
-
-  // Mostra loading enquanto verifica autenticação inicial
-  if (isLoading) {
-    return <LoadingScreen message="Verificando autenticação..." />;
-  }
+  };
 
   return (
     <View className="flex-1 items-center bg-white">
@@ -73,7 +85,7 @@ export default function LoginScreen() {
           className={`mt-6 h-[50px] w-[345px] flex-row items-center justify-center gap-3 rounded-lg ${
             isSigningIn ? "bg-gray-300" : "bg-[#ececec]"
           }`}
-          onPress={handleGoogleSignIn}
+          onPress={handleGoogleLogin}
           disabled={isSigningIn} // Desabilita o botão durante o login
         >
           {isSigningIn ? ( // Se isSigningIn for true, mostra o ActivityIndicator
@@ -87,6 +99,7 @@ export default function LoginScreen() {
             </>
           )}
         </TouchableOpacity>
+        {error && <Text style={{ color: "red" }}>{error}</Text>}
       </View>
     </View>
   );
