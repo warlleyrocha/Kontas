@@ -1,5 +1,7 @@
 import { authService } from "@/services/auth.service";
+import { userService } from "@/services/user.service";
 import { AuthResponse, CompleteProfileRequest, User } from "@/types/auth.types";
+import { UpdateUserRequest } from "@/types/user.types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import React, {
@@ -19,7 +21,7 @@ interface AuthContextData {
   error: string | null;
   loginWithGoogle: (token: string) => Promise<AuthResponse | null>;
   logout: () => Promise<void>;
-  refreshUser: () => Promise<void>;
+  updateUser: (data: UpdateUserRequest) => Promise<void>;
   completeProfile: (data: CompleteProfileRequest) => Promise<void>;
 }
 
@@ -136,22 +138,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  // Atualizar dados do usuário
-  const refreshUser = React.useCallback(async () => {
-    try {
-      console.log("Atualizando dados do usuário...");
-
-      const userData = await authService.me();
-      setUser(userData);
-      await AsyncStorage.setItem("@app:user", JSON.stringify(userData));
-
-      console.log("Dados atualizados:", userData.nome);
-    } catch (error) {
-      console.error("Erro ao atualizar usuário:", error);
-      throw error;
-    }
-  }, []);
-
   // Completar perfil
   const completeProfile = React.useCallback(
     async (data: CompleteProfileRequest) => {
@@ -199,6 +185,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     []
   );
 
+  // Atualizar dados do usuário
+  const updateUser = React.useCallback(async (data: UpdateUserRequest) => {
+    try {
+      console.log("Atualizando dados do usuário...", data);
+
+      const userData = await userService.updateUser(data);
+      setUser(userData);
+      await AsyncStorage.setItem("@app:user", JSON.stringify(userData));
+
+      console.log("Dados atualizados:", userData.nome);
+    } catch (error) {
+      console.error("Erro ao atualizar usuário:", error);
+      throw error;
+    }
+  }, []);
+
   const contextValue = React.useMemo(
     () => ({
       user,
@@ -207,18 +209,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       error,
       loginWithGoogle,
       logout,
-      refreshUser,
+      updateUser,
       completeProfile,
     }),
-    [
-      user,
-      loading,
-      error,
-      loginWithGoogle,
-      logout,
-      refreshUser,
-      completeProfile,
-    ]
+    [user, loading, error, loginWithGoogle, logout, updateUser, completeProfile]
   );
 
   return (
