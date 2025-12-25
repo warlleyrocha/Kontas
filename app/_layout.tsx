@@ -41,11 +41,11 @@ GoogleSignin.configure({
  * Deve estar dentro do AuthProvider para poder usar o useAuth()
  */
 function AppNavigator() {
-  const { user, isLoading } = useAuth();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
     const checkAuth = async () => {
-      if (isLoading) return;
+      if (loading) return;
 
       if (user) {
         const onboardingComplete = await AsyncStorage.getItem(
@@ -61,10 +61,10 @@ function AppNavigator() {
       }
     };
     checkAuth();
-  }, [user, isLoading]);
+  }, [user, loading]);
 
   // Mostra uma tela de carregamento enquanto verifica a autenticação
-  if (isLoading) {
+  if (loading) {
     return <LoadingScreen />;
   }
 
