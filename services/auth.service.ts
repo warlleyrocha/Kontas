@@ -1,5 +1,11 @@
 import { AxiosError } from "axios";
-import { AuthResponse, GoogleLoginRequest, User } from "../types/auth.types";
+import {
+  AuthResponse,
+  CompleteProfileRequest,
+  CompleteProfileResponse,
+  GoogleLoginRequest,
+  User,
+} from "../types/auth.types";
 import { api } from "./api";
 
 export const authService = {
@@ -42,6 +48,43 @@ export const authService = {
             throw new Error("Erro no servidor");
           default:
             throw new Error("Erro ao buscar dados do usuário");
+        }
+      }
+      throw error;
+    }
+  },
+
+  // Completar dados do perfil
+  completeProfile: async (
+    data: CompleteProfileRequest
+  ): Promise<CompleteProfileResponse> => {
+    try {
+      console.log("📝 Completando dados do perfil...");
+
+      const response = await api.post<CompleteProfileResponse>(
+        "/auth/completar-dados",
+        data
+      );
+
+      console.log("🔎 [auth.service] Dados enviados para API:", data);
+      console.log("🔎 [auth.service] Resposta bruta da API:", response);
+      console.log("🔎 [auth.service] response.data:", response.data);
+
+      console.log("✅ Perfil completado com sucesso");
+      return response.data;
+    } catch (error) {
+      console.error("❌ Erro ao completar perfil:", error);
+
+      if (error instanceof AxiosError) {
+        switch (error.response?.status) {
+          case 400:
+            throw new Error(
+              "Dados inválidos. Verifique os campos e tente novamente."
+            );
+          case 401:
+            throw new Error("Não autorizado. Faça login novamente.");
+          default:
+            throw new Error(error.message || "Erro ao completar perfil");
         }
       }
       throw error;

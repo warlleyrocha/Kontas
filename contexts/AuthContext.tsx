@@ -1,5 +1,5 @@
 import { authService } from "@/services/auth.service";
-import { AuthResponse, User } from "@/types/auth.types";
+import { AuthResponse, CompleteProfileRequest, User } from "@/types/auth.types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import React, {
@@ -9,6 +9,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
+import { Alert } from "react-native";
 
 // Interface do que o Context vai fornecer
 interface AuthContextData {
@@ -19,6 +20,7 @@ interface AuthContextData {
   loginWithGoogle: (token: string) => Promise<AuthResponse | null>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  completeProfile: (data: CompleteProfileRequest) => Promise<void>;
 }
 
 // Criar o Context
@@ -150,6 +152,58 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  // Completar perfil
+  const completeProfile = React.useCallback(
+    async (data: CompleteProfileRequest) => {
+      try {
+        console.log("📝 Completando perfil no Context...");
+        console.log("📝 Dados enviados:", data);
+
+        setLoading(true);
+
+        const updatedUser = await authService.completeProfile(data);
+        console.log("📝 Resposta do backend:", updatedUser);
+        console.log("🟢 [AuthContext] Campos recebidos:", {
+          telefone: updatedUser.telefone,
+          chavePix: updatedUser.chavePix,
+        });
+
+        // ✅ Atualizar usando função que recebe estado anterior
+        setUser((prevUser) => {
+          const newUser: User = {
+            ...prevUser!, // Preserva campos antigos (id, etc)
+            ...updatedUser, // ✅ Sobrescreve com dados do backend
+            perfilCompleto: true, // ✅ Garante que está completo
+          };
+
+          console.log("📝 Novo user:", newUser);
+          console.log("🟢 [AuthContext] Novo user.telefone:", newUser.telefone);
+          console.log("🟢 [AuthContext] Novo user.chavePix:", newUser.chavePix);
+
+          // Salvar no AsyncStorage
+          AsyncStorage.setItem("@app:user", JSON.stringify(newUser)).catch(
+            (error) =>
+              console.error("⚠️ Erro ao salvar no AsyncStorage:", error)
+          );
+
+          return newUser;
+        });
+
+        console.log("✅ Perfil completado e sincronizado");
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Erro ao completar perfil";
+        console.error("❌ Erro ao completar perfil:", errorMessage);
+        setError(errorMessage);
+        Alert.alert("Erro ao Completar Perfil", errorMessage, [{ text: "OK" }]);
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [] // ✅ Sem dependências - função estável
+  );
+
   const contextValue = React.useMemo(
     () => ({
       user,
@@ -159,8 +213,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       loginWithGoogle,
       logout,
       refreshUser,
+      completeProfile,
     }),
-    [user, loading, error, loginWithGoogle, logout, refreshUser]
+    [
+      user,
+      loading,
+      error,
+      loginWithGoogle,
+      logout,
+      refreshUser,
+      completeProfile,
+    ]
   );
 
   return (
