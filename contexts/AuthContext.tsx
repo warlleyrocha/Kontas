@@ -1,35 +1,233 @@
-import { USER_STORAGE_KEY } from "@/constants/storageKeys";
+import { authService } from "@/services/auth.service";
+import { AuthResponse, CompleteProfileRequest, User } from "@/types/auth.types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  GoogleSignin,
-  User,
-  isSuccessResponse,
-} from "@react-native-google-signin/google-signin";
-import {
-  ReactNode,
+import { router } from "expo-router";
+import React, {
   createContext,
+  ReactNode,
   useContext,
   useEffect,
-  useMemo,
   useState,
 } from "react";
+import { Alert } from "react-native";
 
-// Interface que define o tipo de dados do usuário autenticado
+// Interface do que o Context vai fornecer
 interface AuthContextData {
-  user: User | null; // Dados do usuário logado (null se não estiver logado)
-  isLoading: boolean; // Indica se está verificando a autenticação
-  signIn: () => Promise<void>; // Função para fazer login com Google
-  signOut: () => Promise<void>; // Função para fazer logout
+  user: User | null;
+  isAuthenticated: boolean;
+  loading: boolean;
+  error: string | null;
+  loginWithGoogle: (token: string) => Promise<AuthResponse | null>;
+  logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
+  completeProfile: (data: CompleteProfileRequest) => Promise<void>;
 }
 
-/* Cria o contexto de autenticação
-Este contexto será usado para compartilhar os dados de autenticação em toda a aplicação*/
+// Criar o Context
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
-// Chave usada para salvar os dados do usuário no AsyncStorage
+// Provider para envolver o app
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true); // Começa true para verificar auth
+  const [error, setError] = useState<string | null>(null);
 
-// Hook personalizado para acessar o contexto de autenticação, para acessar os dados de autenticação use este hook em qualquer componente
-export function useAuth() {
+  // Ao montar o componente, verificar se há usuário logado
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  // Função para verificar autenticação
+  const checkAuth = async () => {
+    try {
+      console.log("Verificando autenticação...");
+
+      // Buscar token e user do AsyncStorage
+      const [storedToken, storedUser] = await Promise.all([
+        AsyncStorage.getItem("@app:token"),
+        AsyncStorage.getItem("@app:user"),
+      ]);
+
+      // Se não tem token, não está logado
+      if (!storedToken) {
+        console.log("Nenhum token encontrado");
+        setLoading(false);
+        return;
+      }
+
+      // Mostrar dados do cache imediatamente (UX rápido)
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        console.log("Usuário carregado do cache:", parsedUser.nome);
+      }
+
+      // Validar token com o backend
+      try {
+        const userData = await authService.me();
+        console.log("Token válido, dados atualizados:", userData.nome);
+
+        // Atualizar estado e cache se os dados mudaram
+        setUser(userData);
+        await AsyncStorage.setItem("@app:user", JSON.stringify(userData));
+      } catch {
+        console.error("Token inválido ou expirado");
+
+        // Token inválido → limpar tudo
+        await AsyncStorage.multiRemove(["@app:token", "@app:user"]);
+        setUser(null);
+      }
+    } catch (error) {
+      console.error("Erro na verificação de auth:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Login com Google
+  const loginWithGoogle = React.useCallback(
+    async (googleToken: string): Promise<AuthResponse | null> => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        console.log("Fazendo login com Google...");
+        const data = await authService.googleLogin(googleToken);
+
+        // Salvar no AsyncStorage
+        await AsyncStorage.setItem("@app:token", data.token);
+        await AsyncStorage.setItem("@app:user", JSON.stringify(data.user));
+
+        // Atualizar estado
+        setUser(data.user);
+
+        console.log("Login bem-sucedido:", data.user.nome);
+        return data;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Erro desconhecido";
+        console.error("Erro no login:", errorMessage);
+        setError(errorMessage);
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
+  // Logout
+  const logout = React.useCallback(async () => {
+    try {
+      console.log("Fazendo logout...");
+
+      // Limpar AsyncStorage
+      await AsyncStorage.multiRemove(["@app:token", "@app:user"]);
+
+      // Limpar estado
+      setUser(null);
+
+      // Redirecionar para login
+      router.replace("/login");
+
+      console.log("Logout realizado");
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+    }
+  }, []);
+
+  // Atualizar dados do usuário
+  const refreshUser = React.useCallback(async () => {
+    try {
+      console.log("Atualizando dados do usuário...");
+
+      const userData = await authService.me();
+      setUser(userData);
+      await AsyncStorage.setItem("@app:user", JSON.stringify(userData));
+
+      console.log("Dados atualizados:", userData.nome);
+    } catch (error) {
+      console.error("Erro ao atualizar usuário:", error);
+      throw error;
+    }
+  }, []);
+
+  // Completar perfil
+  const completeProfile = React.useCallback(
+    async (data: CompleteProfileRequest) => {
+      try {
+        console.log("📝 Completando perfil...");
+        console.log("📝 Dados enviados:", data);
+
+        setLoading(true);
+
+        // 1️⃣ Enviar dados para o backend
+        await authService.completeProfile(data);
+        console.log("✅ Dados enviados com sucesso");
+
+        // 2️⃣ Buscar dados atualizados (fonte da verdade)
+        console.log("🔄 Buscando dados atualizados do backend...");
+        const updatedUser = await authService.me();
+        console.log("✅ Dados sincronizados:", {
+          nome: updatedUser.nome,
+          telefone: updatedUser.telefone,
+          chavePix: updatedUser.chavePix,
+          perfilCompleto: updatedUser.perfilCompleto,
+        });
+
+        // 3️⃣ Atualizar Context
+        setUser(updatedUser);
+
+        // 4️⃣ Atualizar AsyncStorage
+        await AsyncStorage.setItem("@app:user", JSON.stringify(updatedUser));
+
+        console.log("✅ Perfil completado e sincronizado");
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Erro ao completar perfil";
+        console.error("❌ Erro ao completar perfil:", errorMessage);
+
+        setError(errorMessage);
+
+        Alert.alert("Erro ao Completar Perfil", errorMessage, [{ text: "OK" }]);
+
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
+  const contextValue = React.useMemo(
+    () => ({
+      user,
+      isAuthenticated: !!user,
+      loading,
+      error,
+      loginWithGoogle,
+      logout,
+      refreshUser,
+      completeProfile,
+    }),
+    [
+      user,
+      loading,
+      error,
+      loginWithGoogle,
+      logout,
+      refreshUser,
+      completeProfile,
+    ]
+  );
+
+  return (
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+  );
+};
+
+// Hook customizado para usar o contexto facilmente
+export const useAuth = () => {
   const context = useContext(AuthContext);
 
   if (!context) {
@@ -37,129 +235,4 @@ export function useAuth() {
   }
 
   return context;
-}
-
-// Props do AuthProvider
-interface AuthProviderProps {
-  readonly children: ReactNode;
-}
-
-/* - Provider de autenticação
- - Envolve a aplicação e fornece os dados de autenticação para todos os componentes */
-export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  /* 
-    - Efeito que roda ao montar o componente
-    - Verifica se existe um usuário salvo no AsyncStorage e se ele ainda está logado no Google
-  */
-  useEffect(() => {
-    async function loadStoredUser() {
-      try {
-        // 1. Tenta carregar os dados do usuário do AsyncStorage
-        const storedUser = await AsyncStorage.getItem(USER_STORAGE_KEY);
-
-        if (storedUser) {
-          // 2. Verifica se o usuário ainda está logado no Google
-          const currentUser = await GoogleSignin.getCurrentUser();
-
-          if (currentUser) {
-            // Se ainda está logado, usa os dados atualizados
-            setUser(currentUser);
-            // Atualiza o AsyncStorage com os dados mais recentes
-            await AsyncStorage.setItem(
-              USER_STORAGE_KEY,
-              JSON.stringify(currentUser)
-            );
-          } else {
-            // Se não está mais logado, limpa os dados salvos
-            await AsyncStorage.removeItem(USER_STORAGE_KEY);
-            setUser(null);
-          }
-        } else {
-          // 3. Se não tem dados salvos, verifica se há usuário logado no Google
-          const currentUser = await GoogleSignin.getCurrentUser();
-          if (currentUser) {
-            setUser(currentUser);
-            await AsyncStorage.setItem(
-              USER_STORAGE_KEY,
-              JSON.stringify(currentUser)
-            );
-          }
-        }
-      } catch (error) {
-        console.error("Erro ao carregar dados do usuário:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    loadStoredUser();
-  }, []);
-
-  /**
-    - Função para fazer login com Google
-    1. Verifica se os serviços do Google estão disponíveis (Android)
-    2. Inicia o fluxo de login do Google
-    3. Salva os dados do usuário no estado e no AsyncStorage
-  */
-  async function signIn() {
-    try {
-      // Importante para Android - verifica se os Google Play Services estão disponíveis
-      await GoogleSignin.hasPlayServices();
-
-      // Inicia o fluxo de login
-      const response = await GoogleSignin.signIn();
-
-      if (isSuccessResponse(response)) {
-        const userData = response.data;
-
-        // Salva no estado
-        setUser(userData);
-
-        // Salva no AsyncStorage para persistência
-        await AsyncStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData));
-      }
-    } catch (error) {
-      console.error("Erro ao fazer login com Google:", error);
-      throw error; // Propaga o erro para o componente que chamou
-    }
-  }
-
-  /**
-   - Função para fazer logout
-    1. Faz logout no Google
-    2. Limpa os dados do AsyncStorage
-    3. Limpa o estado do usuário
-  */
-  async function signOut() {
-    try {
-      // Faz logout no Google
-      await GoogleSignin.signOut();
-
-      // Limpa os dados salvos
-      await AsyncStorage.removeItem(USER_STORAGE_KEY);
-
-      // Limpa o estado
-      setUser(null);
-    } catch (error) {
-      console.error("Erro ao fazer logout:", error);
-      throw error;
-    }
-  }
-
-  const contextValue = useMemo(
-    () => ({
-      user,
-      isLoading,
-      signIn,
-      signOut,
-    }),
-    [user, isLoading]
-  );
-
-  return (
-    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
-  );
-}
+};

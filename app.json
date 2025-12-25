@@ -4,7 +4,7 @@
     "slug": "kontas",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/android/play_store_512.png",
+    "icon": "./assets/images/app-icon/1024.png",
     "scheme": "kontas",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -18,9 +18,8 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/images/android/res/mipmap-xxxhdpi/ic_launcher_foreground.png",
-        "backgroundImage": "./assets/images/android/res/mipmap-xxxhdpi/ic_launcher_background.png",
-        "monochromeImage": "./assets/images/android/res/mipmap-xxxhdpi/ic_launcher_monochrome.png"
+        "foregroundImage": "./assets/images/app-icon/res/mipmap-xxxhdpi/app-icon_adaptive_fore.png",
+        "backgroundImage": "./assets/images/app-icon/res/mipmap-xxxhdpi/app-icon_adaptive_back.png"
       },
       "splash": {
         "image": "./assets/images/splash-icon-kontas.png",
@@ -33,7 +32,7 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/fav-icon-kontas.png",
+      "favicon": "./assets/images/app-icon/play_store_512.png",
       "bundler": "metro"
     },
     "plugins": [

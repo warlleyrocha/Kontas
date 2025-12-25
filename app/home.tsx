@@ -20,7 +20,7 @@ import { useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
 
-const ImageHeader = require("@/assets/images/android/res/mipmap-xxxhdpi/ic_launcher.png");
+const ImageHeader = require("@/assets/images/app-icon/1024.png");
 
 const initialRepublica: Republica = {
   nome: "",

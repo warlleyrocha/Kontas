@@ -118,7 +118,7 @@ export default function Register() {
         bounces={false}
       >
         <ImageBackground
-          source={require("@/assets/images/image-register.jpg")}
+          source={require("@/assets/images/image-register.webp")}
           style={{
             width: "100%",
             minHeight: height * 0.4,
