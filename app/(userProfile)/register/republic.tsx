@@ -1,10 +1,5 @@
 import InputField from "@/components/ui/input-field";
-import {
-  REPUBLIC_STORAGE_KEY,
-  USER_PROFILE_STORAGE_KEY,
-} from "@/constants/storageKeys";
 import { Feather } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -20,7 +15,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import uuid from "react-native-uuid";
 
 export default function Register() {
   const { width, height } = Dimensions.get("window");
@@ -59,44 +53,9 @@ export default function Register() {
     }
 
     try {
-      // Busca dados do perfil do usuário
-      const profileStr = await AsyncStorage.getItem(USER_PROFILE_STORAGE_KEY);
-      console.log("Dados do perfil recuperados:", profileStr);
+      console.log("Salvando república...");
 
-      if (!profileStr) {
-        Alert.alert("Erro", "Não foi possível obter os dados do usuário.");
-        console.log(
-          "Perfil do usuário não encontrado no AsyncStorage.",
-          profileStr
-        );
-        return;
-      }
-      const profile = JSON.parse(profileStr);
-
-      // Cria o morador admin
-      const moradorAdmin = {
-        id: uuid.v4(),
-        nome: profile.name,
-        chavePix: profile.pixKey,
-        fotoPerfil: profile.photo,
-        telefone: profile.phone,
-      };
-
-      // Cria a república
-      const republica = {
-        id: uuid.v4(),
-        nome: republicName.trim(),
-        imagemRepublica: republicImage,
-        moradores: [moradorAdmin],
-        contas: [],
-      };
-
-      // Salva a república no AsyncStorage
-      await AsyncStorage.setItem(
-        REPUBLIC_STORAGE_KEY,
-        JSON.stringify(republica)
-      );
-      console.log("República salva com sucesso:", republica);
+      console.log("República salva com sucesso");
       // Redireciona para a home
       router.replace("/home");
     } catch (error) {

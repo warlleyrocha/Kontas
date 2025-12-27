@@ -1,23 +1,15 @@
 import { AddAccountModal } from "@/components/Modals/AddAccountModal";
 import { EditRepublicModal } from "@/components/Modals/EditRepublicModal";
 import { MenuButton, SideMenu } from "@/components/SideMenu";
+import { useSideMenu } from "@/components/SideMenu/useSideMenu";
 import Tabs from "@/components/Tabs";
 import { AccountsTab } from "@/components/Tabs/Accounts";
 import { ResidentsTab } from "@/components/Tabs/Residents";
 import { ResumeTab } from "@/components/Tabs/Resume";
-
-import { REPUBLIC_STORAGE_KEY } from "@/constants/storageKeys";
-
 import { useAuth } from "@/contexts";
-
-import { useSideMenu } from "@/components/SideMenu/useSideMenu";
-import { useAsyncStorage } from "@/hooks/useAsyncStorage";
-
 import type { Republica } from "@/types/resume";
 import type { TabKey } from "@/types/tabs";
-
 import { toastErrors } from "@/utils/toastMessages";
-
 import { useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
@@ -64,10 +56,7 @@ export default function Home() {
   const { user, logout } = useAuth();
   const [tab, setTab] = useState<TabKey>("resumo");
 
-  const { data: republica, setData: setRepublica } = useAsyncStorage<Republica>(
-    REPUBLIC_STORAGE_KEY,
-    initialRepublica
-  );
+  const [republica, setRepublica] = useState<Republica>(initialRepublica);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -84,12 +73,9 @@ export default function Home() {
   }, [logout, router]);
   const { menuItems, footerItems } = useSideMenu("home", handleSignOut);
 
-  const handleSaveRepublica = useCallback(
-    (nome: string, imagem?: string) => {
-      setRepublica((prev) => ({ ...prev, nome, imagemRepublica: imagem }));
-    },
-    [setRepublica]
-  );
+  const handleSaveRepublica = (nome: string, imagem?: string) => {
+    setRepublica((prev) => ({ ...prev, nome, imagemRepublica: imagem }));
+  };
 
   const userMenu = useMemo(
     () => ({
