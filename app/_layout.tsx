@@ -1,5 +1,8 @@
 import LoadingScreen from "@/components/ui/loading-screen";
+import { Toaster } from "@/components/ui/sonner";
+
 import { AuthProvider, useAuth } from "@/contexts";
+
 import {
   Inter_300Light,
   Inter_400Regular,
@@ -21,6 +24,7 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "../global.css";
 
 // Previne a splash screen de ocultar automaticamente
@@ -109,9 +113,12 @@ const RootLayout = () => {
   }
 
   return (
-    <AuthProvider>
-      <AppNavigator />
-    </AuthProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <AuthProvider>
+        <AppNavigator />
+        <Toaster position="top-center" />
+      </AuthProvider>
+    </GestureHandlerRootView>
   );
 };
 
