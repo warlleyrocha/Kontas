@@ -1,37 +1,11 @@
 import LoadingScreen from "@/components/ui/loading-screen";
 import { useAuth } from "@/contexts";
-import { checkRepublicaData } from "@/hooks/useAsyncStorage";
 import { Redirect } from "expo-router";
-import { useEffect, useState } from "react";
 
-/**
- * Ponto de entrada do app
- * Redireciona o usuário baseado no estado de autenticação:
- * - Não autenticado → Login
- * - Autenticado sem dados → Registro
- * - Autenticado com dados → Dashboard
- */
 export default function Index() {
-  const { user, isLoading } = useAuth();
-  const [isCheckingData, setIsCheckingData] = useState(true);
-  const [hasCompleteData, setHasCompleteData] = useState(false);
-
-  useEffect(() => {
-    async function checkData() {
-      if (user) {
-        const { isComplete } = await checkRepublicaData();
-        setHasCompleteData(isComplete);
-      }
-      setIsCheckingData(false);
-    }
-
-    if (!isLoading) {
-      checkData();
-    }
-  }, [user, isLoading]);
-
+  const { user, loading } = useAuth();
   // Mostra loading enquanto verifica autenticação e dados
-  if (isLoading || isCheckingData) {
+  if (loading) {
     return <LoadingScreen message="Carregando..." />;
   }
 
@@ -40,11 +14,9 @@ export default function Index() {
     return <Redirect href="/(auth)/login" />;
   }
 
-  // Usuário autenticado sem dados completos → vai para registro
-  if (!hasCompleteData) {
-    return <Redirect href="/onboarding" />;
+  if (!user.perfilCompleto) {
+    return <Redirect href="/(auth)/onboarding" />;
   }
 
-  // Usuário autenticado com dados completos → vai para dashboard
-  return <Redirect href="/home" />;
+  return <Redirect href="/(userProfile)/profile" />;
 }
