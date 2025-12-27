@@ -63,14 +63,17 @@ function AppNavigator() {
         options={{ headerTitle: "Invites" }}
       />
       <Stack.Screen
-        name="register/republic"
+        name="(userProfile)/register/republic"
         options={{ headerTitle: "Register Republic" }}
       />
       <Stack.Screen
-        name="register/residents"
+        name="(userProfile)/register/residents"
         options={{ headerTitle: "Register Residents" }}
       />
-      <Stack.Screen name="home" options={{ headerTitle: "Home" }} />
+      <Stack.Screen
+        name="(userProfile)/home"
+        options={{ headerTitle: "Home" }}
+      />
     </Stack>
   );
 }
