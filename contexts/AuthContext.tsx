@@ -2,6 +2,7 @@ import { authService } from "@/services/auth.service";
 import { userService } from "@/services/user.service";
 import { AuthResponse, CompleteProfileRequest, User } from "@/types/auth.types";
 import { UpdateUserRequest } from "@/types/user.types";
+import { showToast } from "@/utils/showToast";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import React, {
@@ -11,7 +12,6 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { Alert } from "react-native";
 
 // Interface do que o Context vai fornecer
 interface AuthContextData {
@@ -179,9 +179,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         setError(errorMessage);
 
-        Alert.alert("❌ Erro ao Completar Perfil", errorMessage, [
-          { text: "OK" },
-        ]);
+        showToast.error("Erro ao completar o perfil. Tente novamente.");
 
         throw error;
       } finally {

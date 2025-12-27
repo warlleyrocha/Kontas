@@ -1,20 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useCallback, useState } from "react";
-import {
-  Alert,
-  Image,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import { MenuButton, SideMenu } from "@/components/SideMenu";
 
 import { useSideMenu } from "@/components/SideMenu/useSideMenu";
 
 import { useAuth } from "@/contexts";
+import { toastErrors } from "@/utils/toastMessages";
 
 // Mock de convites recebidos
 const mockInvites = [
@@ -153,10 +147,7 @@ export default function Invites() {
       router.replace("/");
     } catch (error) {
       console.error("Erro ao fazer logout da conta:", error);
-      Alert.alert(
-        "Erro no Logout",
-        "Não foi possível fazer logout da conta. Tente novamente."
-      );
+      toastErrors.logoutFailed();
     }
   }, [logout, router]);
   const { menuItems, footerItems } = useSideMenu("invite", handleSignOut);

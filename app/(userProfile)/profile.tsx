@@ -6,6 +6,8 @@ import EmptyRepublic from "@/components/CardsProfile/EmptyRepublic";
 import IncompleteProfile from "@/components/CardsProfile/IncompleteProfile";
 import { EditProfileModal } from "@/components/Modals/EditProfileModal";
 import { MenuButton, SideMenu } from "@/components/SideMenu";
+import { showToast } from "@/utils/showToast";
+import { toastErrors } from "@/utils/toastMessages";
 
 import { useSideMenu } from "@/components/SideMenu/useSideMenu";
 
@@ -24,10 +26,7 @@ export default function SetupProfile() {
       router.replace("/");
     } catch (error) {
       console.error("❌ Erro ao fazer logout:", error);
-      Alert.alert(
-        "Erro no Logout",
-        "Não foi possível fazer logout. Tente novamente."
-      );
+      toastErrors.logoutFailed();
     }
   }, [logout, router]);
 
@@ -77,23 +76,15 @@ export default function SetupProfile() {
         telefone: user?.telefone,
         chavePix: user?.chavePix,
       });
-
-      Alert.alert(
-        "Sucesso!",
+      setShowEditProfileModal(false);
+      showToast.success(
         isCompletingProfile
-          ? "Seu perfil foi completado com sucesso."
-          : "Seu perfil foi atualizado com sucesso.",
-        [
-          {
-            text: "OK",
-            onPress: () => {
-              setShowEditProfileModal(false);
-            },
-          },
-        ]
+          ? "Perfil salvo com sucesso!"
+          : "Perfil atualizado com sucesso!"
       );
     } catch (error) {
-      console.error("❌ Erro ao salvar perfil:", error);
+      console.log("Erro ao salvar o perfil:", error);
+      toastErrors.profileUpdateFailed();
     }
   };
 

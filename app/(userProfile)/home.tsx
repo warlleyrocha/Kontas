@@ -16,9 +16,11 @@ import { useAsyncStorage } from "@/hooks/useAsyncStorage";
 import type { Republica } from "@/types/resume";
 import type { TabKey } from "@/types/tabs";
 
+import { toastErrors } from "@/utils/toastMessages";
+
 import { useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
-import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 
 const ImageHeader = require("@/assets/images/app-icon/1024.png");
 
@@ -77,10 +79,7 @@ export default function Home() {
       router.replace("/");
     } catch (error) {
       console.error("Erro ao fazer logout da conta:", error);
-      Alert.alert(
-        "Erro no Logout",
-        "Não foi possível fazer logout da conta. Tente novamente."
-      );
+      toastErrors.logoutFailed();
     }
   }, [logout, router]);
   const { menuItems, footerItems } = useSideMenu("home", handleSignOut);
