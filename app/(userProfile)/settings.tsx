@@ -61,7 +61,7 @@ const SettingsScreen = () => {
           />
           <InputField
             label="Chave Pix"
-            value={user.chavePix || "Não informado"}
+            value={user.chavePix ?? "Não informado"}
             onChangeText={() => {}}
             editable={false}
           />

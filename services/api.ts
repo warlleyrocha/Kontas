@@ -15,10 +15,11 @@ api.interceptors.request.use(
     const token = await AsyncStorage.getItem("@app:token");
     if (token) {
       if (config.headers) {
-        config.headers['Authorization'] = `Bearer ${token}`;
+        config.headers["Authorization"] = `Bearer ${token}`;
       }
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) =>
+    Promise.reject(error instanceof Error ? error : new Error(String(error)))
 );
