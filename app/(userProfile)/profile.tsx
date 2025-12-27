@@ -23,7 +23,7 @@ export default function SetupProfile() {
       await logout();
       router.replace("/");
     } catch (error) {
-      console.error("Erro ao fazer logout:", error);
+      console.error("❌ Erro ao fazer logout:", error);
       Alert.alert(
         "Erro no Logout",
         "Não foi possível fazer logout. Tente novamente."
@@ -93,7 +93,7 @@ export default function SetupProfile() {
         ]
       );
     } catch (error) {
-      console.error("Erro ao salvar perfil:", error);
+      console.error("❌ Erro ao salvar perfil:", error);
     }
   };
 

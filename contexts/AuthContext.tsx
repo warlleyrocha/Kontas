@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Função para verificar autenticação
   const checkAuth = async () => {
     try {
-      console.log("Verificando autenticação...");
+      console.log("🔄 Verificando autenticação...");
 
       // Buscar token e user do AsyncStorage
       const [storedToken, storedUser] = await Promise.all([
@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // Se não tem token, não está logado
       if (!storedToken) {
-        console.log("Nenhum token encontrado");
+        console.log("⚠️ Nenhum token encontrado");
         setLoading(false);
         return;
       }
@@ -61,26 +61,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
         setUser(parsedUser);
-        console.log("Usuário carregado do cache:", parsedUser.nome);
+        console.log("📋 Usuário carregado do cache:", parsedUser.nome);
       }
 
       // Validar token com o backend
       try {
         const userData = await authService.me();
-        console.log("Token válido, dados atualizados:", userData.nome);
+        console.log(
+          "✅ Token válido, dados sincronizados com o servidor:",
+          userData.nome
+        );
 
         // Atualizar estado e cache se os dados mudaram
         setUser(userData);
         await AsyncStorage.setItem("@app:user", JSON.stringify(userData));
       } catch {
-        console.error("Token inválido ou expirado");
+        console.error("⛔ Token inválido ou expirado");
 
         // Token inválido → limpar tudo
         await AsyncStorage.multiRemove(["@app:token", "@app:user"]);
         setUser(null);
       }
     } catch (error) {
-      console.error("Erro na verificação de auth:", error);
+      console.error("❌ Erro na verificação de auth:", error);
     } finally {
       setLoading(false);
     }
@@ -93,7 +96,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setError(null);
 
       try {
-        console.log("Fazendo login com Google...");
+        console.log("🔵 Iniciando login com Google...");
         const data = await authService.googleLogin(googleToken);
 
         // Salvar no AsyncStorage
@@ -103,15 +106,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Atualizar estado
         setUser(data.user);
 
-        console.log("Login bem-sucedido:", data.user.nome);
+        console.log("✅ Login bem-sucedido:", data.user.email);
         return data;
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Erro desconhecido";
-        console.error("Erro no login:", errorMessage);
+        console.error("❌ Erro no login:", errorMessage);
         setError(errorMessage);
         return null;
       } finally {
+        console.log("🔵 Finalizando login...");
         setLoading(false);
       }
     },
@@ -121,7 +125,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Logout
   const logout = React.useCallback(async () => {
     try {
-      console.log("Fazendo logout...");
+      console.log("🔄 Fazendo logout...");
 
       // Limpar AsyncStorage
       await AsyncStorage.multiRemove(["@app:token", "@app:user"]);
@@ -132,9 +136,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Redirecionar para login
       router.replace("/login");
 
-      console.log("Logout realizado");
+      console.log("✅ Logout realizado");
     } catch (error) {
-      console.error("Erro ao fazer logout:", error);
+      console.error("❌ Erro ao fazer logout:", error);
     }
   }, []);
 
@@ -175,7 +179,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         setError(errorMessage);
 
-        Alert.alert("Erro ao Completar Perfil", errorMessage, [{ text: "OK" }]);
+        Alert.alert("❌ Erro ao Completar Perfil", errorMessage, [
+          { text: "OK" },
+        ]);
 
         throw error;
       } finally {
@@ -188,15 +194,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Atualizar dados do usuário
   const updateUser = React.useCallback(async (data: UpdateUserRequest) => {
     try {
-      console.log("Atualizando dados do usuário...", data);
+      console.log("🔄 Atualizando dados do usuário...", data);
 
       const userData = await userService.updateUser(data);
       setUser(userData);
       await AsyncStorage.setItem("@app:user", JSON.stringify(userData));
 
-      console.log("Dados atualizados:", userData.nome);
+      console.log("✅ Dados atualizados:", userData.nome);
     } catch (error) {
-      console.error("Erro ao atualizar usuário:", error);
+      console.error("❌ Erro ao atualizar usuário:", error);
       throw error;
     }
   }, []);
@@ -225,7 +231,7 @@ export const useAuth = () => {
   const context = useContext(AuthContext);
 
   if (!context) {
-    throw new Error("useAuth deve ser usado dentro de um AuthProvider");
+    throw new Error("❌ useAuth deve ser usado dentro de um AuthProvider");
   }
 
   return context;

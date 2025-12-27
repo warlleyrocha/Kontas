@@ -38,18 +38,15 @@ export default function LoginScreen() {
 
       // Enviar para seu backend
       const result = await loginWithGoogle(googleToken);
-      console.log("🔵 Resultado do backend:", result);
 
       if (!result) {
         return;
       }
 
-      console.log("Login bem-sucedido:", result.user);
       router.replace("/");
     } catch (err) {
       console.error("Erro no login:", err);
     } finally {
-      console.log("🔵 Finalizando login...");
       setIsSigningIn(false);
     }
   };
