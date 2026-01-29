@@ -10,7 +10,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { EditProfileFormValues, useEditProfile } from "./useEditProfile";
+import {
+  EditProfileFormValues,
+  useEditProfile,
+} from "../../hooks/useEditProfile";
 
 export interface EditProfileModalProps extends EditProfileFormValues {
   visible: boolean;

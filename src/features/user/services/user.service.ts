@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
 import { UpdateUserRequest, User } from "../types/user.types";
-import { api } from "./api";
+import { api } from "../../../services/api";
 
 export const userService = {
   //Método para buscar dados
