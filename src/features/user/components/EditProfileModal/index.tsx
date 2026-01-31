@@ -14,6 +14,7 @@ import {
   EditProfileFormValues,
   useEditProfile,
 } from "../../hooks/useEditProfile";
+import { maskPhoneWrite } from "@/src/utils/inputMasks";
 
 export interface EditProfileModalProps extends EditProfileFormValues {
   visible: boolean;
@@ -103,7 +104,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
               </Text>
               <TextInput
                 value={phone}
-                onChangeText={setPhone}
+                onChangeText={(t) => setPhone(maskPhoneWrite(t))}
                 placeholder="Seu telefone"
                 keyboardType="phone-pad"
                 className="rounded-lg border border-gray-300 bg-white px-4 py-3"
