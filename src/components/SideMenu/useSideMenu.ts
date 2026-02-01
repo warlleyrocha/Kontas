@@ -1,3 +1,4 @@
+import { ResidentRole } from "@/src/types/resident.types";
 import { MenuItem, UserMenuContext } from "@/src/types/sideMenu";
 import { useRouter } from "expo-router";
 import { useMemo } from "react";
@@ -5,7 +6,8 @@ import { useMemo } from "react";
 export function useSideMenu(
   context: UserMenuContext,
   handleSignOut: () => void,
-  republicId?: string // Adicione este parâmetro
+  republicId?: string, // Adicione este parâmetro
+  currentUserRole?: ResidentRole | null
 ) {
   const router = useRouter();
 
@@ -59,10 +61,13 @@ export function useSideMenu(
 
     switch (context) {
       case "home":
-        return [base.home, base.profile, base.invitesSent];
+        if (currentUserRole === ResidentRole.USER) {
+          return [base.home, base.profile, base.invitesSent];
+        }
+        return [base.home, base.profile, base.invitesSent, base.controlPanel];
 
       case "profile":
-        return [base.home, base.invites, base.controlPanel];
+        return [base.home, base.invites];
 
       case "invite":
         return [base.home, base.profile, base.invites];
@@ -73,6 +78,7 @@ export function useSideMenu(
   }, [
     context,
     republicId, // Adicione republicId nas dependências
+    currentUserRole,
     navigation.home,
     navigation.profile,
     navigation.invites,

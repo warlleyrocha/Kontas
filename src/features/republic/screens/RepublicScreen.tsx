@@ -34,12 +34,14 @@ export function RepublicScreen({ republicId }: Props) {
     handleSaveRepublic,
     handleSignOut,
     userMenu,
+    currentUserRole,
   } = useRepublicScreen(republicId);
 
   const { menuItems, footerItems } = useSideMenu(
     "home",
     handleSignOut,
-    republic?.id
+    republic?.id,
+    currentUserRole
   );
 
   if (isLoading) {

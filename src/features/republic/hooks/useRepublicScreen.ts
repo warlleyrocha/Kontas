@@ -117,6 +117,15 @@ export function useRepublicScreen(republicId: string) {
     [user?.nome, user?.fotoPerfil, user?.email]
   );
 
+  const currentUserRole = useMemo(() => {
+    if (!user?.email) return null;
+    const normalizedEmail = user.email.toLowerCase();
+    const currentUser = residents.find(
+      (resident) => resident.email.toLowerCase() === normalizedEmail
+    );
+    return currentUser?.role ?? null;
+  }, [residents, user?.email]);
+
   return {
     republic,
     residents,
@@ -132,5 +141,6 @@ export function useRepublicScreen(republicId: string) {
     handleSaveRepublic,
     handleSignOut,
     userMenu,
+    currentUserRole,
   };
 }

@@ -19,7 +19,10 @@ export function useControlPanelScreen() {
     setShowEditModal,
   } = useRepublic();
 
-  const { getResidentsCount } = useRepublicResidents(republics);
+  const { getResidentsCount, isAdmin } = useRepublicResidents(
+    republics,
+    user?.email
+  );
   const {
     sendInvite,
     loading: inviteLoading,
@@ -113,6 +116,7 @@ export function useControlPanelScreen() {
     loading,
     republics,
     getResidentsCount,
+    isAdmin,
     refreshing,
     showEditModal,
     selectedRepublic,
