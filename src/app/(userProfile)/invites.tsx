@@ -1,4 +1,4 @@
-import { InvitesScreen } from "@/src/features/user/screens/InvitesScreen";
+import { InvitesScreen } from "@/src/features/user";
 
 export default function InvitesRoute() {
   return <InvitesScreen />;

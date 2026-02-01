@@ -3,7 +3,7 @@ import { Alert } from "react-native";
 import { useRouter } from "expo-router";
 
 import { useAuth } from "@/src/features/auth/contexts";
-import { useRepublic } from "@/src/hooks/useRepublic";
+import { useRepublicList } from "@/src/features/republic/hooks/useRepublicList";
 
 import { useSideMenu } from "@/src/components/SideMenu/useSideMenu";
 
@@ -15,7 +15,7 @@ export function useProfileScreen() {
   const router = useRouter();
 
   const { user, logout, completeProfile, updateUser } = useAuth();
-  const { republics, fetchRepublics } = useRepublic();
+  const { republics, fetchRepublics } = useRepublicList();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
@@ -99,8 +99,9 @@ export function useProfileScreen() {
   );
 
   useEffect(() => {
+    if (!user?.perfilCompleto) return;
     fetchRepublics();
-  }, [fetchRepublics]);
+  }, [user?.perfilCompleto, fetchRepublics]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);

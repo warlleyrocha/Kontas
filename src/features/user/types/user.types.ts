@@ -5,4 +5,4 @@ export interface UpdateUserRequest {
   fotoPerfil?: string;
 }
 
-export { User } from "../features/auth/types/auth.types";
+export { User } from "../../auth/types/auth.types";
