@@ -4,7 +4,8 @@ import {
   InviteRequest,
   PatchInviteStatusResponse,
   StatusInvite,
-} from "@/src/types/invite.types";
+  getInvitesByEmail,
+} from "@/src/features/invites/types/invite.types";
 import { AxiosError } from "axios";
 
 export const inviteService = {
@@ -46,6 +47,31 @@ export const inviteService = {
             throw new Error("Erro interno do servidor.");
           default:
             throw new Error("Erro ao obter convites.");
+        }
+      }
+      throw error;
+    }
+  },
+
+  // Método para listar convites por email
+  getInvitesByEmail: async (): Promise<getInvitesByEmail[]> => {
+    console.log("Iniciando GET de convites");
+    try {
+      const response = await api.get<getInvitesByEmail[]>("/convites/me");
+      console.log(response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Erro no getInvitesByEmail", error);
+      if (error instanceof AxiosError) {
+        console.log("Status:", error.response?.status);
+        console.log("Data:", error.response?.data);
+        switch (error.response?.status) {
+          case 401:
+            throw new Error("Não autenticado.");
+          case 500:
+            throw new Error("Erro interno do servidor.");
+          default:
+            throw new Error("Erro ao obter repúblicas.");
         }
       }
       throw error;

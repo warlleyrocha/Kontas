@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Alert } from "react-native";
 
 import { useAuth } from "@/src/features/auth/contexts";
-import { useInvites } from "@/src/hooks/useInvite";
+import { useInvites } from "@/src/features/invites/hooks/useInvite";
 import { useRepublic } from "@/src/hooks/useRepublic";
 import { useRepublicResidents } from "@/src/hooks/useRepublicResidents";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
@@ -20,8 +20,11 @@ export function useControlPanelScreen() {
   } = useRepublic();
 
   const { getResidentsCount } = useRepublicResidents(republics);
-  const { sendInvite, loading: inviteLoading, error: inviteError } =
-    useInvites();
+  const {
+    sendInvite,
+    loading: inviteLoading,
+    error: inviteError,
+  } = useInvites();
 
   const [inviteRepublicId, setInviteRepublicId] = useState<string | undefined>(
     undefined

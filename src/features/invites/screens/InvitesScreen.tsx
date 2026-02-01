@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -7,15 +7,16 @@ import { MenuButton, SideMenu } from "@/src/components/SideMenu";
 import { formatDate } from "@/src/utils/formats";
 
 import { useInvitesScreen } from "../hooks/useInvitesScreen";
+import { useInvites } from "../hooks/useInvite";
 
 interface InviteCardProps {
   readonly invite: {
     readonly id: string;
-    readonly republicaNome: string;
-    readonly republicaImagem: string | null;
-    readonly convidadoPor: string;
-    readonly dataConvite: string;
-    readonly moradores: number;
+    readonly email: string;
+    readonly republicaId: string;
+    readonly status: string;
+    readonly criadoEm: string;
+    readonly atualizadoEm: string;
   };
   readonly onAccept: () => void;
   readonly onReject: () => void;
@@ -24,42 +25,26 @@ interface InviteCardProps {
 function InviteCard({ invite, onAccept, onReject }: InviteCardProps) {
   return (
     <View className="mb-4 overflow-hidden rounded-2xl bg-white shadow-sm">
-      <View className="h-28 w-full items-center justify-center overflow-hidden bg-gray-100">
-        {invite.republicaImagem ? (
-          <Image
-            source={{ uri: invite.republicaImagem }}
-            style={{ width: "100%", height: "100%" }}
-            resizeMode="cover"
-          />
-        ) : (
-          <Text className="text-4xl">🏠</Text>
-        )}
-      </View>
-
       <View className="p-4">
-        <Text className="text-lg font-bold text-gray-800">
-          {invite.republicaNome}
-        </Text>
+        <Text className="text-lg font-bold text-gray-800">{invite.id}</Text>
 
         <View className="mt-1 flex-row items-center">
           <Ionicons name="people-outline" size={14} color="#6B7280" />
           <Text className="ml-1 text-sm text-gray-500">
-            {invite.moradores} moradores
+            Para: {invite.email}
           </Text>
         </View>
 
         <View className="mt-2 flex-row items-center">
           <Ionicons name="person-outline" size={14} color="#6B7280" />
           <Text className="ml-1 text-sm text-gray-500">
-            Convidado por {invite.convidadoPor}
+            Convidado por {invite.republicaId}
           </Text>
         </View>
 
         <View className="mt-1 flex-row items-center">
           <Ionicons name="calendar-outline" size={14} color="#6B7280" />
-          <Text className="ml-1 text-sm text-gray-500">
-            {formatDate(invite.dataConvite)}
-          </Text>
+          <Text className="ml-1 text-sm text-gray-500">{invite.criadoEm}</Text>
         </View>
 
         <View className="mt-4 flex-row gap-3">
@@ -88,16 +73,19 @@ function InviteCard({ invite, onAccept, onReject }: InviteCardProps) {
 
 export function InvitesScreen() {
   const router = useRouter();
+
   const {
-    invites,
-    isMenuOpen,
-    setIsMenuOpen,
+    invitesByEmail,
+    fetchInvitesByEmail,
     handleAcceptInvite,
     handleRejectInvite,
-    menuItems,
-    footerItems,
-    sideMenuUser,
-  } = useInvitesScreen();
+  } = useInvites();
+  const { isMenuOpen, setIsMenuOpen, menuItems, footerItems, sideMenuUser } =
+    useInvitesScreen();
+
+  useEffect(() => {
+    fetchInvitesByEmail();
+  }, [fetchInvitesByEmail()]);
 
   return (
     <View className="flex-1 bg-[#FAFAFA]">
@@ -109,16 +97,17 @@ export function InvitesScreen() {
         <View className="flex-1">
           <Text className="text-lg font-semibold">Convites</Text>
           <Text className="text-sm text-gray-500">
-            {invites.length} {invites.length === 1 ? "pendente" : "pendentes"}
+            {invitesByEmail.length}{" "}
+            {invitesByEmail.length === 1 ? "pendente" : "pendentes"}
           </Text>
         </View>
 
         <MenuButton onPress={() => setIsMenuOpen(true)} />
       </View>
 
-      {invites.length > 0 ? (
+      {invitesByEmail.length > 0 ? (
         <ScrollView className="flex-1 px-4 pt-4">
-          {invites.map((invite) => (
+          {invitesByEmail.map((invite) => (
             <InviteCard
               key={invite.id}
               invite={invite}

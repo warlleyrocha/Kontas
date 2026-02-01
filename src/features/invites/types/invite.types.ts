@@ -21,3 +21,18 @@ export interface PatchInviteStatusResponse {
   id: string;
   status: StatusInvite;
 }
+
+export interface GetInvitesByRepublicId {
+  id: string;
+  usuarioId: string;
+  status: string;
+}
+
+export interface getInvitesByEmail {
+  id: string;
+  email: string;
+  republicaId: string;
+  status: string;
+  criadoEm: string;
+  atualizadoEm: string;
+}

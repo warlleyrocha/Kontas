@@ -1,4 +1,4 @@
-import type { InviteRequest } from "@/src/types/invite.types";
+import type { InviteRequest } from "@/src/features/invites/types/invite.types";
 import { Feather } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {

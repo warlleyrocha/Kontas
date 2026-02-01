@@ -1,8 +1,8 @@
 import { MenuButton, SideMenu } from "@/src/components/SideMenu";
 import { useSideMenu } from "@/src/components/SideMenu/useSideMenu";
 import { useAuth } from "@/src/features/auth/contexts";
-import { useInvites } from "@/src/hooks/useInvite";
-import type { Invite } from "@/src/types/invite.types";
+import { useInvites } from "@/src/features/invites/hooks/useInvite";
+import type { Invite } from "@/src/features/invites/types/invite.types";
 import { formatDate } from "@/src/utils/formats";
 import { toastErrors } from "@/src/utils/toastMessages";
 import { Ionicons } from "@expo/vector-icons";
