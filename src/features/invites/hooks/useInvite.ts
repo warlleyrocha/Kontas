@@ -4,7 +4,7 @@ import {
   type Invite,
   type InviteRequest,
   type PatchInviteStatusResponse,
-  type StatusInvite,
+  StatusInvite,
 } from "@/src/features/invites/types/invite.types";
 import { useCallback, useState } from "react";
 import { Alert } from "react-native";
@@ -99,18 +99,29 @@ export function useInvites() {
   );
 
   const handleAcceptInvite = useCallback(
-    (id: string) => {
-      console.log("Aceitar convite:", id);
-      setInvites((prev) => prev.filter((invite) => invite.id !== id));
-      router.push("/register/residents");
+    async (id: string) => {
+      try {
+        await updateInviteStatus(id, StatusInvite.ACEITO);
+        setInvites((prev) => prev.filter((invite) => invite.id !== id));
+        router.replace(`/(republics)/${id}`);
+      } catch {
+        // erro já é setado dentro de updateInviteStatus
+      }
     },
-    [router]
+    [router, updateInviteStatus]
   );
 
-  const handleRejectInvite = useCallback((id: string) => {
-    console.log("Recusar convite:", id);
-    setInvites((prev) => prev.filter((invite) => invite.id !== id));
-  }, []);
+  const handleRejectInvite = useCallback(
+    async (id: string) => {
+      try {
+        await updateInviteStatus(id, StatusInvite.RECUSADO);
+        setInvites((prev) => prev.filter((invite) => invite.id !== id));
+      } catch {
+        // erro já é setado dentro de updateInviteStatus
+      }
+    },
+    [updateInviteStatus]
+  );
 
   return {
     invitesByEmail,
