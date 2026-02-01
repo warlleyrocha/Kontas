@@ -20,4 +20,3 @@ export const mockDividas: Record<number, number> = {
   2: 0,
   3: 350,
 };
-
