@@ -1,12 +1,17 @@
 import { MenuButton, SideMenu } from "@/src/components/SideMenu";
 import { useSideMenu } from "@/src/components/SideMenu/useSideMenu";
+import { RouteErrorFallback } from "@/src/components/error-boundary/RouteErrorFallback";
 import { useAuth } from "@/src/features/auth/contexts";
 import { useInvites } from "@/src/features/invites/hooks/useInvite";
 import type { Invite } from "@/src/features/invites/types/invite.types";
 import { formatDate } from "@/src/utils/formats";
 import { toastErrors } from "@/src/utils/toastMessages";
 import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import {
+  useLocalSearchParams,
+  useRouter,
+  type ErrorBoundaryProps,
+} from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
@@ -203,4 +208,8 @@ export default function invitesSent() {
       )}
     </View>
   );
+}
+
+export function ErrorBoundary(props: ErrorBoundaryProps) {
+  return <RouteErrorFallback domain="Invites" {...props} />;
 }
