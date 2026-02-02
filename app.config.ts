@@ -50,8 +50,8 @@ const OWNER = "warlleyrocha";
 
 // App production config
 const APP_NAME = "Kontas";
-const BUNDLE_IDENTIFIER_IOS = "com.googleauth.ios";
-const PACKAGE_NAME_ANDROID = "com.googleauth.android";
+const BUNDLE_IDENTIFIER_IOS = "br.com.kontas.ios";
+const PACKAGE_NAME_ANDROID = "br.com.kontas.android";
 const ICON = "./assets/images/app-icon/1024.png";
 const ADAPTIVE_ICON_FORE =
   "./assets/images/app-icon/res/mipmap-xxxhdpi/app-icon_adaptive_fore.png";
@@ -65,9 +65,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   const appEnv =
     (process.env.APP_ENV as "development" | "preview" | "production") ||
     "development";
-
-  console.log("🔍 DEBUG - APP_ENV:", process.env.APP_ENV);
-  console.log("⚙️ Building app for environment:", appEnv);
 
   const {
     name,

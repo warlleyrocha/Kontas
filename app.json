@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.googleauth.ios",
+      "bundleIdentifier": "br.com.kontas.ios",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -28,7 +28,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.googleauth.android"
+      "package": "br.com.kontas.android"
     },
     "web": {
       "output": "static",
