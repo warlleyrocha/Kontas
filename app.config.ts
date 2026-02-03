@@ -66,16 +66,16 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     (process.env.APP_ENV as "development" | "preview" | "production") ||
     "development";
 
-  const {
-    name,
-    bundleIdentifier,
-    packageName,
-    scheme,
-    apiUrl: defaultApiUrl,
-  } = getDynamicAppConfig(appEnv);
+  const { name, bundleIdentifier, packageName, scheme } =
+    getDynamicAppConfig(appEnv);
 
   // Usa EXPO_PUBLIC_API_URL se disponível (do EAS), caso contrário usa a URL padrão do ambiente
-  const apiUrl = process.env.EXPO_PUBLIC_API_URL || defaultApiUrl;
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+  if (!apiUrl) {
+    throw new Error(
+      "EXPO_PUBLIC_API_URL não definida. Configure no EAS (eas.json/env vars) ou em .env.local"
+    );
+  }
 
   console.log("🌐 API URL:", apiUrl);
 
@@ -140,7 +140,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     extra: {
       router: {},
-      apiUrl: apiUrl,
+      apiUrl,
       eas: {
         projectId: EAS_PROJECT_ID,
       },
@@ -165,7 +165,6 @@ export const getDynamicAppConfig = (
       bundleIdentifier: BUNDLE_IDENTIFIER_IOS,
       packageName: PACKAGE_NAME_ANDROID,
       scheme: SCHEME,
-      apiUrl: "https://kontas-back-end-production.up.railway.app",
     };
   }
 
@@ -175,7 +174,6 @@ export const getDynamicAppConfig = (
       bundleIdentifier: `${BUNDLE_IDENTIFIER_IOS}`,
       packageName: `${PACKAGE_NAME_ANDROID}`,
       scheme: `${SCHEME}`,
-      apiUrl: "https://kontas-back-end-production.up.railway.app",
     };
   }
 
@@ -185,6 +183,5 @@ export const getDynamicAppConfig = (
     bundleIdentifier: `${BUNDLE_IDENTIFIER_IOS}`,
     packageName: `${PACKAGE_NAME_ANDROID}`,
     scheme: `${SCHEME}`,
-    apiUrl: "http://10.0.2.2:3333",
   };
 };
