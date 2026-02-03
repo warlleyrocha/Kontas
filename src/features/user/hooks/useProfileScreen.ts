@@ -27,7 +27,7 @@ export function useProfileScreen() {
       router.replace("/");
     } catch (error) {
       console.error("❌ Erro ao fazer logout:", error);
-      toastErrors.logoutFailed();
+      toastErrors.logoutFailed(error);
     }
   }, [logout, router]);
 
@@ -70,7 +70,7 @@ export function useProfileScreen() {
         );
       } catch (error) {
         console.log("Erro ao salvar o perfil:", error);
-        toastErrors.profileUpdateFailed();
+        toastErrors.profileUpdateFailed(error);
       }
     },
     [user, completeProfile, updateUser]

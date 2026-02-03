@@ -1,5 +1,6 @@
 import { authService } from "@/src/features/auth/services/auth.service";
 import { userService } from "@/src/features/user/services/user.service";
+import { getErrorMessage, isUnauthorizedError } from "@/src/services/httpError";
 import {
   AuthResponse,
   CompleteProfileRequest,
@@ -77,12 +78,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Atualizar estado e cache se os dados mudaram
         setUser(userData);
         await AsyncStorage.setItem("@app:user", JSON.stringify(userData));
-      } catch {
-        console.error("⛔ Token inválido ou expirado");
+      } catch (error) {
+        if (isUnauthorizedError(error)) {
+          console.error("⛔ Token inválido ou expirado");
 
-        // Token inválido → limpar tudo
-        await AsyncStorage.multiRemove(["@app:token", "@app:user"]);
-        setUser(null);
+          // Token inválido → limpar tudo
+          await AsyncStorage.multiRemove(["@app:token", "@app:user"]);
+          setUser(null);
+        } else {
+          // Em falhas transitórias de rede, preserva sessão local e tenta novamente depois.
+          const message = getErrorMessage(error, "Erro ao validar sessão");
+          console.warn("⚠️ Falha transitória ao validar sessão:", message);
+        }
       }
     } catch (error) {
       console.error("❌ Erro na verificação de auth:", error);
@@ -110,9 +117,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         console.log("✅ Login bem-sucedido");
         return data;
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Erro desconhecido";
+      } catch (error) {
+        const errorMessage = getErrorMessage(error, "Erro desconhecido");
         console.error("❌ Erro no login:", errorMessage);
         setError(errorMessage);
         return null;
@@ -147,8 +153,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const completeProfile = React.useCallback(
     async (data: CompleteProfileRequest) => {
       try {
-        console.log("📝 Dados enviados:", data);
-
         setLoading(true);
 
         // 1️⃣ Enviar dados para o backend
@@ -165,13 +169,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         console.log("✅ Perfil completado e sincronizado");
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "Erro ao completar perfil";
+        const errorMessage = getErrorMessage(error, "Erro ao completar perfil");
         console.error("❌ Erro ao completar perfil:", errorMessage);
 
         setError(errorMessage);
 
-        showToast.error("Erro ao completar o perfil. Tente novamente.");
+        showToast.error(errorMessage);
 
         throw error;
       } finally {
@@ -200,8 +203,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         try {
           const parsed = JSON.parse(json);
           setRepublicData(parsed);
-        } catch (err) {
-          console.warn("Erro ao parsear republic-data", err);
+        } catch (error) {
+          console.warn("Erro ao parsear republic-data", error);
         }
       }
     });

@@ -3,6 +3,7 @@ import type {
   RepublicPost,
   RepublicResponse,
 } from "@/src/features/republic/types/republic.types";
+import { getErrorMessage } from "@/src/services/httpError";
 import { showToast } from "@/src/utils/showToast";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
@@ -80,10 +81,7 @@ export function useRepublic(): UseRepublicReturn {
       router.push(`/(republics)/${republicCreated.id}`);
     } catch (error) {
       console.error("Erro ao salvar republica:", error);
-      Alert.alert(
-        "Erro",
-        "Não foi possível salvar a república. Tente novamente."
-      );
+      showToast.error(getErrorMessage(error, "Não foi possível salvar a república."));
     }
   };
 
@@ -94,9 +92,8 @@ export function useRepublic(): UseRepublicReturn {
       setRepublics(data);
     } catch (error) {
       console.error("Erro ao buscar repúblicas:", error);
-      Alert.alert(
-        "Erro",
-        "Não foi possível carregar as repúblicas. Tente novamente."
+      showToast.error(
+        getErrorMessage(error, "Não foi possível carregar as repúblicas.")
       );
       setRepublics([]);
     } finally {
@@ -110,11 +107,7 @@ export function useRepublic(): UseRepublicReturn {
       const republic = await republicService.getRepublicById(id);
       return republic;
     } catch (error) {
-      console.error("Erro ao buscar república por ID:", error);
-      Alert.alert(
-        "Erro",
-        "Não foi possível carregar a república. Tente novamente."
-      );
+      console.warn("Não foi possível buscar república por ID:", error);
       return null;
     }
   }, []);
@@ -136,7 +129,7 @@ export function useRepublic(): UseRepublicReturn {
         return true;
       } catch (error) {
         console.error("Erro ao atualizar república:", error);
-        showToast.error("Erro ao atualizar república");
+        showToast.error(getErrorMessage(error, "Erro ao atualizar república"));
         return false;
       }
     },
@@ -158,7 +151,7 @@ export function useRepublic(): UseRepublicReturn {
         return true;
       } catch (error) {
         console.error("Erro ao deletar república:", error);
-        showToast.error("Erro ao deletar república");
+        showToast.error(getErrorMessage(error, "Erro ao deletar república"));
         return false;
       }
     },

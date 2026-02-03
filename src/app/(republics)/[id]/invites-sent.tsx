@@ -114,7 +114,7 @@ function InviteCard({ invite }: InviteCardProps) {
   );
 }
 
-export default function invitesSent() {
+export default function InvitesSent() {
   const router = useRouter();
   const { user, logout } = useAuth();
 
@@ -131,7 +131,7 @@ export default function invitesSent() {
       router.replace("/");
     } catch (error) {
       console.error("Erro ao fazer logout da conta:", error);
-      toastErrors.logoutFailed();
+      toastErrors.logoutFailed(error);
     }
   }, [logout, router]);
 
@@ -142,9 +142,6 @@ export default function invitesSent() {
       fetchInvites(republicId);
     }
   }, [republicId, fetchInvites]);
-
-  console.log("República ID:", republicId);
-  console.log("Convites da República", invites);
 
   return (
     <View className="flex-1 bg-[#FAFAFA]">

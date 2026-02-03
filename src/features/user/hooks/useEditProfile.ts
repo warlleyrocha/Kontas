@@ -1,6 +1,8 @@
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { Alert } from "react-native";
+import { getErrorMessage } from "@/src/services/httpError";
+import { showToast } from "@/src/utils/showToast";
 
 export interface EditProfileFormValues {
   onClose: () => void;
@@ -45,7 +47,9 @@ export function useEditProfile({
       onSave(name, pixKey, photoUri, phone);
     } catch (error) {
       console.error("Erro ao salvar:", error);
-      Alert.alert("Erro", "Não foi possível salvar as alterações.");
+      showToast.error(
+        getErrorMessage(error, "Não foi possível salvar as alterações.")
+      );
     } finally {
       setIsUploading(false);
     }
@@ -73,7 +77,9 @@ export function useEditProfile({
       }
     } catch (error) {
       console.error("Erro ao selecionar imagem:", error);
-      Alert.alert("Erro", "Não foi possível selecionar a imagem.");
+      showToast.error(
+        getErrorMessage(error, "Não foi possível selecionar a imagem.")
+      );
     }
   };
 

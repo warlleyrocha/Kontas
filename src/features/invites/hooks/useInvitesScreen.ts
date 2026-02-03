@@ -17,7 +17,7 @@ export function useInvitesScreen() {
       router.replace("/");
     } catch (error) {
       console.error("Erro ao fazer logout da conta:", error);
-      toastErrors.logoutFailed();
+      toastErrors.logoutFailed(error);
     }
   }, [logout, router]);
 
