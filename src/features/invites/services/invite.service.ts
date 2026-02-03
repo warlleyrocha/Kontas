@@ -6,7 +6,7 @@ import {
   StatusInvite,
   getInvitesByEmail,
 } from "@/src/features/invites/types/invite.types";
-import { AxiosError } from "axios";
+import { toUserFriendlyError } from "@/src/services/httpError";
 
 export const inviteService = {
   // Método para enviar um convite
@@ -15,19 +15,14 @@ export const inviteService = {
       const response = await api.post<Invite>("/convites", data);
       return response.data;
     } catch (error) {
-      if (error instanceof AxiosError) {
-        switch (error.response?.status) {
-          case 400:
-            throw new Error("Requisição inválida.");
-          case 401:
-            throw new Error("Não autenticado.");
-          case 500:
-            throw new Error("Erro interno do servidor.");
-          default:
-            throw new Error("Erro ao enviar convite.");
-        }
-      }
-      throw error;
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao enviar convite.",
+        statusMessages: {
+          400: "Requisição inválida.",
+          401: "Não autenticado.",
+          500: "Erro interno do servidor.",
+        },
+      });
     }
   },
 
@@ -39,42 +34,31 @@ export const inviteService = {
       );
       return response.data;
     } catch (error) {
-      if (error instanceof AxiosError) {
-        switch (error.response?.status) {
-          case 401:
-            throw new Error("Não autenticado.");
-          case 500:
-            throw new Error("Erro interno do servidor.");
-          default:
-            throw new Error("Erro ao obter convites.");
-        }
-      }
-      throw error;
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao obter convites.",
+        statusMessages: {
+          401: "Não autenticado.",
+          500: "Erro interno do servidor.",
+        },
+      });
     }
   },
 
   // Método para listar convites por email
   getInvitesByEmail: async (): Promise<getInvitesByEmail[]> => {
-    console.log("Iniciando GET de convites");
+    console.log("🌐 Chamando GET /convites/me...");
     try {
       const response = await api.get<getInvitesByEmail[]>("/convites/me");
-      console.log(response.data);
       return response.data;
     } catch (error) {
       console.error("Erro no getInvitesByEmail", error);
-      if (error instanceof AxiosError) {
-        console.log("Status:", error.response?.status);
-        console.log("Data:", error.response?.data);
-        switch (error.response?.status) {
-          case 401:
-            throw new Error("Não autenticado.");
-          case 500:
-            throw new Error("Erro interno do servidor.");
-          default:
-            throw new Error("Erro ao obter repúblicas.");
-        }
-      }
-      throw error;
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao obter repúblicas.",
+        statusMessages: {
+          401: "Não autenticado.",
+          500: "Erro interno do servidor.",
+        },
+      });
     }
   },
 
@@ -90,19 +74,14 @@ export const inviteService = {
       );
       return response.data;
     } catch (error) {
-      if (error instanceof AxiosError) {
-        switch (error.response?.status) {
-          case 400:
-            throw new Error("Requisição inválida.");
-          case 401:
-            throw new Error("Não autenticado.");
-          case 500:
-            throw new Error("Erro interno do servidor.");
-          default:
-            throw new Error("Erro ao atualizar status do convite.");
-        }
-      }
-      throw error;
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao atualizar status do convite.",
+        statusMessages: {
+          400: "Requisição inválida.",
+          401: "Não autenticado.",
+          500: "Erro interno do servidor.",
+        },
+      });
     }
   },
 };

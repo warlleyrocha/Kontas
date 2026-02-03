@@ -1,10 +1,10 @@
-import { AxiosError } from "axios";
 import {
   AuthResponse,
   CompleteProfileRequest,
   GoogleLoginRequest,
 } from "../types/auth.types";
 import { api } from "../../../services/api";
+import { toUserFriendlyError } from "@/src/services/httpError";
 
 export const authService = {
   // Método para login com Google
@@ -16,19 +16,14 @@ export const authService = {
 
       return response.data;
     } catch (error) {
-      if (error instanceof AxiosError) {
-        switch (error.response?.status) {
-          case 400:
-            throw new Error("Token inválido ou requisição malformada");
-          case 401:
-            throw new Error("Não foi possível autenticar com o Google");
-          case 500:
-            throw new Error("Erro no servidor. Tente novamente mais tarde");
-          default:
-            throw new Error(error.message || "Erro ao fazer login com Google");
-        }
-      }
-      throw error;
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao fazer login com Google.",
+        statusMessages: {
+          400: "Token inválido ou requisição malformada.",
+          401: "Não foi possível autenticar com o Google.",
+          500: "Erro no servidor. Tente novamente mais tarde.",
+        },
+      });
     }
   },
 
@@ -42,22 +37,14 @@ export const authService = {
       console.log("✅ Perfil completado com sucesso no backend");
     } catch (error) {
       console.error("❌ Erro ao completar perfil:", error);
-
-      if (error instanceof AxiosError) {
-        switch (error.response?.status) {
-          case 400:
-            throw new Error(
-              "Dados inválidos. Verifique os campos e tente novamente."
-            );
-          case 401:
-            throw new Error("Sessão expirada. Faça login novamente.");
-          case 500:
-            throw new Error("Erro no servidor. Tente novamente mais tarde.");
-          default:
-            throw new Error(error.message || "Erro ao completar perfil");
-        }
-      }
-      throw error;
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao completar perfil.",
+        statusMessages: {
+          400: "Dados inválidos. Verifique os campos e tente novamente.",
+          401: "Sessão expirada. Faça login novamente.",
+          500: "Erro no servidor. Tente novamente mais tarde.",
+        },
+      });
     }
   },
 };

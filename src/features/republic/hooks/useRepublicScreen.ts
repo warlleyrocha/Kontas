@@ -10,6 +10,7 @@ import type { TabKey } from "@/src/types/tabs";
 
 import { showToast } from "@/src/utils/showToast";
 import { toastErrors } from "@/src/utils/toastMessages";
+import { getErrorMessage } from "@/src/services/httpError";
 
 export function useRepublicScreen(republicId: string) {
   const router = useRouter();
@@ -51,8 +52,8 @@ export function useRepublicScreen(republicId: string) {
 
         setRepublic(data);
       } catch (error) {
-        console.error("Erro ao carregar república:", error);
-        showToast.error("Erro ao carregar república");
+        console.warn("Não foi possível carregar república:", error);
+        showToast.error(getErrorMessage(error, "Erro ao carregar república"));
         router.back();
       } finally {
         setIsLoading(false);
@@ -86,7 +87,7 @@ export function useRepublicScreen(republicId: string) {
       router.replace("/");
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
-      toastErrors.logoutFailed();
+      toastErrors.logoutFailed(error);
     }
   }, [logout, router]);
 

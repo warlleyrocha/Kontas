@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
@@ -131,7 +131,7 @@ export function InvitesScreen() {
             <InviteCard
               key={invite.id}
               invite={invite}
-              onAccept={() => handleAcceptInvite(invite.id)}
+              onAccept={() => handleAcceptInvite(invite.id, invite.republicaId)}
               onReject={() => handleRejectInvite(invite.id)}
             />
           ))}

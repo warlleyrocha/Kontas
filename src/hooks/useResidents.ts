@@ -1,7 +1,8 @@
 import { residentService } from "@/src/services/resident.service";
+import { getErrorMessage } from "@/src/services/httpError";
+import { showToast } from "@/src/utils/showToast";
 import { ResidentResponse } from "@/src/types/resident.types";
 import { useCallback, useState } from "react";
-import { Alert } from "react-native";
 
 type UseResidentState = {
   residents: ResidentResponse[];
@@ -27,9 +28,8 @@ export function useResidents(): UseResidentReturn {
       return residentsData;
     } catch (error) {
       console.error("Erro ao buscar moradores:", error);
-      Alert.alert(
-        "Erro",
-        "Não foi possível carregar os moradores. Tente novamente."
+      showToast.error(
+        getErrorMessage(error, "Não foi possível carregar os moradores.")
       );
       return null;
     } finally {

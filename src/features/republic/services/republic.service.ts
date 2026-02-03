@@ -3,7 +3,7 @@ import {
   RepublicPost,
   RepublicResponse,
 } from "@/src/features/republic/types/republic.types";
-import { AxiosError } from "axios";
+import { toUserFriendlyError } from "@/src/services/httpError";
 
 export const republicService = {
   // Método para criar uma nova república
@@ -12,19 +12,14 @@ export const republicService = {
       const response = await api.post<RepublicResponse>("/republicas", data);
       return response.data;
     } catch (error) {
-      if (error instanceof AxiosError) {
-        switch (error.response?.status) {
-          case 400:
-            throw new Error("Requisição inválida.");
-          case 401:
-            throw new Error("Não autenticado.");
-          case 500:
-            throw new Error("Erro interno do servidor.");
-          default:
-            throw new Error("Erro ao criar república.");
-        }
-      }
-      throw error;
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao criar república.",
+        statusMessages: {
+          400: "Requisição inválida.",
+          401: "Não autenticado.",
+          500: "Erro interno do servidor.",
+        },
+      });
     }
   },
 
@@ -33,23 +28,17 @@ export const republicService = {
     console.log("🌐 Chamando GET /republicas...");
     try {
       const response = await api.get<RepublicResponse[]>("/republicas");
-      console.log("📦 Resposta da API:", response.data);
+
       return response.data;
     } catch (error) {
       console.error("❌ Erro no getRepublics:", error);
-      if (error instanceof AxiosError) {
-        console.log("Status:", error.response?.status);
-        console.log("Data:", error.response?.data);
-        switch (error.response?.status) {
-          case 401:
-            throw new Error("Não autenticado.");
-          case 500:
-            throw new Error("Erro interno do servidor.");
-          default:
-            throw new Error("Erro ao obter repúblicas.");
-        }
-      }
-      throw error;
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao obter repúblicas.",
+        statusMessages: {
+          401: "Não autenticado.",
+          500: "Erro interno do servidor.",
+        },
+      });
     }
   },
 
@@ -58,23 +47,16 @@ export const republicService = {
     try {
       const response = await api.get<RepublicResponse>(`/republicas/${id}`);
 
-      console.log("📦 Resposta da API:", response.data);
-
       return response.data;
     } catch (error) {
-      if (error instanceof AxiosError) {
-        switch (error.response?.status) {
-          case 400:
-            throw new Error("Requisição inválida.");
-          case 401:
-            throw new Error("Não autenticado.");
-          case 500:
-            throw new Error("Erro interno do servidor.");
-          default:
-            throw new Error("Erro ao obter detalhes da república.");
-        }
-      }
-      throw error;
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao obter detalhes da república.",
+        statusMessages: {
+          400: "Requisição inválida.",
+          401: "Não autenticado.",
+          500: "Erro interno do servidor.",
+        },
+      });
     }
   },
 
@@ -90,19 +72,14 @@ export const republicService = {
       );
       return response.data;
     } catch (error) {
-      if (error instanceof AxiosError) {
-        switch (error.response?.status) {
-          case 400:
-            throw new Error("Requisição inválida.");
-          case 401:
-            throw new Error("Não autenticado.");
-          case 500:
-            throw new Error("Erro interno do servidor.");
-          default:
-            throw new Error("Erro ao atualizar república.");
-        }
-      }
-      throw error;
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao atualizar república.",
+        statusMessages: {
+          400: "Requisição inválida.",
+          401: "Não autenticado.",
+          500: "Erro interno do servidor.",
+        },
+      });
     }
   },
 
@@ -111,19 +88,14 @@ export const republicService = {
     try {
       await api.delete(`/republicas/${id}`);
     } catch (error) {
-      if (error instanceof AxiosError) {
-        switch (error.response?.status) {
-          case 400:
-            throw new Error("Requisição inválida.");
-          case 401:
-            throw new Error("Não autenticado.");
-          case 500:
-            throw new Error("Erro interno do servidor.");
-          default:
-            throw new Error("Erro ao deletar república.");
-        }
-      }
-      throw error;
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao deletar república.",
+        statusMessages: {
+          400: "Requisição inválida.",
+          401: "Não autenticado.",
+          500: "Erro interno do servidor.",
+        },
+      });
     }
   },
 };
