@@ -1,6 +1,6 @@
-import { AxiosError } from "axios";
 import { UpdateUserRequest, User } from "../types/user.types";
 import { api } from "../../../services/api";
+import { toUserFriendlyError } from "@/src/services/httpError";
 
 export const userService = {
   //Método para buscar dados
@@ -9,17 +9,13 @@ export const userService = {
       const response = await api.get<User>("/usuarios/me");
       return response.data;
     } catch (error) {
-      if (error instanceof AxiosError) {
-        switch (error.response?.status) {
-          case 401:
-            throw new Error("Não Autenticado.");
-          case 500:
-            throw new Error("Erro interno do servidor.");
-          default:
-            throw new Error("Erro ao buscar dados do usuario.");
-        }
-      }
-      throw error;
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao buscar dados do usuário.",
+        statusMessages: {
+          401: "Não Autenticado.",
+          500: "Erro interno do servidor.",
+        },
+      });
     }
   },
 
@@ -34,21 +30,14 @@ export const userService = {
       return response.data;
     } catch (error) {
       console.error("❌ Erro ao atualizar perfil:", error);
-      if (error instanceof AxiosError) {
-        switch (error.response?.status) {
-          case 400:
-            throw new Error(
-              "Dados inválidos. Verifique os campos e tente novamente."
-            );
-          case 401:
-            throw new Error("Sessão expirada. Faça login novamente.");
-          case 500:
-            throw new Error("Erro no servidor. Tente novamente mais tarde.");
-          default:
-            throw new Error(error.message || "Erro ao atualizar perfil");
-        }
-      }
-      throw error;
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao atualizar perfil.",
+        statusMessages: {
+          400: "Dados inválidos. Verifique os campos e tente novamente.",
+          401: "Sessão expirada. Faça login novamente.",
+          500: "Erro no servidor. Tente novamente mais tarde.",
+        },
+      });
     }
   },
 };

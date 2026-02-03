@@ -3,7 +3,7 @@ import {
   CreateResidentRequest,
   ResidentResponse,
 } from "@/src/types/resident.types";
-import { AxiosError } from "axios";
+import { toUserFriendlyError } from "@/src/services/httpError";
 
 export const residentService = {
   // Método para criar um novo morador
@@ -14,19 +14,14 @@ export const residentService = {
       const response = await api.post<ResidentResponse>("/moradores", data);
       return response.data;
     } catch (error) {
-      if (error instanceof AxiosError) {
-        switch (error.response?.status) {
-          case 400:
-            throw new Error("Requisição inválida.");
-          case 401:
-            throw new Error("Não autenticado.");
-          case 500:
-            throw new Error("Erro interno do servidor.");
-          default:
-            throw new Error("Erro ao criar morador.");
-        }
-      }
-      throw error;
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao criar morador.",
+        statusMessages: {
+          400: "Requisição inválida.",
+          401: "Não autenticado.",
+          500: "Erro interno do servidor.",
+        },
+      });
     }
   },
 
@@ -38,21 +33,15 @@ export const residentService = {
       );
       return response.data;
     } catch (error) {
-      if (error instanceof AxiosError) {
-        switch (error.response?.status) {
-          case 400:
-            throw new Error("ID da república inválido.");
-          case 401:
-            throw new Error("Não autenticado.");
-          case 404:
-            throw new Error("República não encontrada.");
-          case 500:
-            throw new Error("Erro interno do servidor.");
-          default:
-            throw new Error("Erro ao obter moradores.");
-        }
-      }
-      throw error;
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao obter moradores.",
+        statusMessages: {
+          400: "ID da república inválido.",
+          401: "Não autenticado.",
+          404: "República não encontrada.",
+          500: "Erro interno do servidor.",
+        },
+      });
     }
   },
 };
