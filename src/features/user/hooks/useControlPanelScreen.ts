@@ -3,21 +3,18 @@ import { Alert } from "react-native";
 
 import { useAuth } from "@/src/features/auth/contexts";
 import { useInvites } from "@/src/features/invites/hooks/useInvite";
-import { useRepublic } from "@/src/hooks/useRepublic";
+import { useRepublicList } from "../../republic/hooks/useRepublicList";
+import { useRepublicActions } from "../../republic/hooks/useRepublicActions";
 import { useRepublicResidents } from "@/src/hooks/useRepublicResidents";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import { showToast } from "@/src/utils/showToast";
 
 export function useControlPanelScreen() {
   const { user, loading } = useAuth();
-  const {
-    republics,
-    fetchRepublics,
-    deleteRepublic,
-    updatedRepublic,
-    showEditModal,
-    setShowEditModal,
-  } = useRepublic();
+
+  const { republics, fetchRepublics } = useRepublicList();
+  const { deleteRepublic, updateRepublic, showEditModal, setShowEditModal } =
+    useRepublicActions();
 
   const { getResidentsCount, isAdmin } = useRepublicResidents(
     republics,
@@ -89,16 +86,14 @@ export function useControlPanelScreen() {
     async (name: string, image?: string) => {
       if (!selectedRepublic) return;
 
-      const success = await updatedRepublic(selectedRepublic.id, {
+      await updateRepublic(selectedRepublic.id, {
         nome: name,
         imagemRepublica: image,
       });
 
-      if (success) {
-        handleCloseEditModal();
-      }
+      handleCloseEditModal();
     },
-    [selectedRepublic, updatedRepublic, handleCloseEditModal]
+    [selectedRepublic, updateRepublic, handleCloseEditModal]
   );
 
   const handleOpenInviteModal = useCallback((republicId: string) => {

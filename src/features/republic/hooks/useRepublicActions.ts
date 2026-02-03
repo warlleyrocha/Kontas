@@ -1,4 +1,5 @@
 // hooks/useRepublicActions.ts
+import { useState } from "react";
 import { republicService } from "../services/republic.service";
 import { useRouter } from "expo-router";
 import type { RepublicPost } from "../types/republic.types";
@@ -6,6 +7,7 @@ import { showToast } from "@/src/utils/showToast";
 
 export function useRepublicActions() {
   const router = useRouter();
+  const [showEditModal, setShowEditModal] = useState(false);
 
   async function createRepublic(data: RepublicPost) {
     const republic = await republicService.createRepublic(data);
@@ -28,5 +30,7 @@ export function useRepublicActions() {
     createRepublic,
     updateRepublic,
     deleteRepublic,
+    showEditModal,
+    setShowEditModal,
   };
 }

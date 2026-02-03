@@ -2,8 +2,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 
 import { useAuth } from "@/src/features/auth/contexts";
-import { useRepublic } from "@/src/hooks/useRepublic";
 import { useResidents } from "@/src/hooks/useResidents";
+import { useRepublicList } from "./useRepublicList";
+import { useRepublicActions } from "./useRepublicActions";
 
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import type { TabKey } from "@/src/types/tabs";
@@ -16,12 +17,9 @@ export function useRepublicScreen(republicId: string) {
   const router = useRouter();
   const { user, logout } = useAuth();
 
-  const {
-    fetchRepublicById,
-    updatedRepublic,
-    showEditModal,
-    setShowEditModal,
-  } = useRepublic();
+  const { fetchRepublicById } = useRepublicList();
+  const { updateRepublic, showEditModal, setShowEditModal } =
+    useRepublicActions();
 
   const { residents, fetchResidents } = useResidents();
 
@@ -95,18 +93,16 @@ export function useRepublicScreen(republicId: string) {
     async (nome: string, imagem?: string) => {
       if (!republic) return;
 
-      const success = await updatedRepublic(republic.id, {
+      await updateRepublic(republic.id, {
         nome,
         imagemRepublica: imagem,
       });
 
-      if (success) {
-        setRepublic((prev) =>
-          prev ? { ...prev, nome, imagemRepublica: imagem } : null
-        );
-      }
+      setRepublic((prev) =>
+        prev ? { ...prev, nome, imagemRepublica: imagem } : null
+      );
     },
-    [republic, updatedRepublic]
+    [republic, updateRepublic]
   );
 
   const userMenu = useMemo(
