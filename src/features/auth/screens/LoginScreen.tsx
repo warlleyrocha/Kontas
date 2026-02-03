@@ -1,5 +1,6 @@
 import IconGoogle from "@/assets/images/google-icon.svg";
 import { useAuth } from "@/src/features/auth/contexts/AuthContext";
+import { legalLinks, openLegalLink } from "@/src/constants/legal";
 import { getErrorMessage } from "@/src/services/httpError";
 import { showToast } from "@/src/utils/showToast";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
@@ -47,7 +48,10 @@ export default function LoginScreen() {
     } catch (error) {
       console.error("Erro no login:", error);
       showToast.error(
-        getErrorMessage(error, "Erro ao fazer login com Google. Tente novamente.")
+        getErrorMessage(
+          error,
+          "Erro ao fazer login com Google. Tente novamente."
+        )
       );
     } finally {
       setIsSigningIn(false);
@@ -83,7 +87,7 @@ export default function LoginScreen() {
         </View>
 
         <TouchableOpacity
-          className={`mt-6 h-[50px] w-[345px] flex-row items-center justify-center gap-3 rounded-lg ${
+          className={`mt-44 h-[50px] w-[345px] flex-row items-center justify-center gap-3 rounded-lg ${
             isSigningIn ? "bg-gray-300" : "bg-[#ececec]"
           }`}
           onPress={handleGoogleLogin}
@@ -100,6 +104,29 @@ export default function LoginScreen() {
             </>
           )}
         </TouchableOpacity>
+
+        <Text className="px-12 text-center text-xs leading-5 text-gray-500">
+          Ao continuar, você concorda com nossos{" "}
+          <Text
+            className="font-semibold text-indigo-600"
+            onPress={() =>
+              openLegalLink(legalLinks.termsOfUse, "Termos de Uso")
+            }
+          >
+            Termos de Uso
+          </Text>{" "}
+          e{" "}
+          <Text
+            className="font-semibold text-indigo-600"
+            onPress={() =>
+              openLegalLink(legalLinks.privacyPolicy, "Política de Privacidade")
+            }
+          >
+            Política de Privacidade
+          </Text>
+          .
+        </Text>
+
         {error && <Text style={{ color: "red" }}>{error}</Text>}
       </View>
     </View>

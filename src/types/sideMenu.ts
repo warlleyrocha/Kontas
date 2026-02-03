@@ -8,6 +8,8 @@ export interface MenuItem {
     | "person-outline"
     | "mail-outline"
     | "grid-outline"
+    | "document-text-outline"
+    | "shield-checkmark-outline"
     | "log-out-outline";
   onPress: () => void;
   danger?: boolean;

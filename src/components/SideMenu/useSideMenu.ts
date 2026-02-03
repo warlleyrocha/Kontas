@@ -1,3 +1,4 @@
+import { legalLinks, openLegalLink } from "@/src/constants/legal";
 import { ResidentRole } from "@/src/types/resident.types";
 import { MenuItem, UserMenuContext } from "@/src/types/sideMenu";
 import { useRouter } from "expo-router";
@@ -77,7 +78,6 @@ export function useSideMenu(
     }
   }, [
     context,
-    republicId, // Adicione republicId nas dependências
     currentUserRole,
     navigation.home,
     navigation.profile,
@@ -88,6 +88,19 @@ export function useSideMenu(
 
   const footerItems = useMemo<MenuItem[]>(
     () => [
+      {
+        id: "termsOfUse",
+        label: "Termos de Uso",
+        icon: "document-text-outline" as const,
+        onPress: () => openLegalLink(legalLinks.termsOfUse, "Termos de Uso"),
+      },
+      {
+        id: "privacyPolicy",
+        label: "Política de Privacidade",
+        icon: "shield-checkmark-outline" as const,
+        onPress: () =>
+          openLegalLink(legalLinks.privacyPolicy, "Política de Privacidade"),
+      },
       {
         id: "logout",
         label: "Sair",
