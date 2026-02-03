@@ -60,7 +60,6 @@ export default function CheckEmail() {
     inputRefs.current[0]?.focus();
 
     console.log("Código reenviado");
-    // TODO: Adicionar lógica de reenvio do código
   };
 
   // Função para continuar (verificar o código)
@@ -68,7 +67,6 @@ export default function CheckEmail() {
     const fullCode = code.join("");
     if (fullCode.length === 6) {
       console.log("Código digitado:", fullCode);
-      // TODO: Adicionar lógica de verificação do código
     } else {
       alert("Por favor, digite o código completo");
     }
