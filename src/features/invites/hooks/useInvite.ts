@@ -1,6 +1,6 @@
 import { inviteService } from "@/src/features/invites/services/invite.service";
 import {
-  type getInvitesByEmail,
+  type GetInvitesByUser,
   type Invite,
   type InviteRequest,
   type PatchInviteStatusResponse,
@@ -15,7 +15,7 @@ export function useInvites() {
   const router = useRouter();
 
   const [invites, setInvites] = useState<Invite[]>([]);
-  const [invitesByEmail, setInvitesByEmail] = useState<getInvitesByEmail[]>([]);
+  const [invitesByEmail, setInvitesByEmail] = useState<GetInvitesByUser[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -57,7 +57,7 @@ export function useInvites() {
   // BUscar convites por email
   const fetchInvitesByEmail = useCallback(async () => {
     try {
-      const data = await inviteService.getInvitesByEmail();
+      const data = await inviteService.getInvitesByUser();
       setInvitesByEmail(data);
     } catch (error) {
       const message = getErrorMessage(

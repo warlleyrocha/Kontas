@@ -4,7 +4,7 @@ import {
   InviteRequest,
   PatchInviteStatusResponse,
   StatusInvite,
-  getInvitesByEmail,
+  GetInvitesByUser,
 } from "@/src/features/invites/types/invite.types";
 import { toUserFriendlyError } from "@/src/services/httpError";
 
@@ -44,14 +44,14 @@ export const inviteService = {
     }
   },
 
-  // Método para listar convites por email
-  getInvitesByEmail: async (): Promise<getInvitesByEmail[]> => {
+  // Método para listar convites por usuario
+  getInvitesByUser: async (): Promise<GetInvitesByUser[]> => {
     console.log("🌐 Chamando GET /convites/me...");
     try {
-      const response = await api.get<getInvitesByEmail[]>("/convites/me");
+      const response = await api.get<GetInvitesByUser[]>("/convites/me");
       return response.data;
     } catch (error) {
-      console.error("Erro no getInvitesByEmail", error);
+      console.error("Erro no getInvitesByUser", error);
       throw toUserFriendlyError(error, {
         defaultMessage: "Erro ao obter repúblicas.",
         statusMessages: {

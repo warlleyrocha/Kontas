@@ -28,7 +28,7 @@ export interface GetInvitesByRepublicId {
   status: string;
 }
 
-export interface getInvitesByEmail {
+export interface GetInvitesByUser {
   id: string;
   email: string;
   republicaId: string;
