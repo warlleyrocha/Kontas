@@ -10,35 +10,48 @@ import { version } from "./package.json";
 (function loadLocalEnv() {
   try {
     const envPath = path.resolve(process.cwd(), ".env.local");
-    if (fs.existsSync(envPath) && !process.env.APP_ENV) {
+
+    // ✅ Só carrega em DEV SERVER (expo start / metro)
+    const isDevServer =
+      !!process.env.EXPO_PACKAGER_SOCKET_PORT ||
+      !!process.env.EXPO_DEV_SERVER_URL ||
+      !!process.env.REACT_NATIVE_PACKAGER_HOSTNAME ||
+      !!process.env.RCT_METRO_PORT;
+
+    if (!isDevServer) {
+      return; // ⛔ nunca carrega em eas build / expo prebuild / etc
+    }
+
+    // Só carrega se ainda não tiver URL no ambiente
+    if (fs.existsSync(envPath) && !process.env.EXPO_PUBLIC_API_URL) {
       const content = fs.readFileSync(envPath, { encoding: "utf8" });
       const lines = content.split(/\r?\n/);
+
       for (const raw of lines) {
         const line = raw.trim();
         if (!line || line.startsWith("#")) continue;
+
         const equalsIndex = line.indexOf("=");
         if (equalsIndex === -1) continue;
+
         const key = line.slice(0, equalsIndex).trim();
         let value = line.slice(equalsIndex + 1).trim();
-        // remove surrounding quotes
+
         if (
           (value.startsWith('"') && value.endsWith('"')) ||
           (value.startsWith("'") && value.endsWith("'"))
         ) {
           value = value.slice(1, -1);
         }
-        // unescape simple escapes
-        value = value.replace(/\\n/g, "\n").replace(/\\r/g, "\r");
+
         if (!process.env[key]) {
           process.env[key] = value;
         }
       }
-      console.log(
-        "🔒 .env.local carregado para desenvolvimento (variáveis injetadas no process.env)"
-      );
+
+      console.log("🔒 .env.local carregado (apenas dev server)");
     }
   } catch (err) {
-    // não bloquear a execução do config em caso de erro
     console.warn("⚠️ Falha ao carregar .env.local:", err);
   }
 })();
@@ -68,16 +81,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
   const { name, bundleIdentifier, packageName, scheme } =
     getDynamicAppConfig(appEnv);
-
-  // Usa EXPO_PUBLIC_API_URL se disponível (do EAS), caso contrário usa a URL padrão do ambiente
-  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
-  if (!apiUrl) {
-    throw new Error(
-      "EXPO_PUBLIC_API_URL não definida. Configure no EAS (eas.json/env vars) ou em .env.local"
-    );
-  }
-
-  console.log("🌐 API URL:", apiUrl);
 
   return {
     ...config,
@@ -140,7 +143,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     },
     extra: {
       router: {},
-      apiUrl,
       eas: {
         projectId: EAS_PROJECT_ID,
       },

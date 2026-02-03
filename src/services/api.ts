@@ -1,11 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import Constants from "expo-constants";
 
-const API_URL = Constants.expoConfig?.extra?.apiUrl;
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 if (!API_URL) {
-  throw new Error("API_URL indefinida: verifique EXPO_PUBLIC_API_URL no build");
+  throw new Error(
+    "EXPO_PUBLIC_API_URL não definida no runtime. Verifique o build preview/production."
+  );
 }
 
 export const api = axios.create({
