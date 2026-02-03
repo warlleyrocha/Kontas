@@ -92,14 +92,18 @@ export function useSideMenu(
         id: "termsOfUse",
         label: "Termos de Uso",
         icon: "document-text-outline" as const,
-        onPress: () => openLegalLink(legalLinks.termsOfUse, "Termos de Uso"),
+        onPress: () =>
+          void openLegalLink(legalLinks.termsOfUse, "Termos de Uso"),
       },
       {
         id: "privacyPolicy",
         label: "Política de Privacidade",
         icon: "shield-checkmark-outline" as const,
         onPress: () =>
-          openLegalLink(legalLinks.privacyPolicy, "Política de Privacidade"),
+          void openLegalLink(
+            legalLinks.privacyPolicy,
+            "Política de Privacidade"
+          ),
       },
       {
         id: "logout",
