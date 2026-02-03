@@ -176,7 +176,7 @@ export function AccountsTab({ onOpenAdd }: AccountsTabProps) {
                 <Text className="font-semibold text-gray-700">Divisão:</Text>
                 <View className="flex-row items-center gap-2">
                   <Text className="text-sm text-gray-500">
-                    {conta.responsaveis?.length || 0}{" "}
+                    {conta.responsaveis?.length ?? 0}{" "}
                     {conta.responsaveis?.length === 1 ? "pessoa" : "pessoas"}
                   </Text>
                   <MaterialCommunityIcons

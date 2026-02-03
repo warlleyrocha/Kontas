@@ -160,7 +160,7 @@ export function ControlPanelScreen() {
       <EditRepublicModal
         visible={showEditModal}
         onClose={handleCloseEditModal}
-        currentName={selectedRepublic?.nome || ""}
+        currentName={selectedRepublic?.nome ?? ""}
         currentImage={selectedRepublic?.imagemRepublica}
         onSave={handleSaveEdit}
       />

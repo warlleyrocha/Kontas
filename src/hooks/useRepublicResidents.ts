@@ -32,7 +32,7 @@ export function useRepublicResidents(
         republics.map(async (republic) => {
           try {
             const residents = await fetchResidents(republic.id);
-            counts[republic.id] = residents?.length || 0;
+            counts[republic.id] = residents?.length ?? 0;
             if (currentUserEmail) {
               const normalizedEmail = currentUserEmail.toLowerCase();
               const currentUser = residents?.find(

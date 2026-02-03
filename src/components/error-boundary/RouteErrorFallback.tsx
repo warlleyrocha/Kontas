@@ -11,7 +11,7 @@ export function RouteErrorFallback({
   domain,
   error,
   retry,
-}: RouteErrorFallbackProps) {
+}: Readonly<RouteErrorFallbackProps>) {
   useEffect(() => {
     captureException(error, {
       tags: {

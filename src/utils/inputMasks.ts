@@ -14,7 +14,7 @@ export function maskPhone(value: string): string {
     cleaned = cleaned.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3");
   }
 
-  while (cleaned.endsWith("-") || cleaned.endsWith(" ")) {
+  while (cleaned.endsWith("-") ?? cleaned.endsWith(" ")) {
     cleaned = cleaned.slice(0, -1);
   }
 

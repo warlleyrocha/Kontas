@@ -16,7 +16,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 interface InviteCardProps {
-  invite: Invite;
+  readonly invite: Invite;
 }
 
 function InviteCard({ invite }: InviteCardProps) {

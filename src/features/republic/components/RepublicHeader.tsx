@@ -6,11 +6,11 @@ import type { RepublicResponse } from "@/src/features/republic/types/republic.ty
 import { MenuButton } from "@/src/components/SideMenu";
 
 interface RepublicHeaderProps {
-  republic: RepublicResponse;
-  isFavorited: boolean;
-  onEdit: () => void;
-  onToggleFavorite: () => void;
-  onMenuOpen: () => void;
+  readonly republic: RepublicResponse;
+  readonly isFavorited: boolean;
+  readonly onEdit: () => void;
+  readonly onToggleFavorite: () => void;
+  readonly onMenuOpen: () => void;
 }
 
 export function RepublicHeader({
@@ -42,7 +42,7 @@ export function RepublicHeader({
         accessibilityLabel="Editar república"
       >
         <Text className="text-base font-semibold">
-          {republic.nome || "República"}
+          {republic.nome ?? "República"}
         </Text>
         <Text className="text-sm text-gray-500">0 Morador</Text>
       </TouchableOpacity>

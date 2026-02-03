@@ -15,7 +15,7 @@ import { RepublicHeader } from "../components/RepublicHeader";
 import { useRepublicScreen } from "../hooks/useRepublicScreen";
 
 interface Props {
-  republicId: string;
+  readonly republicId: string;
 }
 
 export function RepublicScreen({ republicId }: Props) {

@@ -21,9 +21,9 @@ export interface ResidentResponse {
   id: string;
   nome: string;
   email: string;
-  fotoPerfil: string | "";
-  chavePix: string | "";
-  telefone: string | "";
+  fotoPerfil: string;
+  chavePix: string;
+  telefone: string;
   role: ResidentRole;
   status: ResidentStatus;
 }

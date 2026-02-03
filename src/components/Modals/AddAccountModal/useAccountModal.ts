@@ -11,7 +11,7 @@ export const toNumber = (s?: string) =>
       .toString()
       .replace(",", ".")
       .replaceAll(/[^\d.-]/g, "")
-  ) || 0;
+  ) ?? 0;
 
 export const formatNumber = (n: number) => Number(n).toFixed(2);
 
@@ -236,7 +236,7 @@ export default function useAddConta({
       Alert.alert("Preencha a descrição");
       return false;
     }
-    if (Number.isNaN(valor) || valor <= 0) {
+    if (Number.isNaN(valor) ?? valor <= 0) {
       Alert.alert("Informe um valor válido");
       return false;
     }
@@ -274,11 +274,11 @@ export default function useAddConta({
       descricao: descricao.trim(),
       valor: Number(valor.toFixed(2)),
       vencimento: vencimento.toISOString(),
-      pago: contaParaEditar?.pago || false,
+      pago: contaParaEditar?.pago ?? false,
       pagoEm: contaParaEditar?.pagoEm,
       responsavelId,
       responsaveis,
-      metodoPagamento: metodoPagamento || undefined,
+      metodoPagamento: metodoPagamento ?? undefined,
     };
 
     if (contaParaEditar) {

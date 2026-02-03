@@ -56,8 +56,7 @@ const circuitBreaker = {
 
 const SHOULD_LOG_HTTP = process.env.NODE_ENV !== "production";
 
-const sleep = (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms));
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const canProceed = (): { allowed: boolean; halfOpen: boolean } => {
   if (circuitBreaker.state === "OPEN") {
@@ -234,7 +233,7 @@ api.interceptors.response.use(
     const wasHalfOpen = Boolean(config?._cbHalfOpen);
 
     logError(
-      axiosError.response?.status || "Network Error",
+      axiosError.response?.status ?? "Network Error",
       config?.url,
       axiosError.response?.data
     );
