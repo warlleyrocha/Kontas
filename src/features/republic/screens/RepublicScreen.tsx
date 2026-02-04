@@ -7,7 +7,7 @@ import { AccountsTab } from "@/src/components/Tabs/Accounts";
 import { ResidentsTab } from "@/src/components/Tabs/Residents";
 import { ResumeTab } from "@/src/components/Tabs/Resume";
 
-import { EditRepublicModal } from "@/src/components/Modals/EditRepublicModal";
+import { EditRepublicModal } from "@/src/features/republic/components/EditRepublicModal";
 import { SideMenu } from "@/src/components/SideMenu";
 import { useSideMenu } from "@/src/components/SideMenu/useSideMenu";
 
