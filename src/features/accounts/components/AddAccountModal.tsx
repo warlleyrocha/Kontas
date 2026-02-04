@@ -1,5 +1,3 @@
-import useAddAccount from "@/src/components/Modals/AddAccountModal/useAccountModal";
-import type { Conta, Republica } from "@/src/types/resume";
 import { Feather } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useState } from "react";
@@ -13,51 +11,37 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useAccountForm } from "../hooks/useAccountForm";
 
 interface AddAccountModalProps {
   visible: boolean;
   onClose: () => void;
-  republica: Republica;
-  setRepublica: (r: Republica) => void;
-  contaParaEditar?: Conta | null;
 }
 
-export const AddAccountModal: React.FC<AddAccountModalProps> = ({
-  visible,
-  onClose,
-  republica,
-  setRepublica,
-  contaParaEditar,
-}) => {
+export const AddAccountModal = ({ visible, onClose }: AddAccountModalProps) => {
   const {
     descricao,
-    setDescricao,
-    valorStr,
-    setValorStr,
+    valorTotal,
     vencimento,
-    showDatepicker,
-    setShowDatepicker,
     metodoPagamento,
-    setMetodoPagamento,
-    responsavelId,
-    setResponsavelId,
+    tempVencimento,
+    showDatepicker,
     tipoDivisao,
-    setTipoDivisao,
-    selectedIds,
-    toggleSelectMorador,
-    valoresByMorador,
-    setValorMorador,
-    somaResponsaveis,
-    limpar,
-    salvar,
+    moradoresDivisao,
+    totalDivisaoPreenchido,
+
+    setDescricao,
+    setValorTotal,
+    setMetodoPagamento,
+
+    handleCloseModal,
+    handleConfirmDate,
+    handleOpenDatepicker,
     handleDateChange,
-  } = useAddAccount({
-    republica,
-    setRepublica,
-    onClose,
-    visible,
-    contaParaEditar,
-  });
+    handleSetTipoDivisao,
+    handleToggleMorador,
+    handleMoradorValorChange,
+  } = useAccountForm({ onClose });
 
   const [isValorInputFocused, setIsValorInputFocused] = useState(false);
 
@@ -74,16 +58,12 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({
             {/* header */}
             <View className="mb-3 flex-row items-center justify-between">
               <View>
-                <Text className="text-lg font-semibold">
-                  {contaParaEditar ? "Editar Conta" : "Nova Conta"}
-                </Text>
+                <Text className="text-lg font-semibold">Nova Conta</Text>
                 <Text className="mt-1 text-sm text-gray-500">
-                  {contaParaEditar
-                    ? "Modifique os dados da conta"
-                    : "Adicione uma nova conta para a república"}
+                  Adicione uma nova conta para a república
                 </Text>
               </View>
-              <TouchableOpacity onPress={onClose} className="p-2">
+              <TouchableOpacity onPress={handleCloseModal} className="p-2">
                 <Feather name="x" size={24} color="#374151" />
               </TouchableOpacity>
             </View>
@@ -110,8 +90,8 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({
                     Valor Total (R$)
                   </Text>
                   <TextInput
-                    value={valorStr}
-                    onChangeText={setValorStr}
+                    value={valorTotal}
+                    onChangeText={setValorTotal}
                     keyboardType="numeric"
                     placeholder="0,00"
                     className="rounded border border-gray-200 bg-gray-50 px-3 py-2"
@@ -122,7 +102,7 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({
                   <Text className="mb-1 text-sm text-gray-700">Vencimento</Text>
                   <TouchableOpacity
                     className="flex-row items-center justify-between rounded border border-gray-200 bg-gray-50 px-3 py-2"
-                    onPress={() => setShowDatepicker(true)}
+                    onPress={handleOpenDatepicker}
                   >
                     <Text>{vencimento.toLocaleDateString("pt-BR")}</Text>
                     <Feather name="calendar" size={18} color="#6b7280" />
@@ -136,9 +116,7 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({
                       <View className="flex-1 justify-end bg-black/40">
                         <View className="bg-white pb-8 pt-4">
                           <View className="mb-2 flex-row justify-end px-4">
-                            <TouchableOpacity
-                              onPress={() => setShowDatepicker(false)}
-                            >
+                            <TouchableOpacity onPress={handleConfirmDate}>
                               <Text className="text-base font-semibold text-indigo-600">
                                 Confirmar
                               </Text>
@@ -147,7 +125,7 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({
 
                           <View className="items-center">
                             <DateTimePicker
-                              value={vencimento}
+                              value={tempVencimento}
                               mode="date"
                               display="spinner"
                               onChange={handleDateChange}
@@ -194,31 +172,6 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({
                 </TouchableOpacity>
               </View>
 
-              <View className="mb-3">
-                <Text className="mb-1 text-sm text-gray-700">
-                  Morador Responsável
-                </Text>
-                <View className="flex-row flex-wrap gap-2">
-                  {republica.moradores.map((m) => (
-                    <TouchableOpacity
-                      key={m.id}
-                      onPress={() => setResponsavelId(m.id)}
-                      className={`rounded-md border px-3 py-2 ${responsavelId === m.id ? "border-indigo-600 bg-indigo-50" : "border-gray-200"}`}
-                    >
-                      <Text
-                        className={
-                          responsavelId === m.id
-                            ? "text-indigo-600"
-                            : "text-gray-700"
-                        }
-                      >
-                        {m.nome}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-
               {/* Tipo de divisão */}
               <View className="mb-3 border-t border-gray-200 pt-3">
                 <Text className="mb-2 text-sm text-gray-700">
@@ -226,21 +179,29 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({
                 </Text>
                 <View>
                   <TouchableOpacity
-                    onPress={() => setTipoDivisao("equal")}
+                    onPress={() => handleSetTipoDivisao("equal")}
                     className="mb-2 flex-row items-center"
                   >
                     <View
-                      className={`mr-3 h-4 w-4 rounded-full border ${tipoDivisao === "equal" ? "border-indigo-600 bg-indigo-600" : "border-gray-300"}`}
+                      className={`mr-3 h-4 w-4 rounded-full border border-indigo-600 ${
+                        tipoDivisao === "equal"
+                          ? "bg-indigo-600"
+                          : "bg-transparent"
+                      }`}
                     />
                     <Text>Dividir igualmente</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity
-                    onPress={() => setTipoDivisao("custom")}
+                    onPress={() => handleSetTipoDivisao("custom")}
                     className="flex-row items-center"
                   >
                     <View
-                      className={`mr-3 h-4 w-4 rounded-full border ${tipoDivisao === "custom" ? "border-indigo-600 bg-indigo-600" : "border-gray-300"}`}
+                      className={`mr-3 h-4 w-4 rounded-full border border-indigo-600 ${
+                        tipoDivisao === "custom"
+                          ? "bg-indigo-600"
+                          : "bg-transparent"
+                      }`}
                     />
                     <Text>Valores customizados</Text>
                   </TouchableOpacity>
@@ -253,64 +214,66 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({
                   Selecione os Moradores
                 </Text>
                 <View className="space-y-2">
-                  {republica.moradores.map((m) => {
-                    const checked = selectedIds.includes(m.id);
-                    const valor = valoresByMorador[m.id] ?? "0.00";
-                    return (
-                      <View
-                        key={m.id}
-                        className="flex-row items-center justify-between rounded-md bg-gray-50 px-3 py-2"
-                      >
-                        <View className="flex-row items-center">
-                          <TouchableOpacity
-                            onPress={() => toggleSelectMorador(m.id)}
-                            className={`mr-3 h-6 w-6 items-center justify-center rounded-sm ${checked ? "bg-indigo-600" : "border border-gray-300 bg-white"}`}
-                          >
-                            {checked && (
-                              <Feather name="check" size={14} color="#fff" />
-                            )}
-                          </TouchableOpacity>
-
-                          <Text>{m.nome}</Text>
-                        </View>
-
-                        <View style={{ width: 120 }}>
-                          <TextInput
-                            value={valor}
-                            editable={checked}
-                            onFocus={() => setIsValorInputFocused(true)}
-                            onBlur={() => setIsValorInputFocused(false)}
-                            onChangeText={(t) => setValorMorador(m.id, t)}
-                            keyboardType="numeric"
-                            className={`rounded px-2 py-1 text-right ${checked ? "border border-gray-200 bg-white" : "bg-gray-100"}`}
+                  {moradoresDivisao.map((morador) => (
+                    <View
+                      key={morador.moradorId}
+                      className="flex-row items-center justify-between rounded-md bg-gray-50 px-3 py-2"
+                    >
+                      <View className="flex-row items-center">
+                        <TouchableOpacity
+                          onPress={() => handleToggleMorador(morador.moradorId)}
+                          className={`mr-3 h-6 w-6 items-center justify-center rounded-sm border ${
+                            morador.checked
+                              ? "border-indigo-600 bg-indigo-600"
+                              : "border-gray-300 bg-white"
+                          }`}
+                        >
+                          <Feather
+                            name="check"
+                            size={14}
+                            color={morador.checked ? "#fff" : "transparent"}
                           />
-                        </View>
+                        </TouchableOpacity>
+
+                        <Text>{morador.nome}</Text>
                       </View>
-                    );
-                  })}
+
+                      <View style={{ width: 120 }}>
+                        <TextInput
+                          value={morador.valor}
+                          editable={morador.checked && tipoDivisao === "custom"}
+                          onFocus={() => setIsValorInputFocused(true)}
+                          onBlur={() => setIsValorInputFocused(false)}
+                          onChangeText={(value) =>
+                            handleMoradorValorChange(morador.moradorId, value)
+                          }
+                          keyboardType="numeric"
+                          className={`rounded px-2 py-1 text-right ${
+                            morador.checked && tipoDivisao === "custom"
+                              ? "bg-white"
+                              : "bg-gray-100 text-gray-500"
+                          }`}
+                        />
+                      </View>
+                    </View>
+                  ))}
                 </View>
 
                 {/* total check */}
-                <View className="mr-2 mt-3 flex-row items-center justify-between">
+                <View className="mr-2 mt-8 flex-row items-center justify-between">
                   <Text className="text-sm text-gray-500">
                     Total preenchido
                   </Text>
                   <Text className="text-sm font-semibold">
-                    R$ {somaResponsaveis.toFixed(2)}
+                    R$ {totalDivisaoPreenchido.toFixed(2).replace(".", ",")}
                   </Text>
                 </View>
               </View>
 
               {/* buttons */}
-              <View className="mt-[20px] flex-row gap-3">
+              <View className="mt-[10px] flex-row gap-3">
                 <TouchableOpacity
-                  onPress={async () => {
-                    const ok = await salvar();
-                    // salvar já chama onClose() via hook; caso prefira, pode controlar aqui também
-                    if (ok) {
-                      // nada extra por enquanto
-                    }
-                  }}
+                  onPress={() => console.log("clicado")}
                   className="flex-1 items-center rounded-md bg-indigo-600 py-3"
                 >
                   <Text className="font-medium text-white">
@@ -319,10 +282,7 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  onPress={() => {
-                    limpar();
-                    onClose();
-                  }}
+                  onPress={handleCloseModal}
                   className="flex-1 items-center rounded-md border border-gray-300 py-3"
                 >
                   <Text className="font-medium text-gray-700">Cancelar</Text>

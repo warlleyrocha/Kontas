@@ -9,7 +9,7 @@ import {
   moradoresMock,
   responsavel,
 } from "@/src/constants/account.mock";
-//import { AddAccountModal } from "../../Modals/AddAccountModal";
+import { AddAccountModal } from "@/src/features/accounts/components/AddAccountModal";
 
 interface Responsavel {
   moradorId: string;
@@ -39,6 +39,7 @@ export function AccountsTab({ onOpenAdd }: AccountsTabProps) {
   const [mostrarContasAbertas, setMostrarContasAbertas] = useState(true);
   const [mostrarContasPagas, setMostrarContasPagas] = useState(false);
   const [expandidaId, setExpandidaId] = useState<string | null>(null);
+  const [showAccountModal, setShowAccountModal] = useState(false);
 
   // Filtra contas por mês
   const contasFiltradas =
@@ -293,7 +294,7 @@ export function AccountsTab({ onOpenAdd }: AccountsTabProps) {
     return (
       <TouchableOpacity
         className="mt-6 items-center rounded-lg bg-white p-6 shadow-lg"
-        onPress={() => onOpenAdd?.()}
+        onPress={() => setShowAccountModal(true)}
       >
         <Feather name="dollar-sign" size={48} color="#9ca3af" />
         <Text className="mt-4 text-center text-gray-500">
@@ -412,21 +413,18 @@ export function AccountsTab({ onOpenAdd }: AccountsTabProps) {
 
           <TouchableOpacity
             className="items-center rounded-md bg-indigo-600 px-4 py-3 mb-2"
-            onPress={() => onOpenAdd?.()}
+            onPress={() => setShowAccountModal(true)}
           >
             <Text className="text-white">+ Nova Conta</Text>
           </TouchableOpacity>
         </View>
       )}
 
-      {/* Modal de Edição 
+      {/* Modal de Adição de conta*/}
       <AddAccountModal
-        visible={showEditModal}
-        onClose={fecharEdicao}
-        republica={republica}
-        setRepublica={setRepublica}
-        contaParaEditar={contaParaEditar}
-      />*/}
+        visible={showAccountModal}
+        onClose={() => setShowAccountModal(false)}
+      />
     </ScrollView>
   );
 }
