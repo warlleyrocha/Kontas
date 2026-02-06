@@ -25,6 +25,8 @@ import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "../../global.css";
+import { ApolloProvider } from "@apollo/client/react";
+import { apolloClient } from "@/src/services/apolloClient";
 
 import * as Sentry from "@sentry/react-native";
 
@@ -100,10 +102,12 @@ function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <GlobalErrorBoundary>
-        <AuthProvider>
-          <RootStack />
-          <Toaster position="bottom-center" />
-        </AuthProvider>
+        <ApolloProvider client={apolloClient}>
+          <AuthProvider>
+            <RootStack />
+            <Toaster position="bottom-center" />
+          </AuthProvider>
+        </ApolloProvider>
       </GlobalErrorBoundary>
     </GestureHandlerRootView>
   );
