@@ -1,26 +1,49 @@
 import { formatMounthYear } from "@/src/utils/formats";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
-import { useState } from "react";
-import { mesesDisponiveis, contasMockadas } from "@/src/constants/account.mock";
+import { useState, useMemo } from "react";
 import { AddAccountModal } from "@/src/features/accounts/components/AddAccountModal";
 import { AccountCard } from "@/src/features/accounts/components/AccountCard";
+import { useQuery } from "@apollo/client/react";
+import { GET_CONTAS_POR_REPUBLICA } from "@/src/graphql/queries/accounts";
+import { adaptarContaGraphQL } from "@/src/utils/account.adapter";
+import type { ContaGraphQL } from "@/src/graphql/types/account";
 
 interface AccountsTabProps {
-  readonly onOpenAdd?: () => void;
+  readonly republicId: string;
 }
 
-export function AccountsTab({ onOpenAdd }: AccountsTabProps) {
+export function AccountsTab({ republicId }: AccountsTabProps) {
+  console.log("identificador da republica: ", republicId);
   const [mesSelecionado, setMesSelecionado] = useState<string>("todos");
   const [mostrarContasAbertas, setMostrarContasAbertas] = useState(true);
   const [mostrarContasPagas, setMostrarContasPagas] = useState(false);
   const [showAccountModal, setShowAccountModal] = useState(false);
 
+  // Busca as contas do GraphQL
+  const { data, loading, error } = useQuery<{
+    contasPorRepublica: ContaGraphQL[];
+  }>(GET_CONTAS_POR_REPUBLICA, {
+    variables: { republicaId: republicId },
+  });
+
+  // Adapta os dados do GraphQL para o formato esperado pelo componente
+  const contasAdaptadas = useMemo(() => {
+    if (!data?.contasPorRepublica) return [];
+    return data.contasPorRepublica.map(adaptarContaGraphQL);
+  }, [data]);
+
+  // Extrai meses disponíveis das contas
+  const mesesDisponiveis = useMemo(() => {
+    const meses = new Set(contasAdaptadas.map((c) => c.mesReferencia));
+    return Array.from(meses).sort((a, b) => a.localeCompare(b));
+  }, [contasAdaptadas]);
+
   // Filtra contas por mês
   const contasFiltradas =
     mesSelecionado === "todos"
-      ? contasMockadas
-      : contasMockadas.filter(
+      ? contasAdaptadas
+      : contasAdaptadas.filter(
           (conta) => conta.mesReferencia === mesSelecionado
         );
 
@@ -30,6 +53,29 @@ export function AccountsTab({ onOpenAdd }: AccountsTabProps) {
     pagas: contasFiltradas.filter((conta) => conta.status === "paga"),
   };
 
+  // Loading state
+  if (loading) {
+    return (
+      <View className="flex-1 items-center justify-center">
+        <Text className="text-gray-500">Carregando contas...</Text>
+      </View>
+    );
+  }
+
+  // Error state
+  if (error) {
+    console.log(error);
+    return (
+      <View className="flex-1 items-center justify-center px-4">
+        <Feather name="alert-circle" size={48} color="#ef4444" />
+        <Text className="mt-4 text-center text-red-600">
+          Erro ao carregar contas: {error.message}
+        </Text>
+      </View>
+    );
+  }
+
+  // Estado vazio
   if (
     contasOrdenadas.abertas.length === 0 &&
     contasOrdenadas.pagas.length === 0 &&
