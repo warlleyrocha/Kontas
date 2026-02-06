@@ -75,7 +75,7 @@ export function RepublicScreen({ republicId }: Props) {
       <View className="flex-1 p-4">
         <Tabs value={tab} onChange={setTab} />
 
-        {tab === "contas" && <AccountsTab />}
+        {tab === "contas" && <AccountsTab republicId={republicId} />}
         {tab === "moradores" && <ResidentsTab residents={residents} />}
         {tab === "resumo" && <ResumeTab />}
       </View>

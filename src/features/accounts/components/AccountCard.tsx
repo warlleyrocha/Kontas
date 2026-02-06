@@ -1,38 +1,21 @@
 import { useState } from "react";
 import { View, TouchableOpacity, Text } from "react-native";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { moradoresMock, responsavel } from "@/src/constants/account.mock";
+import { responsavel } from "@/src/constants/account.mock";
 import { DeleteButton } from "@/src/components/ui/delete-button";
-
-interface Responsavel {
-  moradorId: string;
-  valor: number;
-  pago?: boolean;
-}
-
-interface Conta {
-  id: string;
-  descricao: string;
-  valor: number;
-  vencimento: string;
-  status: string;
-  mesReferencia: string;
-  responsaveis: Responsavel[];
-  pago: boolean;
-  pagoEm?: string; // ISO date,
-  metodoPagamento?: string;
-}
+import type { ContaAdaptada } from "@/src/graphql/types/account";
 
 interface AccountCardProps {
-  conta: Conta;
+  conta: ContaAdaptada;
 }
 
 export const AccountCard = ({ conta }: AccountCardProps) => {
   const vencimento = new Date(conta.vencimento);
   vencimento.setHours(23, 59, 59, 999);
   const hoje = new Date();
-  const vencida = vencimento < hoje && !conta.pago;
-  const emAberto = vencimento >= hoje && !conta.pago;
+  const paga = conta.status === "paga";
+  const vencida = vencimento < hoje && !paga;
+  const emAberto = vencimento >= hoje && !paga;
   const [expandidaId, setExpandidaId] = useState<string | null>(null);
 
   // Mock: usando dados fictícios para responsável
@@ -61,14 +44,14 @@ export const AccountCard = ({ conta }: AccountCardProps) => {
               }}
             >
               <MaterialCommunityIcons
-                name={conta.pago ? "checkbox-marked" : "checkbox-blank-outline"}
+                name={paga ? "checkbox-marked" : "checkbox-blank-outline"}
                 size={24}
-                color={conta.pago ? "#16a34a" : "#6b7280"}
+                color={paga ? "#16a34a" : "#6b7280"}
               />
 
               <Text
                 className={`text-base font-semibold ${
-                  conta.pago ? "text-gray-400 line-through" : ""
+                  paga ? "text-gray-400 line-through" : ""
                 }`}
               >
                 {conta.descricao}
@@ -95,21 +78,21 @@ export const AccountCard = ({ conta }: AccountCardProps) => {
               )}
 
               {/* Em Aberto */}
-              {!conta.pago && emAberto && (
+              {!paga && emAberto && (
                 <View className="rounded-md bg-blue-600 px-2 py-1">
                   <Text className="text-xs text-white">Em Aberto</Text>
                 </View>
               )}
 
               {/* Vencida */}
-              {!conta.pago && vencida && (
+              {!paga && vencida && (
                 <View className="rounded-md bg-orange-600 px-2 py-1">
                   <Text className="text-xs text-white">Vencida</Text>
                 </View>
               )}
 
               {/* Pago */}
-              {conta.pago && (
+              {paga && (
                 <View className="rounded-md border border-green-600 px-2 py-1">
                   <Text className="text-xs text-green-600">Pago</Text>
                 </View>
@@ -126,11 +109,6 @@ export const AccountCard = ({ conta }: AccountCardProps) => {
             <Text className="font-semibold text-indigo-600">
               R$ {conta.valor.toFixed(2)}
             </Text>
-            {conta.metodoPagamento && (
-              <Text className="mt-1 text-xs text-gray-500">
-                {conta.metodoPagamento}
-              </Text>
-            )}
           </View>
         </View>
 
@@ -147,10 +125,10 @@ export const AccountCard = ({ conta }: AccountCardProps) => {
             >
               <Text className="font-semibold text-gray-700">Divisão:</Text>
               <View className="flex-row items-center gap-2">
-                <Text className="text-sm text-gray-500">
+                {/*<Text className="text-sm text-gray-500">
                   {conta.responsaveis?.length ?? 0}{" "}
                   {conta.responsaveis?.length === 1 ? "pessoa" : "pessoas"}
-                </Text>
+                </Text>*/}
                 <MaterialCommunityIcons
                   name={
                     expandidaId === conta.id ? "chevron-up" : "chevron-down"
@@ -165,65 +143,12 @@ export const AccountCard = ({ conta }: AccountCardProps) => {
             {expandidaId === conta.id && (
               <View className="border-t border-gray-200 px-4 py-3">
                 <View className="space-y-2">
-                  {conta.responsaveis.map((resp) => {
-                    const morador = moradoresMock.find(
-                      (m) => m.id === resp.moradorId
-                    );
-
-                    return (
-                      <View
-                        key={resp.moradorId}
-                        className="flex-row items-center justify-between rounded-lg bg-white p-3"
-                      >
-                        <TouchableOpacity
-                          onPress={(e) => {
-                            e.stopPropagation();
-                            console.log(
-                              "Marcar responsável como pago",
-                              resp.moradorId
-                            );
-                          }}
-                          className="flex-1 flex-row items-center gap-2"
-                        >
-                          <MaterialCommunityIcons
-                            name={
-                              resp.pago
-                                ? "checkbox-marked"
-                                : "checkbox-blank-outline"
-                            }
-                            size={20}
-                            color={resp.pago ? "#16a34a" : "#6b7280"}
-                          />
-                          <Text
-                            className={`font-medium ${
-                              resp.pago
-                                ? "text-gray-400 line-through"
-                                : "text-gray-800"
-                            }`}
-                          >
-                            {morador?.nome}
-                          </Text>
-                        </TouchableOpacity>
-                        <Text
-                          className={`font-bold ${
-                            resp.pago ? "text-gray-400" : "text-indigo-600"
-                          }`}
-                        >
-                          R$ {resp.valor.toFixed(2)}
-                        </Text>
-                      </View>
-                    );
-                  })}
-
                   {/* Total da divisão */}
                   <View className="mt-3 border-t border-gray-200 pt-3">
                     <View className="flex-row items-center justify-between rounded-lg bg-indigo-50 p-3">
                       <Text className="font-bold text-indigo-900">Total:</Text>
                       <Text className="text-lg font-bold text-indigo-600">
-                        R${" "}
-                        {conta.responsaveis
-                          .reduce((acc, r) => acc + r.valor, 0)
-                          .toFixed(2)}
+                        R$ 20
                       </Text>
                     </View>
                   </View>
@@ -233,7 +158,7 @@ export const AccountCard = ({ conta }: AccountCardProps) => {
           </View>
 
           {/* Copiar PIX */}
-          {!conta.pago && ownerAccount?.chavePix && (
+          {!paga && ownerAccount?.chavePix && (
             <TouchableOpacity
               onPress={() => console.log("Copiar PIX")}
               className="flex-row items-center justify-center rounded-md border border-indigo-600 px-4 py-2"
@@ -241,13 +166,6 @@ export const AccountCard = ({ conta }: AccountCardProps) => {
               <Feather name="copy" size={18} color="#4b5563" />
               <Text className="ml-2 text-gray-700">Copiar Chave PIX</Text>
             </TouchableOpacity>
-          )}
-
-          {/* Pago em */}
-          {conta.pago && conta.pagoEm && (
-            <Text className="text-sm text-gray-500">
-              Pago em: {new Date(conta.pagoEm).toLocaleDateString("pt-BR")}
-            </Text>
           )}
         </View>
       </View>
