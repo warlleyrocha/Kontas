@@ -2,8 +2,8 @@ import type { ResidentResponse } from "@/src/types/resident.types";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
 import { FlatList, Text, View } from "react-native";
-import { ResidentCard } from "./ResidentCard";
-import { useTabResidents } from "./useTabResidents";
+import { ResidentCard } from "@/src/features/residents/components/ResidentCard";
+import { useTabResidents } from "@/src/features/residents/hooks/useTabResidents";
 
 interface ResidentsTabProps {
   residents: ResidentResponse[];
