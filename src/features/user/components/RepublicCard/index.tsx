@@ -15,6 +15,8 @@ export default function RepublicCard({
   onEdit,
   onSelect,
 }: RepublicaCardProps) {
+  const residentsLabel = residentsCount === 1 ? "Morador" : "Moradores";
+
   return (
     <TouchableOpacity
       onPress={onSelect}
@@ -44,7 +46,7 @@ export default function RepublicCard({
           <View className="flex-row items-center">
             <Ionicons name="people-outline" size={14} color="#3B82F6" />
             <Text className="ml-1 text-sm font-medium text-gray-600">
-              {residentsCount} {residentsCount === 1 ? "morador" : "moradores"}
+              {residentsCount} {residentsLabel}
             </Text>
           </View>
 
