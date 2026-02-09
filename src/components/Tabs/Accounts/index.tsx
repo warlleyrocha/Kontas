@@ -1,57 +1,33 @@
-import { formatMounthYear } from "@/src/utils/formats";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
-import { useState, useMemo } from "react";
+
+import { formatMounthYear } from "@/src/utils/formats";
+
 import { AddAccountModal } from "@/src/features/accounts/components/AddAccountModal";
 import { AccountCard } from "@/src/features/accounts/components/AccountCard";
-import { useQuery } from "@apollo/client/react";
-import { GET_CONTAS_POR_REPUBLICA } from "@/src/graphql/queries/accounts";
-import { adaptarContaGraphQL } from "@/src/utils/account.adapter";
-import type { ContaGraphQL } from "@/src/graphql/types/account";
+import { useAccountActions } from "@/src/features/accounts/hooks/useAccountActions";
+import { useAccountList } from "@/src/features/accounts/hooks/useAccountList";
 
 interface AccountsTabProps {
   readonly republicId: string;
 }
 
 export function AccountsTab({ republicId }: AccountsTabProps) {
-  console.log("identificador da republica: ", republicId);
-  const [mesSelecionado, setMesSelecionado] = useState<string>("todos");
-  const [mostrarContasAbertas, setMostrarContasAbertas] = useState(true);
-  const [mostrarContasPagas, setMostrarContasPagas] = useState(false);
-  const [showAccountModal, setShowAccountModal] = useState(false);
+  const {
+    contasOrdenadas,
+    mesesDisponiveis,
+    mesSelecionado,
+    mostrarContasAbertas,
+    mostrarContasPagas,
+    loading,
+    error,
+    setMesSelecionado,
+    setMostrarContasPagas,
+    setMostrarContasAbertas,
+  } = useAccountList({ republicId });
 
-  // Busca as contas do GraphQL
-  const { data, loading, error } = useQuery<{
-    contasPorRepublica: ContaGraphQL[];
-  }>(GET_CONTAS_POR_REPUBLICA, {
-    variables: { republicaId: republicId },
-  });
-
-  // Adapta os dados do GraphQL para o formato esperado pelo componente
-  const contasAdaptadas = useMemo(() => {
-    if (!data?.contasPorRepublica) return [];
-    return data.contasPorRepublica.map(adaptarContaGraphQL);
-  }, [data]);
-
-  // Extrai meses disponíveis das contas
-  const mesesDisponiveis = useMemo(() => {
-    const meses = new Set(contasAdaptadas.map((c) => c.mesReferencia));
-    return Array.from(meses).sort((a, b) => a.localeCompare(b));
-  }, [contasAdaptadas]);
-
-  // Filtra contas por mês
-  const contasFiltradas =
-    mesSelecionado === "todos"
-      ? contasAdaptadas
-      : contasAdaptadas.filter(
-          (conta) => conta.mesReferencia === mesSelecionado
-        );
-
-  // Organiza contas em abertas e pagas
-  const contasOrdenadas = {
-    abertas: contasFiltradas.filter((conta) => conta.status === "aberta"),
-    pagas: contasFiltradas.filter((conta) => conta.status === "paga"),
-  };
+  const { showAccountModal, setShowAccountModal, handleSubmit } =
+    useAccountActions();
 
   // Loading state
   if (loading) {
@@ -62,36 +38,71 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
     );
   }
 
-  // Error state
+  // Error state - mostra erro mas permite adicionar conta
   if (error) {
     console.log(error);
     return (
-      <View className="flex-1 items-center justify-center px-4">
-        <Feather name="alert-circle" size={48} color="#ef4444" />
-        <Text className="mt-4 text-center text-red-600">
-          Erro ao carregar contas: {error.message}
-        </Text>
+      <View className="flex-1 px-4">
+        {/* Banner de erro */}
+        <View className="mt-6 rounded-lg bg-red-50 border border-red-200 p-4">
+          <View className="flex-row items-center">
+            <Feather name="alert-circle" size={24} color="#ef4444" />
+            <Text className="ml-3 flex-1 text-red-600">
+              Erro ao carregar contas: {error.message}
+            </Text>
+          </View>
+        </View>
+
+        {/* Estado vazio com opção de adicionar */}
+        <TouchableOpacity
+          className="mt-6 items-center rounded-lg bg-white p-6 shadow-lg"
+          onPress={() => setShowAccountModal(true)}
+        >
+          <Feather name="dollar-sign" size={48} color="#9ca3af" />
+          <Text className="mt-4 text-center text-gray-500">
+            Nenhuma conta cadastrada ainda.{"\n"}
+            Toque para adicionar.
+          </Text>
+        </TouchableOpacity>
+
+        {/* Modal de Adição de conta*/}
+        <AddAccountModal
+          onSubmit={handleSubmit}
+          visible={showAccountModal}
+          onClose={() => setShowAccountModal(false)}
+          republicId={republicId}
+        />
       </View>
     );
   }
 
-  // Estado vazio
+  // Estado vazio (sem erro)
   if (
     contasOrdenadas.abertas.length === 0 &&
     contasOrdenadas.pagas.length === 0 &&
     mesSelecionado === "todos"
   ) {
     return (
-      <TouchableOpacity
-        className="mt-6 items-center rounded-lg bg-white p-6 shadow-lg"
-        onPress={() => setShowAccountModal(true)}
-      >
-        <Feather name="dollar-sign" size={48} color="#9ca3af" />
-        <Text className="mt-4 text-center text-gray-500">
-          Nenhuma conta cadastrada ainda.{"\n"}
-          Toque para adicionar.
-        </Text>
-      </TouchableOpacity>
+      <View className="px-4">
+        <TouchableOpacity
+          className="mt-6 items-center rounded-lg bg-white p-6 shadow-lg"
+          onPress={() => setShowAccountModal(true)}
+        >
+          <Feather name="dollar-sign" size={48} color="#9ca3af" />
+          <Text className="mt-4 text-center text-gray-500">
+            Nenhuma conta cadastrada ainda.{"\n"}
+            Toque para adicionar.
+          </Text>
+        </TouchableOpacity>
+
+        {/* Modal de Adição de conta*/}
+        <AddAccountModal
+          visible={showAccountModal}
+          onSubmit={handleSubmit}
+          onClose={() => setShowAccountModal(false)}
+          republicId={republicId}
+        />
+      </View>
     );
   }
 
@@ -218,7 +229,9 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
       {/* Modal de Adição de conta*/}
       <AddAccountModal
         visible={showAccountModal}
+        onSubmit={handleSubmit}
         onClose={() => setShowAccountModal(false)}
+        republicId={republicId}
       />
     </ScrollView>
   );
