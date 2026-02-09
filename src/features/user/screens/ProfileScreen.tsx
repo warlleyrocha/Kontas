@@ -5,7 +5,6 @@ import EmptyRepublic from "@/src/features/user/components/CardsProfile/EmptyRepu
 import IncompleteProfile from "@/src/features/user/components/CardsProfile/IncompleteProfile";
 import RepublicList from "@/src/features/user/components/CardsProfile/RepublicList";
 import { EditProfileModal } from "@/src/features/user/components/EditProfileModal";
-import RepublicCard from "@/src/features/user/components/RepublicCard";
 
 import { MenuButton, SideMenu } from "@/src/components/SideMenu";
 import { maskPhone } from "@/src/utils/inputMasks";
@@ -59,7 +58,6 @@ export function ProfileScreen() {
         onEditRepublic={handleEditRepublic}
         onSelectRepublic={handleSelectRepublic}
         onCreateRepublic={handleCreateRepublic}
-        RepublicCard={RepublicCard}
         refreshing={refreshing}
         onRefresh={onRefresh}
       />

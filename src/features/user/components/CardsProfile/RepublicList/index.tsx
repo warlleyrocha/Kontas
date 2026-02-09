@@ -1,5 +1,6 @@
 import { useRepublicResidents } from "@/src/hooks/useRepublicResidents";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
+import RepublicCard from "@/src/features/user/components/RepublicCard";
 import { Ionicons } from "@expo/vector-icons";
 import {
   RefreshControl,
@@ -14,13 +15,6 @@ interface RepublicListProps {
   readonly onEditRepublic: (id: string) => void;
   readonly onSelectRepublic: (id: string) => void;
   readonly onCreateRepublic: () => void;
-  readonly RepublicCard: React.ComponentType<{
-    republic: RepublicResponse;
-    residentsCount?: number;
-
-    onEdit: () => void;
-    onSelect: () => void;
-  }>;
   readonly refreshing?: boolean;
   readonly onRefresh?: () => void | Promise<void>;
 }
@@ -30,7 +24,6 @@ export default function RepublicList({
   onEditRepublic,
   onSelectRepublic,
   onCreateRepublic,
-  RepublicCard,
   refreshing = false,
   onRefresh,
 }: RepublicListProps) {
