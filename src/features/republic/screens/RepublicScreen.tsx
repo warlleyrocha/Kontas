@@ -22,6 +22,7 @@ export function RepublicScreen({ republicId }: Props) {
   const {
     republic,
     residents,
+    residentsCount,
     tab,
     setTab,
     isLoading,
@@ -66,6 +67,7 @@ export function RepublicScreen({ republicId }: Props) {
     <View className="flex-1 bg-[#FAFAFA]">
       <RepublicHeader
         republic={republic}
+        numberResidents={residentsCount}
         isFavorited={isFavorited}
         onEdit={() => setShowEditModal(true)}
         onToggleFavorite={toggleFavorite}

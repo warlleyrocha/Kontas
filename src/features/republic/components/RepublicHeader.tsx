@@ -7,6 +7,7 @@ import { MenuButton } from "@/src/components/SideMenu";
 
 interface RepublicHeaderProps {
   readonly republic: RepublicResponse;
+  readonly numberResidents: number;
   readonly isFavorited: boolean;
   readonly onEdit: () => void;
   readonly onToggleFavorite: () => void;
@@ -16,10 +17,13 @@ interface RepublicHeaderProps {
 export function RepublicHeader({
   republic,
   isFavorited,
+  numberResidents,
   onEdit,
   onToggleFavorite,
   onMenuOpen,
 }: RepublicHeaderProps) {
+  const residentsLabel = numberResidents === 1 ? "Morador" : "Moradores";
+
   return (
     <View className="mt-[32px] flex-row gap-3 border-b border-b-black/10 bg-[#FAFAFA] px-[16px] py-4">
       {/* Imagem */}
@@ -44,7 +48,9 @@ export function RepublicHeader({
         <Text className="text-base font-semibold">
           {republic.nome ?? "República"}
         </Text>
-        <Text className="text-sm text-gray-500">0 Morador</Text>
+        <Text className="text-sm text-gray-500">
+          {numberResidents} {residentsLabel}
+        </Text>
       </TouchableOpacity>
 
       {/* Favorito */}

@@ -68,6 +68,9 @@ export function useRepublicScreen(republicId: string) {
     }
   }, [republic?.id, fetchResidents]);
 
+  // Obtém numero de moradores
+  const residentsCount = residents.length;
+
   const toggleFavorite = useCallback(() => {
     setIsFavorited((prev) => {
       showToast.success(
@@ -126,6 +129,7 @@ export function useRepublicScreen(republicId: string) {
   return {
     republic,
     residents,
+    residentsCount,
     tab,
     setTab,
     isLoading,
