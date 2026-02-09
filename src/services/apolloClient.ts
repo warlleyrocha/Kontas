@@ -8,8 +8,6 @@ import { Observable } from "@apollo/client/utilities";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const debugLink = new ApolloLink((operation, forward) => {
-  const { headers } = operation.getContext();
-  console.log("[GQL headers]", headers);
   return forward(operation);
 });
 

@@ -12,13 +12,21 @@ import {
   View,
 } from "react-native";
 import { useAccountForm } from "../hooks/useAccountForm";
+import { CriarContaInput } from "@/src/graphql/types/account";
 
 interface AddAccountModalProps {
   visible: boolean;
   onClose: () => void;
+  republicId: string;
+  onSubmit: (data: CriarContaInput) => void;
 }
 
-export const AddAccountModal = ({ visible, onClose }: AddAccountModalProps) => {
+export const AddAccountModal = ({
+  visible,
+  onClose,
+  republicId,
+  onSubmit,
+}: AddAccountModalProps) => {
   const {
     descricao,
     valorTotal,
@@ -44,6 +52,26 @@ export const AddAccountModal = ({ visible, onClose }: AddAccountModalProps) => {
   } = useAccountForm({ onClose });
 
   const [isValorInputFocused, setIsValorInputFocused] = useState(false);
+
+  const handleSubmit = () => {
+    // Converte a data para formato ISO string
+    const vencimentoISO = vencimento.toISOString();
+
+    // Converte o valor de string para número
+    const valorNumerico = parseFloat(valorTotal.replace(",", ".")) || 0;
+
+    // Monta o objeto no formato esperado pelo GraphQL
+    const formData: CriarContaInput = {
+      descricao,
+      valor: valorNumerico,
+      vencimento: vencimentoISO,
+      republicaId: republicId,
+      status: "PENDENTE", // ou outro status padrão
+    };
+
+    // Chama a função onSubmit passada como prop
+    onSubmit(formData);
+  };
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
@@ -273,7 +301,7 @@ export const AddAccountModal = ({ visible, onClose }: AddAccountModalProps) => {
               {/* buttons */}
               <View className="mt-[10px] flex-row gap-3">
                 <TouchableOpacity
-                  onPress={() => console.log("clicado")}
+                  onPress={handleSubmit}
                   className="flex-1 items-center rounded-md bg-indigo-600 py-3"
                 >
                   <Text className="font-medium text-white">

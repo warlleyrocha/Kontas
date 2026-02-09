@@ -21,3 +21,22 @@ export type ContaAdaptada = {
   mesReferencia: string; // formato: "2024-12"
   republicaId: string;
 };
+
+// Input para criar uma conta
+export type CriarContaInput = {
+  descricao: string;
+  valor: number;
+  vencimento: string; // DateTime em formato ISO
+  republicaId: string;
+  status?: StatusConta; // Opcional
+};
+
+// Variáveis da mutation de criar conta
+export type CriarContaVariables = {
+  data: CriarContaInput;
+};
+
+// Resposta da mutation de criar conta
+export type CriarContaResponse = {
+  criarConta: ContaGraphQL;
+};
