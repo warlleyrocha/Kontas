@@ -38,6 +38,7 @@ export const inviteService = {
         defaultMessage: "Erro ao obter convites.",
         statusMessages: {
           401: "Não autenticado.",
+          404: "Nenhum convite encontrado para este usuário.",
           500: "Erro interno do servidor.",
         },
       });
@@ -53,7 +54,7 @@ export const inviteService = {
     } catch (error) {
       console.error("Erro no getInvitesByUser", error);
       throw toUserFriendlyError(error, {
-        defaultMessage: "Erro ao obter repúblicas.",
+        defaultMessage: "Erro ao obter convites.",
         statusMessages: {
           401: "Não autenticado.",
           500: "Erro interno do servidor.",

@@ -7,7 +7,6 @@ import {
   StatusInvite,
 } from "@/src/features/invites/types/invite.types";
 import { getErrorMessage } from "@/src/services/httpError";
-import { showToast } from "@/src/utils/showToast";
 import { useCallback, useState } from "react";
 import { useRouter } from "expo-router";
 
@@ -15,7 +14,7 @@ export function useInvites() {
   const router = useRouter();
 
   const [invites, setInvites] = useState<Invite[]>([]);
-  const [invitesByEmail, setInvitesByEmail] = useState<GetInvitesByUser[]>([]);
+  const [invitesByUser, setInvitesByUser] = useState<GetInvitesByUser[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,10 +54,11 @@ export function useInvites() {
   }, []);
 
   // BUscar convites por email
-  const fetchInvitesByEmail = useCallback(async () => {
+  const fetchInvitesByUser = useCallback(async () => {
+    setError(null);
     try {
       const data = await inviteService.getInvitesByUser();
-      setInvitesByEmail(data);
+      setInvitesByUser(data);
     } catch (error) {
       const message = getErrorMessage(
         error,
@@ -66,8 +66,7 @@ export function useInvites() {
       );
       console.error("Erro ao buscar convites no hook:", error);
       setError(message);
-      showToast.error(message);
-      setInvitesByEmail([]);
+      setInvitesByUser([]);
     } finally {
       console.log("Busca dos convites encerrada.");
     }
@@ -108,7 +107,7 @@ export function useInvites() {
       try {
         await updateInviteStatus(inviteId, StatusInvite.ACEITO);
         setInvites((prev) => prev.filter((invite) => invite.id !== inviteId));
-        setInvitesByEmail((prev) =>
+        setInvitesByUser((prev) =>
           prev.filter((invite) => invite.id !== inviteId)
         );
         router.replace(`/(republics)/${republicaId}`);
@@ -124,7 +123,7 @@ export function useInvites() {
       try {
         await updateInviteStatus(id, StatusInvite.RECUSADO);
         setInvites((prev) => prev.filter((invite) => invite.id !== id));
-        setInvitesByEmail((prev) => prev.filter((invite) => invite.id !== id));
+        setInvitesByUser((prev) => prev.filter((invite) => invite.id !== id));
       } catch {
         // erro já é setado dentro de updateInviteStatus
       }
@@ -133,12 +132,12 @@ export function useInvites() {
   );
 
   return {
-    invitesByEmail,
+    invitesByUser,
     invites,
     loading,
     error,
     fetchInvites,
-    fetchInvitesByEmail,
+    fetchInvitesByUser,
     sendInvite,
     updateInviteStatus,
     handleAcceptInvite,
