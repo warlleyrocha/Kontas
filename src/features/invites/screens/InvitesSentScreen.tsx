@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import { MenuButton, SideMenu } from "@/src/components/SideMenu";
+import { EmptyState } from "@/src/components/EmptyState";
 
 import { InvitesCard } from "../components/InvitesCard";
 import { useInvitesScreen } from "../hooks/useInvitesScreen";
@@ -15,13 +16,51 @@ interface InvitesSentScreenProps {
 
 export function InvitesSentScreen({ republicId }: InvitesSentScreenProps) {
   const router = useRouter();
-  const { invites, fetchInvites } = useInvites();
+  const { invites, fetchInvites, error } = useInvites();
   const { isMenuOpen, setIsMenuOpen, menuItems, footerItems, sideMenuUser } =
     useInvitesScreen();
 
   useEffect(() => {
     fetchInvites(republicId);
   }, [fetchInvites, republicId]);
+
+  const renderContent = () => {
+    if (error) {
+      return (
+        <EmptyState
+          icon="alert-circle-outline"
+          iconColor="#EF4444"
+          bgColor="bg-red-50"
+          title="Não foi possível carregar os convites"
+          description={error}
+          buttonText="Tentar novamente"
+          onPress={() => fetchInvites(republicId)}
+        />
+      );
+    }
+
+    if (invites.length === 0) {
+      return (
+        <EmptyState
+          icon="paper-plane-outline"
+          iconColor="#9CA3AF"
+          bgColor="bg-gray-100"
+          title="Nenhum convite enviado"
+          description="Você ainda não enviou convites para esta república. Convide pessoas para se juntarem a você!"
+          buttonText="Voltar"
+          onPress={() => router.back()}
+        />
+      );
+    }
+
+    return (
+      <ScrollView className="flex-1 px-4 pt-4">
+        {invites.map((invite) => (
+          <InvitesCard key={invite.id} invite={invite} />
+        ))}
+      </ScrollView>
+    );
+  };
 
   return (
     <View className="flex-1 bg-[#FAFAFA]">
@@ -40,37 +79,7 @@ export function InvitesSentScreen({ republicId }: InvitesSentScreenProps) {
         <MenuButton onPress={() => setIsMenuOpen(true)} />
       </View>
 
-      {invites.length > 0 ? (
-        <ScrollView className="flex-1 px-4 pt-4">
-          {invites.map((invite) => (
-            <InvitesCard key={invite.id} invite={invite} />
-          ))}
-        </ScrollView>
-      ) : (
-        <View className="flex-1 items-center justify-center px-6">
-          <View className="mb-6 h-24 w-24 items-center justify-center rounded-full bg-gray-100">
-            <Ionicons name="paper-plane-outline" size={48} color="#9CA3AF" />
-          </View>
-
-          <Text className="mb-2 text-center text-xl font-bold text-gray-800">
-            Nenhum convite enviado
-          </Text>
-
-          <Text className="mb-8 text-center text-base text-gray-500">
-            Você ainda não enviou convites para esta república. Convide pessoas
-            para se juntarem a você!
-          </Text>
-
-          <TouchableOpacity
-            onPress={() => router.back()}
-            className="flex-row items-center rounded-xl bg-indigo-600 px-6 py-3"
-            activeOpacity={0.8}
-          >
-            <Ionicons name="arrow-back" size={18} color="white" />
-            <Text className="ml-2 font-semibold text-white">Voltar</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+      {renderContent()}
 
       {isMenuOpen && sideMenuUser && (
         <SideMenu
