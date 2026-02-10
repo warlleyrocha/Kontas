@@ -53,7 +53,7 @@ export default function RepublicList({
             key={republic.id}
             republic={republic}
             residentsCount={getResidentsCount(republic.id)}
-            onEdit={() => onEditRepublic(republic.id)}
+            //onEdit={() => onEditRepublic(republic.id)}
             onSelect={() => onSelectRepublic(republic.id)}
           />
         ))}

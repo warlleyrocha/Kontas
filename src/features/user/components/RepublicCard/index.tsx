@@ -5,14 +5,14 @@ import { Image, Text, TouchableOpacity, View } from "react-native";
 interface RepublicaCardProps {
   readonly republic: RepublicResponse;
   readonly residentsCount?: number;
-  readonly onEdit: () => void;
+  //readonly onEdit: () => void;
   readonly onSelect: () => void;
 }
 
 export default function RepublicCard({
   republic,
   residentsCount = 0,
-  onEdit,
+  //onEdit,
   onSelect,
 }: RepublicaCardProps) {
   const residentsLabel = residentsCount === 1 ? "Morador" : "Moradores";
@@ -50,6 +50,7 @@ export default function RepublicCard({
             </Text>
           </View>
 
+          {/* 
           <TouchableOpacity
             onPress={onEdit}
             className="rounded-full bg-blue-100 p-2"
@@ -57,6 +58,7 @@ export default function RepublicCard({
           >
             <Ionicons name="pencil" size={16} color="#3B82F6" />
           </TouchableOpacity>
+          */}
         </View>
       </View>
     </TouchableOpacity>
