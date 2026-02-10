@@ -1,4 +1,4 @@
-import { useResidents } from "@/src/hooks/useResidents";
+import { useResidents } from "@/src/features/residents/hooks/useResidents";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import { ResidentRole } from "@/src/types/resident.types";
 import { useCallback, useEffect, useState } from "react";

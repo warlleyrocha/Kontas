@@ -1,4 +1,4 @@
-import { residentService } from "@/src/services/resident.service";
+import { residentService } from "@/src/features/residents/services/resident.service";
 import { getErrorMessage } from "@/src/services/httpError";
 import { showToast } from "@/src/utils/showToast";
 import { ResidentResponse } from "@/src/types/resident.types";
