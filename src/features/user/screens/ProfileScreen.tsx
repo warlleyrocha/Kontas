@@ -25,7 +25,7 @@ export function ProfileScreen() {
     handleSaveProfile,
     handleCreateRepublic,
     handleViewInvites,
-    handleEditRepublic,
+    //handleEditRepublic,
     handleSelectRepublic,
     onRefresh,
 
@@ -55,7 +55,7 @@ export function ProfileScreen() {
     return (
       <RepublicList
         republics={republics}
-        onEditRepublic={handleEditRepublic}
+        //onEditRepublic={handleEditRepublic}
         onSelectRepublic={handleSelectRepublic}
         onCreateRepublic={handleCreateRepublic}
         refreshing={refreshing}

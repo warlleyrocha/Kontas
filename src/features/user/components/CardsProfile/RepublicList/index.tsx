@@ -12,7 +12,7 @@ import {
 
 interface RepublicListProps {
   readonly republics: RepublicResponse[];
-  readonly onEditRepublic: (id: string) => void;
+  //readonly onEditRepublic: (id: string) => void;
   readonly onSelectRepublic: (id: string) => void;
   readonly onCreateRepublic: () => void;
   readonly refreshing?: boolean;
@@ -21,7 +21,7 @@ interface RepublicListProps {
 
 export default function RepublicList({
   republics,
-  onEditRepublic,
+  //onEditRepublic,
   onSelectRepublic,
   onCreateRepublic,
   refreshing = false,
