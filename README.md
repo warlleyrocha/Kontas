@@ -1,329 +1,207 @@
-# Kontas 💰
+# Kontas
 
-Aplicativo mobile para gestão financeira de repúblicas e moradias compartilhadas. Desenvolvido com React Native e Expo, o Kontas facilita o controle de contas, divisão de despesas e gerenciamento de moradores.
+Aplicativo mobile (Expo/React Native) para gestão de repúblicas: autenticação, perfil, convites, moradores e contas compartilhadas.
 
-## 📱 Funcionalidades
+## Visão Geral
 
-### Autenticação
+O app usa:
 
-- Login com Google OAuth
-- Persistência de sessão
-- Logout seguro
+- **REST (Axios)** para autenticação, usuário, repúblicas, moradores e convites.
+- **GraphQL (Apollo Client)** para contas (`contasPorRepublica`, `criarConta`, `removerConta`).
+- **Expo Router** para rotas baseadas em arquivos.
+- **AsyncStorage** para persistência de sessão (`@app:token`, `@app:user`).
+- **Sentry** para monitoramento de erros.
 
-### Gestão de República
+## Funcionalidades Implementadas
 
-- Cadastro de república com nome e foto personalizada
-- Edição de informações da república
-- Visualização de resumo com total de moradores
+### Autenticação e Sessão
 
-### Gestão de Moradores
+- Login com Google (`@react-native-google-signin/google-signin`).
+- Validação de token com backend em inicialização.
+- Cache local de usuário e token.
+- Logout com limpeza de sessão.
 
-- Cadastro de moradores com nome, chave PIX e foto de perfil
-- Edição e exclusão de moradores
-- Cópia rápida de chave PIX para transferências
-- Visualização de dívidas individuais por morador
-- Contagem de contas pendentes por morador
+### Perfil
 
-### Gestão de Contas
+- Fluxo de onboarding para novos usuários (`perfilCompleto = false`).
+- Edição de nome, telefone, chave Pix e foto.
+- Validação de campos obrigatórios ao completar perfil.
 
-- Cadastro de contas com descrição, valor, vencimento e método de pagamento
-- Edição e exclusão de contas
-- Divisão de despesas:
-  - **Divisão igual**: divide o valor igualmente entre os moradores selecionados
-  - **Divisão customizada**: permite definir valores específicos para cada morador
-- Controle de pagamento:
-  - Marcação de conta como paga
-  - Marcação individual de responsáveis como pagos
-  - Data de pagamento registrada automaticamente
-- Status visual:
-  - 🟢 **Pago**: conta totalmente quitada
-  - 🔵 **Em Aberto**: conta dentro do prazo
-  - 🟠 **Vencida**: conta fora do prazo
-- Filtros por mês de vencimento
-- Agrupamento de contas pagas e em aberto
+### Repúblicas
 
-### Resumo Financeiro
+- Criar república com nome e imagem.
+- Listar e abrir república.
+- Atualizar e excluir república.
+- Painel de controle com ações administrativas.
 
-- Total de contas registradas
-- Total de contas pagas
-- Total de contas pendentes
-- Dívidas detalhadas por morador
-- Status de pagamento (Em dia / Pendente)
+### Convites
 
-## 🛠️ Tecnologias
+- Envio de convite por e-mail para uma república.
+- Listagem de convites recebidos (`/convites/me`).
+- Aceitar ou recusar convite.
+- Listagem de convites enviados por república.
 
-- **React Native** 0.81.5 - Framework mobile multiplataforma
-- **Expo** ~54.0.26 - Plataforma e ferramentas para React Native
-- **Expo Router** ~6.0.16 - Roteamento baseado em arquivos
-- **TypeScript** ~5.9.2 - Tipagem estática
-- **NativeWind** ^4.2.1 - Tailwind CSS para React Native
-- **AsyncStorage** 2.2.0 - Armazenamento local persistente
-- **Google Sign-In** ^16.0.0 - Autenticação Google
-- **Expo Image Picker** ~17.0.8 - Seleção de imagens
-- **React Navigation** ^7.1.8 - Navegação entre telas
+### Moradores
 
-## 📋 Pré-requisitos
+- Listagem de moradores por república.
+- Cópia de chave Pix para área de transferência.
+- Controle de role por morador (`ADMIN`/`USER`) usado no menu/contexto.
 
-Antes de começar, certifique-se de ter instalado:
+### Contas (GraphQL)
 
-- **Node.js** (versão 18 ou superior)
-- **npm** ou **yarn**
-- **Expo CLI** (instalado globalmente ou via npx)
-- **Git**
+- Listagem de contas por república.
+- Cadastro de conta com:
+  - descrição, valor total, vencimento, método de pagamento;
+  - divisão igual ou customizada entre moradores selecionados.
+- Filtro por mês de referência.
+- Separação visual de contas abertas e pagas.
+- Exclusão de conta.
 
-### Para desenvolvimento mobile
+## Pontos Em Evolução (estado atual do código)
 
-**Android:**
+- Aba **Resumo** usa dados mockados (`src/constants/resume.logic.ts`).
+- Em `AccountCard`, parte de responsáveis/pagamento por morador ainda está marcada com `TODO`.
+- Mutation `ATUALIZAR_STATUS_CONTA` existe, mas não está conectada na UI atual.
 
-- Android Studio
-- Android SDK
-- Emulador Android configurado OU dispositivo físico
+## Stack
 
-**iOS (apenas macOS):**
+- Expo SDK 54
+- React Native 0.81
+- React 19
+- TypeScript
+- NativeWind (Tailwind)
+- Apollo Client + GraphQL
+- Axios
+- Sonner Native (toasts)
+- Sentry
 
-- Xcode (versão mais recente)
-- CocoaPods
-- Simulador iOS OU dispositivo físico
+## Estrutura Atual
 
-## 🚀 Instalação
-
-### 1. Clone o repositório
-
-```bash
-git clone https://github.com/warlleyrocha/Kontas.git
-cd Kontas
+```text
+.
+├── src/
+│   ├── app/                      # Rotas (expo-router)
+│   │   ├── (auth)/
+│   │   ├── (userProfile)/
+│   │   └── (republics)/[id]/
+│   ├── features/
+│   │   ├── auth/
+│   │   ├── user/
+│   │   ├── republic/
+│   │   ├── invites/
+│   │   ├── residents/
+│   │   └── accounts/
+│   ├── services/                 # api axios, apollo client, tratamento de erro
+│   ├── graphql/                  # queries/mutations/types de contas
+│   ├── components/               # SideMenu, Tabs, UI, error boundaries
+│   ├── constants/
+│   └── utils/
+├── docs/
+│   ├── privacy-policy.md
+│   └── terms-of-use.md
+├── app.config.ts
+├── eas.json
+└── docker-compose.yml
 ```
 
-### 2. Instale as dependências
+## Pré-requisitos
+
+- Node.js 18+
+- npm
+- Ambiente Expo (Android Studio/Xcode quando aplicável)
+
+## Configuração de Ambiente
+
+Crie `.env.local` para desenvolvimento local:
+
+```env
+APP_ENV=development
+EXPO_PUBLIC_API_URL=http://10.0.2.2:3333
+EXPO_PUBLIC_TERMS_OF_USE_URL=https://seu-dominio/terms
+EXPO_PUBLIC_PRIVACY_POLICY_URL=https://seu-dominio/privacy
+SONAR_TOKEN=seu_token_sonar
+```
+
+Variáveis importantes:
+
+- `EXPO_PUBLIC_API_URL`: obrigatória para REST (app falha sem ela).
+- `EXPO_PUBLIC_TERMS_OF_USE_URL` e `EXPO_PUBLIC_PRIVACY_POLICY_URL`: usadas nos links legais da tela de login/menu.
+- `APP_ENV`: controla nome/config dinâmica no `app.config.ts`.
+
+## Backend e Endpoints
+
+### REST (base em `EXPO_PUBLIC_API_URL`)
+
+- `POST /auth/google`
+- `POST /auth/completar-dados`
+- `GET /usuarios/me`
+- `PATCH /usuarios/atualizar-perfil`
+- `GET/POST/PATCH/DELETE /republicas`
+- `GET /moradores/republica/:id`
+- `POST /convites`
+- `GET /convites/me`
+- `GET /convites/republica/:id`
+- `PATCH /convites/:inviteId`
+
+### GraphQL (contas)
+
+Atualmente definido em `src/services/apolloClient.ts`:
+
+- URI: `http://10.0.2.2:3333/graphql`
+- Query: `contasPorRepublica`
+- Mutations: `criarConta`, `removerConta`, `atualizarStatus` (não usada na UI)
+
+## Executar Projeto
 
 ```bash
 npm install
-```
-
-### 3. Configure o Google OAuth (Opcional para desenvolvimento)
-
-O aplicativo já vem configurado com credenciais de desenvolvimento. Para usar suas próprias credenciais:
-
-1. Acesse o [Google Cloud Console](https://console.cloud.google.com/)
-2. Crie um projeto ou selecione um existente
-3. Ative a API "Google Sign-In"
-4. Configure as credenciais OAuth 2.0:
-   - **Android**: Adicione o SHA-1 do seu certificado
-   - **iOS**: Configure o Bundle ID
-5. Atualize as credenciais em `app/_layout.tsx`:
-
-   ```typescript
-   GoogleSignin.configure({
-     iosClientId: "SEU_IOS_CLIENT_ID",
-     webClientId: "SEU_WEB_CLIENT_ID",
-   });
-   ```
-
-6. Atualize o `app.json` com o `iosUrlScheme` correto
-
-## ▶️ Executando o Projeto
-
-### Modo Desenvolvimento
-
-Inicie o servidor de desenvolvimento:
-
-```bash
 npm start
-# ou
-npx expo start
 ```
 
-Escolha uma das opções:
-
-- Pressione `a` para abrir no emulador Android
-- Pressione `i` para abrir no simulador iOS
-- Escaneie o QR code com o **Expo Go** no seu dispositivo físico
-- Pressione `w` para abrir no navegador web
-
-### Modo Desenvolvimento com Dev Client
-
-Para usar recursos nativos (como Google Sign-In), use o dev client:
+Scripts disponíveis:
 
 ```bash
+npm run start
 npm run dev
-```
-
-**Nota:** O dev client requer um build nativo. Veja a seção [Build](#-build) abaixo.
-
-### Executar em plataformas específicas
-
-```bash
-# Android
 npm run android
-
-# iOS
 npm run ios
-
-# Web
 npm run web
-```
-
-## 📁 Estrutura do Projeto
-
-```
-Kontas/
-├── app/                    # Rotas da aplicação (Expo Router)
-│   ├── _layout.tsx        # Layout raiz e configuração de navegação
-│   ├── index.tsx          # Tela de login
-│   ├── register.tsx       # Cadastro de república
-│   ├── residents.tsx      # Cadastro de moradores
-│   └── dashboard.tsx      # Dashboard principal
-├── components/            # Componentes reutilizáveis
-│   ├── Accounts/          # Componente de gestão de contas
-│   ├── AddAccountModal/   # Modal para adicionar/editar contas
-│   ├── EditRepublicModal/ # Modal para editar república
-│   ├── ResidentsPage/     # Componente de gestão de moradores
-│   ├── Resume.tsx         # Componente de resumo financeiro
-│   ├── Tabs.tsx           # Componente de abas
-│   └── ui/                # Componentes de UI base
-├── contexts/              # Contextos React
-│   └── AuthContext.tsx    # Contexto de autenticação
-├── hooks/                 # Hooks customizados
-│   └── useAsyncStorage.ts # Hook para AsyncStorage
-├── types/                 # Definições de tipos TypeScript
-│   ├── resume.ts          # Tipos de dados da república
-│   └── tabs.ts            # Tipos de abas
-├── assets/                # Recursos estáticos (imagens, ícones)
-├── app.json               # Configuração do Expo
-├── package.json           # Dependências e scripts
-└── tsconfig.json          # Configuração TypeScript
-```
-
-## 📜 Scripts Disponíveis
-
-```bash
-# Iniciar servidor de desenvolvimento
-npm start
-
-# Iniciar com dev client
-npm run dev
-
-# Executar no Android
-npm run android
-
-# Executar no iOS
-npm run ios
-
-# Executar na Web
-npm run web
-
-# Executar linter
 npm run lint
-
-# Resetar projeto (limpar cache)
 npm run reset-project
 ```
 
-## 🏗️ Build
+## Build (EAS)
 
-### Build com EAS (Expo Application Services)
+Perfis em `eas.json`:
 
-O projeto está configurado para usar o EAS Build. Para criar builds de produção:
+- `development`
+- `preview`
+- `production`
 
-1. Instale o EAS CLI:
-
-   ```bash
-   npm install -g eas-cli
-   ```
-
-2. Faça login:
-
-   ```bash
-   eas login
-   ```
-
-3. Configure o projeto:
-
-   ```bash
-   eas build:configure
-   ```
-
-4. Crie um build:
-
-   ```bash
-   # Android
-   eas build --platform android
-
-   # iOS
-   eas build --platform ios
-
-   # Ambos
-   eas build --platform all
-   ```
-
-5. Consulte `eas.json` para configurações de build personalizadas.
-
-### Build Local
-
-Para builds locais (requer ambiente nativo configurado):
+Exemplos:
 
 ```bash
-# Android
-npx expo run:android
-
-# iOS
-npx expo run:ios
+eas build --platform android --profile preview
+eas build --platform ios --profile production
 ```
 
-## 🐳 Docker (SonarQube)
+## Qualidade e Observabilidade
 
-O projeto inclui configuração Docker para análise de código com SonarQube:
+- **Error boundaries** globais e por domínio de rota.
+- **Sentry** inicializado no layout raiz.
+- **SonarQube** via Docker:
 
 ```bash
-# Iniciar SonarQube
 docker-compose up -d
-
-# Executar análise
 docker-compose run --rm node-sonar
 ```
 
-Acesse o SonarQube em: `http://localhost:9000`
+## Documentos Legais
 
-## 📱 Armazenamento de Dados
+- `docs/privacy-policy.md`
+- `docs/terms-of-use.md`
 
-O aplicativo utiliza **AsyncStorage** para persistência local de dados:
+## Autor
 
-- Dados do usuário autenticado
-- Informações da república (nome, moradores, contas)
-- Imagens da república e moradores
-
-**Nota:** Os dados são armazenados localmente no dispositivo. Para sincronização entre dispositivos, seria necessário implementar um backend.
-
-## 🔐 Segurança
-
-- Autenticação via Google OAuth
-- Dados armazenados localmente no dispositivo
-- Validação de permissões para acesso à galeria de imagens
-
-## 🐛 Troubleshooting
-
-### Problemas com Google Sign-In
-
-- Verifique se as credenciais OAuth estão corretas
-- No Android, certifique-se de que o SHA-1 está configurado no Google Cloud Console
-- No iOS, verifique o Bundle ID no `app.json`
-
-## 🤝 Contribuindo
-
-Contribuições são bem-vindas! Sinta-se à vontade para:
-
-1. Fazer fork do projeto
-2. Criar uma branch para sua feature (`git checkout -b feature/NewFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some NewFeature'`)
-4. Push para a branch (`git push origin feature/NewFeature`)
-5. Abrir um Pull Request
-
-## 👤 Autor
-
-**Warlley Rocha**
-
-- GitHub: [@warlleyrocha](https://github.com/warlleyrocha)
-
----
-
-⌨️ Feito por [Warlley Rocha](https://github.com/warlleyrocha)
+Warlley Rocha  
+GitHub: [@warlleyrocha](https://github.com/warlleyrocha)
