@@ -5,6 +5,7 @@ export type ContaGraphQL = {
   descricao: string;
   valor: number;
   vencimento: string; // DateTime vem como string do GraphQL
+  metodoPagamento: string;
   status: StatusConta;
   criadoEm: string;
   atualizadoEm: string;
@@ -17,9 +18,17 @@ export type ContaAdaptada = {
   descricao: string;
   valor: number;
   vencimento: Date;
+  metodoPagamento: string;
   status: "aberta" | "paga"; // Status simplificado para UI
   mesReferencia: string; // formato: "2024-12"
   republicaId: string;
+};
+
+// Input para moradores responsáveis
+export type ResponsavelInput = {
+  moradorId: string;
+  valor: number;
+  pago?: boolean;
 };
 
 // Input para criar uma conta
@@ -27,8 +36,10 @@ export type CriarContaInput = {
   descricao: string;
   valor: number;
   vencimento: string; // DateTime em formato ISO
+  metodoPagamento: string;
   republicaId: string;
   status?: StatusConta; // Opcional
+  responsaveis?: ResponsavelInput[]; // Moradores responsáveis (será implementado no backend)
 };
 
 // Variáveis da mutation de criar conta

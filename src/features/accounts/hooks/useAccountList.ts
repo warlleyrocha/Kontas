@@ -21,6 +21,8 @@ export function useAccountList({ republicId }: UseAccountsListProps) {
     variables: { republicaId: republicId },
   });
 
+  console.log("Dados de contas recebidos:", data);
+
   // Adapta os dados do GraphQL para o formato esperado pelo componente
   const contasAdaptadas = useMemo(() => {
     if (!data?.contasPorRepublica) return [];

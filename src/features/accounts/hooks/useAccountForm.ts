@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Platform } from "react-native";
-import { moradoresMock } from "@/src/constants/account.mock";
+import { useResidents } from "@/src/features/residents/hooks/useResidents";
 
 interface UseAccountFormParams {
+  republicId: string;
   onClose: () => void;
 }
 
@@ -39,7 +40,8 @@ function splitEvenly(total: number, parts: number): number[] {
   });
 }
 
-export function useAccountForm({ onClose }: UseAccountFormParams) {
+export function useAccountForm({ republicId, onClose }: UseAccountFormParams) {
+  const { residents, fetchResidents } = useResidents();
   const [descricao, setDescricao] = useState("");
   const [valorTotal, setValorTotal] = useState("");
   const [vencimento, setVencimento] = useState(new Date());
@@ -48,13 +50,30 @@ export function useAccountForm({ onClose }: UseAccountFormParams) {
   const [showDatepicker, setShowDatepicker] = useState(false);
   const [tipoDivisao, setTipoDivisao] = useState<TipoDivisao>("equal");
   const [moradoresDivisao, setMoradoresDivisao] = useState<MoradorDivisao[]>(
-    moradoresMock.map((morador) => ({
-      moradorId: morador.id,
-      nome: morador.nome,
-      checked: true,
-      valor: "",
-    }))
+    []
   );
+
+  // Buscar moradores da API quando o componente montar
+  useEffect(() => {
+    const loadResidents = async () => {
+      await fetchResidents(republicId);
+    };
+    loadResidents();
+  }, [republicId, fetchResidents]);
+
+  // Atualizar moradoresDivisao quando residents mudar
+  useEffect(() => {
+    if (residents.length > 0) {
+      setMoradoresDivisao(
+        residents.map((resident) => ({
+          moradorId: resident.id,
+          nome: resident.nome,
+          checked: true,
+          valor: "",
+        }))
+      );
+    }
+  }, [residents]);
 
   const applySplitByType = (
     list: MoradorDivisao[],
@@ -62,12 +81,18 @@ export function useAccountForm({ onClose }: UseAccountFormParams) {
     totalValue: string
   ) => {
     const selected = list.filter((morador) => morador.checked);
-    if (!selected.length) return list.map((morador) => ({ ...morador, valor: "" }));
+    if (!selected.length)
+      return list.map((morador) => ({ ...morador, valor: "" }));
 
     if (type === "custom") {
       return list.map((morador) => ({
         ...morador,
-        valor: morador.checked && !morador.valor ? "0,00" : morador.checked ? morador.valor : "",
+        valor:
+          morador.checked && !morador.valor
+            ? "0,00"
+            : morador.checked
+              ? morador.valor
+              : "",
       }));
     }
 
@@ -122,7 +147,9 @@ export function useAccountForm({ onClose }: UseAccountFormParams) {
   const handleToggleMorador = (moradorId: string) => {
     setMoradoresDivisao((prev) => {
       const updated = prev.map((morador) =>
-        morador.moradorId === moradorId ? { ...morador, checked: !morador.checked } : morador
+        morador.moradorId === moradorId
+          ? { ...morador, checked: !morador.checked }
+          : morador
       );
 
       return applySplitByType(updated, tipoDivisao, valorTotal);
@@ -133,7 +160,9 @@ export function useAccountForm({ onClose }: UseAccountFormParams) {
     const sanitized = value.replace(/[^\d.,]/g, "");
     setMoradoresDivisao((prev) =>
       prev.map((morador) =>
-        morador.moradorId === moradorId ? { ...morador, valor: sanitized } : morador
+        morador.moradorId === moradorId
+          ? { ...morador, valor: sanitized }
+          : morador
       )
     );
   };

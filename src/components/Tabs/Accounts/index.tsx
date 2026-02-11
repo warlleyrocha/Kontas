@@ -26,8 +26,8 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
     setMostrarContasAbertas,
   } = useAccountList({ republicId });
 
-  const { showAccountModal, setShowAccountModal, handleSubmit } =
-    useAccountActions();
+  const { showAccountModal, setShowAccountModal, handleSubmit, handleDelete } =
+    useAccountActions(republicId);
 
   // Loading state
   if (loading) {
@@ -188,7 +188,12 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
 
               {mostrarContasAbertas &&
                 contasOrdenadas.abertas.map((conta) => (
-                  <AccountCard key={conta.id} conta={conta} />
+                  <AccountCard
+                    key={conta.id}
+                    conta={conta}
+                    republicId={republicId}
+                    onDelete={handleDelete}
+                  />
                 ))}
             </View>
           )}
@@ -212,7 +217,12 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
 
               {mostrarContasPagas &&
                 contasOrdenadas.pagas.map((conta) => (
-                  <AccountCard key={conta.id} conta={conta} />
+                  <AccountCard
+                    key={conta.id}
+                    conta={conta}
+                    republicId={republicId}
+                    onDelete={handleDelete}
+                  />
                 ))}
             </View>
           )}

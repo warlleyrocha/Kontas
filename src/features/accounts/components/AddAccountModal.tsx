@@ -49,7 +49,7 @@ export const AddAccountModal = ({
     handleSetTipoDivisao,
     handleToggleMorador,
     handleMoradorValorChange,
-  } = useAccountForm({ onClose });
+  } = useAccountForm({ onClose, republicId });
 
   const [isValorInputFocused, setIsValorInputFocused] = useState(false);
 
@@ -60,13 +60,24 @@ export const AddAccountModal = ({
     // Converte o valor de string para número
     const valorNumerico = parseFloat(valorTotal.replace(",", ".")) || 0;
 
+    // Formata os moradores selecionados com seus valores
+    const responsaveis = moradoresDivisao
+      .filter((morador) => morador.checked)
+      .map((morador) => ({
+        moradorId: morador.moradorId,
+        valor: parseFloat(morador.valor.replace(",", ".")) || 0,
+        pago: false, // Padrão: não pago
+      }));
+
     // Monta o objeto no formato esperado pelo GraphQL
     const formData: CriarContaInput = {
       descricao,
       valor: valorNumerico,
       vencimento: vencimentoISO,
+      metodoPagamento: metodoPagamento,
       republicaId: republicId,
       status: "PENDENTE", // ou outro status padrão
+      responsaveis, // Moradores selecionados com seus valores
     };
 
     // Chama a função onSubmit passada como prop
@@ -176,7 +187,7 @@ export const AddAccountModal = ({
                 </View>
               </View>
 
-              {/* Metodo e Responsavel principal */}
+              {/* Metodo de pagamento da conta */}
               <View className="mb-3">
                 <Text className="mb-1 text-sm text-gray-700">
                   Método de Pagamento

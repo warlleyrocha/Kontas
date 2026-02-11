@@ -8,6 +8,7 @@ export const CRIAR_CONTA = gql`
       descricao
       valor
       vencimento
+      metodoPagamento
       status
       criadoEm
       atualizadoEm
@@ -24,6 +25,7 @@ export const ATUALIZAR_STATUS_CONTA = gql`
       descricao
       valor
       vencimento
+      metodoPagamento
       status
       criadoEm
       atualizadoEm
