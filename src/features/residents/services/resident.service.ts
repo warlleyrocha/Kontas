@@ -2,13 +2,13 @@ import { api } from "@/src/services/api";
 import {
   CreateResidentRequest,
   ResidentResponse,
-} from "@/src/types/resident.types";
+} from "@/src/shared/types/resident.types";
 import { toUserFriendlyError } from "@/src/services/httpError";
 
 export const residentService = {
   // Método para criar um novo morador
   createResident: async (
-    data: CreateResidentRequest
+    data: CreateResidentRequest,
   ): Promise<ResidentResponse> => {
     try {
       const response = await api.post<ResidentResponse>("/moradores", data);
@@ -29,7 +29,7 @@ export const residentService = {
   getResidents: async (id: string): Promise<ResidentResponse[]> => {
     try {
       const response = await api.get<ResidentResponse[]>(
-        `/moradores/republica/${id}`
+        `/moradores/republica/${id}`,
       );
       return response.data;
     } catch (error) {

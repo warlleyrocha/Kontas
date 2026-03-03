@@ -5,7 +5,7 @@ import { useAuth } from "@/src/features/auth/contexts";
 import { useInvites } from "@/src/features/invites/hooks/useInvite";
 import { useRepublicList } from "../../republic/hooks/useRepublicList";
 import { useRepublicActions } from "../../republic/hooks/useRepublicActions";
-import { useRepublicResidents } from "@/src/hooks/useRepublicResidents";
+import { useRepublicResidents } from "@/src/shared/hooks/useRepublicResidents";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import { showToast } from "@/src/utils/showToast";
 
@@ -18,7 +18,7 @@ export function useControlPanelScreen() {
 
   const { getResidentsCount, isAdmin } = useRepublicResidents(
     republics,
-    user?.email
+    user?.email,
   );
   const {
     sendInvite,
@@ -27,7 +27,7 @@ export function useControlPanelScreen() {
   } = useInvites();
 
   const [inviteRepublicId, setInviteRepublicId] = useState<string | undefined>(
-    undefined
+    undefined,
   );
   const [modalOpen, setModalOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -63,10 +63,10 @@ export function useControlPanelScreen() {
               await deleteRepublic(republicId);
             },
           },
-        ]
+        ],
       );
     },
-    [deleteRepublic]
+    [deleteRepublic],
   );
 
   const handleEditRepublic = useCallback(
@@ -74,7 +74,7 @@ export function useControlPanelScreen() {
       setSelectedRepublic(republic);
       setShowEditModal(true);
     },
-    [setShowEditModal]
+    [setShowEditModal],
   );
 
   const handleCloseEditModal = useCallback(() => {
@@ -93,7 +93,7 @@ export function useControlPanelScreen() {
 
       handleCloseEditModal();
     },
-    [selectedRepublic, updateRepublic, handleCloseEditModal]
+    [selectedRepublic, updateRepublic, handleCloseEditModal],
   );
 
   const handleOpenInviteModal = useCallback((republicId: string) => {

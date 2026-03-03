@@ -1,6 +1,6 @@
-import { legalLinks, openLegalLink } from "@/src/constants/legal";
-import { ResidentRole } from "@/src/types/resident.types";
-import { MenuItem, UserMenuContext } from "@/src/types/sideMenu";
+import { legalLinks, openLegalLink } from "@/src/shared/constants/legal";
+import { ResidentRole } from "@/src/shared/types/resident.types";
+import { MenuItem, UserMenuContext } from "@/src/shared/types/sideMenu";
 import { useRouter } from "expo-router";
 import { useMemo } from "react";
 
@@ -8,7 +8,7 @@ export function useSideMenu(
   context: UserMenuContext,
   handleSignOut: () => void,
   republicId?: string, // Adicione este parâmetro
-  currentUserRole?: ResidentRole | null
+  currentUserRole?: ResidentRole | null,
 ) {
   const router = useRouter();
 
@@ -102,7 +102,7 @@ export function useSideMenu(
         onPress: () =>
           void openLegalLink(
             legalLinks.privacyPolicy,
-            "Política de Privacidade"
+            "Política de Privacidade",
           ),
       },
       {
@@ -113,7 +113,7 @@ export function useSideMenu(
         danger: true,
       },
     ],
-    [handleSignOut]
+    [handleSignOut],
   );
 
   return { menuItems, footerItems };

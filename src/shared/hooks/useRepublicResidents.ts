@@ -1,15 +1,15 @@
 import { useResidents } from "@/src/features/residents/hooks/useResidents";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
-import { ResidentRole } from "@/src/types/resident.types";
+import { ResidentRole } from "@/src/shared/types/resident.types";
 import { useCallback, useEffect, useState } from "react";
 
 export function useRepublicResidents(
   republics: RepublicResponse[],
-  currentUserEmail?: string | null
+  currentUserEmail?: string | null,
 ) {
   const { fetchResidents } = useResidents();
   const [residentsCount, setResidentsCount] = useState<Record<string, number>>(
-    {}
+    {},
   );
   const [userRolesByRepublic, setUserRolesByRepublic] = useState<
     Record<string, ResidentRole | null>
@@ -36,21 +36,21 @@ export function useRepublicResidents(
             if (currentUserEmail) {
               const normalizedEmail = currentUserEmail.toLowerCase();
               const currentUser = residents?.find(
-                (resident) => resident.email.toLowerCase() === normalizedEmail
+                (resident) => resident.email.toLowerCase() === normalizedEmail,
               );
               roles[republic.id] = currentUser?.role ?? null;
             }
           } catch (error) {
             console.error(
               `Erro ao buscar moradores da república ${republic.id}:`,
-              error
+              error,
             );
             counts[republic.id] = 0;
             if (currentUserEmail) {
               roles[republic.id] = null;
             }
           }
-        })
+        }),
       );
 
       setResidentsCount(counts);
@@ -68,21 +68,21 @@ export function useRepublicResidents(
     (republicId: string): number => {
       return residentsCount[republicId] ?? 0;
     },
-    [residentsCount]
+    [residentsCount],
   );
 
   const getUserRole = useCallback(
     (republicId: string): ResidentRole | null => {
       return userRolesByRepublic[republicId] ?? null;
     },
-    [userRolesByRepublic]
+    [userRolesByRepublic],
   );
 
   const isAdmin = useCallback(
     (republicId: string): boolean => {
       return userRolesByRepublic[republicId] === ResidentRole.ADMIN;
     },
-    [userRolesByRepublic]
+    [userRolesByRepublic],
   );
 
   return {

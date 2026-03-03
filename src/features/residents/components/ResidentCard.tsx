@@ -1,4 +1,4 @@
-import type { ResidentResponse } from "@/src/types/resident.types";
+import type { ResidentResponse } from "@/src/shared/types/resident.types";
 
 import { Feather, Ionicons } from "@expo/vector-icons";
 import React from "react";

@@ -1,4 +1,4 @@
-import { ResidentResponse } from "@/src/types/resident.types";
+import { ResidentResponse } from "@/src/shared/types/resident.types";
 import { showToast } from "@/src/utils/showToast";
 import * as Clipboard from "expo-clipboard";
 import { useState } from "react";

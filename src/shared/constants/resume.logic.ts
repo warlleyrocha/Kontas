@@ -1,10 +1,10 @@
 // resume.logic.ts
 
-import { mockRepublica, mockDividas } from "@/src/constants/resume.mock";
+import { mockRepublica, mockDividas } from "@/src/shared/constants/resume.mock";
 
 export const totalContas = mockRepublica.contas.reduce(
   (acc, c) => acc + c.valor,
-  0
+  0,
 );
 
 export const contasPagas = mockRepublica.contas
@@ -16,10 +16,10 @@ export const contasPendentes = mockRepublica.contas
   .reduce((acc, c) => acc + c.valor, 0);
 
 export const quantidadeContasPagas = mockRepublica.contas.filter(
-  (c) => c.pago
+  (c) => c.pago,
 ).length;
 export const quantidadeContasPendentes = mockRepublica.contas.filter(
-  (c) => !c.pago
+  (c) => !c.pago,
 ).length;
 export const quantidadeTotalContas = mockRepublica.contas.length;
 

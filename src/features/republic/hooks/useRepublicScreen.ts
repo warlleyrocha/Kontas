@@ -7,7 +7,7 @@ import { useRepublicList } from "./useRepublicList";
 import { useRepublicActions } from "./useRepublicActions";
 
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
-import type { TabKey } from "@/src/types/tabs";
+import type { TabKey } from "@/src/shared/types/tabs";
 
 import { showToast } from "@/src/utils/showToast";
 import { toastErrors } from "@/src/utils/toastMessages";
@@ -76,7 +76,7 @@ export function useRepublicScreen(republicId: string) {
       showToast.success(
         prev
           ? "República removida dos favoritos"
-          : "República adicionada aos favoritos"
+          : "República adicionada aos favoritos",
       );
       return !prev;
     });
@@ -102,10 +102,10 @@ export function useRepublicScreen(republicId: string) {
       });
 
       setRepublic((prev) =>
-        prev ? { ...prev, nome, imagemRepublica: imagem } : null
+        prev ? { ...prev, nome, imagemRepublica: imagem } : null,
       );
     },
-    [republic, updateRepublic]
+    [republic, updateRepublic],
   );
 
   const userMenu = useMemo(
@@ -114,14 +114,14 @@ export function useRepublicScreen(republicId: string) {
       photo: user?.fotoPerfil,
       email: user?.email,
     }),
-    [user?.nome, user?.fotoPerfil, user?.email]
+    [user?.nome, user?.fotoPerfil, user?.email],
   );
 
   const currentUserRole = useMemo(() => {
     if (!user?.email) return null;
     const normalizedEmail = user.email.toLowerCase();
     const currentUser = residents.find(
-      (resident) => resident.email.toLowerCase() === normalizedEmail
+      (resident) => resident.email.toLowerCase() === normalizedEmail,
     );
     return currentUser?.role ?? null;
   }, [residents, user?.email]);

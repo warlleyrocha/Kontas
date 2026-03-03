@@ -10,7 +10,7 @@ import {
   quantidadeTotalContas,
   republicaMock,
   dividas,
-} from "@/src/constants/resume.logic";
+} from "@/src/shared/constants/resume.logic";
 
 export const ResumeTab = () => {
   const resumoCards = [

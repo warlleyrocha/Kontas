@@ -1,6 +1,6 @@
 import IconGoogle from "@/assets/images/google-icon.svg";
 import { useAuth } from "@/src/features/auth/contexts/AuthContext";
-import { legalLinks, openLegalLink } from "@/src/constants/legal";
+import { legalLinks, openLegalLink } from "@/src/shared/constants/legal";
 import { getErrorMessage } from "@/src/services/httpError";
 import { showToast } from "@/src/utils/showToast";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
@@ -50,8 +50,8 @@ export default function LoginScreen() {
       showToast.error(
         getErrorMessage(
           error,
-          "Erro ao fazer login com Google. Tente novamente."
-        )
+          "Erro ao fazer login com Google. Tente novamente.",
+        ),
       );
     } finally {
       setIsSigningIn(false);
