@@ -16,6 +16,7 @@ export type Conta = {
   status: StatusConta;
   republicaId: string;
   criadoPorId: string;
+  criadoPorNome: string;
   metodoPagamento: string;
   pago: boolean;
   pagoEm?: Date | null;

@@ -5,7 +5,7 @@ import { Conta } from "../types/account.types";
 import { ContaMorador } from "@/src/shared/types/accountResidents.types";
 interface AccountCardProps {
   conta: Conta;
-  criadoPor: string;
+  criadoPorNome: string;
   expanded: boolean;
   onToggleExpand: () => void;
   moradores: ContaMorador[];
@@ -15,7 +15,7 @@ interface AccountCardProps {
 
 export const AccountCard = ({
   conta,
-  criadoPor,
+  criadoPorNome,
   expanded,
   onToggleExpand,
   moradores,
@@ -69,7 +69,7 @@ export const AccountCard = ({
                     moradorPago ? "text-gray-400 line-through" : "text-gray-700"
                   }`}
                 >
-                  {morador.moradorId}
+                  {morador.moradorNome}
                 </Text>
                 {morador.valor > 0 && (
                   <Text className="mt-1 text-xs text-gray-500">
@@ -140,7 +140,7 @@ export const AccountCard = ({
             {/* Responsável */}
             <View className="rounded-md border border-indigo-600 px-2 py-1">
               <Text className="text-xs text-indigo-600">
-                Responsável: {criadoPor}
+                Responsável: {criadoPorNome}
               </Text>
             </View>
 

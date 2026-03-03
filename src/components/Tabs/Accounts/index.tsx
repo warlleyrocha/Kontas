@@ -238,7 +238,7 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
                   <AccountCard
                     key={conta.id}
                     conta={conta}
-                    criadoPor={conta.criadoPorId}
+                    criadoPorNome={conta.criadoPorNome}
                     expanded={expandedAccountId === conta.id}
                     onToggleExpand={() => void handleToggleExpand(conta.id)}
                     moradores={accountResidentsById[conta.id] ?? []}
@@ -271,7 +271,7 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
                   <AccountCard
                     key={conta.id}
                     conta={conta}
-                    criadoPor={conta.criadoPorId}
+                    criadoPorNome={conta.criadoPorNome}
                     expanded={expandedAccountId === conta.id}
                     onToggleExpand={() => void handleToggleExpand(conta.id)}
                     moradores={accountResidentsById[conta.id] ?? []}

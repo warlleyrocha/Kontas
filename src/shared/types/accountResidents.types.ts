@@ -4,6 +4,7 @@ export interface ContaMorador {
   id: string;
   contaId: string;
   moradorId: string;
+  moradorNome: string;
   status: StatusConta;
   valor: number;
   visivel: boolean;
