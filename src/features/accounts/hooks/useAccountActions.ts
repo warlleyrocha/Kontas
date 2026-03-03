@@ -1,52 +1,74 @@
-import { CRIAR_CONTA, REMOVER_CONTA } from "@/src/graphql/mutations/account";
-import { GET_CONTAS_POR_REPUBLICA } from "@/src/graphql/queries/accounts";
-import type { CriarContaInput } from "@/src/graphql/types/account";
-import { useMutation } from "@apollo/client/react";
-import { useState } from "react";
+import { getErrorMessage } from "@/src/services/httpError";
+import { showToast } from "@/src/utils/showToast";
+import { useCallback, useState } from "react";
+import { accountService } from "../services/account.service";
+import type { CriarContaComMoradoresRequest } from "../types/account.types";
 
-export function useAccountActions(republicId: string) {
+interface UseAccountActionsOptions {
+  onRefresh?: () => Promise<unknown> | void;
+}
+
+export function useAccountActions({
+  onRefresh,
+}: UseAccountActionsOptions = {}) {
   const [showAccountModal, setShowAccountModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const [criarConta] = useMutation(CRIAR_CONTA, {
-    refetchQueries: [
-      {
-        query: GET_CONTAS_POR_REPUBLICA,
-        variables: { republicaId: republicId },
-      },
-    ], // Atualiza lista automaticamente
-    onCompleted: (result) => {
-      console.log("retorno criarConta", JSON.stringify(result, null, 2));
-      setShowAccountModal(false);
-      // Mostrar toast de sucesso
+  const handleSubmit = useCallback(
+    async (data: CriarContaComMoradoresRequest) => {
+      setIsSubmitting(true);
+
+      try {
+        const { moradorIds, ...contaPayload } = data;
+        const conta = await accountService.criarConta(contaPayload);
+
+        if (moradorIds.length > 0) {
+          await accountService.vincularMoradores({
+            contaId: conta.id,
+            moradorIds,
+            valorTotal: contaPayload.valor,
+          });
+        }
+
+        showToast.success("Conta criada com sucesso.");
+        setShowAccountModal(false);
+        await onRefresh?.();
+      } catch (error) {
+        showToast.error(
+          getErrorMessage(error, "Não foi possível criar a conta."),
+        );
+      } finally {
+        setIsSubmitting(false);
+      }
     },
+    [onRefresh],
+  );
 
-    onError: (error) => {
-      // Mostrar toast de erro
-      console.error(error);
+  const handleDelete = useCallback(
+    async (accountId: string) => {
+      setIsDeleting(true);
+
+      try {
+        await accountService.removerConta({ id: accountId });
+        showToast.success("Conta removida com sucesso.");
+        await onRefresh?.();
+      } catch (error) {
+        showToast.error(
+          getErrorMessage(error, "Não foi possível remover a conta."),
+        );
+      } finally {
+        setIsDeleting(false);
+      }
     },
-  });
+    [onRefresh],
+  );
 
-  const [deletarConta] = useMutation(REMOVER_CONTA, {
-    refetchQueries: [
-      {
-        query: GET_CONTAS_POR_REPUBLICA,
-        variables: { republicaId: republicId },
-      },
-    ],
-  });
-
-  const handleSubmit = async (data: CriarContaInput) => {
-    console.log("data enviada", JSON.stringify(data, null, 2));
-    await criarConta({ variables: { data } });
-  };
-
-  const handleDelete = async (accountId: string) => {
-    console.log("Deletar conta", accountId);
-    await deletarConta({ variables: { contaId: accountId } });
-  };
   return {
     showAccountModal,
     setShowAccountModal,
+    isSubmitting,
+    isDeleting,
     handleSubmit,
     handleDelete,
   };

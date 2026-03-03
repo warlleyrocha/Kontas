@@ -12,13 +12,16 @@ import {
   View,
 } from "react-native";
 import { useAccountForm } from "../hooks/useAccountForm";
-import { CriarContaInput } from "@/src/graphql/types/account";
+import {
+  StatusConta,
+  type CriarContaComMoradoresRequest,
+} from "../types/account.types";
 
 interface AddAccountModalProps {
   visible: boolean;
   onClose: () => void;
   republicId: string;
-  onSubmit: (data: CriarContaInput) => void;
+  onSubmit: (data: CriarContaComMoradoresRequest) => Promise<void> | void;
 }
 
 export const AddAccountModal = ({
@@ -60,28 +63,22 @@ export const AddAccountModal = ({
     // Converte o valor de string para número
     const valorNumerico = parseFloat(valorTotal.replace(",", ".")) || 0;
 
-    // Formata os moradores selecionados com seus valores
-    const responsaveis = moradoresDivisao
+    // Monta o payload no formato REST
+    const moradorIds = moradoresDivisao
       .filter((morador) => morador.checked)
-      .map((morador) => ({
-        moradorId: morador.moradorId,
-        valor: parseFloat(morador.valor.replace(",", ".")) || 0,
-        pago: false, // Padrão: não pago
-      }));
+      .map((morador) => String(morador.moradorId));
 
-    // Monta o objeto no formato esperado pelo GraphQL
-    const formData: CriarContaInput = {
+    const formData: CriarContaComMoradoresRequest = {
       descricao,
       valor: valorNumerico,
       vencimento: vencimentoISO,
-      metodoPagamento: metodoPagamento,
+      metodoPagamento,
       republicaId: republicId,
-      status: "PENDENTE", // ou outro status padrão
-      responsaveis, // Moradores selecionados com seus valores
+      status: StatusConta.PENDENTE,
+      moradorIds,
     };
 
-    // Chama a função onSubmit passada como prop
-    onSubmit(formData);
+    void onSubmit(formData);
   };
 
   return (

@@ -7,6 +7,8 @@ import { AddAccountModal } from "@/src/features/accounts/components/AddAccountMo
 import { AccountCard } from "@/src/features/accounts/components/AccountCard";
 import { useAccountActions } from "@/src/features/accounts/hooks/useAccountActions";
 import { useAccountList } from "@/src/features/accounts/hooks/useAccountList";
+import { ContaMorador } from "@/src/shared/types/accountResidents.types";
+import { useCallback, useEffect, useState } from "react";
 
 interface AccountsTabProps {
   readonly republicId: string;
@@ -14,6 +16,8 @@ interface AccountsTabProps {
 
 export function AccountsTab({ republicId }: AccountsTabProps) {
   const {
+    fetchAccounts,
+    fetchAccountResidents,
     contasOrdenadas,
     mesesDisponiveis,
     mesSelecionado,
@@ -27,7 +31,50 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
   } = useAccountList({ republicId });
 
   const { showAccountModal, setShowAccountModal, handleSubmit, handleDelete } =
-    useAccountActions(republicId);
+    useAccountActions({ onRefresh: fetchAccounts });
+  const [expandedAccountId, setExpandedAccountId] = useState<string | null>(
+    null,
+  );
+  const [accountResidentsById, setAccountResidentsById] = useState<
+    Record<string, ContaMorador[]>
+  >({});
+  const [loadingResidentsById, setLoadingResidentsById] = useState<
+    Record<string, boolean>
+  >({});
+
+  useEffect(() => {
+    void fetchAccounts();
+  }, [fetchAccounts]);
+
+  useEffect(() => {
+    setAccountResidentsById({});
+    setLoadingResidentsById({});
+    setExpandedAccountId(null);
+  }, [republicId]);
+
+  const handleToggleExpand = useCallback(
+    async (accountId: string) => {
+      setExpandedAccountId((current) =>
+        current === accountId ? null : accountId,
+      );
+
+      if (accountResidentsById[accountId] || loadingResidentsById[accountId]) {
+        return;
+      }
+
+      setLoadingResidentsById((prev) => ({ ...prev, [accountId]: true }));
+      try {
+        const moradores = await fetchAccountResidents(accountId);
+        setAccountResidentsById((prev) => ({
+          ...prev,
+          [accountId]: moradores,
+        }));
+      } finally {
+        setLoadingResidentsById((prev) => ({ ...prev, [accountId]: false }));
+      }
+    },
+    [accountResidentsById, fetchAccountResidents, loadingResidentsById],
+  );
 
   // Loading state
   if (loading) {
@@ -191,7 +238,11 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
                   <AccountCard
                     key={conta.id}
                     conta={conta}
-                    republicId={republicId}
+                    criadoPor={conta.criadoPorId}
+                    expanded={expandedAccountId === conta.id}
+                    onToggleExpand={() => void handleToggleExpand(conta.id)}
+                    moradores={accountResidentsById[conta.id] ?? []}
+                    isLoadingMoradores={Boolean(loadingResidentsById[conta.id])}
                     onDelete={handleDelete}
                   />
                 ))}
@@ -220,7 +271,11 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
                   <AccountCard
                     key={conta.id}
                     conta={conta}
-                    republicId={republicId}
+                    criadoPor={conta.criadoPorId}
+                    expanded={expandedAccountId === conta.id}
+                    onToggleExpand={() => void handleToggleExpand(conta.id)}
+                    moradores={accountResidentsById[conta.id] ?? []}
+                    isLoadingMoradores={Boolean(loadingResidentsById[conta.id])}
                     onDelete={handleDelete}
                   />
                 ))}
