@@ -1,3 +1,5 @@
+import { ContaMorador } from "@/src/shared/types/accountResidents.types";
+
 // Enums
 export enum StatusConta {
   PENDENTE = "PENDENTE",
@@ -5,47 +7,38 @@ export enum StatusConta {
   ATRASADO = "ATRASADO",
 }
 
-// Types base
+// Tipo base
 export type Conta = {
   id: string;
   descricao: string;
   valor: number;
-  vencimento: string; // ISO 8601 date string
+  vencimento: string;
   status: StatusConta;
   republicaId: string;
-  criadoEm: string; // ISO 8601 datetime string
-  atualizadoEm: string; // ISO 8601 datetime string
+  criadoPorId: string;
+  metodoPagamento: string;
+  pago: boolean;
+  pagoEm?: Date | null;
+  criadoEm: string;
+  atualizadoEm: string;
 };
 
 // POST /contas
 export type CriarContaRequest = {
   descricao: string;
   valor: number;
-  vencimento: string; // Formato: "DD/MM/YYYY" ou ISO 8601
+  vencimento: string;
   republicaId: string;
   status: StatusConta;
+  metodoPagamento: string;
 };
 
-// GET /contas/republica/{republicaId}
-export type ListarContasParams = {
-  republicaId: string;
+export type CriarContaComMoradoresRequest = CriarContaRequest & {
+  moradorIds: string[];
 };
 
-export type ListarContasResponse = Conta[];
-
-// PATCH /contas/{id}/status
-export type AtualizarStatusContaParams = {
-  id: string;
-};
-
-export type AtualizarStatusContaRequest = {
-  status: StatusConta;
-};
-
-export type AtualizarStatusContaResponse = {
-  id: string;
-  status: StatusConta;
-};
+export type ListarContasResponse = ContaMorador[];
+export type ListarContasRepublic = Conta[];
 
 // DELETE /contas/{id}
 export type RemoverContaParams = {
