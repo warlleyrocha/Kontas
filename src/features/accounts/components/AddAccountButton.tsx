@@ -1,0 +1,19 @@
+import { Feather } from "@expo/vector-icons";
+import { TouchableOpacity } from "react-native";
+
+interface AddAccountButtonProps {
+  readonly onPress: () => void;
+}
+
+export function AddAccountButton({ onPress }: AddAccountButtonProps) {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel="Adicionar nova conta"
+      className="absolute bottom-6 right-6 h-14 w-14 items-center justify-center rounded-full bg-indigo-600 shadow-lg"
+    >
+      <Feather name="plus" size={28} color="white" />
+    </TouchableOpacity>
+  );
+}

@@ -1,0 +1,75 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Text, TouchableOpacity, View } from "react-native";
+
+import { AccountCard } from "@/src/features/accounts/components/AccountCard";
+import type { ContaMorador } from "@/src/shared/types/accountResidents.types";
+import type { Conta } from "../types/account.types";
+
+interface AccountSectionProps {
+  readonly label: string;
+  readonly contas: Conta[];
+  readonly visivel: boolean;
+  readonly onToggle: () => void;
+  readonly headerBg: string;
+  readonly headerTextColor: string;
+  readonly headerIconColor: string;
+  readonly expandedAccountId: string | null;
+  readonly onToggleExpand: (accountId: string) => void;
+  readonly accountResidentsById: Record<string, ContaMorador[]>;
+  readonly loadingResidentsById: Record<string, boolean>;
+  readonly errorResidentsById: Record<string, boolean>;
+  readonly onDelete: (accountId: string) => void;
+}
+
+export function AccountSection({
+  label,
+  contas,
+  visivel,
+  onToggle,
+  headerBg,
+  headerTextColor,
+  headerIconColor,
+  expandedAccountId,
+  onToggleExpand,
+  accountResidentsById,
+  loadingResidentsById,
+  errorResidentsById,
+  onDelete,
+}: AccountSectionProps) {
+  if (contas.length === 0) {
+    return null;
+  }
+
+  return (
+    <View className="mb-4">
+      <TouchableOpacity
+        onPress={onToggle}
+        className={`mb-3 flex-row items-center justify-between rounded-lg p-4 ${headerBg}`}
+      >
+        <Text className={`text-lg font-semibold ${headerTextColor}`}>
+          {label} ({contas.length})
+        </Text>
+        <MaterialCommunityIcons
+          name={visivel ? "chevron-up" : "chevron-down"}
+          size={24}
+          color={headerIconColor}
+        />
+      </TouchableOpacity>
+
+      {visivel &&
+        contas.map((conta) => (
+          <AccountCard
+            key={conta.id}
+            conta={conta}
+            criadoPorNome={conta.criadoPorNome}
+            expanded={expandedAccountId === conta.id}
+            onToggleExpand={() => onToggleExpand(conta.id)}
+            moradores={accountResidentsById[conta.id] ?? []}
+            isLoadingMoradores={Boolean(loadingResidentsById[conta.id])}
+            //isErrorMoradores={Boolean(errorResidentsById[conta.id])}
+            onDelete={onDelete}
+          />
+        ))}
+    </View>
+  );
+}

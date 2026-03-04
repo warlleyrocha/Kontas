@@ -1,14 +1,15 @@
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import { formatMounthYear } from "@/src/utils/formats";
 
-import { AddAccountModal } from "@/src/features/accounts/components/AddAccountModal";
-import { AccountCard } from "@/src/features/accounts/components/AccountCard";
+import { AccountSection } from "@/src/features/accounts/components/AccountSection";
+
 import { useAccountActions } from "@/src/features/accounts/hooks/useAccountActions";
+import { useAccountExpansion } from "@/src/features/accounts/hooks/useAccountExpansion";
 import { useAccountList } from "@/src/features/accounts/hooks/useAccountList";
-import { ContaMorador } from "@/src/shared/types/accountResidents.types";
-import { useCallback, useEffect, useState } from "react";
+import { AddAccountButton } from "@/src/features/accounts/components/AddAccountButton";
+import AddAccountModal from "@/src/features/accounts/components/AddAccountModal";
 
 interface AccountsTabProps {
   readonly republicId: string;
@@ -16,8 +17,7 @@ interface AccountsTabProps {
 
 export function AccountsTab({ republicId }: AccountsTabProps) {
   const {
-    fetchAccounts,
-    fetchAccountResidents,
+    refresh,
     contasOrdenadas,
     mesesDisponiveis,
     mesSelecionado,
@@ -28,55 +28,18 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
     setMesSelecionado,
     setMostrarContasPagas,
     setMostrarContasAbertas,
+    accountResidentsById,
+    loadingResidentsById,
+    errorResidentsById,
   } = useAccountList({ republicId });
 
+  const { expandedAccountId, handleToggleExpand } = useAccountExpansion({
+    republicId,
+  });
+
   const { showAccountModal, setShowAccountModal, handleSubmit, handleDelete } =
-    useAccountActions({ onRefresh: fetchAccounts });
-  const [expandedAccountId, setExpandedAccountId] = useState<string | null>(
-    null,
-  );
-  const [accountResidentsById, setAccountResidentsById] = useState<
-    Record<string, ContaMorador[]>
-  >({});
-  const [loadingResidentsById, setLoadingResidentsById] = useState<
-    Record<string, boolean>
-  >({});
+    useAccountActions({ onRefresh: refresh });
 
-  useEffect(() => {
-    void fetchAccounts();
-  }, [fetchAccounts]);
-
-  useEffect(() => {
-    setAccountResidentsById({});
-    setLoadingResidentsById({});
-    setExpandedAccountId(null);
-  }, [republicId]);
-
-  const handleToggleExpand = useCallback(
-    async (accountId: string) => {
-      setExpandedAccountId((current) =>
-        current === accountId ? null : accountId,
-      );
-
-      if (accountResidentsById[accountId] || loadingResidentsById[accountId]) {
-        return;
-      }
-
-      setLoadingResidentsById((prev) => ({ ...prev, [accountId]: true }));
-      try {
-        const moradores = await fetchAccountResidents(accountId);
-        setAccountResidentsById((prev) => ({
-          ...prev,
-          [accountId]: moradores,
-        }));
-      } finally {
-        setLoadingResidentsById((prev) => ({ ...prev, [accountId]: false }));
-      }
-    },
-    [accountResidentsById, fetchAccountResidents, loadingResidentsById],
-  );
-
-  // Loading state
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center">
@@ -85,12 +48,9 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
     );
   }
 
-  // Error state - mostra erro mas permite adicionar conta
   if (error) {
-    console.log(error);
     return (
       <View className="flex-1 px-4">
-        {/* Banner de erro */}
         <View className="mt-6 rounded-lg bg-red-50 border border-red-200 p-4">
           <View className="flex-row items-center">
             <Feather name="alert-circle" size={24} color="#ef4444" />
@@ -100,37 +60,24 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
           </View>
         </View>
 
-        {/* Estado vazio com opção de adicionar */}
-        <TouchableOpacity
-          className="mt-6 items-center rounded-lg bg-white p-6 shadow-lg"
-          onPress={() => setShowAccountModal(true)}
-        >
+        <View className="mt-6 items-center rounded-lg bg-white p-6 shadow-lg">
           <Feather name="dollar-sign" size={48} color="#9ca3af" />
           <Text className="mt-4 text-center text-gray-500">
             Nenhuma conta cadastrada ainda.{"\n"}
-            Toque para adicionar.
+            Toque no botão para adicionar.
           </Text>
-        </TouchableOpacity>
-
-        {/* Modal de Adição de conta*/}
-        <AddAccountModal
-          onSubmit={handleSubmit}
-          visible={showAccountModal}
-          onClose={() => setShowAccountModal(false)}
-          republicId={republicId}
-        />
+        </View>
       </View>
     );
   }
 
-  // Estado vazio (sem erro)
   if (
     contasOrdenadas.abertas.length === 0 &&
     contasOrdenadas.pagas.length === 0 &&
     mesSelecionado === "todos"
   ) {
     return (
-      <View className="px-4">
+      <View className="flex-1 px-4">
         <TouchableOpacity
           className="mt-6 items-center rounded-lg bg-white p-6 shadow-lg"
           onPress={() => setShowAccountModal(true)}
@@ -138,11 +85,10 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
           <Feather name="dollar-sign" size={48} color="#9ca3af" />
           <Text className="mt-4 text-center text-gray-500">
             Nenhuma conta cadastrada ainda.{"\n"}
-            Toque para adicionar.
+            Toque no botão para adicionar.
           </Text>
         </TouchableOpacity>
 
-        {/* Modal de Adição de conta*/}
         <AddAccountModal
           visible={showAccountModal}
           onSubmit={handleSubmit}
@@ -154,150 +100,115 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
   }
 
   return (
-    <ScrollView contentContainerStyle={{ paddingVertical: 12 }}>
-      {/* Filtro de Mês */}
-      <View className="mb-4 px-4">
-        <Text className="mb-2 text-sm font-semibold text-gray-700">
-          Filtrar por mês:
-        </Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 8 }}
-        >
-          <TouchableOpacity
-            onPress={() => setMesSelecionado("todos")}
-            className={`rounded-full px-4 py-2 ${
-              mesSelecionado === "todos"
-                ? "bg-indigo-600"
-                : "border border-gray-300 bg-white"
-            }`}
+    <View className="flex-1">
+      <ScrollView
+        contentContainerStyle={{ paddingVertical: 12, paddingBottom: 88 }}
+      >
+        {/* Filtro de Mês */}
+        <View className="mb-4 px-4">
+          <Text className="mb-2 text-sm font-semibold text-gray-700">
+            Filtrar por mês:
+          </Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: 8 }}
           >
-            <Text
-              className={`font-medium ${
-                mesSelecionado === "todos" ? "text-white" : "text-gray-700"
-              }`}
-            >
-              Todos
-            </Text>
-          </TouchableOpacity>
-
-          {mesesDisponiveis.map((mesAno) => (
             <TouchableOpacity
-              key={mesAno}
-              onPress={() => setMesSelecionado(mesAno)}
+              onPress={() => setMesSelecionado("todos")}
               className={`rounded-full px-4 py-2 ${
-                mesSelecionado === mesAno
+                mesSelecionado === "todos"
                   ? "bg-indigo-600"
                   : "border border-gray-300 bg-white"
               }`}
             >
               <Text
                 className={`font-medium ${
-                  mesSelecionado === mesAno ? "text-white" : "text-gray-700"
+                  mesSelecionado === "todos" ? "text-white" : "text-gray-700"
                 }`}
               >
-                {formatMounthYear(mesAno)}
+                Todos
               </Text>
             </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
 
-      {/* Mensagem quando não há contas no mês selecionado */}
-      {contasOrdenadas.abertas.length === 0 &&
-      contasOrdenadas.pagas.length === 0 &&
-      mesSelecionado !== "todos" ? (
-        <View className="mx-4 mt-6 items-center rounded-lg bg-white p-6 shadow-sm">
-          <Feather name="calendar" size={48} color="#9ca3af" />
-          <Text className="mt-4 text-center text-gray-500">
-            Nenhuma conta encontrada para {formatMounthYear(mesSelecionado)}.
-          </Text>
-        </View>
-      ) : (
-        <View className="px-4">
-          {/* Dropdown de Contas em Aberto */}
-          {contasOrdenadas.abertas.length > 0 && (
-            <View className="mb-4">
+            {mesesDisponiveis.map((mesAno) => (
               <TouchableOpacity
-                onPress={() => setMostrarContasAbertas(!mostrarContasAbertas)}
-                className="mb-3 flex-row items-center justify-between rounded-lg bg-blue-50 p-4"
+                key={mesAno}
+                onPress={() => setMesSelecionado(mesAno)}
+                className={`rounded-full px-4 py-2 ${
+                  mesSelecionado === mesAno
+                    ? "bg-indigo-600"
+                    : "border border-gray-300 bg-white"
+                }`}
               >
-                <Text className="text-lg font-semibold text-blue-800">
-                  Em Aberto ({contasOrdenadas.abertas.length})
+                <Text
+                  className={`font-medium ${
+                    mesSelecionado === mesAno ? "text-white" : "text-gray-700"
+                  }`}
+                >
+                  {formatMounthYear(mesAno)}
                 </Text>
-                <MaterialCommunityIcons
-                  name={mostrarContasAbertas ? "chevron-up" : "chevron-down"}
-                  size={24}
-                  color="#1e40af"
-                />
               </TouchableOpacity>
-
-              {mostrarContasAbertas &&
-                contasOrdenadas.abertas.map((conta) => (
-                  <AccountCard
-                    key={conta.id}
-                    conta={conta}
-                    criadoPorNome={conta.criadoPorNome}
-                    expanded={expandedAccountId === conta.id}
-                    onToggleExpand={() => void handleToggleExpand(conta.id)}
-                    moradores={accountResidentsById[conta.id] ?? []}
-                    isLoadingMoradores={Boolean(loadingResidentsById[conta.id])}
-                    onDelete={handleDelete}
-                  />
-                ))}
-            </View>
-          )}
-
-          {/* Dropdown de Contas Pagas */}
-          {contasOrdenadas.pagas.length > 0 && (
-            <View className="mb-4">
-              <TouchableOpacity
-                onPress={() => setMostrarContasPagas(!mostrarContasPagas)}
-                className="mb-3 flex-row items-center justify-between rounded-lg bg-green-50 p-4"
-              >
-                <Text className="text-lg font-semibold text-green-800">
-                  Contas Pagas ({contasOrdenadas.pagas.length})
-                </Text>
-                <MaterialCommunityIcons
-                  name={mostrarContasPagas ? "chevron-up" : "chevron-down"}
-                  size={24}
-                  color="#166534"
-                />
-              </TouchableOpacity>
-
-              {mostrarContasPagas &&
-                contasOrdenadas.pagas.map((conta) => (
-                  <AccountCard
-                    key={conta.id}
-                    conta={conta}
-                    criadoPorNome={conta.criadoPorNome}
-                    expanded={expandedAccountId === conta.id}
-                    onToggleExpand={() => void handleToggleExpand(conta.id)}
-                    moradores={accountResidentsById[conta.id] ?? []}
-                    isLoadingMoradores={Boolean(loadingResidentsById[conta.id])}
-                    onDelete={handleDelete}
-                  />
-                ))}
-            </View>
-          )}
-
-          <TouchableOpacity
-            className="items-center rounded-md bg-indigo-600 px-4 py-3 mb-2"
-            onPress={() => setShowAccountModal(true)}
-          >
-            <Text className="text-white">+ Nova Conta</Text>
-          </TouchableOpacity>
+            ))}
+          </ScrollView>
         </View>
-      )}
 
-      {/* Modal de Adição de conta*/}
+        {contasOrdenadas.abertas.length === 0 &&
+        contasOrdenadas.pagas.length === 0 &&
+        mesSelecionado !== "todos" ? (
+          <View className="mx-4 mt-6 items-center rounded-lg bg-white p-6 shadow-sm">
+            <Feather name="calendar" size={48} color="#9ca3af" />
+            <Text className="mt-4 text-center text-gray-500">
+              Nenhuma conta encontrada para {formatMounthYear(mesSelecionado)}.
+            </Text>
+          </View>
+        ) : (
+          <View className="px-4">
+            {/* Contas em Aberto */}
+            <AccountSection
+              label="Em Aberto"
+              contas={contasOrdenadas.abertas}
+              visivel={mostrarContasAbertas}
+              onToggle={() => setMostrarContasAbertas(!mostrarContasAbertas)}
+              headerBg="bg-blue-50"
+              headerTextColor="text-blue-800"
+              headerIconColor="#1e40af"
+              expandedAccountId={expandedAccountId}
+              onToggleExpand={handleToggleExpand}
+              accountResidentsById={accountResidentsById}
+              loadingResidentsById={loadingResidentsById}
+              errorResidentsById={errorResidentsById}
+              onDelete={handleDelete}
+            />
+
+            {/* Contas Pagas */}
+            <AccountSection
+              label="Contas Pagas"
+              contas={contasOrdenadas.pagas}
+              visivel={mostrarContasPagas}
+              onToggle={() => setMostrarContasPagas(!mostrarContasPagas)}
+              headerBg="bg-green-50"
+              headerTextColor="text-green-800"
+              headerIconColor="#166534"
+              expandedAccountId={expandedAccountId}
+              onToggleExpand={handleToggleExpand}
+              accountResidentsById={accountResidentsById}
+              loadingResidentsById={loadingResidentsById}
+              errorResidentsById={errorResidentsById}
+              onDelete={handleDelete}
+            />
+          </View>
+        )}
+      </ScrollView>
+
+      <AddAccountButton onPress={() => setShowAccountModal(true)} />
+
       <AddAccountModal
         visible={showAccountModal}
         onSubmit={handleSubmit}
         onClose={() => setShowAccountModal(false)}
         republicId={republicId}
       />
-    </ScrollView>
+    </View>
   );
 }
