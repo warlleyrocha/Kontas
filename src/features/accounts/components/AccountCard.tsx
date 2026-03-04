@@ -10,7 +10,7 @@ interface AccountCardProps {
   onToggleExpand: () => void;
   moradores: ContaMorador[];
   isLoadingMoradores: boolean;
-  onDelete?: (accountId: string) => Promise<void>; // se for assíncrona
+  onDelete?: (accountId: string) => Promise<void> | void;
 }
 
 export const AccountCard = ({
