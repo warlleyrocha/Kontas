@@ -8,9 +8,18 @@ interface UseAccountActionsOptions {
   onRefresh?: () => Promise<unknown> | void;
 }
 
+interface UseAccountActionsReturn {
+  showAccountModal: boolean;
+  setShowAccountModal: (value: boolean) => void;
+  isSubmitting: boolean;
+  isDeleting: boolean;
+  handleSubmit: (data: CriarContaComMoradoresRequest) => Promise<void>;
+  handleDelete: (accountId: string) => Promise<void>;
+}
+
 export function useAccountActions({
   onRefresh,
-}: UseAccountActionsOptions = {}) {
+}: UseAccountActionsOptions = {}): UseAccountActionsReturn {
   const [showAccountModal, setShowAccountModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
