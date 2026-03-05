@@ -2,6 +2,7 @@
 import { useCallback, useState } from "react";
 
 import { accountService } from "@/src/features/accounts/services/account.service";
+import { accountResidentsService } from "../../services/account-residents.service";
 import { getErrorMessage } from "@/src/services/httpError";
 import { showToast } from "@/src/utils/showToast";
 import type { Conta } from "@/src/features/accounts/types/account.types";
@@ -52,7 +53,9 @@ export function useAccountData({
   const fetchAccountResidents = useCallback(
     async (accountId: string): Promise<ContaMorador[]> => {
       try {
-        return await accountService.listarContasPorMoradores(accountId);
+        return await accountResidentsService.listarContasPorMoradores(
+          accountId,
+        );
       } catch (err) {
         const message = getErrorMessage(
           err,

@@ -2,6 +2,7 @@ import { getErrorMessage } from "@/src/services/httpError";
 import { showToast } from "@/src/utils/showToast";
 import { useCallback, useState } from "react";
 import { accountService } from "../services/account.service";
+import { accountResidentsService } from "../services/account-residents.service";
 import type {
   CriarContaComMoradoresRequest,
   MetodoPagamento,
@@ -42,7 +43,7 @@ export function useAccountActions({
         const conta = await accountService.criarConta(contaPayload);
 
         if (moradorIds.length > 0) {
-          await accountService.vincularMoradores({
+          await accountResidentsService.vincularMoradores({
             contaId: conta.id,
             moradorIds,
             valorTotal: contaPayload.valor,
