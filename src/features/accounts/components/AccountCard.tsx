@@ -1,7 +1,8 @@
 import { View, TouchableOpacity, Text, ActivityIndicator } from "react-native";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useState } from "react";
 
-import { Conta } from "../types/account.types";
+import { Conta, MetodoPagamento } from "../types/account.types";
 import { ContaMorador } from "@/src/shared/types/accountResidents.types";
 interface AccountCardProps {
   conta: Conta;
@@ -11,7 +12,29 @@ interface AccountCardProps {
   moradores: ContaMorador[];
   isLoadingMoradores: boolean;
   onDelete?: (accountId: string) => Promise<void> | void;
+  onPatch?: (
+    accountId: string,
+    metodoPagamento: MetodoPagamento,
+  ) => Promise<void> | void;
 }
+
+const normalizeMetodoPagamento = (metodoPagamento: string): MetodoPagamento => {
+  const normalized = metodoPagamento
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toUpperCase();
+
+  if (normalized === MetodoPagamento.CARTAO) {
+    return MetodoPagamento.CARTAO;
+  }
+
+  if (normalized === MetodoPagamento.DINHEIRO) {
+    return MetodoPagamento.DINHEIRO;
+  }
+
+  return MetodoPagamento.PIX;
+};
 
 export const AccountCard = ({
   conta,
@@ -21,12 +44,28 @@ export const AccountCard = ({
   moradores,
   isLoadingMoradores,
   onDelete,
+  onPatch,
 }: AccountCardProps) => {
+  const [isPatching, setIsPatching] = useState(false);
   const vencimento = new Date(conta.vencimento);
   vencimento.setHours(23, 59, 59, 999);
   const hoje = new Date();
   const paga = conta.pago;
   const vencida = vencimento < hoje && !paga;
+
+  const handlePatchAccount = async () => {
+    if (paga || isPatching || !onPatch) {
+      return;
+    }
+
+    setIsPatching(true);
+    try {
+      const metodoPagamento = normalizeMetodoPagamento(conta.metodoPagamento);
+      await onPatch(conta.id, metodoPagamento);
+    } finally {
+      setIsPatching(false);
+    }
+  };
 
   const renderMoradorContent = () => {
     if (isLoadingMoradores) {
@@ -110,16 +149,21 @@ export const AccountCard = ({
         <View className="flex-row items-center justify-between border-b border-gray-100 px-4 py-3">
           <TouchableOpacity
             className="flex-1 flex-row items-center gap-2"
+            disabled={paga || isPatching}
             onPress={(e) => {
               e.stopPropagation();
-              console.log("Marcar como pago", conta.id);
+              void handlePatchAccount();
             }}
           >
-            <MaterialCommunityIcons
-              name={paga ? "checkbox-marked" : "checkbox-blank-outline"}
-              size={24}
-              color={paga ? "#16a34a" : "#6b7280"}
-            />
+            {isPatching ? (
+              <ActivityIndicator size="small" color="#6b7280" />
+            ) : (
+              <MaterialCommunityIcons
+                name={paga ? "checkbox-marked" : "checkbox-blank-outline"}
+                size={24}
+                color={paga ? "#16a34a" : "#6b7280"}
+              />
+            )}
             <Text
               className={`flex-1 text-base font-semibold ${
                 paga ? "text-gray-400 line-through" : "text-gray-800"

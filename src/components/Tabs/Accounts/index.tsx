@@ -37,8 +37,22 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
     republicId,
   });
 
-  const { showAccountModal, setShowAccountModal, handleSubmit, handleDelete } =
+  const {
+    showAccountModal,
+    setShowAccountModal,
+    handleSubmit,
+    handleDelete,
+    handlePatch,
+  } =
     useAccountActions({ onRefresh: refresh });
+
+  const handlePatchAndRefresh = async (
+    accountId: string,
+    metodoPagamento: Parameters<typeof handlePatch>[1],
+  ) => {
+    await handlePatch(accountId, metodoPagamento);
+    await refresh();
+  };
 
   if (loading) {
     return (
@@ -179,6 +193,7 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
               loadingResidentsById={loadingResidentsById}
               errorResidentsById={errorResidentsById}
               onDelete={handleDelete}
+              onPatch={handlePatchAndRefresh}
             />
 
             {/* Contas Pagas */}
@@ -196,6 +211,7 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
               loadingResidentsById={loadingResidentsById}
               errorResidentsById={errorResidentsById}
               onDelete={handleDelete}
+              onPatch={handlePatchAndRefresh}
             />
           </View>
         )}
