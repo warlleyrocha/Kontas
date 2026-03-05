@@ -7,6 +7,12 @@ export enum StatusConta {
   ATRASADO = "ATRASADO",
 }
 
+export enum MetodoPagamento {
+  PIX = "PIX",
+  DINHEIRO = "DINHEIRO",
+  CARTAO = "CARTAO",
+}
+
 // Tipo base
 export type Conta = {
   id: string;
@@ -44,6 +50,11 @@ export type ListarContasRepublic = Conta[];
 // DELETE /contas/{id}
 export type RemoverContaParams = {
   id: string;
+};
+
+export type MarcarContaPaga = {
+  id: string;
+  metodoPagamento: MetodoPagamento;
 };
 
 // Tipos de erro (opcionais, mas úteis)

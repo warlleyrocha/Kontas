@@ -2,7 +2,10 @@ import { getErrorMessage } from "@/src/services/httpError";
 import { showToast } from "@/src/utils/showToast";
 import { useCallback, useState } from "react";
 import { accountService } from "../services/account.service";
-import type { CriarContaComMoradoresRequest } from "../types/account.types";
+import type {
+  CriarContaComMoradoresRequest,
+  MetodoPagamento,
+} from "../types/account.types";
 
 interface UseAccountActionsOptions {
   onRefresh?: () => Promise<unknown> | void;
@@ -13,8 +16,13 @@ interface UseAccountActionsReturn {
   setShowAccountModal: (value: boolean) => void;
   isSubmitting: boolean;
   isDeleting: boolean;
+  isUpdating: boolean;
   handleSubmit: (data: CriarContaComMoradoresRequest) => Promise<void>;
   handleDelete: (accountId: string) => Promise<void>;
+  handlePatch: (
+    accountId: string,
+    metodoPagamento: MetodoPagamento,
+  ) => Promise<void>;
 }
 
 export function useAccountActions({
@@ -23,6 +31,7 @@ export function useAccountActions({
   const [showAccountModal, setShowAccountModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const handleSubmit = useCallback(
     async (data: CriarContaComMoradoresRequest) => {
@@ -73,12 +82,33 @@ export function useAccountActions({
     [onRefresh],
   );
 
+  const handlePatch = useCallback(
+    async (accountId: string, metodoPagamento: MetodoPagamento) => {
+      setIsUpdating(true);
+
+      try {
+        await accountService.pagarConta({ id: accountId, metodoPagamento });
+
+        showToast.success("Conta marcada como paga com sucesso!");
+      } catch (error) {
+        showToast.error(
+          error instanceof Error ? error.message : "Erro inesperado",
+        );
+      } finally {
+        setIsUpdating(false);
+      }
+    },
+    [],
+  );
+
   return {
     showAccountModal,
     setShowAccountModal,
     isSubmitting,
     isDeleting,
+    isUpdating,
     handleSubmit,
     handleDelete,
+    handlePatch,
   };
 }

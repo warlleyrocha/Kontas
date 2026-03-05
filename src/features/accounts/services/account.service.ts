@@ -5,6 +5,7 @@ import {
   ListarContasResponse,
   ListarContasRepublic,
   RemoverContaParams,
+  MarcarContaPaga,
 } from "@/src/features/accounts/types/account.types";
 import {
   ContaMorador,
@@ -115,6 +116,28 @@ export const accountService = {
           401: "Não autenticado.",
           404: "Conta não encontrada.",
           500: "Erro interno do servidor.",
+        },
+      });
+    }
+  },
+
+  // Método para marcar uma conta como paga
+  pagarConta: async ({
+    id,
+    metodoPagamento,
+  }: MarcarContaPaga): Promise<void> => {
+    try {
+      await api.patch(`/contas/${id}`, { status: "PAGA", metodoPagamento });
+      console.log(`Conta ${id} paga com sucesso`);
+    } catch (error) {
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao marcar conta como paga",
+        statusMessages: {
+          400: "Dados inválidos.",
+          401: "Não Autenticado.",
+          403: "Apenas ADMIN pode alterar a conta",
+          404: "Conta não encontrada",
+          500: "Erro interno do servidor",
         },
       });
     }
