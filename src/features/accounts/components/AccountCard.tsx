@@ -1,9 +1,25 @@
 import { View, TouchableOpacity, Text, ActivityIndicator } from "react-native";
-import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  Feather,
+  Ionicons,
+  MaterialCommunityIcons,
+  MaterialIcons,
+} from "@expo/vector-icons";
 import { useState } from "react";
 
-import { Conta, MetodoPagamento } from "../types/account.types";
-import { ContaMorador } from "@/src/shared/types/accountResidents.types";
+import { Conta, MetodoPagamento, StatusConta } from "../types/account.types";
+import {
+  ContaMorador,
+  StatusPagamento,
+} from "@/src/shared/types/accountResidents.types";
+import {
+  getContaStatusIcon,
+  getContaStatusVisual,
+  getMoradorStatusBadge,
+  getMoradorStatusIcon,
+  getMoradorStatusVisual,
+  parseContaVencimento,
+} from "../utils/accountStatus.utils";
 interface AccountCardProps {
   conta: Conta;
   criadoPorNome: string;
@@ -47,11 +63,15 @@ export const AccountCard = ({
   onPatch,
 }: AccountCardProps) => {
   const [isPatching, setIsPatching] = useState(false);
-  const vencimento = new Date(conta.vencimento);
-  vencimento.setHours(23, 59, 59, 999);
-  const hoje = new Date();
-  const paga = conta.pago;
-  const vencida = vencimento < hoje && !paga;
+  const vencimento = parseContaVencimento(conta.vencimento);
+  const contaStatusVisual = getContaStatusVisual(conta);
+  const contaStatusIcon = getContaStatusIcon(contaStatusVisual);
+  const vencimentoLabel = vencimento
+    ? vencimento.toLocaleDateString("pt-BR")
+    : "Data inválida";
+
+  const paga = contaStatusVisual === StatusConta.PAGO;
+  const vencida = contaStatusVisual === StatusConta.ATRASADO;
 
   const handlePatchAccount = async () => {
     if (paga || isPatching || !onPatch) {
@@ -65,6 +85,30 @@ export const AccountCard = ({
     } finally {
       setIsPatching(false);
     }
+  };
+
+  const renderContaLeadingIcon = () => {
+    if (isPatching) {
+      return <ActivityIndicator size="small" color="#6b7280" />;
+    }
+
+    if (contaStatusIcon.library === "material") {
+      return (
+        <MaterialIcons
+          name={contaStatusIcon.name}
+          size={24}
+          color={contaStatusIcon.color}
+        />
+      );
+    }
+
+    return (
+      <MaterialCommunityIcons
+        name={contaStatusIcon.name}
+        size={24}
+        color={contaStatusIcon.color}
+      />
+    );
   };
 
   const renderMoradorContent = () => {
@@ -81,8 +125,35 @@ export const AccountCard = ({
 
     if (moradores.length > 0) {
       return moradores.map((morador, index) => {
-        const moradorPago =
-          morador.status === "PAGO" || Boolean(morador.pagoEm);
+        const moradorStatusVisual = getMoradorStatusVisual(morador);
+
+        const moradorPago = moradorStatusVisual === StatusPagamento.PAGO;
+        const {
+          backgroundClassName: moradorStatusBadgeClass,
+          textClassName: moradorStatusTextClass,
+          label: moradorStatusLabel,
+        } = getMoradorStatusBadge(moradorStatusVisual);
+        const moradorStatusIcon = getMoradorStatusIcon(moradorStatusVisual);
+
+        const renderMoradorLeadingIcon = () => {
+          if (moradorStatusIcon.library === "material") {
+            return (
+              <MaterialIcons
+                name={moradorStatusIcon.name}
+                size={20}
+                color={moradorStatusIcon.color}
+              />
+            );
+          }
+
+          return (
+            <MaterialCommunityIcons
+              name={moradorStatusIcon.name}
+              size={20}
+              color={moradorStatusIcon.color}
+            />
+          );
+        };
 
         return (
           <View
@@ -95,13 +166,7 @@ export const AccountCard = ({
               onPress={() => console.log(morador.id)}
               className="flex-1 flex-row items-center gap-3"
             >
-              <MaterialCommunityIcons
-                name={
-                  moradorPago ? "checkbox-marked" : "checkbox-blank-outline"
-                }
-                size={20}
-                color={moradorPago ? "#16a34a" : "#6b7280"}
-              />
+              {renderMoradorLeadingIcon()}
               <View className="flex-1">
                 <Text
                   className={`text-sm font-medium ${
@@ -118,11 +183,13 @@ export const AccountCard = ({
               </View>
             </TouchableOpacity>
 
-            {moradorPago && (
-              <View className="rounded-md bg-green-50 px-2 py-1">
-                <Text className="text-xs font-medium text-green-600">Pago</Text>
-              </View>
-            )}
+            <View
+              className={`flex-row items-center gap-1 rounded-md px-2 py-1 ${moradorStatusBadgeClass}`}
+            >
+              <Text className={`text-xs font-medium ${moradorStatusTextClass}`}>
+                {moradorStatusLabel}
+              </Text>
+            </View>
           </View>
         );
       });
@@ -145,7 +212,7 @@ export const AccountCard = ({
           vencida ? "border border-orange-300 bg-orange-50" : ""
         }`}
       >
-        {/* HEADER: Checkbox + Descrição + Valor */}
+        {/* HEADER: Status + Descrição + Valor */}
         <View className="flex-row items-center justify-between border-b border-gray-100 px-4 py-3">
           <TouchableOpacity
             className="flex-1 flex-row items-center gap-2"
@@ -155,15 +222,7 @@ export const AccountCard = ({
               void handlePatchAccount();
             }}
           >
-            {isPatching ? (
-              <ActivityIndicator size="small" color="#6b7280" />
-            ) : (
-              <MaterialCommunityIcons
-                name={paga ? "checkbox-marked" : "checkbox-blank-outline"}
-                size={24}
-                color={paga ? "#16a34a" : "#6b7280"}
-              />
-            )}
+            {renderContaLeadingIcon()}
             <Text
               className={`flex-1 text-base font-semibold ${
                 paga ? "text-gray-400 line-through" : "text-gray-800"
@@ -192,7 +251,7 @@ export const AccountCard = ({
             <View className="flex-row items-center gap-1">
               <Ionicons name="calendar-outline" size={16} color="#4b5563" />
               <Text className="text-sm text-gray-600">
-                {vencimento.toLocaleDateString("pt-BR")}
+                {vencimentoLabel}
               </Text>
             </View>
           </View>
