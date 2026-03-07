@@ -31,6 +31,8 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
     accountResidentsById,
     loadingResidentsById,
     errorResidentsById,
+    updatingResidentById,
+    confirmResidentPayment,
   } = useAccountList({ republicId });
 
   const { expandedAccountId, handleToggleExpand } = useAccountExpansion({
@@ -192,6 +194,8 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
               accountResidentsById={accountResidentsById}
               loadingResidentsById={loadingResidentsById}
               errorResidentsById={errorResidentsById}
+              updatingResidentById={updatingResidentById}
+              onConfirmResidentPayment={confirmResidentPayment}
               onDelete={handleDelete}
               onPatch={handlePatchAndRefresh}
             />
@@ -210,6 +214,8 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
               accountResidentsById={accountResidentsById}
               loadingResidentsById={loadingResidentsById}
               errorResidentsById={errorResidentsById}
+              updatingResidentById={updatingResidentById}
+              onConfirmResidentPayment={confirmResidentPayment}
               onDelete={handleDelete}
               onPatch={handlePatchAndRefresh}
             />

@@ -33,7 +33,9 @@ export function useAccountList({ republicId }: UseAccountListProps) {
     accountResidentsById,
     loadingResidentsById,
     errorResidentsById,
+    updatingResidentById,
     loadResidents,
+    confirmResidentPayment,
   } = useAccountResidents({ fetchAccountResidents });
 
   const refresh = useCallback(async () => {
@@ -65,5 +67,7 @@ export function useAccountList({ republicId }: UseAccountListProps) {
     accountResidentsById,
     loadingResidentsById,
     errorResidentsById,
+    updatingResidentById,
+    confirmResidentPayment,
   };
 }

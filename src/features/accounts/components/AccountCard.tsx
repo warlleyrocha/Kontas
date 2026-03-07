@@ -27,6 +27,11 @@ interface AccountCardProps {
   onToggleExpand: () => void;
   moradores: ContaMorador[];
   isLoadingMoradores: boolean;
+  updatingResidentById: Record<string, boolean>;
+  onConfirmResidentPayment?: (
+    accountId: string,
+    accountResidentId: string,
+  ) => Promise<void> | void;
   onDelete?: (accountId: string) => Promise<void> | void;
   onPatch?: (
     accountId: string,
@@ -59,6 +64,8 @@ export const AccountCard = ({
   onToggleExpand,
   moradores,
   isLoadingMoradores,
+  updatingResidentById,
+  onConfirmResidentPayment,
   onDelete,
   onPatch,
 }: AccountCardProps) => {
@@ -128,6 +135,9 @@ export const AccountCard = ({
         const moradorStatusVisual = getMoradorStatusVisual(morador);
 
         const moradorPago = moradorStatusVisual === StatusPagamento.PAGO;
+        const moradorAguardando =
+          moradorStatusVisual === StatusPagamento.AGUARDANDO_CONFIRMACAO;
+        const isUpdatingMorador = Boolean(updatingResidentById[morador.id]);
         const {
           backgroundClassName: moradorStatusBadgeClass,
           textClassName: moradorStatusTextClass,
@@ -136,6 +146,10 @@ export const AccountCard = ({
         const moradorStatusIcon = getMoradorStatusIcon(moradorStatusVisual);
 
         const renderMoradorLeadingIcon = () => {
+          if (isUpdatingMorador) {
+            return <ActivityIndicator size="small" color="#6b7280" />;
+          }
+
           if (moradorStatusIcon.library === "material") {
             return (
               <MaterialIcons
@@ -163,7 +177,26 @@ export const AccountCard = ({
             }`}
           >
             <TouchableOpacity
-              onPress={() => console.log(morador.id)}
+              onPress={(e) => {
+                e.stopPropagation();
+
+                if (
+                  moradorPago ||
+                  moradorAguardando ||
+                  isUpdatingMorador ||
+                  !onConfirmResidentPayment
+                ) {
+                  return;
+                }
+
+                void onConfirmResidentPayment(conta.id, morador.id);
+              }}
+              disabled={
+                moradorPago ||
+                moradorAguardando ||
+                isUpdatingMorador ||
+                !onConfirmResidentPayment
+              }
               className="flex-1 flex-row items-center gap-3"
             >
               {renderMoradorLeadingIcon()}

@@ -1,6 +1,9 @@
 import { useCallback, useState } from "react";
 
+import { getErrorMessage } from "@/src/services/httpError";
 import type { ContaMorador } from "@/src/shared/types/accountResidents.types";
+import { showToast } from "@/src/utils/showToast";
+import { accountResidentsService } from "../services/account-residents.service";
 import type { Conta } from "../types/account.types";
 
 interface UseAccountResidentsProps {
@@ -11,7 +14,12 @@ interface UseAccountResidentsReturn {
   accountResidentsById: Record<string, ContaMorador[]>;
   loadingResidentsById: Record<string, boolean>;
   errorResidentsById: Record<string, boolean>;
+  updatingResidentById: Record<string, boolean>;
   loadResidents: (contas: Conta[]) => Promise<void>;
+  confirmResidentPayment: (
+    accountId: string,
+    accountResidentId: string,
+  ) => Promise<void>;
 }
 
 export function useAccountResidents({
@@ -26,12 +34,16 @@ export function useAccountResidents({
   const [errorResidentsById, setErrorResidentsById] = useState<
     Record<string, boolean>
   >({});
+  const [updatingResidentById, setUpdatingResidentById] = useState<
+    Record<string, boolean>
+  >({});
 
   const loadResidents = useCallback(
     async (contas: Conta[]) => {
       setAccountResidentsById({});
       setLoadingResidentsById({});
       setErrorResidentsById({});
+      setUpdatingResidentById({});
 
       if (contas.length === 0) {
         return;
@@ -73,10 +85,54 @@ export function useAccountResidents({
     [fetchAccountResidents],
   );
 
+  const confirmResidentPayment = useCallback(
+    async (accountId: string, accountResidentId: string) => {
+      if (updatingResidentById[accountResidentId]) {
+        return;
+      }
+
+      setUpdatingResidentById((previousState) => ({
+        ...previousState,
+        [accountResidentId]: true,
+      }));
+
+      try {
+        await accountResidentsService.confirmarPagamentoMorador({
+          id: accountResidentId,
+        });
+
+        const updatedResidents = await fetchAccountResidents(accountId);
+
+        setAccountResidentsById((previousState) => ({
+          ...previousState,
+          [accountId]: updatedResidents,
+        }));
+
+        showToast.success("Pagamento do morador enviado para confirmação.");
+      } catch (error) {
+        showToast.error(
+          getErrorMessage(
+            error,
+            "Não foi possível confirmar pagamento do morador.",
+          ),
+        );
+      } finally {
+        setUpdatingResidentById((previousState) => {
+          const nextState = { ...previousState };
+          delete nextState[accountResidentId];
+          return nextState;
+        });
+      }
+    },
+    [fetchAccountResidents, updatingResidentById],
+  );
+
   return {
     accountResidentsById,
     loadingResidentsById,
     errorResidentsById,
+    updatingResidentById,
     loadResidents,
+    confirmResidentPayment,
   };
 }
