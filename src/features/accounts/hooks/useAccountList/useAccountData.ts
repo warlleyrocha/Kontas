@@ -53,9 +53,7 @@ export function useAccountData({
   const fetchAccountResidents = useCallback(
     async (accountId: string): Promise<ContaMorador[]> => {
       try {
-        return await accountResidentsService.listarContasPorMoradores(
-          accountId,
-        );
+        return await accountResidentsService.listarContasMoradores(accountId);
       } catch (err) {
         const message = getErrorMessage(
           err,
