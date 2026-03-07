@@ -70,6 +70,24 @@ export const accountService = {
     }
   },
 
+  // Método para recuperar uma conta deletada
+  restaurarConta: async (id: string): Promise<void> => {
+    try {
+      await api.patch(`/contas/${id}/restaurar`);
+      console.log(`Conta ${id} recuperada com sucesso.`);
+    } catch (error) {
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao recuperar conta.",
+        statusMessages: {
+          401: "Não autenticado.",
+          403: "Apenas ADMIN pode restaurar conta.",
+          404: "Conta não encontrada.",
+          500: "Erro interno do servidor.",
+        },
+      });
+    }
+  },
+
   // Método para marcar uma conta como paga
   pagarConta: async ({
     id,

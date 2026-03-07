@@ -1,12 +1,16 @@
 import { getErrorMessage } from "@/src/services/httpError";
 import { showToast } from "@/src/utils/showToast";
-import { useCallback, useState } from "react";
+import { createElement, useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "@/src/components/ui/sonner";
+import { AccountRecoveryToast } from "../components/AccountRecoveryToast";
 import { accountService } from "../services/account.service";
 import { accountResidentsService } from "../services/account-residents.service";
 import type {
   CriarContaComMoradoresRequest,
   MetodoPagamento,
 } from "../types/account.types";
+
+const RECOVERY_TOAST_DURATION_MS = 10_000;
 
 interface UseAccountActionsOptions {
   onRefresh?: () => Promise<unknown> | void;
@@ -24,6 +28,7 @@ interface UseAccountActionsReturn {
     accountId: string,
     metodoPagamento: MetodoPagamento,
   ) => Promise<void>;
+  handleRecovery: (accountId: string) => Promise<void>;
 }
 
 export function useAccountActions({
@@ -33,6 +38,26 @@ export function useAccountActions({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const pendingDeleteTimeoutsRef = useRef<
+    Map<string, ReturnType<typeof setTimeout>>
+  >(new Map());
+  const pendingDeleteToastIdsRef = useRef<Map<string, string | number>>(
+    new Map(),
+  );
+
+  useEffect(() => {
+    return () => {
+      pendingDeleteTimeoutsRef.current.forEach((timeoutId) => {
+        clearTimeout(timeoutId);
+      });
+      pendingDeleteTimeoutsRef.current.clear();
+
+      pendingDeleteToastIdsRef.current.forEach((toastId) => {
+        toast.dismiss(toastId);
+      });
+      pendingDeleteToastIdsRef.current.clear();
+    };
+  }, []);
 
   const handleSubmit = useCallback(
     async (data: CriarContaComMoradoresRequest) => {
@@ -64,23 +89,85 @@ export function useAccountActions({
     [onRefresh],
   );
 
-  const handleDelete = useCallback(
+  const handleRecovery = useCallback(
     async (accountId: string) => {
+      const pendingTimeout = pendingDeleteTimeoutsRef.current.get(accountId);
+      if (pendingTimeout) {
+        clearTimeout(pendingTimeout);
+        pendingDeleteTimeoutsRef.current.delete(accountId);
+
+        const toastId = pendingDeleteToastIdsRef.current.get(accountId);
+        if (toastId !== undefined) {
+          toast.dismiss(toastId);
+        }
+        pendingDeleteToastIdsRef.current.delete(accountId);
+
+        showToast.success("Remoção cancelada com sucesso.");
+        return;
+      }
+
       setIsDeleting(true);
 
       try {
-        await accountService.removerConta({ id: accountId });
-        showToast.success("Conta removida com sucesso.");
+        await accountService.restaurarConta(accountId);
+        showToast.success("Conta recuperada com sucesso.");
         await onRefresh?.();
       } catch (error) {
         showToast.error(
-          getErrorMessage(error, "Não foi possível remover a conta."),
+          getErrorMessage(error, "Não foi possível recuperar a conta."),
         );
       } finally {
         setIsDeleting(false);
       }
     },
     [onRefresh],
+  );
+
+  const handleDelete = useCallback(
+    async (accountId: string) => {
+      if (pendingDeleteTimeoutsRef.current.has(accountId)) {
+        return;
+      }
+
+      const timeoutId = setTimeout(() => {
+        pendingDeleteTimeoutsRef.current.delete(accountId);
+        const toastId = pendingDeleteToastIdsRef.current.get(accountId);
+        if (toastId !== undefined) {
+          toast.dismiss(toastId);
+        }
+        pendingDeleteToastIdsRef.current.delete(accountId);
+
+        void (async () => {
+          setIsDeleting(true);
+          try {
+            await accountService.removerConta({ id: accountId });
+            showToast.success("Conta removida com sucesso.");
+            await onRefresh?.();
+          } catch (error) {
+            showToast.error(
+              getErrorMessage(error, "Não foi possível remover a conta."),
+            );
+          } finally {
+            setIsDeleting(false);
+          }
+        })();
+      }, RECOVERY_TOAST_DURATION_MS);
+
+      pendingDeleteTimeoutsRef.current.set(accountId, timeoutId);
+
+      const toastId = toast.custom(
+        createElement(AccountRecoveryToast, {
+          message: "Conta apagada",
+          onRecover: () => {
+            void handleRecovery(accountId);
+          },
+          durationMs: RECOVERY_TOAST_DURATION_MS,
+        }),
+        { duration: RECOVERY_TOAST_DURATION_MS },
+      );
+      pendingDeleteToastIdsRef.current.set(accountId, toastId);
+    },
+    [handleRecovery, onRefresh],
   );
 
   const handlePatch = useCallback(
@@ -111,5 +198,6 @@ export function useAccountActions({
     handleSubmit,
     handleDelete,
     handlePatch,
+    handleRecovery,
   };
 }
