@@ -1,4 +1,4 @@
-import { ContaMorador } from "@/src/shared/types/accountResidents.types";
+import { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
 
 // Enums
 export enum StatusConta {

@@ -6,7 +6,7 @@ import { accountResidentsService } from "../../services/account-residents.servic
 import { getErrorMessage } from "@/src/services/httpError";
 import { showToast } from "@/src/utils/showToast";
 import type { Conta } from "@/src/features/accounts/types/account.types";
-import type { ContaMorador } from "@/src/shared/types/accountResidents.types";
+import type { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
 
 interface UseAccountDataProps {
   readonly republicId: string;

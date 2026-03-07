@@ -2,7 +2,7 @@ import { api } from "@/src/services/api";
 import {
   ContaMorador,
   VincularMoradoresRequest,
-} from "@/src/shared/types/accountResidents.types";
+} from "@/src/features/accounts/types/accountResidents.types";
 import { ListarContasResponse } from "@/src/features/accounts/types/account.types";
 import { toUserFriendlyError } from "@/src/services/httpError";
 

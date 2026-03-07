@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 
 import { getErrorMessage } from "@/src/services/httpError";
-import type { ContaMorador } from "@/src/shared/types/accountResidents.types";
+import type { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
 import { showToast } from "@/src/utils/showToast";
 import { accountResidentsService } from "../services/account-residents.service";
 import type { Conta } from "../types/account.types";

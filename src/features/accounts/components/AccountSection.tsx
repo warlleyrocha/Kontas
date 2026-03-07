@@ -2,7 +2,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 
 import { AccountCard } from "@/src/features/accounts/components/AccountCard";
-import type { ContaMorador } from "@/src/shared/types/accountResidents.types";
+import type { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
 import type { Conta, MetodoPagamento } from "../types/account.types";
 
 interface AccountSectionProps {

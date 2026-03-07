@@ -11,7 +11,7 @@ import { Conta, MetodoPagamento, StatusConta } from "../types/account.types";
 import {
   ContaMorador,
   StatusPagamento,
-} from "@/src/shared/types/accountResidents.types";
+} from "@/src/features/accounts/types/accountResidents.types";
 import {
   getContaStatusIcon,
   getContaStatusVisual,
@@ -283,9 +283,7 @@ export const AccountCard = ({
             {/* Data */}
             <View className="flex-row items-center gap-1">
               <Ionicons name="calendar-outline" size={16} color="#4b5563" />
-              <Text className="text-sm text-gray-600">
-                {vencimentoLabel}
-              </Text>
+              <Text className="text-sm text-gray-600">{vencimentoLabel}</Text>
             </View>
           </View>
         </View>

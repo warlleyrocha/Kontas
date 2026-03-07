@@ -6,7 +6,7 @@ import {
 import {
   ContaMorador,
   StatusPagamento,
-} from "@/src/shared/types/accountResidents.types";
+} from "@/src/features/accounts/types/accountResidents.types";
 
 type ContaStatusIcon =
   | {
