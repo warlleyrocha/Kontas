@@ -14,7 +14,10 @@ export class AppError extends Error {
   code?: string;
   originalError?: unknown;
 
-  constructor(message: string, options?: { status?: number; code?: string; originalError?: unknown }) {
+  constructor(
+    message: string,
+    options?: { status?: number; code?: string; originalError?: unknown },
+  ) {
     super(message);
     this.name = "AppError";
     this.status = options?.status;
@@ -25,11 +28,12 @@ export class AppError extends Error {
 
 export const toUserFriendlyError = (
   error: unknown,
-  options: UserFriendlyErrorOptions
+  options: UserFriendlyErrorOptions,
 ): AppError => {
   if (!isAxiosError(error)) {
     if (error instanceof AppError) return error;
-    if (error instanceof Error) return new AppError(error.message, { originalError: error });
+    if (error instanceof Error)
+      return new AppError(error.message, { originalError: error });
     return new AppError(options.defaultMessage, { originalError: error });
   }
 
@@ -39,14 +43,18 @@ export const toUserFriendlyError = (
 
   const messageByStatus = status ? options.statusMessages?.[status] : undefined;
   if (messageByStatus) {
-    return new AppError(messageByStatus, { status, code, originalError: error });
+    return new AppError(messageByStatus, {
+      status,
+      code,
+      originalError: error,
+    });
   }
 
   const isTimeout = code === "ECONNABORTED";
   if (isTimeout) {
     return new AppError(
       options.timeoutMessage ?? "Tempo de resposta excedido. Tente novamente.",
-      { status, code, originalError: error }
+      { status, code, originalError: error },
     );
   }
 
@@ -54,11 +62,15 @@ export const toUserFriendlyError = (
   if (hasNoResponse) {
     return new AppError(
       options.networkMessage ?? "Falha de conexão. Verifique sua internet.",
-      { status, code, originalError: error }
+      { status, code, originalError: error },
     );
   }
 
-  return new AppError(options.defaultMessage, { status, code, originalError: error });
+  return new AppError(options.defaultMessage, {
+    status,
+    code,
+    originalError: error,
+  });
 };
 
 export const isUnauthorizedError = (error: unknown): boolean => {
@@ -69,7 +81,7 @@ export const isUnauthorizedError = (error: unknown): boolean => {
 
 export const getErrorMessage = (
   error: unknown,
-  fallback = "Ocorreu um erro. Tente novamente."
+  fallback = "Ocorreu um erro. Tente novamente.",
 ): string => {
   if (error instanceof AppError) return error.message;
   if (error instanceof Error) return error.message;
