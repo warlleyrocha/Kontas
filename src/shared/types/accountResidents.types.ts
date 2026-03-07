@@ -1,11 +1,14 @@
-import { StatusConta } from "@/src/features/accounts/types/account.types";
-
+export enum StatusPagamento {
+  PENDENTE = "PENDENTE",
+  AGUARDANDO_CONFIRMACAO = "AGUARDANDO_CONFIRMACAO",
+  PAGO = "PAGO",
+}
 export interface ContaMorador {
   id: string;
   contaId: string;
   moradorId: string;
   moradorNome: string;
-  status: StatusConta;
+  status: StatusPagamento;
   valor: number;
   visivel: boolean;
   pagoEm: string | null;
