@@ -1,13 +1,21 @@
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { Animated, Image, Text, View } from "react-native";
+import { Image, Text, View } from "react-native";
+import Animated, {
+  Extrapolation,
+  interpolate,
+  type SharedValue,
+  useAnimatedStyle,
+} from "react-native-reanimated";
+
+import type { OnboardingSlide } from "../../constants/slides";
 
 interface RenderSlideProps {
-  item: any;
+  item: OnboardingSlide;
   index: number;
   width: number;
   height: number;
-  scrollX: Animated.Value;
+  scrollX: SharedValue<number>;
 }
 
 const RenderSlide: React.FC<RenderSlideProps> = ({
@@ -17,29 +25,32 @@ const RenderSlide: React.FC<RenderSlideProps> = ({
   height,
   scrollX,
 }) => {
-  const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
+  const animatedStyle = useAnimatedStyle(() => {
+    const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
 
-  const scale = scrollX.interpolate({
-    inputRange,
-    outputRange: [0.8, 1, 0.8],
-    extrapolate: "clamp",
-  });
-
-  const opacity = scrollX.interpolate({
-    inputRange,
-    outputRange: [0.4, 1, 0.4],
-    extrapolate: "clamp",
+    return {
+      transform: [
+        {
+          scale: interpolate(
+            scrollX.value,
+            inputRange,
+            [0.8, 1, 0.8],
+            Extrapolation.CLAMP,
+          ),
+        },
+      ],
+      opacity: interpolate(
+        scrollX.value,
+        inputRange,
+        [0.4, 1, 0.4],
+        Extrapolation.CLAMP,
+      ),
+    };
   });
 
   return (
     <View className="flex-1 items-center px-6" style={{ width }}>
-      <Animated.View
-        style={{
-          transform: [{ scale }],
-          opacity,
-        }}
-        className="mb-6 items-center"
-      >
+      <Animated.View style={animatedStyle} className="mb-6 items-center">
         <View style={{ position: "relative" }}>
           <Image
             source={{ uri: item.image }}

@@ -1,13 +1,21 @@
 import React from "react";
-import { Animated, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
+import Animated, {
+  Extrapolation,
+  interpolate,
+  type SharedValue,
+  useAnimatedStyle,
+} from "react-native-reanimated";
+
+import type { OnboardingSlide } from "../../constants/slides";
 
 interface OnboardingButtonsProps {
   isLastSlide: boolean;
   currentIndex: number;
-  slides: any[];
+  slides: OnboardingSlide[];
   handleNext: () => void;
   handleSkip: () => void;
-  scrollX: Animated.Value;
+  scrollX: SharedValue<number>;
   width: number;
 }
 
@@ -19,43 +27,49 @@ const OnboardingButtons: React.FC<OnboardingButtonsProps> = ({
   handleSkip,
   scrollX,
   width,
-}) => (
-  <View className="gap-1">
-    <TouchableOpacity
-      className="flex-row items-center justify-center rounded-2xl py-4 shadow-lg w-full"
-      style={{ backgroundColor: slides[currentIndex].color }}
-      onPress={handleNext}
-      activeOpacity={0.9}
-    >
-      <Text className="text-center text-[16px] leading-[18px] font-mulish-medium text-white w-full">
-        {isLastSlide ? "Começar Agora" : "Continuar"}
-      </Text>
-    </TouchableOpacity>
+}) => {
+  const skipAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(
+      scrollX.value,
+      [0, width * 0.3, width * 0.7, width],
+      [1, 0.7, 0.2, 0],
+      Extrapolation.CLAMP,
+    ),
+  }));
 
-    <Animated.View
-      style={{
-        opacity: scrollX.interpolate({
-          inputRange: [0, width * 0.3, width * 0.7, width],
-          outputRange: [1, 0.7, 0.2, 0],
-          extrapolate: "clamp",
-        }),
-        height: currentIndex === 0 ? undefined : 0,
-        overflow: "hidden",
-      }}
-    >
-      {currentIndex === 0 && (
-        <TouchableOpacity
-          className="flex-row items-center justify-center rounded-full py-4 w-full"
-          onPress={handleSkip}
-          activeOpacity={0.7}
-        >
-          <Text className="text-center text-[16px] leading-[18px] font-mulish-medium text-slate-500 w-full">
-            Pular
-          </Text>
-        </TouchableOpacity>
-      )}
-    </Animated.View>
-  </View>
-);
+  return (
+    <View className="gap-1">
+      <TouchableOpacity
+        className="w-full flex-row items-center justify-center rounded-2xl py-4 shadow-lg"
+        style={{ backgroundColor: slides[currentIndex].color }}
+        onPress={handleNext}
+        activeOpacity={0.9}
+      >
+        <Text className="w-full text-center font-mulish-medium text-[16px] leading-[18px] text-white">
+          {isLastSlide ? "Começar Agora" : "Continuar"}
+        </Text>
+      </TouchableOpacity>
+
+      <Animated.View
+        style={[
+          skipAnimatedStyle,
+          currentIndex === 0 ? { overflow: "hidden" } : { height: 0, overflow: "hidden" },
+        ]}
+      >
+        {currentIndex === 0 && (
+          <TouchableOpacity
+            className="w-full flex-row items-center justify-center rounded-full py-4"
+            onPress={handleSkip}
+            activeOpacity={0.7}
+          >
+            <Text className="w-full text-center font-mulish-medium text-[16px] leading-[18px] text-slate-500">
+              Pular
+            </Text>
+          </TouchableOpacity>
+        )}
+      </Animated.View>
+    </View>
+  );
+};
 
 export default OnboardingButtons;

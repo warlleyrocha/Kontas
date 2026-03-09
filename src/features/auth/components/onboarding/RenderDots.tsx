@@ -1,11 +1,59 @@
 import React from "react";
-import { Animated, View } from "react-native";
+import { View } from "react-native";
+import Animated, {
+  Extrapolation,
+  interpolate,
+  type SharedValue,
+  useAnimatedStyle,
+} from "react-native-reanimated";
+
+import type { OnboardingSlide } from "../../constants/slides";
 
 interface RenderDotsProps {
-  slides: any[];
-  scrollX: Animated.Value;
+  slides: OnboardingSlide[];
+  scrollX: SharedValue<number>;
   currentIndex: number;
   width: number;
+}
+
+interface RenderDotItemProps {
+  readonly slide: OnboardingSlide;
+  readonly index: number;
+  readonly scrollX: SharedValue<number>;
+  readonly currentIndex: number;
+  readonly width: number;
+}
+
+function RenderDotItem({
+  slide,
+  index,
+  scrollX,
+  currentIndex,
+  width,
+}: RenderDotItemProps) {
+  const animatedStyle = useAnimatedStyle(() => {
+    const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
+
+    return {
+      width: interpolate(scrollX.value, inputRange, [8, 24, 8], Extrapolation.CLAMP),
+      opacity: interpolate(
+        scrollX.value,
+        inputRange,
+        [0.3, 1, 0.3],
+        Extrapolation.CLAMP,
+      ),
+    };
+  });
+
+  return (
+    <Animated.View
+      className="mx-1 h-2 rounded-full"
+      style={[
+        animatedStyle,
+        { backgroundColor: index === currentIndex ? slide.color : "#6a6b5f" },
+      ]}
+    />
+  );
 }
 
 const RenderDots: React.FC<RenderDotsProps> = ({
@@ -15,38 +63,16 @@ const RenderDots: React.FC<RenderDotsProps> = ({
   width,
 }) => (
   <View className="mb-6 flex-row items-center justify-center">
-    {slides.map((slide, index) => {
-      const inputRange = [
-        (index - 1) * width,
-        index * width,
-        (index + 1) * width,
-      ];
-
-      // Animar largura dos dots (pill)
-      const animatedWidth = scrollX.interpolate({
-        inputRange,
-        outputRange: [8, 24, 8], // inativo: 8px, ativo: 24px
-        extrapolate: "clamp",
-      });
-
-      const dotOpacity = scrollX.interpolate({
-        inputRange,
-        outputRange: [0.3, 1, 0.3],
-        extrapolate: "clamp",
-      });
-
-      return (
-        <Animated.View
-          key={slide.id}
-          className="mx-1 h-2 rounded-full"
-          style={{
-            width: animatedWidth,
-            opacity: dotOpacity,
-            backgroundColor: index === currentIndex ? slide.color : "#6a6b5f",
-          }}
-        />
-      );
-    })}
+    {slides.map((slide, index) => (
+      <RenderDotItem
+        key={slide.id}
+        slide={slide}
+        index={index}
+        scrollX={scrollX}
+        currentIndex={currentIndex}
+        width={width}
+      />
+    ))}
   </View>
 );
 

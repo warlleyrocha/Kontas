@@ -1,19 +1,23 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import {
-  Animated,
-  Dimensions,
   Image,
   Modal,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  useWindowDimensions,
   View,
 } from "react-native";
+import Animated, {
+  Extrapolation,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const MENU_WIDTH = Math.min(SCREEN_WIDTH * 0.65, 300);
 
 export interface MenuItem {
   id: string;
@@ -85,43 +89,45 @@ export function SideMenu({
   menuItems,
   footerItems,
 }: SideMenuProps) {
-  const [slideAnim] = useState(() => new Animated.Value(-MENU_WIDTH));
-  const [fadeAnim] = useState(() => new Animated.Value(0));
-
-  const openMenu = useCallback(() => {
-    Animated.parallel([
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [slideAnim, fadeAnim]);
+  const { width: screenWidth } = useWindowDimensions();
+  const menuWidth = Math.min(screenWidth * 0.65, 300);
+  const progress = useSharedValue(0);
+  const isClosingRef = useRef(false);
 
   const closeMenu = useCallback(() => {
-    Animated.parallel([
-      Animated.timing(slideAnim, {
-        toValue: -MENU_WIDTH,
-        duration: 250,
-        useNativeDriver: true,
-      }),
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 250,
-        useNativeDriver: true,
-      }),
-    ]).start(onRequestClose);
-  }, [slideAnim, fadeAnim, onRequestClose]);
+    if (isClosingRef.current) {
+      return;
+    }
+
+    isClosingRef.current = true;
+    progress.value = withTiming(0, { duration: 250 }, (finished) => {
+      if (finished) {
+        scheduleOnRN(onRequestClose);
+      }
+    });
+  }, [onRequestClose, progress]);
 
   useEffect(() => {
-    openMenu();
-    return () => closeMenu();
-  }, [openMenu, closeMenu]);
+    isClosingRef.current = false;
+    progress.value = withTiming(1, { duration: 300 });
+  }, [progress]);
+
+  const backdropAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: progress.value,
+  }));
+
+  const panelAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        translateX: interpolate(
+          progress.value,
+          [0, 1],
+          [-menuWidth, 0],
+          Extrapolation.CLAMP,
+        ),
+      },
+    ],
+  }));
 
   const userInitial = useMemo(
     () => user.name.charAt(0).toUpperCase(),
@@ -129,21 +135,18 @@ export function SideMenu({
   );
 
   return (
-    <Modal transparent animationType="none">
+    <Modal transparent animationType="none" onRequestClose={closeMenu}>
       <View className="flex-1 flex-row">
         <TouchableWithoutFeedback onPress={closeMenu}>
           <Animated.View
             className="flex-1 bg-black/50"
-            style={{ opacity: fadeAnim }}
+            style={backdropAnimatedStyle}
           />
         </TouchableWithoutFeedback>
 
         <Animated.View
           className="h-full bg-white shadow-lg"
-          style={{
-            width: MENU_WIDTH,
-            transform: [{ translateX: slideAnim }],
-          }}
+          style={[{ width: menuWidth }, panelAnimatedStyle]}
         >
           <SafeAreaView className="flex-1">
             {/* User Header */}

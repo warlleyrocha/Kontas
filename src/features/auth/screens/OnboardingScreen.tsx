@@ -1,17 +1,29 @@
 import OnboardingButtons from "@/src/features/auth/components/onboarding/OnboardingButtons";
 import RenderDots from "@/src/features/auth/components/onboarding/RenderDots";
 import RenderSlide from "@/src/features/auth/components/onboarding/RenderSlide";
-import { slides } from "@/src/features/auth/constants/slides";
+import {
+  slides,
+  type OnboardingSlide,
+} from "@/src/features/auth/constants/slides";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
-import { Animated, Dimensions, FlatList, View } from "react-native";
-
-const { width, height } = Dimensions.get("window");
+import { FlatList, type ListRenderItemInfo, useWindowDimensions, View } from "react-native";
+import Animated, {
+  useAnimatedScrollHandler,
+  useSharedValue,
+} from "react-native-reanimated";
 
 export default function Onboarding() {
+  const { width, height } = useWindowDimensions();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const flatListRef = useRef<FlatList>(null);
-  const [scrollX] = useState(() => new Animated.Value(0));
+  const flatListRef = useRef<FlatList<OnboardingSlide>>(null);
+  const scrollX = useSharedValue(0);
+
+  const handleScroll = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollX.value = event.contentOffset.x;
+    },
+  });
 
   const handleNext = async () => {
     if (currentIndex < slides.length - 1) {
@@ -28,29 +40,28 @@ export default function Onboarding() {
 
   const isLastSlide = currentIndex === slides.length - 1;
 
+  const renderSlide = ({ item, index }: ListRenderItemInfo<OnboardingSlide>) => (
+    <RenderSlide
+      item={item}
+      index={index}
+      width={width}
+      height={height}
+      scrollX={scrollX}
+    />
+  );
+
   return (
     <View className="flex-1 bg-[#FAFAFA]">
       {/* Slides */}
       <Animated.FlatList
         ref={flatListRef}
         data={slides}
-        renderItem={({ item, index }) => (
-          <RenderSlide
-            item={item}
-            index={index}
-            width={width}
-            height={height}
-            scrollX={scrollX}
-          />
-        )}
+        renderItem={renderSlide}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item) => item.id}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-          { useNativeDriver: false },
-        )}
+        onScroll={handleScroll}
         onMomentumScrollEnd={(event) => {
           const index = Math.round(event.nativeEvent.contentOffset.x / width);
           setCurrentIndex(index);

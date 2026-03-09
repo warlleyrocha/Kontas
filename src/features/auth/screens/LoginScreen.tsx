@@ -8,19 +8,18 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
-  Dimensions,
+  useWindowDimensions,
   Image,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 
-const { height } = Dimensions.get("window");
-
 export default function LoginScreen() {
   const router = useRouter();
   const [isSigningIn, setIsSigningIn] = useState(false);
   const { loginWithGoogle, error } = useAuth();
+  const { height } = useWindowDimensions();
 
   const handleGoogleLogin = async () => {
     if (isSigningIn) return; // Previne múltiplos cliques
