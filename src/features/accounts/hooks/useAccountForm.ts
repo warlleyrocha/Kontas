@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Platform } from "react-native";
 import { useResidents } from "@/src/features/residents/hooks/useResidents";
 
@@ -14,6 +14,15 @@ interface MoradorDivisao {
   nome: string;
   checked: boolean;
   valor: string;
+}
+
+interface AccountFormData {
+  descricao: string;
+  valorTotal: string;
+  vencimento: Date;
+  metodoPagamento: string;
+  tipoDivisao: TipoDivisao;
+  moradoresDivisao: MoradorDivisao[];
 }
 
 function parseCurrencyValue(value: string): number {
@@ -40,18 +49,24 @@ function splitEvenly(total: number, parts: number): number[] {
   });
 }
 
+function createInitialFormData(): AccountFormData {
+  return {
+    descricao: "",
+    valorTotal: "",
+    vencimento: new Date(),
+    metodoPagamento: "PIX",
+    tipoDivisao: "equal",
+    moradoresDivisao: [],
+  };
+}
+
 export function useAccountForm({ republicId, onClose }: UseAccountFormParams) {
   const { residents, fetchResidents } = useResidents();
-  const [descricao, setDescricao] = useState("");
-  const [valorTotal, setValorTotal] = useState("");
-  const [vencimento, setVencimento] = useState(new Date());
-  const [metodoPagamento, setMetodoPagamento] = useState("PIX");
-  const [tempVencimento, setTempVencimento] = useState(new Date());
-  const [showDatepicker, setShowDatepicker] = useState(false);
-  const [tipoDivisao, setTipoDivisao] = useState<TipoDivisao>("equal");
-  const [moradoresDivisao, setMoradoresDivisao] = useState<MoradorDivisao[]>(
-    []
+  const [formData, setFormData] = useState<AccountFormData>(
+    createInitialFormData
   );
+  const [tempVencimento, setTempVencimento] = useState(formData.vencimento);
+  const [showDatepicker, setShowDatepicker] = useState(false);
 
   // Buscar moradores da API quando o componente montar
   useEffect(() => {
@@ -61,63 +76,67 @@ export function useAccountForm({ republicId, onClose }: UseAccountFormParams) {
     loadResidents();
   }, [republicId, fetchResidents]);
 
+  const applySplitByType = useCallback(
+    (list: MoradorDivisao[], type: TipoDivisao, totalValue: string) => {
+      const selected = list.filter((morador) => morador.checked);
+      if (!selected.length)
+        return list.map((morador) => ({ ...morador, valor: "" }));
+
+      if (type === "custom") {
+        return list.map((morador) => ({
+          ...morador,
+          valor:
+            morador.checked && !morador.valor
+              ? "0,00"
+              : morador.checked
+                ? morador.valor
+                : "",
+        }));
+      }
+
+      const total = parseCurrencyValue(totalValue);
+      const values = splitEvenly(total, selected.length);
+      let cursor = 0;
+
+      return list.map((morador) => {
+        if (!morador.checked) return { ...morador, valor: "" };
+
+        const nextValue = values[cursor] ?? 0;
+        cursor += 1;
+
+        return {
+          ...morador,
+          valor: formatCurrencyValue(nextValue),
+        };
+      });
+    },
+    []
+  );
+
   // Atualizar moradoresDivisao quando residents mudar
   useEffect(() => {
-    if (residents.length > 0) {
-      setMoradoresDivisao(
-        residents.map((resident) => ({
-          moradorId: resident.id,
-          nome: resident.nome,
-          checked: true,
-          valor: "",
-        }))
-      );
-    }
-  }, [residents]);
+    const moradores = residents.map((resident) => ({
+      moradorId: resident.id,
+      nome: resident.nome,
+      checked: true,
+      valor: "",
+    }));
 
-  const applySplitByType = (
-    list: MoradorDivisao[],
-    type: TipoDivisao,
-    totalValue: string
-  ) => {
-    const selected = list.filter((morador) => morador.checked);
-    if (!selected.length)
-      return list.map((morador) => ({ ...morador, valor: "" }));
-
-    if (type === "custom") {
-      return list.map((morador) => ({
-        ...morador,
-        valor:
-          morador.checked && !morador.valor
-            ? "0,00"
-            : morador.checked
-              ? morador.valor
-              : "",
-      }));
-    }
-
-    const total = parseCurrencyValue(totalValue);
-    const values = splitEvenly(total, selected.length);
-    let cursor = 0;
-
-    return list.map((morador) => {
-      if (!morador.checked) return { ...morador, valor: "" };
-
-      const nextValue = values[cursor] ?? 0;
-      cursor += 1;
-
-      return {
-        ...morador,
-        valor: formatCurrencyValue(nextValue),
-      };
-    });
-  };
+    setFormData((prev) => ({
+      ...prev,
+      moradoresDivisao: applySplitByType(
+        moradores,
+        prev.tipoDivisao,
+        prev.valorTotal
+      ),
+    }));
+  }, [residents, applySplitByType]);
 
   const handleDateChange = (_: any, selectedDate?: Date) => {
     if (!selectedDate) return;
 
     if (Platform.OS === "android") {
-      setVencimento(selectedDate);
+      setFormData((prev) => ({ ...prev, vencimento: selectedDate }));
       setShowDatepicker(false);
       return;
     }
@@ -126,12 +145,12 @@ export function useAccountForm({ republicId, onClose }: UseAccountFormParams) {
   };
 
   const handleOpenDatepicker = () => {
-    setTempVencimento(vencimento);
+    setTempVencimento(formData.vencimento);
     setShowDatepicker(true);
   };
 
   const handleConfirmDate = () => {
-    setVencimento(tempVencimento);
+    setFormData((prev) => ({ ...prev, vencimento: tempVencimento }));
     setShowDatepicker(false);
   };
 
@@ -140,65 +159,79 @@ export function useAccountForm({ republicId, onClose }: UseAccountFormParams) {
   };
 
   const handleSetTipoDivisao = (type: TipoDivisao) => {
-    setTipoDivisao(type);
-    setMoradoresDivisao((prev) => applySplitByType(prev, type, valorTotal));
+    setFormData((prev) => ({
+      ...prev,
+      tipoDivisao: type,
+      moradoresDivisao: applySplitByType(
+        prev.moradoresDivisao,
+        type,
+        prev.valorTotal
+      ),
+    }));
   };
 
   const handleToggleMorador = (moradorId: string) => {
-    setMoradoresDivisao((prev) => {
-      const updated = prev.map((morador) =>
+    setFormData((prev) => {
+      const updated = prev.moradoresDivisao.map((morador) =>
         morador.moradorId === moradorId
           ? { ...morador, checked: !morador.checked }
           : morador
       );
 
-      return applySplitByType(updated, tipoDivisao, valorTotal);
+      return {
+        ...prev,
+        moradoresDivisao: applySplitByType(
+          updated,
+          prev.tipoDivisao,
+          prev.valorTotal
+        ),
+      };
     });
   };
 
   const handleMoradorValorChange = (moradorId: string, value: string) => {
     const sanitized = value.replace(/[^\d.,]/g, "");
-    setMoradoresDivisao((prev) =>
-      prev.map((morador) =>
+    setFormData((prev) => ({
+      ...prev,
+      moradoresDivisao: prev.moradoresDivisao.map((morador) =>
         morador.moradorId === moradorId
           ? { ...morador, valor: sanitized }
           : morador
-      )
-    );
+      ),
+    }));
   };
 
-  useEffect(() => {
-    if (tipoDivisao !== "equal") return;
-    setMoradoresDivisao((prev) => applySplitByType(prev, "equal", valorTotal));
-  }, [tipoDivisao, valorTotal]);
+  const handleValorTotalChange = (value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      valorTotal: value,
+      moradoresDivisao:
+        prev.tipoDivisao === "equal"
+          ? applySplitByType(prev.moradoresDivisao, "equal", value)
+          : prev.moradoresDivisao,
+    }));
+  };
 
   const totalDivisaoPreenchido = useMemo(
     () =>
-      moradoresDivisao.reduce((acc, morador) => {
+      formData.moradoresDivisao.reduce((acc, morador) => {
         if (!morador.checked) return acc;
         return acc + parseCurrencyValue(morador.valor);
       }, 0),
-    [moradoresDivisao]
+    [formData.moradoresDivisao]
   );
 
   return {
-    descricao,
-    valorTotal,
-    vencimento,
-    metodoPagamento,
+    formData,
     tempVencimento,
     showDatepicker,
-    tipoDivisao,
-    moradoresDivisao,
     totalDivisaoPreenchido,
 
-    setDescricao,
-    setValorTotal,
-    setVencimento,
-    setMetodoPagamento,
+    setFormData,
     setTempVencimento,
     setShowDatepicker,
 
+    handleValorTotalChange,
     handleCloseModal,
     handleConfirmDate,
     handleOpenDatepicker,

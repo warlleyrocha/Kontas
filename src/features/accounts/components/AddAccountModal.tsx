@@ -13,8 +13,8 @@ import {
 } from "react-native";
 import { useAccountForm } from "../hooks/useAccountForm";
 import {
-  StatusConta,
   type CriarContaComMoradoresRequest,
+  StatusConta,
 } from "../types/account.types";
 
 interface AddAccountModalProps {
@@ -31,28 +31,30 @@ export const AddAccountModal = ({
   onSubmit,
 }: AddAccountModalProps) => {
   const {
-    descricao,
-    valorTotal,
-    vencimento,
-    metodoPagamento,
+    formData,
     tempVencimento,
     showDatepicker,
-    tipoDivisao,
-    moradoresDivisao,
     totalDivisaoPreenchido,
-
-    setDescricao,
-    setValorTotal,
-    setMetodoPagamento,
+    setFormData,
 
     handleCloseModal,
     handleConfirmDate,
     handleOpenDatepicker,
     handleDateChange,
+    handleValorTotalChange,
     handleSetTipoDivisao,
     handleToggleMorador,
     handleMoradorValorChange,
   } = useAccountForm({ onClose, republicId });
+  // Destructuring
+  const {
+    descricao,
+    valorTotal,
+    vencimento,
+    metodoPagamento,
+    tipoDivisao,
+    moradoresDivisao,
+  } = formData;
 
   const [isValorInputFocused, setIsValorInputFocused] = useState(false);
 
@@ -68,7 +70,7 @@ export const AddAccountModal = ({
       .filter((morador) => morador.checked)
       .map((morador) => String(morador.moradorId));
 
-    const formData: CriarContaComMoradoresRequest = {
+    const payload: CriarContaComMoradoresRequest = {
       descricao,
       valor: valorNumerico,
       vencimento: vencimentoISO,
@@ -78,7 +80,7 @@ export const AddAccountModal = ({
       moradorIds,
     };
 
-    void onSubmit(formData);
+    void onSubmit(payload);
   };
 
   return (
@@ -113,7 +115,9 @@ export const AddAccountModal = ({
                 <Text className="mb-1 text-sm text-gray-700">Descrição</Text>
                 <TextInput
                   value={descricao}
-                  onChangeText={setDescricao}
+                  onChangeText={(value) =>
+                    setFormData((prev) => ({ ...prev, descricao: value }))
+                  }
                   placeholder="Ex: Cemig"
                   className="rounded border border-gray-200 bg-gray-50 px-3 py-2"
                 />
@@ -127,7 +131,7 @@ export const AddAccountModal = ({
                   </Text>
                   <TextInput
                     value={valorTotal}
-                    onChangeText={setValorTotal}
+                    onChangeText={handleValorTotalChange}
                     keyboardType="numeric"
                     placeholder="0,00"
                     className="rounded border border-gray-200 bg-gray-50 px-3 py-2"
@@ -201,7 +205,10 @@ export const AddAccountModal = ({
                     } else {
                       next = "PIX";
                     }
-                    setMetodoPagamento(next);
+                    setFormData((prev) => ({
+                      ...prev,
+                      metodoPagamento: next,
+                    }));
                   }}
                 >
                   <Text>{metodoPagamento}</Text>
