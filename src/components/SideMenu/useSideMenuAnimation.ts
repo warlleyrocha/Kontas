@@ -48,7 +48,7 @@ export function useSideMenuAnimation({
         translateX: interpolate(
           progress.value,
           [0, 1],
-          [-menuWidth, 0],
+          [menuWidth, 0],
           Extrapolation.CLAMP,
         ),
       },
