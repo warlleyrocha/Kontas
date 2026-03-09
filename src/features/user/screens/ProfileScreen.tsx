@@ -11,6 +11,53 @@ import { maskPhone } from "@/src/utils/inputMasks";
 
 import { useProfileScreen } from "../hooks/useProfileScreen";
 
+interface ProfileContentProps {
+  readonly perfilCompleto: boolean;
+  readonly republicsLength: number;
+  readonly republics: ReturnType<typeof useProfileScreen>["republics"];
+  readonly refreshing: boolean;
+  readonly onContinueIncomplete: () => void;
+  readonly onCreateRepublic: () => void;
+  readonly onViewInvites: () => void;
+  readonly onSelectRepublic: (republicId: string) => void;
+  readonly onRefresh: () => void;
+}
+
+function ProfileContent({
+  perfilCompleto,
+  republicsLength,
+  republics,
+  refreshing,
+  onContinueIncomplete,
+  onCreateRepublic,
+  onViewInvites,
+  onSelectRepublic,
+  onRefresh,
+}: ProfileContentProps) {
+  if (!perfilCompleto) {
+    return <IncompleteProfile onContinue={onContinueIncomplete} />;
+  }
+
+  if (republicsLength === 0) {
+    return (
+      <EmptyRepublic
+        onCreateRepublic={onCreateRepublic}
+        onViewInvites={onViewInvites}
+      />
+    );
+  }
+
+  return (
+    <RepublicList
+      republics={republics}
+      onSelectRepublic={onSelectRepublic}
+      onCreateRepublic={onCreateRepublic}
+      refreshing={refreshing}
+      onRefresh={onRefresh}
+    />
+  );
+}
+
 export function ProfileScreen() {
   const {
     user,
@@ -35,34 +82,6 @@ export function ProfileScreen() {
   } = useProfileScreen();
 
   if (!user) return null;
-
-  const renderContent = () => {
-    if (!user.perfilCompleto) {
-      return (
-        <IncompleteProfile onContinue={() => setShowEditProfileModal(true)} />
-      );
-    }
-
-    if (user.perfilCompleto && republics.length === 0) {
-      return (
-        <EmptyRepublic
-          onCreateRepublic={handleCreateRepublic}
-          onViewInvites={handleViewInvites}
-        />
-      );
-    }
-
-    return (
-      <RepublicList
-        republics={republics}
-        //onEditRepublic={handleEditRepublic}
-        onSelectRepublic={handleSelectRepublic}
-        onCreateRepublic={handleCreateRepublic}
-        refreshing={refreshing}
-        onRefresh={onRefresh}
-      />
-    );
-  };
 
   return (
     <View className="flex-1 bg-[#FAFAFA]">
@@ -94,7 +113,17 @@ export function ProfileScreen() {
       </View>
 
       {/* CONTENT */}
-      {renderContent()}
+      <ProfileContent
+        perfilCompleto={user.perfilCompleto}
+        republicsLength={republics.length}
+        republics={republics}
+        refreshing={refreshing}
+        onContinueIncomplete={() => setShowEditProfileModal(true)}
+        onCreateRepublic={handleCreateRepublic}
+        onViewInvites={handleViewInvites}
+        onSelectRepublic={handleSelectRepublic}
+        onRefresh={onRefresh}
+      />
 
       {/* MENU LATERAL */}
       {isMenuOpen && sideMenuUser && (

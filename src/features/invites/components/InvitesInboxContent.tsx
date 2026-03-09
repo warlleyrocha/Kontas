@@ -22,7 +22,7 @@ export function InvitesInboxContent({
   return (
     <InviteListContentBase
       error={error}
-      items={invites}
+      hasItems={invites.length > 0}
       onRetry={onRetry}
       emptyState={{
         icon: "mail-open-outline",
@@ -34,14 +34,15 @@ export function InvitesInboxContent({
         buttonText: "Voltar ao Perfil",
         onPress: onEmptyStatePress,
       }}
-      keyExtractor={(invite) => invite.id}
-      renderItem={(invite) => (
+    >
+      {invites.map((invite) => (
         <InviteCardMe
+          key={invite.id}
           invite={invite}
           onAccept={() => onAcceptInvite(invite.id, invite.republicaId)}
           onReject={() => onRejectInvite(invite.id)}
         />
-      )}
-    />
+      ))}
+    </InviteListContentBase>
   );
 }

@@ -1,5 +1,5 @@
 import { EmptyState } from "@/src/components/EmptyState";
-import { Fragment, type ComponentProps, type ReactNode } from "react";
+import { type ComponentProps, type ReactNode } from "react";
 import { ScrollView } from "react-native";
 
 type EmptyStateProps = Pick<
@@ -13,23 +13,21 @@ type EmptyStateProps = Pick<
   | "onPress"
 >;
 
-interface InviteListContentBaseProps<TItem> {
+interface InviteListContentBaseProps {
   readonly error: string | null;
-  readonly items: readonly TItem[];
+  readonly hasItems: boolean;
   readonly onRetry: () => void;
   readonly emptyState: EmptyStateProps;
-  readonly keyExtractor: (item: TItem, index: number) => string;
-  readonly renderItem: (item: TItem, index: number) => ReactNode;
+  readonly children: ReactNode;
 }
 
-export function InviteListContentBase<TItem>({
+export function InviteListContentBase({
   error,
-  items,
+  hasItems,
   onRetry,
   emptyState,
-  keyExtractor,
-  renderItem,
-}: InviteListContentBaseProps<TItem>) {
+  children,
+}: InviteListContentBaseProps) {
   if (error) {
     return (
       <EmptyState
@@ -44,17 +42,9 @@ export function InviteListContentBase<TItem>({
     );
   }
 
-  if (items.length === 0) {
+  if (!hasItems) {
     return <EmptyState {...emptyState} />;
   }
 
-  return (
-    <ScrollView className="flex-1 px-4 pt-4">
-      {items.map((item, index) => (
-        <Fragment key={keyExtractor(item, index)}>
-          {renderItem(item, index)}
-        </Fragment>
-      ))}
-    </ScrollView>
-  );
+  return <ScrollView className="flex-1 px-4 pt-4">{children}</ScrollView>;
 }

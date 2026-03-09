@@ -18,7 +18,7 @@ export function InvitesSentContent({
   return (
     <InviteListContentBase
       error={error}
-      items={invites}
+      hasItems={invites.length > 0}
       onRetry={onRetry}
       emptyState={{
         icon: "paper-plane-outline",
@@ -30,8 +30,10 @@ export function InvitesSentContent({
         buttonText: "Voltar",
         onPress: onEmptyStatePress,
       }}
-      keyExtractor={(invite) => invite.id}
-      renderItem={(invite) => <InvitesCard invite={invite} />}
-    />
+    >
+      {invites.map((invite) => (
+        <InvitesCard key={invite.id} invite={invite} />
+      ))}
+    </InviteListContentBase>
   );
 }
