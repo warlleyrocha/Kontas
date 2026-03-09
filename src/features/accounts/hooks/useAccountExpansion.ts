@@ -13,7 +13,7 @@ export function useAccountExpansion({
   republicId,
 }: UseAccountExpansionProps): UseAccountExpansionReturn {
   const [expandedAccountId, setExpandedAccountId] = useState<string | null>(
-    null,
+    null
   );
   const previousRepublicIdRef = useRef(republicId);
 
@@ -28,7 +28,7 @@ export function useAccountExpansion({
 
   const handleToggleExpand = useCallback((accountId: string) => {
     setExpandedAccountId((current) =>
-      current === accountId ? null : accountId,
+      current === accountId ? null : accountId
     );
   }, []);
 

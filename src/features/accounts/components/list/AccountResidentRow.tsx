@@ -18,7 +18,7 @@ interface AccountResidentRowProps {
   readonly isUpdatingMorador: boolean;
   readonly onConfirmResidentPayment?: (
     accountId: string,
-    accountResidentId: string,
+    accountResidentId: string
   ) => Promise<void> | void;
 }
 

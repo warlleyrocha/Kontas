@@ -8,12 +8,12 @@ import { toUserFriendlyError } from "@/src/services/httpError";
 
 export const accountResidentsService = {
   vincularMoradores: async (
-    data: VincularMoradoresRequest,
+    data: VincularMoradoresRequest
   ): Promise<ContaMorador[]> => {
     try {
       const response = await api.post<ContaMorador[]>(
         "/contas-moradores",
-        data,
+        data
       );
       return response.data;
     } catch (error) {
@@ -31,15 +31,15 @@ export const accountResidentsService = {
   },
 
   listarContasMoradores: async (
-    contaId: string,
+    contaId: string
   ): Promise<ListarContasResponse> => {
     try {
       const response = await api.get<ListarContasResponse>(
-        `/contas-moradores/conta/${contaId}`,
+        `/contas-moradores/conta/${contaId}`
       );
       console.log(
         `Contas listadas para os moradores ${contaId}:`,
-        response.data,
+        response.data
       );
       return response.data;
     } catch (error) {
@@ -55,11 +55,11 @@ export const accountResidentsService = {
   },
 
   listarContasPorMorador: async (
-    moradorId: string,
+    moradorId: string
   ): Promise<ListarContasResponse> => {
     try {
       const response = await api.get<ListarContasResponse>(
-        `contas-moradores/morador/${moradorId}`,
+        `contas-moradores/morador/${moradorId}`
       );
       console.log(`Lista de contas do morador ${moradorId}: `, response.data);
       return response.data;

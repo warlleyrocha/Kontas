@@ -21,7 +21,7 @@ interface AddAccountModalProps {
   readonly onClose: () => void;
   readonly republicId: string;
   readonly onSubmit: (
-    data: CriarContaComMoradoresRequest,
+    data: CriarContaComMoradoresRequest
   ) => Promise<void> | void;
 }
 

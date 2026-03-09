@@ -10,7 +10,7 @@ interface AccountResidentsContentProps {
   readonly updatingResidentById: Record<string, boolean>;
   readonly onConfirmResidentPayment?: (
     accountId: string,
-    accountResidentId: string,
+    accountResidentId: string
   ) => Promise<void> | void;
 }
 

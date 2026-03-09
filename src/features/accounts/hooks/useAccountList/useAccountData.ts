@@ -38,7 +38,7 @@ export function useAccountData({
     } catch (err) {
       const message = getErrorMessage(
         err,
-        "Não foi possível carregar as contas.",
+        "Não foi possível carregar as contas."
       );
       console.error("Erro ao buscar contas:", err);
       showToast.error(message);
@@ -57,14 +57,14 @@ export function useAccountData({
       } catch (err) {
         const message = getErrorMessage(
           err,
-          "Não foi possível carregar os moradores da conta.",
+          "Não foi possível carregar os moradores da conta."
         );
         console.error("Erro ao buscar moradores da conta:", err);
         showToast.error(message);
         return [];
       }
     },
-    [],
+    []
   );
 
   return {

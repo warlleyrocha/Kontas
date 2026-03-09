@@ -62,7 +62,7 @@ export function useAccountsTab({ republicId }: UseAccountsTabParams) {
       await handlePatch(accountId, metodoPagamento);
       await refresh();
     },
-    [handlePatch, refresh],
+    [handlePatch, refresh]
   );
 
   const hasNoAccounts =

@@ -5,9 +5,7 @@ interface AddAccountModalHeaderProps {
   readonly onClose: () => void;
 }
 
-export function AddAccountModalHeader({
-  onClose,
-}: AddAccountModalHeaderProps) {
+export function AddAccountModalHeader({ onClose }: AddAccountModalHeaderProps) {
   return (
     <View className="mb-3 flex-row items-center justify-between">
       <View>

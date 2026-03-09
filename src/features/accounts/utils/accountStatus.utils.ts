@@ -81,7 +81,7 @@ export function getContaStatusIcon(statusConta: StatusConta): ContaStatusIcon {
 }
 
 export function getMoradorStatusVisual(
-  contaMorador: ContaMorador,
+  contaMorador: ContaMorador
 ): StatusPagamento {
   if (
     contaMorador.status === StatusPagamento.PAGO ||
@@ -116,7 +116,7 @@ export type MoradorStatusIcon =
     };
 
 export function getMoradorStatusBadge(
-  statusPagamento: StatusPagamento,
+  statusPagamento: StatusPagamento
 ): MoradorStatusBadge {
   if (statusPagamento === StatusPagamento.PAGO) {
     return {
@@ -142,7 +142,7 @@ export function getMoradorStatusBadge(
 }
 
 export function getMoradorStatusIcon(
-  statusPagamento: StatusPagamento,
+  statusPagamento: StatusPagamento
 ): MoradorStatusIcon {
   if (statusPagamento === StatusPagamento.PAGO) {
     return {

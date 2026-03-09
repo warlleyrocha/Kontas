@@ -1,10 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 
-import type {
-  MoradorDivisao,
-  TipoDivisao,
-} from "../../hooks/useAccountForm";
+import type { MoradorDivisao, TipoDivisao } from "../../hooks/useAccountForm";
 
 interface AddAccountModalResidentsSectionProps {
   readonly tipoDivisao: TipoDivisao;
@@ -74,7 +71,9 @@ export function AddAccountModalResidentsSection({
       </View>
 
       <View className="mb-4">
-        <Text className="mb-2 text-sm text-gray-700">Selecione os Moradores</Text>
+        <Text className="mb-2 text-sm text-gray-700">
+          Selecione os Moradores
+        </Text>
 
         <View className="space-y-2">
           {moradoresDivisao.map((morador) => (

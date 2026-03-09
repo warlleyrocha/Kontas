@@ -21,12 +21,12 @@ interface AccountSectionProps {
   readonly updatingResidentById: Record<string, boolean>;
   readonly onConfirmResidentPayment: (
     accountId: string,
-    accountResidentId: string,
+    accountResidentId: string
   ) => Promise<void> | void;
   readonly onDelete: (accountId: string) => void;
   readonly onPatch: (
     accountId: string,
-    metodoPagamento: MetodoPagamento,
+    metodoPagamento: MetodoPagamento
   ) => Promise<void> | void;
 }
 

@@ -1,9 +1,5 @@
 import { View, TouchableOpacity, Text } from "react-native";
-import {
-  Feather,
-  Ionicons,
-  MaterialCommunityIcons,
-} from "@expo/vector-icons";
+import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useState } from "react";
 
 import { AccountResidentsContent } from "./AccountResidentsContent";
@@ -26,12 +22,12 @@ interface AccountCardProps {
   updatingResidentById: Record<string, boolean>;
   onConfirmResidentPayment?: (
     accountId: string,
-    accountResidentId: string,
+    accountResidentId: string
   ) => Promise<void> | void;
   onDelete?: (accountId: string) => Promise<void> | void;
   onPatch?: (
     accountId: string,
-    metodoPagamento: MetodoPagamento,
+    metodoPagamento: MetodoPagamento
   ) => Promise<void> | void;
 }
 
