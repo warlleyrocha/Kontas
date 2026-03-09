@@ -89,6 +89,8 @@ export const AccountCard = ({
     try {
       const metodoPagamento = normalizeMetodoPagamento(conta.metodoPagamento);
       await onPatch(conta.id, metodoPagamento);
+    } catch {
+      // erro já tratado em onPatch
     } finally {
       setIsPatching(false);
     }

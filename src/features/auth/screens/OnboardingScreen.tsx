@@ -11,7 +11,7 @@ const { width, height } = Dimensions.get("window");
 export default function Onboarding() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
-  const scrollX = useRef(new Animated.Value(0)).current;
+  const [scrollX] = useState(() => new Animated.Value(0));
 
   const handleNext = async () => {
     if (currentIndex < slides.length - 1) {
@@ -49,7 +49,7 @@ export default function Onboarding() {
         keyExtractor={(item) => item.id}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-          { useNativeDriver: false }
+          { useNativeDriver: false },
         )}
         onMomentumScrollEnd={(event) => {
           const index = Math.round(event.nativeEvent.contentOffset.x / width);

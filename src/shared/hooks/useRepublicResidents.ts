@@ -55,6 +55,10 @@ export function useRepublicResidents(
 
       setResidentsCount(counts);
       setUserRolesByRepublic(currentUserEmail ? roles : {});
+    } catch (error) {
+      // Promise.all não deve rejeitar pois cada república trata seu próprio erro,
+      // mas o catch externo satisfaz a análise de fluxo do compiler.
+      console.error("Erro inesperado ao carregar moradores:", error);
     } finally {
       setLoading(false);
     }

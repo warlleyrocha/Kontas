@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Animated,
   Dimensions,
@@ -51,12 +51,12 @@ function MenuItemComponent({ item, onClose }: MenuItemComponentProps) {
 
   const iconColor = useMemo(
     () => (item.danger ? "#ef4444" : "#374151"),
-    [item.danger]
+    [item.danger],
   );
 
   const textClassName = useMemo(
     () => `text-base ${item.danger ? "text-red-500" : "text-gray-700"}`,
-    [item.danger]
+    [item.danger],
   );
 
   return (
@@ -85,8 +85,8 @@ export function SideMenu({
   menuItems,
   footerItems,
 }: SideMenuProps) {
-  const slideAnim = useRef(new Animated.Value(-MENU_WIDTH)).current;
-  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [slideAnim] = useState(() => new Animated.Value(-MENU_WIDTH));
+  const [fadeAnim] = useState(() => new Animated.Value(0));
 
   const openMenu = useCallback(() => {
     Animated.parallel([
@@ -125,7 +125,7 @@ export function SideMenu({
 
   const userInitial = useMemo(
     () => user.name.charAt(0).toUpperCase(),
-    [user.name]
+    [user.name],
   );
 
   return (

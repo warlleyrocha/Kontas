@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Animated, Easing, Text, TouchableOpacity, View } from "react-native";
+import { useEffect, useMemo, useState } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 interface AccountRecoveryToastProps {
@@ -16,18 +16,6 @@ export function AccountRecoveryToast({
   durationMs,
 }: AccountRecoveryToastProps) {
   const [remainingMs, setRemainingMs] = useState(durationMs);
-  const spinAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.loop(
-      Animated.timing(spinAnim, {
-        toValue: 1,
-        duration: 1200,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-    ).start();
-  }, [spinAnim]);
 
   useEffect(() => {
     const startedAt = Date.now();
