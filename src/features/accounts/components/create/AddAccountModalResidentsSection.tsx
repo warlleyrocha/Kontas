@@ -4,7 +4,7 @@ import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import type {
   MoradorDivisao,
   TipoDivisao,
-} from "../hooks/useAccountForm";
+} from "../../hooks/useAccountForm";
 
 interface AddAccountModalResidentsSectionProps {
   readonly tipoDivisao: TipoDivisao;

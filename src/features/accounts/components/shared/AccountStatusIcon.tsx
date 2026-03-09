@@ -4,7 +4,7 @@ import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import {
   type ContaStatusIcon,
   type MoradorStatusIcon,
-} from "../utils/accountStatus.utils";
+} from "../../utils/accountStatus.utils";
 
 interface AccountStatusIconProps {
   readonly icon: ContaStatusIcon | MoradorStatusIcon;

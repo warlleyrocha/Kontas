@@ -2,7 +2,7 @@ import { getErrorMessage } from "@/src/services/httpError";
 import { showToast } from "@/src/utils/showToast";
 import { createElement, useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "@/src/components/ui/sonner";
-import { AccountRecoveryToast } from "../components/AccountRecoveryToast";
+import { AccountRecoveryToast } from "../components";
 import { accountService } from "../services/account.service";
 import { accountResidentsService } from "../services/account-residents.service";
 import type {

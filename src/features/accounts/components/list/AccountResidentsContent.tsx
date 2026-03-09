@@ -1,6 +1,6 @@
 import { ActivityIndicator, Text, View } from "react-native";
 
-import type { ContaMorador } from "../types/accountResidents.types";
+import type { ContaMorador } from "../../types/accountResidents.types";
 import { AccountResidentRow } from "./AccountResidentRow";
 
 interface AccountResidentsContentProps {

@@ -10,11 +10,11 @@ import { AddAccountModalActions } from "./AddAccountModalActions";
 import { AddAccountModalFormSection } from "./AddAccountModalFormSection";
 import { AddAccountModalHeader } from "./AddAccountModalHeader";
 import { AddAccountModalResidentsSection } from "./AddAccountModalResidentsSection";
-import { useAccountForm } from "../hooks/useAccountForm";
+import { useAccountForm } from "../../hooks/useAccountForm";
 import {
   type CriarContaComMoradoresRequest,
   StatusConta,
-} from "../types/account.types";
+} from "../../types/account.types";
 
 interface AddAccountModalProps {
   readonly visible: boolean;

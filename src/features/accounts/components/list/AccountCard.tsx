@@ -7,14 +7,14 @@ import {
 import { useState } from "react";
 
 import { AccountResidentsContent } from "./AccountResidentsContent";
-import { AccountStatusIcon } from "./AccountStatusIcon";
-import { Conta, MetodoPagamento, StatusConta } from "../types/account.types";
+import { AccountStatusIcon } from "../shared/AccountStatusIcon";
+import { Conta, MetodoPagamento, StatusConta } from "../../types/account.types";
 import { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
 import {
   getContaStatusIcon,
   getContaStatusVisual,
   parseContaVencimento,
-} from "../utils/accountStatus.utils";
+} from "../../utils/accountStatus.utils";
 
 interface AccountCardProps {
   conta: Conta;

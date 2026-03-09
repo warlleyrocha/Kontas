@@ -2,14 +2,14 @@ import { Feather } from "@expo/vector-icons";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import { formatMounthYear } from "@/src/utils/formats";
-
-import { AccountSection } from "@/src/features/accounts/components/AccountSection";
-
 import { useAccountActions } from "@/src/features/accounts/hooks/useAccountActions";
 import { useAccountExpansion } from "@/src/features/accounts/hooks/useAccountExpansion";
 import { useAccountList } from "@/src/features/accounts/hooks/useAccountList";
-import { AddAccountButton } from "@/src/features/accounts/components/AddAccountButton";
-import AccountModal from "@/src/features/accounts/components/AddAccountModal";
+import {
+  AccountSection,
+  AddAccountButton,
+  AddAccountModal,
+} from "@/src/features/accounts/components";
 
 interface AccountsTabProps {
   readonly republicId: string;
@@ -105,7 +105,7 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
           </Text>
         </TouchableOpacity>
 
-        <AccountModal
+        <AddAccountModal
           visible={showAccountModal}
           onSubmit={handleSubmit}
           onClose={() => setShowAccountModal(false)}
@@ -225,7 +225,7 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
 
       <AddAccountButton onPress={() => setShowAccountModal(true)} />
 
-      <AccountModal
+      <AddAccountModal
         visible={showAccountModal}
         onSubmit={handleSubmit}
         onClose={() => setShowAccountModal(false)}

@@ -1,14 +1,15 @@
 import { Text, TouchableOpacity, View } from "react-native";
 
-import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
-
-import { AccountStatusIcon } from "./AccountStatusIcon";
-import type { ContaMorador } from "../types/accountResidents.types";
+import {
+  ContaMorador,
+  StatusPagamento,
+} from "@/src/features/accounts/types/accountResidents.types";
+import { AccountStatusIcon } from "../shared/AccountStatusIcon";
 import {
   getMoradorStatusBadge,
   getMoradorStatusIcon,
   getMoradorStatusVisual,
-} from "../utils/accountStatus.utils";
+} from "../../utils/accountStatus.utils";
 
 interface AccountResidentRowProps {
   readonly accountId: string;
