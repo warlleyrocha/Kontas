@@ -8,7 +8,7 @@ import {
   StatusPagamento,
 } from "@/src/features/accounts/types/accountResidents.types";
 
-type ContaStatusIcon =
+export type ContaStatusIcon =
   | {
       library: "material";
       name: "payment";
@@ -103,7 +103,7 @@ type MoradorStatusBadge = {
   label: string;
 };
 
-type MoradorStatusIcon =
+export type MoradorStatusIcon =
   | {
       library: "material";
       name: "payment";

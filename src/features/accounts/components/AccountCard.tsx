@@ -1,25 +1,21 @@
-import { View, TouchableOpacity, Text, ActivityIndicator } from "react-native";
+import { View, TouchableOpacity, Text } from "react-native";
 import {
   Feather,
   Ionicons,
   MaterialCommunityIcons,
-  MaterialIcons,
 } from "@expo/vector-icons";
 import { useState } from "react";
 
+import { AccountResidentsContent } from "./AccountResidentsContent";
+import { AccountStatusIcon } from "./AccountStatusIcon";
 import { Conta, MetodoPagamento, StatusConta } from "../types/account.types";
-import {
-  ContaMorador,
-  StatusPagamento,
-} from "@/src/features/accounts/types/accountResidents.types";
+import { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
 import {
   getContaStatusIcon,
   getContaStatusVisual,
-  getMoradorStatusBadge,
-  getMoradorStatusIcon,
-  getMoradorStatusVisual,
   parseContaVencimento,
 } from "../utils/accountStatus.utils";
+
 interface AccountCardProps {
   conta: Conta;
   criadoPorNome: string;
@@ -91,150 +87,9 @@ export const AccountCard = ({
       await onPatch(conta.id, metodoPagamento);
     } catch {
       // erro já tratado em onPatch
-    } finally {
-      setIsPatching(false);
-    }
-  };
-
-  const renderContaLeadingIcon = () => {
-    if (isPatching) {
-      return <ActivityIndicator size="small" color="#6b7280" />;
     }
 
-    if (contaStatusIcon.library === "material") {
-      return (
-        <MaterialIcons
-          name={contaStatusIcon.name}
-          size={24}
-          color={contaStatusIcon.color}
-        />
-      );
-    }
-
-    return (
-      <MaterialCommunityIcons
-        name={contaStatusIcon.name}
-        size={24}
-        color={contaStatusIcon.color}
-      />
-    );
-  };
-
-  const renderMoradorContent = () => {
-    if (isLoadingMoradores) {
-      return (
-        <View className="items-center justify-center py-6">
-          <ActivityIndicator size="small" color="#4b5563" />
-          <Text className="mt-2 text-sm text-gray-500">
-            Carregando moradores...
-          </Text>
-        </View>
-      );
-    }
-
-    if (moradores.length > 0) {
-      return moradores.map((morador, index) => {
-        const moradorStatusVisual = getMoradorStatusVisual(morador);
-
-        const moradorPago = moradorStatusVisual === StatusPagamento.PAGO;
-        const moradorAguardando =
-          moradorStatusVisual === StatusPagamento.AGUARDANDO_CONFIRMACAO;
-        const isUpdatingMorador = Boolean(updatingResidentById[morador.id]);
-        const {
-          backgroundClassName: moradorStatusBadgeClass,
-          textClassName: moradorStatusTextClass,
-          label: moradorStatusLabel,
-        } = getMoradorStatusBadge(moradorStatusVisual);
-        const moradorStatusIcon = getMoradorStatusIcon(moradorStatusVisual);
-
-        const renderMoradorLeadingIcon = () => {
-          if (isUpdatingMorador) {
-            return <ActivityIndicator size="small" color="#6b7280" />;
-          }
-
-          if (moradorStatusIcon.library === "material") {
-            return (
-              <MaterialIcons
-                name={moradorStatusIcon.name}
-                size={20}
-                color={moradorStatusIcon.color}
-              />
-            );
-          }
-
-          return (
-            <MaterialCommunityIcons
-              name={moradorStatusIcon.name}
-              size={20}
-              color={moradorStatusIcon.color}
-            />
-          );
-        };
-
-        return (
-          <View
-            key={morador.id}
-            className={`flex-row items-center justify-between px-4 py-3 ${
-              index !== moradores.length - 1 ? "border-b border-gray-200" : ""
-            }`}
-          >
-            <TouchableOpacity
-              onPress={(e) => {
-                e.stopPropagation();
-
-                if (
-                  moradorPago ||
-                  moradorAguardando ||
-                  isUpdatingMorador ||
-                  !onConfirmResidentPayment
-                ) {
-                  return;
-                }
-
-                void onConfirmResidentPayment(conta.id, morador.id);
-              }}
-              disabled={
-                moradorPago ||
-                moradorAguardando ||
-                isUpdatingMorador ||
-                !onConfirmResidentPayment
-              }
-              className="flex-1 flex-row items-center gap-3"
-            >
-              {renderMoradorLeadingIcon()}
-              <View className="flex-1">
-                <Text
-                  className={`text-sm font-medium ${
-                    moradorPago ? "text-gray-400 line-through" : "text-gray-700"
-                  }`}
-                >
-                  {morador.moradorNome}
-                </Text>
-                {morador.valor > 0 && (
-                  <Text className="mt-1 text-xs text-gray-500">
-                    R$ {morador.valor.toFixed(2).replace(".", ",")}
-                  </Text>
-                )}
-              </View>
-            </TouchableOpacity>
-
-            <View
-              className={`flex-row items-center gap-1 rounded-md px-2 py-1 ${moradorStatusBadgeClass}`}
-            >
-              <Text className={`text-xs font-medium ${moradorStatusTextClass}`}>
-                {moradorStatusLabel}
-              </Text>
-            </View>
-          </View>
-        );
-      });
-    }
-
-    return (
-      <View className="items-center justify-center py-6">
-        <Text className="text-sm text-gray-500">Nenhum morador disponível</Text>
-      </View>
-    );
+    setIsPatching(false);
   };
 
   return (
@@ -257,7 +112,11 @@ export const AccountCard = ({
               void handlePatchAccount();
             }}
           >
-            {renderContaLeadingIcon()}
+            <AccountStatusIcon
+              icon={contaStatusIcon}
+              size={24}
+              isLoading={isPatching}
+            />
             <Text
               className={`flex-1 text-base font-semibold ${
                 paga ? "text-gray-400 line-through" : "text-gray-800"
@@ -318,7 +177,13 @@ export const AccountCard = ({
           {/* CONTEÚDO: Lista de Moradores */}
           {expanded && (
             <View className="border-t border-gray-100 bg-gray-50">
-              {renderMoradorContent()}
+              <AccountResidentsContent
+                accountId={conta.id}
+                moradores={moradores}
+                isLoadingMoradores={isLoadingMoradores}
+                updatingResidentById={updatingResidentById}
+                onConfirmResidentPayment={onConfirmResidentPayment}
+              />
             </View>
           )}
         </View>
