@@ -5,30 +5,22 @@ import {
   slides,
   type OnboardingSlide,
 } from "@/src/features/auth/constants/slides";
+import { useOnboardingAnimation } from "@/src/features/auth/hooks/useOnboardingAnimation";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
 import { FlatList, type ListRenderItemInfo, useWindowDimensions, View } from "react-native";
-import Animated, {
-  useAnimatedScrollHandler,
-  useSharedValue,
-} from "react-native-reanimated";
+import Animated from "react-native-reanimated";
 
 export default function Onboarding() {
   const { width, height } = useWindowDimensions();
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList<OnboardingSlide>>(null);
-  const scrollX = useSharedValue(0);
-
-  const handleScroll = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      scrollX.value = event.contentOffset.x;
-    },
-  });
+  const { scrollX, handleScroll } = useOnboardingAnimation();
 
   const handleNext = async () => {
     if (currentIndex < slides.length - 1) {
       flatListRef.current?.scrollToIndex({ index: currentIndex + 1 });
-      setCurrentIndex(currentIndex + 1);
+      setCurrentIndex((prev) => prev + 1);
     } else {
       router.replace("/(userProfile)/profile");
     }

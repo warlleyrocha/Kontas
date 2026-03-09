@@ -15,18 +15,19 @@ export function AccountRecoveryToast({
   onRecover,
   durationMs,
 }: AccountRecoveryToastProps) {
-  const [remainingMs, setRemainingMs] = useState(durationMs);
+  const [elapsedMs, setElapsedMs] = useState(0);
 
   useEffect(() => {
     const startedAt = Date.now();
     const interval = setInterval(() => {
-      const elapsed = Date.now() - startedAt;
-      const nextRemainingMs = Math.max(durationMs - elapsed, 0);
-      setRemainingMs(nextRemainingMs);
-      if (nextRemainingMs <= 0) clearInterval(interval);
+      const nextElapsedMs = Math.min(Date.now() - startedAt, durationMs);
+      setElapsedMs(nextElapsedMs);
+      if (nextElapsedMs >= durationMs) clearInterval(interval);
     }, UPDATE_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [durationMs]);
+
+  const remainingMs = Math.max(durationMs - elapsedMs, 0);
 
   const progressPercent = useMemo(() => {
     if (durationMs <= 0) return 0;
@@ -40,11 +41,7 @@ export function AccountRecoveryToast({
         backgroundColor: "#ffffff",
         marginHorizontal: 16,
         padding: 4,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.35,
-        shadowRadius: 16,
-        elevation: 12,
+        boxShadow: "0px 8px 16px rgba(0, 0, 0, 0.35)",
       }}
     >
       {/* Content row — justify-between separa esquerda e direita */}

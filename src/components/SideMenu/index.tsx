@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useMemo } from "react";
 import {
   Image,
   Modal,
@@ -9,15 +9,9 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
-import Animated, {
-  Extrapolation,
-  interpolate,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from "react-native-reanimated";
-import { scheduleOnRN } from "react-native-worklets";
+import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useSideMenuAnimation } from "./useSideMenuAnimation";
 
 export interface MenuItem {
   id: string;
@@ -53,15 +47,8 @@ function MenuItemComponent({ item, onClose }: MenuItemComponentProps) {
     setTimeout(item.onPress, 250);
   }, [item.onPress, onClose]);
 
-  const iconColor = useMemo(
-    () => (item.danger ? "#ef4444" : "#374151"),
-    [item.danger],
-  );
-
-  const textClassName = useMemo(
-    () => `text-base ${item.danger ? "text-red-500" : "text-gray-700"}`,
-    [item.danger],
-  );
+  const iconColor = item.danger ? "#ef4444" : "#374151";
+  const textClassName = `text-base ${item.danger ? "text-red-500" : "text-gray-700"}`;
 
   return (
     <TouchableOpacity
@@ -91,43 +78,8 @@ export function SideMenu({
 }: SideMenuProps) {
   const { width: screenWidth } = useWindowDimensions();
   const menuWidth = Math.min(screenWidth * 0.65, 300);
-  const progress = useSharedValue(0);
-  const isClosingRef = useRef(false);
-
-  const closeMenu = useCallback(() => {
-    if (isClosingRef.current) {
-      return;
-    }
-
-    isClosingRef.current = true;
-    progress.value = withTiming(0, { duration: 250 }, (finished) => {
-      if (finished) {
-        scheduleOnRN(onRequestClose);
-      }
-    });
-  }, [onRequestClose, progress]);
-
-  useEffect(() => {
-    isClosingRef.current = false;
-    progress.value = withTiming(1, { duration: 300 });
-  }, [progress]);
-
-  const backdropAnimatedStyle = useAnimatedStyle(() => ({
-    opacity: progress.value,
-  }));
-
-  const panelAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      {
-        translateX: interpolate(
-          progress.value,
-          [0, 1],
-          [-menuWidth, 0],
-          Extrapolation.CLAMP,
-        ),
-      },
-    ],
-  }));
+  const { closeMenu, backdropAnimatedStyle, panelAnimatedStyle } =
+    useSideMenuAnimation({ menuWidth, onRequestClose });
 
   const userInitial = useMemo(
     () => user.name.charAt(0).toUpperCase(),
