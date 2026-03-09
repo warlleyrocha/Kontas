@@ -63,7 +63,7 @@ function createInitialFormData(): AccountFormData {
 export function useAccountForm({ republicId, onClose }: UseAccountFormParams) {
   const { residents, fetchResidents } = useResidents();
   const [formData, setFormData] = useState<AccountFormData>(
-    createInitialFormData
+    createInitialFormData,
   );
   const [tempVencimento, setTempVencimento] = useState(formData.vencimento);
   const [showDatepicker, setShowDatepicker] = useState(false);
@@ -83,14 +83,14 @@ export function useAccountForm({ republicId, onClose }: UseAccountFormParams) {
         return list.map((morador) => ({ ...morador, valor: "" }));
 
       if (type === "custom") {
+        const getValor = (morador: MoradorDivisao) => {
+          if (!morador.checked) return "";
+          return morador.valor || "0,00";
+        };
+
         return list.map((morador) => ({
           ...morador,
-          valor:
-            morador.checked && !morador.valor
-              ? "0,00"
-              : morador.checked
-                ? morador.valor
-                : "",
+          valor: getValor(morador),
         }));
       }
 
@@ -110,7 +110,7 @@ export function useAccountForm({ republicId, onClose }: UseAccountFormParams) {
         };
       });
     },
-    []
+    [],
   );
 
   // Atualizar moradoresDivisao quando residents mudar
@@ -127,7 +127,7 @@ export function useAccountForm({ republicId, onClose }: UseAccountFormParams) {
       moradoresDivisao: applySplitByType(
         moradores,
         prev.tipoDivisao,
-        prev.valorTotal
+        prev.valorTotal,
       ),
     }));
   }, [residents, applySplitByType]);
@@ -165,7 +165,7 @@ export function useAccountForm({ republicId, onClose }: UseAccountFormParams) {
       moradoresDivisao: applySplitByType(
         prev.moradoresDivisao,
         type,
-        prev.valorTotal
+        prev.valorTotal,
       ),
     }));
   };
@@ -175,7 +175,7 @@ export function useAccountForm({ republicId, onClose }: UseAccountFormParams) {
       const updated = prev.moradoresDivisao.map((morador) =>
         morador.moradorId === moradorId
           ? { ...morador, checked: !morador.checked }
-          : morador
+          : morador,
       );
 
       return {
@@ -183,7 +183,7 @@ export function useAccountForm({ republicId, onClose }: UseAccountFormParams) {
         moradoresDivisao: applySplitByType(
           updated,
           prev.tipoDivisao,
-          prev.valorTotal
+          prev.valorTotal,
         ),
       };
     });
@@ -196,7 +196,7 @@ export function useAccountForm({ republicId, onClose }: UseAccountFormParams) {
       moradoresDivisao: prev.moradoresDivisao.map((morador) =>
         morador.moradorId === moradorId
           ? { ...morador, valor: sanitized }
-          : morador
+          : morador,
       ),
     }));
   };
@@ -218,7 +218,7 @@ export function useAccountForm({ republicId, onClose }: UseAccountFormParams) {
         if (!morador.checked) return acc;
         return acc + parseCurrencyValue(morador.valor);
       }, 0),
-    [formData.moradoresDivisao]
+    [formData.moradoresDivisao],
   );
 
   return {
