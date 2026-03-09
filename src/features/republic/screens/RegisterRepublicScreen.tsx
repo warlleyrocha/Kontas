@@ -2,7 +2,7 @@ import InputField from "@/src/components/ui/input-field";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
 import {
-  Dimensions,
+  useWindowDimensions,
   Image,
   ImageBackground,
   KeyboardAvoidingView,
@@ -16,9 +16,10 @@ import {
 import ImageDefault from "@/assets/images/image-register.webp";
 import { useRepublicForm } from "../hooks/useRepublicForm";
 import { useRepublicActions } from "../hooks/useRepublicActions";
-const { width, height } = Dimensions.get("window");
 
 export function RegisterRepublicScreen() {
+  const { width, height } = useWindowDimensions();
+
   const {
     republicName,
     setRepublicName,
