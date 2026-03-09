@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { KeyboardAvoidingView, Modal, ScrollView, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  View,
+} from "react-native";
 import { AddAccountModalActions } from "./AddAccountModalActions";
 import { AddAccountModalFormSection } from "./AddAccountModalFormSection";
 import { AddAccountModalHeader } from "./AddAccountModalHeader";
@@ -103,10 +109,13 @@ export default function AddAccountModal({
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
-      <View className="min-h-screen flex-1 justify-center bg-black/40 px-[16px] pt-[20px]">
-        <KeyboardAvoidingView>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <View className="flex-1 items-center justify-center bg-black/40 px-4">
           <View
-            className="max-h-[100%] rounded-xl bg-white px-6 pt-6"
+            className="max-h-[90%] w-full max-w-[480px] rounded-xl bg-white px-6 pt-6"
             style={{
               transform: [{ translateY: isValorInputFocused ? -135 : 0 }],
             }}
@@ -148,8 +157,8 @@ export default function AddAccountModal({
               />
             </ScrollView>
           </View>
-        </KeyboardAvoidingView>
-      </View>
+        </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
