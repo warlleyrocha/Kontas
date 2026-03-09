@@ -3,7 +3,7 @@ import { ActivityIndicator, Text, View } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import Tabs from "@/src/components/Tabs";
-import { AccountsTab } from "@/src/components/Tabs/Accounts";
+import { AccountsTab } from "@/src/features/accounts";
 import { ResidentsTab } from "@/src/components/Tabs/Residents";
 import { ResumeTab } from "@/src/components/Tabs/Resume";
 
@@ -42,7 +42,7 @@ export function RepublicScreen({ republicId }: Props) {
     "home",
     handleSignOut,
     republic?.id,
-    currentUserRole
+    currentUserRole,
   );
 
   if (isLoading) {

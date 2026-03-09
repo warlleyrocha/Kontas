@@ -1,15 +1,13 @@
 import { Feather } from "@expo/vector-icons";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
-import { formatMounthYear } from "@/src/utils/formats";
-import { useAccountActions } from "@/src/features/accounts/hooks/useAccountActions";
-import { useAccountExpansion } from "@/src/features/accounts/hooks/useAccountExpansion";
-import { useAccountList } from "@/src/features/accounts/hooks/useAccountList";
 import {
   AccountSection,
   AddAccountButton,
   AddAccountModal,
 } from "@/src/features/accounts/components";
+import { useAccountsTab } from "@/src/features/accounts/hooks/useAccountsTab";
+import { formatMounthYear } from "@/src/utils/formats";
 
 interface AccountsTabProps {
   readonly republicId: string;
@@ -17,44 +15,31 @@ interface AccountsTabProps {
 
 export function AccountsTab({ republicId }: AccountsTabProps) {
   const {
-    refresh,
+    accountResidentsById,
+    closeAccountModal,
+    confirmResidentPayment,
     contasOrdenadas,
-    mesesDisponiveis,
+    error,
+    errorResidentsById,
+    expandedAccountId,
+    handleDelete,
+    handlePatchAndRefresh,
+    handleSubmit,
+    handleToggleExpand,
+    hasNoAccounts,
+    loading,
+    loadingResidentsById,
     mesSelecionado,
+    mesesDisponiveis,
     mostrarContasAbertas,
     mostrarContasPagas,
-    loading,
-    error,
+    openAccountModal,
     setMesSelecionado,
-    setMostrarContasPagas,
-    setMostrarContasAbertas,
-    accountResidentsById,
-    loadingResidentsById,
-    errorResidentsById,
-    updatingResidentById,
-    confirmResidentPayment,
-  } = useAccountList({ republicId });
-
-  const { expandedAccountId, handleToggleExpand } = useAccountExpansion({
-    republicId,
-  });
-
-  const {
     showAccountModal,
-    setShowAccountModal,
-    handleSubmit,
-    handleDelete,
-    handlePatch,
-  } =
-    useAccountActions({ onRefresh: refresh });
-
-  const handlePatchAndRefresh = async (
-    accountId: string,
-    metodoPagamento: Parameters<typeof handlePatch>[1],
-  ) => {
-    await handlePatch(accountId, metodoPagamento);
-    await refresh();
-  };
+    toggleOpenAccounts,
+    togglePaidAccounts,
+    updatingResidentById,
+  } = useAccountsTab({ republicId });
 
   if (loading) {
     return (
@@ -67,7 +52,7 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
   if (error) {
     return (
       <View className="flex-1 px-4">
-        <View className="mt-6 rounded-lg bg-red-50 border border-red-200 p-4">
+        <View className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4">
           <View className="flex-row items-center">
             <Feather name="alert-circle" size={24} color="#ef4444" />
             <Text className="ml-3 flex-1 text-red-600">
@@ -87,16 +72,12 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
     );
   }
 
-  if (
-    contasOrdenadas.abertas.length === 0 &&
-    contasOrdenadas.pagas.length === 0 &&
-    mesSelecionado === "todos"
-  ) {
+  if (hasNoAccounts && mesSelecionado === "todos") {
     return (
       <View className="flex-1 px-4">
         <TouchableOpacity
           className="mt-6 items-center rounded-lg bg-white p-6 shadow-lg"
-          onPress={() => setShowAccountModal(true)}
+          onPress={openAccountModal}
         >
           <Feather name="dollar-sign" size={48} color="#9ca3af" />
           <Text className="mt-4 text-center text-gray-500">
@@ -108,7 +89,7 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
         <AddAccountModal
           visible={showAccountModal}
           onSubmit={handleSubmit}
-          onClose={() => setShowAccountModal(false)}
+          onClose={closeAccountModal}
           republicId={republicId}
         />
       </View>
@@ -120,7 +101,6 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
       <ScrollView
         contentContainerStyle={{ paddingVertical: 12, paddingBottom: 88 }}
       >
-        {/* Filtro de Mês */}
         <View className="mb-4 px-4">
           <Text className="mb-2 text-sm font-semibold text-gray-700">
             Filtrar por mês:
@@ -169,9 +149,7 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
           </ScrollView>
         </View>
 
-        {contasOrdenadas.abertas.length === 0 &&
-        contasOrdenadas.pagas.length === 0 &&
-        mesSelecionado !== "todos" ? (
+        {hasNoAccounts && mesSelecionado !== "todos" ? (
           <View className="mx-4 mt-6 items-center rounded-lg bg-white p-6 shadow-sm">
             <Feather name="calendar" size={48} color="#9ca3af" />
             <Text className="mt-4 text-center text-gray-500">
@@ -180,12 +158,11 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
           </View>
         ) : (
           <View className="px-4">
-            {/* Contas em Aberto */}
             <AccountSection
               label="Em Aberto"
               contas={contasOrdenadas.abertas}
               visivel={mostrarContasAbertas}
-              onToggle={() => setMostrarContasAbertas(!mostrarContasAbertas)}
+              onToggle={toggleOpenAccounts}
               headerBg="bg-blue-50"
               headerTextColor="text-blue-800"
               headerIconColor="#1e40af"
@@ -200,12 +177,11 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
               onPatch={handlePatchAndRefresh}
             />
 
-            {/* Contas Pagas */}
             <AccountSection
               label="Contas Pagas"
               contas={contasOrdenadas.pagas}
               visivel={mostrarContasPagas}
-              onToggle={() => setMostrarContasPagas(!mostrarContasPagas)}
+              onToggle={togglePaidAccounts}
               headerBg="bg-green-50"
               headerTextColor="text-green-800"
               headerIconColor="#166534"
@@ -223,12 +199,12 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
         )}
       </ScrollView>
 
-      <AddAccountButton onPress={() => setShowAccountModal(true)} />
+      <AddAccountButton onPress={openAccountModal} />
 
       <AddAccountModal
         visible={showAccountModal}
         onSubmit={handleSubmit}
-        onClose={() => setShowAccountModal(false)}
+        onClose={closeAccountModal}
         republicId={republicId}
       />
     </View>
