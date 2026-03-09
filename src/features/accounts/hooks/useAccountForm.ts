@@ -7,9 +7,9 @@ interface UseAccountFormParams {
   onClose: () => void;
 }
 
-type TipoDivisao = "equal" | "custom";
+export type TipoDivisao = "equal" | "custom";
 
-interface MoradorDivisao {
+export interface MoradorDivisao {
   moradorId: string;
   nome: string;
   checked: boolean;

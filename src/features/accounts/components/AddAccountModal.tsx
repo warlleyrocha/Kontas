@@ -1,16 +1,9 @@
-import { Feather } from "@expo/vector-icons";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useState } from "react";
-import {
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  ScrollView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { KeyboardAvoidingView, Modal, ScrollView, View } from "react-native";
+import { AddAccountModalActions } from "./AddAccountModalActions";
+import { AddAccountModalFormSection } from "./AddAccountModalFormSection";
+import { AddAccountModalHeader } from "./AddAccountModalHeader";
+import { AddAccountModalResidentsSection } from "./AddAccountModalResidentsSection";
 import { useAccountForm } from "../hooks/useAccountForm";
 import {
   type CriarContaComMoradoresRequest,
@@ -18,18 +11,32 @@ import {
 } from "../types/account.types";
 
 interface AddAccountModalProps {
-  visible: boolean;
-  onClose: () => void;
-  republicId: string;
-  onSubmit: (data: CriarContaComMoradoresRequest) => Promise<void> | void;
+  readonly visible: boolean;
+  readonly onClose: () => void;
+  readonly republicId: string;
+  readonly onSubmit: (
+    data: CriarContaComMoradoresRequest,
+  ) => Promise<void> | void;
 }
 
-export const AddAccountModal = ({
+function getNextPaymentMethod(currentMethod: string): string {
+  if (currentMethod === "PIX") {
+    return "Cartão";
+  }
+
+  if (currentMethod === "Cartão") {
+    return "Dinheiro";
+  }
+
+  return "PIX";
+}
+
+export default function AddAccountModal({
   visible,
   onClose,
   republicId,
   onSubmit,
-}: AddAccountModalProps) => {
+}: AddAccountModalProps) {
   const {
     formData,
     tempVencimento,
@@ -57,6 +64,17 @@ export const AddAccountModal = ({
   } = formData;
 
   const [isValorInputFocused, setIsValorInputFocused] = useState(false);
+
+  const handleDescricaoChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, descricao: value }));
+  };
+
+  const handleCyclePaymentMethod = () => {
+    setFormData((prev) => ({
+      ...prev,
+      metodoPagamento: getNextPaymentMethod(prev.metodoPagamento),
+    }));
+  };
 
   const handleSubmit = () => {
     // Converte a data para formato ISO string
@@ -93,250 +111,45 @@ export const AddAccountModal = ({
               transform: [{ translateY: isValorInputFocused ? -135 : 0 }],
             }}
           >
-            {/* header */}
-            <View className="mb-3 flex-row items-center justify-between">
-              <View>
-                <Text className="text-lg font-semibold">Nova Conta</Text>
-                <Text className="mt-1 text-sm text-gray-500">
-                  Adicione uma nova conta para a república
-                </Text>
-              </View>
-              <TouchableOpacity onPress={handleCloseModal} className="p-2">
-                <Feather name="x" size={24} color="#374151" />
-              </TouchableOpacity>
-            </View>
+            <AddAccountModalHeader onClose={handleCloseModal} />
 
             <ScrollView
               contentContainerStyle={{ paddingBottom: 16 }}
               showsVerticalScrollIndicator={false}
             >
-              {/* Descrição */}
-              <View className="mb-3">
-                <Text className="mb-1 text-sm text-gray-700">Descrição</Text>
-                <TextInput
-                  value={descricao}
-                  onChangeText={(value) =>
-                    setFormData((prev) => ({ ...prev, descricao: value }))
-                  }
-                  placeholder="Ex: Cemig"
-                  className="rounded border border-gray-200 bg-gray-50 px-3 py-2"
-                />
-              </View>
+              <AddAccountModalFormSection
+                descricao={descricao}
+                valorTotal={valorTotal}
+                vencimento={vencimento}
+                tempVencimento={tempVencimento}
+                showDatepicker={showDatepicker}
+                metodoPagamento={metodoPagamento}
+                onDescricaoChange={handleDescricaoChange}
+                onValorTotalChange={handleValorTotalChange}
+                onOpenDatepicker={handleOpenDatepicker}
+                onConfirmDate={handleConfirmDate}
+                onDateChange={handleDateChange}
+                onCycleMetodoPagamento={handleCyclePaymentMethod}
+              />
 
-              {/* Valor e Vencimento - duas colunas */}
-              <View className="mb-3 flex-row gap-3">
-                <View className="flex-1">
-                  <Text className="mb-1 text-sm text-gray-700">
-                    Valor Total (R$)
-                  </Text>
-                  <TextInput
-                    value={valorTotal}
-                    onChangeText={handleValorTotalChange}
-                    keyboardType="numeric"
-                    placeholder="0,00"
-                    className="rounded border border-gray-200 bg-gray-50 px-3 py-2"
-                  />
-                </View>
+              <AddAccountModalResidentsSection
+                tipoDivisao={tipoDivisao}
+                moradoresDivisao={moradoresDivisao}
+                totalDivisaoPreenchido={totalDivisaoPreenchido}
+                onSetTipoDivisao={handleSetTipoDivisao}
+                onToggleMorador={handleToggleMorador}
+                onMoradorValorChange={handleMoradorValorChange}
+                onValorInputFocusChange={setIsValorInputFocused}
+              />
 
-                <View style={{ width: 140 }}>
-                  <Text className="mb-1 text-sm text-gray-700">Vencimento</Text>
-                  <TouchableOpacity
-                    className="flex-row items-center justify-between rounded border border-gray-200 bg-gray-50 px-3 py-2"
-                    onPress={handleOpenDatepicker}
-                  >
-                    <Text>{vencimento.toLocaleDateString("pt-BR")}</Text>
-                    <Feather name="calendar" size={18} color="#6b7280" />
-                  </TouchableOpacity>
-                  {Platform.OS === "ios" ? (
-                    <Modal
-                      visible={showDatepicker}
-                      transparent
-                      animationType="slide"
-                    >
-                      <View className="flex-1 justify-end bg-black/40">
-                        <View className="bg-white pb-8 pt-4">
-                          <View className="mb-2 flex-row justify-end px-4">
-                            <TouchableOpacity onPress={handleConfirmDate}>
-                              <Text className="text-base font-semibold text-indigo-600">
-                                Confirmar
-                              </Text>
-                            </TouchableOpacity>
-                          </View>
-
-                          <View className="items-center">
-                            <DateTimePicker
-                              value={tempVencimento}
-                              mode="date"
-                              display="spinner"
-                              onChange={handleDateChange}
-                              locale="pt-BR"
-                            />
-                          </View>
-                        </View>
-                      </View>
-                    </Modal>
-                  ) : (
-                    showDatepicker && (
-                      <DateTimePicker
-                        value={vencimento}
-                        mode="date"
-                        display="calendar"
-                        onChange={handleDateChange}
-                      />
-                    )
-                  )}
-                </View>
-              </View>
-
-              {/* Metodo de pagamento da conta */}
-              <View className="mb-3">
-                <Text className="mb-1 text-sm text-gray-700">
-                  Método de Pagamento
-                </Text>
-                <TouchableOpacity
-                  className="flex-row items-center justify-between rounded border border-gray-200 bg-gray-50 px-3 py-2"
-                  onPress={() => {
-                    // placeholder: ciclo simples entre algumas opções (pode trocar p/ menu)
-                    let next: string;
-                    if (metodoPagamento === "PIX") {
-                      next = "Cartão";
-                    } else if (metodoPagamento === "Cartão") {
-                      next = "Dinheiro";
-                    } else {
-                      next = "PIX";
-                    }
-                    setFormData((prev) => ({
-                      ...prev,
-                      metodoPagamento: next,
-                    }));
-                  }}
-                >
-                  <Text>{metodoPagamento}</Text>
-                </TouchableOpacity>
-              </View>
-
-              {/* Tipo de divisão */}
-              <View className="mb-3 border-t border-gray-200 pt-3">
-                <Text className="mb-2 text-sm text-gray-700">
-                  Tipo de Divisão
-                </Text>
-                <View>
-                  <TouchableOpacity
-                    onPress={() => handleSetTipoDivisao("equal")}
-                    className="mb-2 flex-row items-center"
-                  >
-                    <View
-                      className={`mr-3 h-4 w-4 rounded-full border border-indigo-600 ${
-                        tipoDivisao === "equal"
-                          ? "bg-indigo-600"
-                          : "bg-transparent"
-                      }`}
-                    />
-                    <Text>Dividir igualmente</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    onPress={() => handleSetTipoDivisao("custom")}
-                    className="flex-row items-center"
-                  >
-                    <View
-                      className={`mr-3 h-4 w-4 rounded-full border border-indigo-600 ${
-                        tipoDivisao === "custom"
-                          ? "bg-indigo-600"
-                          : "bg-transparent"
-                      }`}
-                    />
-                    <Text>Valores customizados</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-
-              {/* Selecione os moradores (checkbox + valor) */}
-              <View className="mb-4">
-                <Text className="mb-2 text-sm text-gray-700">
-                  Selecione os Moradores
-                </Text>
-                <View className="space-y-2">
-                  {moradoresDivisao.map((morador) => (
-                    <View
-                      key={morador.moradorId}
-                      className="flex-row items-center justify-between rounded-md bg-gray-50 px-3 py-2"
-                    >
-                      <View className="flex-row items-center">
-                        <TouchableOpacity
-                          onPress={() => handleToggleMorador(morador.moradorId)}
-                          className={`mr-3 h-6 w-6 items-center justify-center rounded-sm border ${
-                            morador.checked
-                              ? "border-indigo-600 bg-indigo-600"
-                              : "border-gray-300 bg-white"
-                          }`}
-                        >
-                          <Feather
-                            name="check"
-                            size={14}
-                            color={morador.checked ? "#fff" : "transparent"}
-                          />
-                        </TouchableOpacity>
-
-                        <Text>{morador.nome}</Text>
-                      </View>
-
-                      <View style={{ width: 120 }}>
-                        <TextInput
-                          value={morador.valor}
-                          editable={morador.checked && tipoDivisao === "custom"}
-                          onFocus={() => setIsValorInputFocused(true)}
-                          onBlur={() => setIsValorInputFocused(false)}
-                          onChangeText={(value) =>
-                            handleMoradorValorChange(morador.moradorId, value)
-                          }
-                          keyboardType="numeric"
-                          className={`rounded px-2 py-1 text-right ${
-                            morador.checked && tipoDivisao === "custom"
-                              ? "bg-white"
-                              : "bg-gray-100 text-gray-500"
-                          }`}
-                        />
-                      </View>
-                    </View>
-                  ))}
-                </View>
-
-                {/* total check */}
-                <View className="mr-2 mt-8 flex-row items-center justify-between">
-                  <Text className="text-sm text-gray-500">
-                    Total preenchido
-                  </Text>
-                  <Text className="text-sm font-semibold">
-                    R$ {totalDivisaoPreenchido.toFixed(2).replace(".", ",")}
-                  </Text>
-                </View>
-              </View>
-
-              {/* buttons */}
-              <View className="mt-[10px] flex-row gap-3">
-                <TouchableOpacity
-                  onPress={handleSubmit}
-                  className="flex-1 items-center rounded-md bg-indigo-600 py-3"
-                >
-                  <Text className="font-medium text-white">
-                    Adicionar Conta
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={handleCloseModal}
-                  className="flex-1 items-center rounded-md border border-gray-300 py-3"
-                >
-                  <Text className="font-medium text-gray-700">Cancelar</Text>
-                </TouchableOpacity>
-              </View>
+              <AddAccountModalActions
+                onSubmit={handleSubmit}
+                onCancel={handleCloseModal}
+              />
             </ScrollView>
           </View>
         </KeyboardAvoidingView>
       </View>
     </Modal>
   );
-};
-
-export default AddAccountModal;
+}
