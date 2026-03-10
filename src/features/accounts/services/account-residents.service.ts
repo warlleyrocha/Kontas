@@ -1,10 +1,11 @@
-import { api } from "@/src/services/api";
+import { ListarContasResponse } from "@/src/features/accounts/types/account.types";
 import {
+  AtualizarVisibilidadeContaMoradorRequest,
   ContaMorador,
   ContaMoradorIdParams,
   VincularMoradoresRequest,
 } from "@/src/features/accounts/types/accountResidents.types";
-import { ListarContasResponse } from "@/src/features/accounts/types/account.types";
+import { api } from "@/src/services/api";
 import { toUserFriendlyError } from "@/src/services/httpError";
 
 export const accountResidentsService = {
@@ -115,6 +116,30 @@ export const accountResidentsService = {
           403: "Apenas ADMIN pode confirmar pagamentos.",
           404: "Registro não encontrado.",
           409: "Pagamento não está aguardando confirmação.",
+          500: "Erro interno do servidor.",
+        },
+      });
+    }
+  },
+
+  atualizarVisibilidadeAdmin: async ({
+    id,
+    visivel,
+  }: AtualizarVisibilidadeContaMoradorRequest): Promise<ContaMorador> => {
+    try {
+      const response = await api.patch<ContaMorador>(
+        `/contas-moradores/${id}/visibilidade`,
+        { visivel }
+      );
+      console.log(`Visibilidade da conta ${id} atualizada pelo ADMIN`);
+      return response.data;
+    } catch (error) {
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao atualizar visibilidade.",
+        statusMessages: {
+          401: "Não autenticado.",
+          403: "Apenas ADMIN pode alterar visibilidade.",
+          404: "Registro não encontrado.",
           500: "Erro interno do servidor.",
         },
       });
