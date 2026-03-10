@@ -36,6 +36,7 @@ export function RepublicScreen({ republicId }: Props) {
     handleSignOut,
     userMenu,
     currentUserRole,
+    currentResidentId,
   } = useRepublicScreen(republicId);
 
   const { menuItems, footerItems } = useSideMenu(
@@ -77,7 +78,12 @@ export function RepublicScreen({ republicId }: Props) {
       <View className="flex-1 p-4">
         <Tabs value={tab} onChange={setTab} />
 
-        {tab === "contas" && <AccountsTab republicId={republicId} />}
+        {tab === "contas" && (
+          <AccountsTab
+            republicId={republicId}
+            currentResidentId={currentResidentId}
+          />
+        )}
         {tab === "moradores" && <ResidentsTab residents={residents} />}
         {tab === "resumo" && <ResumeTab />}
       </View>

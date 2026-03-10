@@ -8,6 +8,7 @@ interface AccountResidentsContentProps {
   readonly moradores: ContaMorador[];
   readonly isLoadingMoradores: boolean;
   readonly updatingResidentById: Record<string, boolean>;
+  readonly currentResidentId: string | null;
   readonly onConfirmResidentPayment?: (
     accountId: string,
     accountResidentId: string
@@ -19,6 +20,7 @@ export function AccountResidentsContent({
   moradores,
   isLoadingMoradores,
   updatingResidentById,
+  currentResidentId,
   onConfirmResidentPayment,
 }: AccountResidentsContentProps) {
   if (isLoadingMoradores) {
@@ -49,6 +51,7 @@ export function AccountResidentsContent({
           morador={morador}
           isLastItem={index === moradores.length - 1}
           isUpdatingMorador={Boolean(updatingResidentById[morador.id])}
+          currentResidentId={currentResidentId}
           onConfirmResidentPayment={onConfirmResidentPayment}
         />
       ))}

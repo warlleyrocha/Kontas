@@ -11,9 +11,13 @@ import { formatMounthYear } from "@/src/utils/formats";
 
 interface AccountsTabProps {
   readonly republicId: string;
+  readonly currentResidentId: string | null;
 }
 
-export function AccountsTab({ republicId }: AccountsTabProps) {
+export function AccountsTab({
+  republicId,
+  currentResidentId,
+}: AccountsTabProps) {
   const {
     accountResidentsById,
     closeAccountModal,
@@ -172,6 +176,7 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
               loadingResidentsById={loadingResidentsById}
               errorResidentsById={errorResidentsById}
               updatingResidentById={updatingResidentById}
+              currentResidentId={currentResidentId}
               onConfirmResidentPayment={confirmResidentPayment}
               onDelete={handleDelete}
               onPatch={handlePatchAndRefresh}
@@ -191,6 +196,7 @@ export function AccountsTab({ republicId }: AccountsTabProps) {
               loadingResidentsById={loadingResidentsById}
               errorResidentsById={errorResidentsById}
               updatingResidentById={updatingResidentById}
+              currentResidentId={currentResidentId}
               onConfirmResidentPayment={confirmResidentPayment}
               onDelete={handleDelete}
               onPatch={handlePatchAndRefresh}

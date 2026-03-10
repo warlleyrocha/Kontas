@@ -16,6 +16,7 @@ interface AccountResidentRowProps {
   readonly morador: ContaMorador;
   readonly isLastItem: boolean;
   readonly isUpdatingMorador: boolean;
+  readonly currentResidentId: string | null;
   readonly onConfirmResidentPayment?: (
     accountId: string,
     accountResidentId: string
@@ -27,12 +28,14 @@ export function AccountResidentRow({
   morador,
   isLastItem,
   isUpdatingMorador,
+  currentResidentId,
   onConfirmResidentPayment,
 }: AccountResidentRowProps) {
   const moradorStatusVisual = getMoradorStatusVisual(morador);
   const moradorPago = moradorStatusVisual === StatusPagamento.PAGO;
   const moradorAguardando =
     moradorStatusVisual === StatusPagamento.AGUARDANDO_CONFIRMACAO;
+  const canConfirmOwnPayment = morador.moradorId === currentResidentId;
   const {
     backgroundClassName: moradorStatusBadgeClass,
     textClassName: moradorStatusTextClass,
@@ -54,6 +57,7 @@ export function AccountResidentRow({
             moradorPago ||
             moradorAguardando ||
             isUpdatingMorador ||
+            !canConfirmOwnPayment ||
             !onConfirmResidentPayment
           ) {
             return;
@@ -65,6 +69,7 @@ export function AccountResidentRow({
           moradorPago ||
           moradorAguardando ||
           isUpdatingMorador ||
+          !canConfirmOwnPayment ||
           !onConfirmResidentPayment
         }
         className="flex-1 flex-row items-center gap-3"

@@ -19,6 +19,7 @@ interface AccountSectionProps {
   readonly loadingResidentsById: Record<string, boolean>;
   readonly errorResidentsById: Record<string, boolean>;
   readonly updatingResidentById: Record<string, boolean>;
+  readonly currentResidentId: string | null;
   readonly onConfirmResidentPayment: (
     accountId: string,
     accountResidentId: string
@@ -44,6 +45,7 @@ export function AccountSection({
   loadingResidentsById,
   errorResidentsById,
   updatingResidentById,
+  currentResidentId,
   onConfirmResidentPayment,
   onDelete,
   onPatch,
@@ -80,6 +82,7 @@ export function AccountSection({
             isLoadingMoradores={Boolean(loadingResidentsById[conta.id])}
             //isErrorMoradores={Boolean(errorResidentsById[conta.id])}
             updatingResidentById={updatingResidentById}
+            currentResidentId={currentResidentId}
             onConfirmResidentPayment={onConfirmResidentPayment}
             onDelete={onDelete}
             onPatch={onPatch}

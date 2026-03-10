@@ -20,6 +20,7 @@ interface AccountCardProps {
   moradores: ContaMorador[];
   isLoadingMoradores: boolean;
   updatingResidentById: Record<string, boolean>;
+  currentResidentId: string | null;
   onConfirmResidentPayment?: (
     accountId: string,
     accountResidentId: string
@@ -57,6 +58,7 @@ export const AccountCard = ({
   moradores,
   isLoadingMoradores,
   updatingResidentById,
+  currentResidentId,
   onConfirmResidentPayment,
   onDelete,
   onPatch,
@@ -178,6 +180,7 @@ export const AccountCard = ({
                 moradores={moradores}
                 isLoadingMoradores={isLoadingMoradores}
                 updatingResidentById={updatingResidentById}
+                currentResidentId={currentResidentId}
                 onConfirmResidentPayment={onConfirmResidentPayment}
               />
             </View>

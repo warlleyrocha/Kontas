@@ -117,14 +117,16 @@ export function useRepublicScreen(republicId: string) {
     [user?.nome, user?.fotoPerfil, user?.email],
   );
 
-  const currentUserRole = useMemo(() => {
+  const currentResident = useMemo(() => {
     if (!user?.email) return null;
     const normalizedEmail = user.email.toLowerCase();
-    const currentUser = residents.find(
+    return residents.find(
       (resident) => resident.email.toLowerCase() === normalizedEmail,
     );
-    return currentUser?.role ?? null;
   }, [residents, user?.email]);
+
+  const currentUserRole = currentResident?.role ?? null;
+  const currentResidentId = currentResident?.id ?? null;
 
   return {
     republic,
@@ -143,5 +145,6 @@ export function useRepublicScreen(republicId: string) {
     handleSignOut,
     userMenu,
     currentUserRole,
+    currentResidentId,
   };
 }
