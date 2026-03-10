@@ -8,6 +8,7 @@ export interface MenuItem {
     | "person-outline"
     | "mail-outline"
     | "grid-outline"
+    | "wallet-outline"
     | "document-text-outline"
     | "shield-checkmark-outline"
     | "log-out-outline";
