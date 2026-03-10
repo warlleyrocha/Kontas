@@ -7,7 +7,7 @@ import { MenuItem, UserMenuContext } from "@/src/shared/types/sideMenu";
 export function useSideMenu(
   context: UserMenuContext,
   handleSignOut: () => void,
-  republicId?: string, // Adicione este parâmetro
+  republicId?: string,
   currentUserRole?: ResidentRole | null,
 ) {
   const router = useRouter();
@@ -38,8 +38,13 @@ export function useSideMenu(
   }, [router]);
 
   const navigatePayments = useCallback(() => {
-    router.push("/payments");
-  }, [router]);
+    if (!republicId) return;
+
+    router.push({
+      pathname: "/(republics)/[id]/payments",
+      params: { id: republicId },
+    });
+  }, [republicId, router]);
 
   const menuItems = useMemo<MenuItem[]>(() => {
     const base = {
