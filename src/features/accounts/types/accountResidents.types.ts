@@ -24,6 +24,10 @@ export interface VincularMoradoresRequest {
   valorTotal: number;
 }
 
+export interface ContaMoradorIdParams {
+  id: string;
+}
+
 export interface ListarContasResponse {
   id: string;
   nome: string;
