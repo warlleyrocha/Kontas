@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Platform } from "react-native";
 import { useResidents } from "@/src/features/residents/hooks/useResidents";
+import { MetodoPagamento } from "../types/account.types";
 
 interface UseAccountFormParams {
   republicId: string;
@@ -20,7 +21,7 @@ interface AccountFormData {
   descricao: string;
   valorTotal: string;
   vencimento: Date;
-  metodoPagamento: string;
+  metodoPagamento: MetodoPagamento;
   tipoDivisao: TipoDivisao;
   moradoresDivisao: MoradorDivisao[];
 }
@@ -54,7 +55,7 @@ function createInitialFormData(): AccountFormData {
     descricao: "",
     valorTotal: "",
     vencimento: new Date(),
-    metodoPagamento: "PIX",
+    metodoPagamento: MetodoPagamento.PIX,
     tipoDivisao: "equal",
     moradoresDivisao: [],
   };

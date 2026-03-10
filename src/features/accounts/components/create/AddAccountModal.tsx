@@ -6,15 +6,16 @@ import {
   ScrollView,
   View,
 } from "react-native";
+import { useAccountForm } from "../../hooks/useAccountForm";
+import {
+  type CriarContaComMoradoresRequest,
+  MetodoPagamento,
+  StatusConta,
+} from "../../types/account.types";
 import { AddAccountModalActions } from "./AddAccountModalActions";
 import { AddAccountModalFormSection } from "./AddAccountModalFormSection";
 import { AddAccountModalHeader } from "./AddAccountModalHeader";
 import { AddAccountModalResidentsSection } from "./AddAccountModalResidentsSection";
-import { useAccountForm } from "../../hooks/useAccountForm";
-import {
-  type CriarContaComMoradoresRequest,
-  StatusConta,
-} from "../../types/account.types";
 
 interface AddAccountModalProps {
   readonly visible: boolean;
@@ -25,16 +26,16 @@ interface AddAccountModalProps {
   ) => Promise<void> | void;
 }
 
-function getNextPaymentMethod(currentMethod: string): string {
-  if (currentMethod === "PIX") {
-    return "Cartão";
+function getNextPaymentMethod(currentMethod: MetodoPagamento): MetodoPagamento {
+  if (currentMethod === MetodoPagamento.PIX) {
+    return MetodoPagamento.CARTAO;
   }
 
-  if (currentMethod === "Cartão") {
-    return "Dinheiro";
+  if (currentMethod === MetodoPagamento.CARTAO) {
+    return MetodoPagamento.DINHEIRO;
   }
 
-  return "PIX";
+  return MetodoPagamento.PIX;
 }
 
 export default function AddAccountModal({

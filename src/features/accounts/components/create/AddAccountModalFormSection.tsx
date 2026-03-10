@@ -8,6 +8,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { MetodoPagamento } from "../../types/account.types";
+
+const paymentMethodLabels: Record<MetodoPagamento, string> = {
+  [MetodoPagamento.PIX]: "PIX",
+  [MetodoPagamento.CARTAO]: "Cartão",
+  [MetodoPagamento.DINHEIRO]: "Dinheiro",
+};
 
 interface AddAccountModalFormSectionProps {
   readonly descricao: string;
@@ -15,7 +22,7 @@ interface AddAccountModalFormSectionProps {
   readonly vencimento: Date;
   readonly tempVencimento: Date;
   readonly showDatepicker: boolean;
-  readonly metodoPagamento: string;
+  readonly metodoPagamento: MetodoPagamento;
   readonly onDescricaoChange: (value: string) => void;
   readonly onValorTotalChange: (value: string) => void;
   readonly onOpenDatepicker: () => void;
@@ -115,7 +122,7 @@ export function AddAccountModalFormSection({
           className="flex-row items-center justify-between rounded border border-gray-200 bg-gray-50 px-3 py-2"
           onPress={onCycleMetodoPagamento}
         >
-          <Text>{metodoPagamento}</Text>
+          <Text>{paymentMethodLabels[metodoPagamento]}</Text>
         </TouchableOpacity>
       </View>
     </>

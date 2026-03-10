@@ -37,7 +37,7 @@ export type CriarContaRequest = {
   vencimento: string;
   republicaId: string;
   status: StatusConta;
-  metodoPagamento: string;
+  metodoPagamento: MetodoPagamento;
 };
 
 export type CriarContaComMoradoresRequest = CriarContaRequest & {
