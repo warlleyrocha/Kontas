@@ -1,84 +1,132 @@
 import type { ResidentResponse } from "@/src/shared/types/resident.types";
 
+import { useResidentCard } from "@/src/features/residents/hooks/useResidentCard";
+import { getInitials } from "@/src/utils/getInitials";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
+import Animated from "react-native-reanimated";
 
 interface ResidentCardProps {
   morador: ResidentResponse;
-  copiadoId: string | null;
   onCopyPix: (morador: ResidentResponse) => void;
 }
 
 export const ResidentCard: React.FC<ResidentCardProps> = ({
   morador,
-  copiadoId,
   onCopyPix,
 }) => {
+  const {
+    expanded,
+    copiado,
+    imageError,
+    animatedStyle,
+    toggleExpanded,
+    handleCopyPix,
+    setImageError,
+  } = useResidentCard(morador, onCopyPix);
+
   return (
-    <View>
-      <View className="rounded-lg bg-white p-4 shadow-sm">
-        {/* header */}
-        <View className="flex-row items-start justify-between">
-          <View className="flex-row items-center gap-3">
-            <View className="h-12 w-12 items-center justify-center rounded-full bg-indigo-100">
-              {morador.fotoPerfil ? (
-                <Image
-                  source={{ uri: morador.fotoPerfil }}
-                  className="h-12 w-12 rounded-full"
-                />
-              ) : (
-                <Feather name="user" size={20} color="#4f46e5" />
-              )}
+    <View className="rounded-3xl border border-[#E7E7EA] bg-white p-5">
+      <View className="flex-row items-start justify-between gap-4">
+        <View className="flex-1 flex-row items-center gap-3">
+          <View className="h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-[#F2F2F7]">
+            {morador.fotoPerfil && !imageError ? (
+              <Image
+                source={{ uri: morador.fotoPerfil }}
+                className="h-full w-full rounded-full"
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <Text className="text-sm font-semibold text-[#111827]">
+                {getInitials(morador.nome)}
+              </Text>
+            )}
+          </View>
+
+          <View className="flex-1">
+            <Text
+              className="text-base font-semibold text-[#111827]"
+              numberOfLines={1}
+            >
+              {morador.nome}
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      <TouchableOpacity
+        activeOpacity={0.85}
+        onPress={toggleExpanded}
+        accessibilityRole="button"
+        accessibilityLabel={
+          expanded ? "Recolher detalhes" : "Ver mais detalhes"
+        }
+        className="mt-4 flex-row items-center justify-between rounded-full bg-[#F5F5F7] px-4 py-3"
+      >
+        <Text className="text-sm font-medium text-gray-600">
+          Ver mais detalhes
+        </Text>
+        <Feather
+          name={expanded ? "chevron-up" : "chevron-down"}
+          size={18}
+          color="#6B7280"
+        />
+      </TouchableOpacity>
+
+      <Animated.View style={animatedStyle}>
+        <View className="mt-4 rounded-3xl bg-[#F5F5F7] p-4">
+          <Text className="text-xs font-medium uppercase tracking-wide text-gray-400">
+            Contato
+          </Text>
+
+          <View className="mt-3 gap-3">
+            <View>
+              <Text className="text-xs font-medium text-gray-500">Email</Text>
+              <Text className="mt-1 text-sm text-[#111827]" numberOfLines={1}>
+                {morador.email || "Não informado"}
+              </Text>
             </View>
 
             <View>
-              <Text className="text-lg font-semibold w-[150px]">
-                {morador.nome}
+              <Text className="text-xs font-medium text-gray-500">
+                Telefone
               </Text>
-              <Text className="text-sm text-gray-500">1 Conta Pendente</Text>
+              <Text className="mt-1 text-sm text-[#111827]" numberOfLines={1}>
+                {morador.telefone || "Não informado"}
+              </Text>
             </View>
           </View>
 
-          <View className="flex-row items-center gap-2 rounded-md border px-3 border-orange-600">
-            <Text className="text-sm text-orange-500">Pendente</Text>
+          <Text className="mt-4 text-xs font-medium uppercase tracking-wide text-gray-400">
+            Chave PIX
+          </Text>
+
+          <View className=" flex-row items-center gap-3">
+            <Text className="flex-1 text-sm text-[#111827]" numberOfLines={2}>
+              {morador.chavePix || "Não informado"}
+            </Text>
+
+            {morador.chavePix ? (
+              <TouchableOpacity
+                activeOpacity={0.85}
+                onPress={handleCopyPix}
+                accessibilityRole="button"
+                accessibilityLabel={
+                  copiado ? "Chave PIX copiada" : "Copiar chave PIX"
+                }
+                className="min-h-11 min-w-11 flex-row items-center justify-center rounded-full bg-white px-4"
+              >
+                {copiado ? (
+                  <Ionicons name="checkmark" size={18} color="#16a34a" />
+                ) : (
+                  <Feather name="copy" size={18} color="#374151" />
+                )}
+              </TouchableOpacity>
+            ) : null}
           </View>
         </View>
-
-        {/* conteúdo */}
-        <View className="mt-3 space-y-3">
-          <View className="mt-2 flex-row justify-between rounded-lg bg-gray-50 p-3">
-            <Text className="mb-1 text-sm text-gray-600">Valor Pendente</Text>
-            <Text className="font-semibold text-orange-600">R$ 20</Text>
-          </View>
-
-          {morador.chavePix ? (
-            <View className="mt-4">
-              <Text className="mb-2 text-sm text-gray-600">Chave PIX</Text>
-
-              <View className="flex-row items-center gap-2">
-                <View className="flex-1 rounded bg-gray-50 p-2">
-                  <Text className="text-sm">{morador.chavePix}</Text>
-                </View>
-
-                <TouchableOpacity
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    onCopyPix(morador);
-                  }}
-                  className="rounded-md border border-[#374151] px-3 py-2"
-                >
-                  {copiadoId === morador.id ? (
-                    <Ionicons name="checkmark" size={18} color="#16a34a" />
-                  ) : (
-                    <Feather name="copy" size={18} color="#374151" />
-                  )}
-                </TouchableOpacity>
-              </View>
-            </View>
-          ) : null}
-        </View>
-      </View>
+      </Animated.View>
     </View>
   );
 };

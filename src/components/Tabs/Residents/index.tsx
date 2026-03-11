@@ -10,16 +10,10 @@ interface ResidentsTabProps {
 }
 
 export const ResidentsTab: React.FC<ResidentsTabProps> = ({ residents }) => {
-  const { copiadoId, copiarChavePix } = useTabResidents();
+  const { copiarChavePix } = useTabResidents();
 
   const renderMorador = ({ item }: { item: ResidentResponse }) => {
-    return (
-      <ResidentCard
-        morador={item}
-        copiadoId={copiadoId}
-        onCopyPix={copiarChavePix}
-      />
-    );
+    return <ResidentCard morador={item} onCopyPix={copiarChavePix} />;
   };
 
   const renderItemSeparator = () => <View className="h-4" />;
