@@ -4,7 +4,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import Tabs from "@/src/components/Tabs";
 import { AccountsTab } from "@/src/features/accounts";
-import { ResidentsTab } from "@/src/components/Tabs/Residents";
+import { ResidentsTab } from "@/src/features/residents/screens/ResidentsTab";
 import { ResumeTab } from "@/src/components/Tabs/Resume";
 
 import { EditRepublicModal } from "@/src/features/republic/components/EditRepublicModal";
