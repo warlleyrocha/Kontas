@@ -1,6 +1,14 @@
-import type { ContaMorador } from "./accountResidents.types";
+import type {
+  ContaMorador,
+  StatusPagamento,
+} from "./accountResidents.types";
 import type { Conta } from "./account.types";
 
-export interface PendingPaymentAccount extends Conta {
-  readonly pendingResidents: ContaMorador[];
+export interface PaymentAccount extends Conta {
+  readonly residents: ContaMorador[];
 }
+
+export type PaymentStatusFilter =
+  | "todos"
+  | StatusPagamento.AGUARDANDO_CONFIRMACAO
+  | StatusPagamento.PAGO;
