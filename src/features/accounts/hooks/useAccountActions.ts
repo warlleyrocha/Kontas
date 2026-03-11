@@ -7,6 +7,7 @@ import { accountService } from "../services/account.service";
 import { accountResidentsService } from "../services/account-residents.service";
 import type {
   CriarContaComMoradoresRequest,
+  ListarContasResponse,
   MetodoPagamento,
 } from "../types/account.types";
 
@@ -29,6 +30,7 @@ interface UseAccountActionsReturn {
     metodoPagamento: MetodoPagamento,
   ) => Promise<void>;
   handleRecovery: (accountId: string) => Promise<void>;
+  fetchContasPorMorador: (moradorId: string) => Promise<ListarContasResponse>;
 }
 
 export function useAccountActions({
@@ -190,6 +192,13 @@ export function useAccountActions({
     [],
   );
 
+  const fetchContasPorMorador = useCallback(
+    async (moradorId: string): Promise<ListarContasResponse> => {
+      return accountResidentsService.listarContasPorMorador(moradorId);
+    },
+    [],
+  );
+
   return {
     showAccountModal,
     setShowAccountModal,
@@ -200,5 +209,6 @@ export function useAccountActions({
     handleDelete,
     handlePatch,
     handleRecovery,
+    fetchContasPorMorador,
   };
 }
