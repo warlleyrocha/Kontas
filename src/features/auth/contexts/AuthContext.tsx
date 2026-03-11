@@ -9,6 +9,7 @@ import {
 import { UpdateUserRequest } from "@/src/features/user/types/user.types";
 import { showToast } from "@/src/utils/showToast";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { router } from "expo-router";
 import React, {
   createContext,
@@ -134,14 +135,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       console.log("🔄 Fazendo logout...");
 
-      // Limpar AsyncStorage
-      await AsyncStorage.multiRemove(["@app:token", "@app:user"]);
+      // Limpa a sessão do app e a conta mantida pelo Google Sign-In.
+      await Promise.allSettled([
+        AsyncStorage.multiRemove(["@app:token", "@app:user", "republic-data"]),
+        GoogleSignin.signOut(),
+      ]);
 
       // Limpar estado
       setUser(null);
+      setRepublicData(null);
+      setError(null);
 
       // Redirecionar para login
-      router.replace("/login");
+      router.replace("/(auth)/login");
 
       console.log("✅ Logout realizado");
     } catch (error) {
