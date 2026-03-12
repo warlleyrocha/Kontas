@@ -1,6 +1,7 @@
 import LoadingScreen from "@/src/components/ui/loading-screen";
 import { Toaster } from "@/src/components/ui/sonner";
 import { AuthProvider, useAuth } from "@/src/features/auth/contexts";
+import { RefreshProvider } from "@/src/shared/contexts/RefreshContext";
 import { GlobalErrorBoundary } from "@/src/components/error-boundary/GlobalErrorBoundary";
 import {
   Inter_300Light,
@@ -101,8 +102,10 @@ function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <GlobalErrorBoundary>
         <AuthProvider>
-          <RootStack />
-          <Toaster position="bottom-center" />
+          <RefreshProvider>
+            <RootStack />
+            <Toaster position="bottom-center" />
+          </RefreshProvider>
         </AuthProvider>
       </GlobalErrorBoundary>
     </GestureHandlerRootView>
