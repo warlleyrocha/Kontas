@@ -14,7 +14,10 @@ export class AppError extends Error {
   code?: string;
   originalError?: unknown;
 
-  constructor(message: string, options?: { status?: number; code?: string; originalError?: unknown }) {
+  constructor(
+    message: string,
+    options?: { status?: number; code?: string; originalError?: unknown }
+  ) {
     super(message);
     this.name = "AppError";
     this.status = options?.status;
@@ -29,7 +32,8 @@ export const toUserFriendlyError = (
 ): AppError => {
   if (!isAxiosError(error)) {
     if (error instanceof AppError) return error;
-    if (error instanceof Error) return new AppError(error.message, { originalError: error });
+    if (error instanceof Error)
+      return new AppError(error.message, { originalError: error });
     return new AppError(options.defaultMessage, { originalError: error });
   }
 
@@ -39,7 +43,11 @@ export const toUserFriendlyError = (
 
   const messageByStatus = status ? options.statusMessages?.[status] : undefined;
   if (messageByStatus) {
-    return new AppError(messageByStatus, { status, code, originalError: error });
+    return new AppError(messageByStatus, {
+      status,
+      code,
+      originalError: error,
+    });
   }
 
   const isTimeout = code === "ECONNABORTED";
@@ -58,7 +66,11 @@ export const toUserFriendlyError = (
     );
   }
 
-  return new AppError(options.defaultMessage, { status, code, originalError: error });
+  return new AppError(options.defaultMessage, {
+    status,
+    code,
+    originalError: error,
+  });
 };
 
 export const isUnauthorizedError = (error: unknown): boolean => {

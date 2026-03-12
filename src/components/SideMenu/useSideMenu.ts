@@ -1,30 +1,50 @@
-import { legalLinks, openLegalLink } from "@/src/constants/legal";
-import { ResidentRole } from "@/src/types/resident.types";
-import { MenuItem, UserMenuContext } from "@/src/types/sideMenu";
 import { useRouter } from "expo-router";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { legalLinks, openLegalLink } from "@/src/shared/constants/legal";
+import { ResidentRole } from "@/src/shared/types/resident.types";
+import { MenuItem, UserMenuContext } from "@/src/shared/types/sideMenu";
 
 export function useSideMenu(
   context: UserMenuContext,
   handleSignOut: () => void,
-  republicId?: string, // Adicione este parâmetro
+  republicId?: string,
   currentUserRole?: ResidentRole | null
 ) {
   const router = useRouter();
 
-  const navigation = {
-    home: () => router.push("/"),
-    profile: () => router.push("/(userProfile)/profile"),
-    invites: () => router.push("/(userProfile)/invites"),
-    invitesSent: () => {
-      if (!republicId) return;
-      router.push({
-        pathname: "/(republics)/[id]/invites-sent",
-        params: { id: republicId },
-      });
-    },
-    controlPanel: () => router.push("/(userProfile)/control-panel"),
-  };
+  const navigateHome = useCallback(() => {
+    router.push("/");
+  }, [router]);
+
+  const navigateProfile = useCallback(() => {
+    router.push("/(userProfile)/profile");
+  }, [router]);
+
+  const navigateInvites = useCallback(() => {
+    router.push("/(userProfile)/invites");
+  }, [router]);
+
+  const navigateInvitesSent = useCallback(() => {
+    if (!republicId) return;
+
+    router.push({
+      pathname: "/(republics)/[id]/invites-sent",
+      params: { id: republicId },
+    });
+  }, [republicId, router]);
+
+  const navigateControlPanel = useCallback(() => {
+    router.push("/(userProfile)/control-panel");
+  }, [router]);
+
+  const navigatePayments = useCallback(() => {
+    if (!republicId) return;
+
+    router.push({
+      pathname: "/(republics)/[id]/payments",
+      params: { id: republicId },
+    });
+  }, [republicId, router]);
 
   const menuItems = useMemo<MenuItem[]>(() => {
     const base = {
@@ -32,31 +52,37 @@ export function useSideMenu(
         id: "home",
         label: "Início",
         icon: "home-outline" as const,
-        onPress: navigation.home,
+        onPress: navigateHome,
       },
       profile: {
         id: "profile",
         label: "Meu Perfil",
         icon: "person-outline" as const,
-        onPress: navigation.profile,
+        onPress: navigateProfile,
       },
       invites: {
         id: "invites",
         label: "Convites",
         icon: "mail-outline" as const,
-        onPress: navigation.invites,
+        onPress: navigateInvites,
       },
       invitesSent: {
         id: "invitesSent",
         label: "Convites Enviados",
         icon: "mail-outline" as const,
-        onPress: navigation.invitesSent,
+        onPress: navigateInvitesSent,
       },
       controlPanel: {
         id: "controlPanel",
         label: "Painel de Controle",
         icon: "grid-outline" as const,
-        onPress: navigation.controlPanel,
+        onPress: navigateControlPanel,
+      },
+      payments: {
+        id: "payment",
+        label: "Pagamentos",
+        icon: "wallet-outline" as const,
+        onPress: navigatePayments,
       },
     };
 
@@ -65,7 +91,12 @@ export function useSideMenu(
         if (currentUserRole === ResidentRole.USER) {
           return [base.home, base.profile, base.invitesSent];
         }
-        return [base.home, base.profile, base.invitesSent, base.controlPanel];
+        return [
+          base.profile,
+          base.invitesSent,
+          base.payments,
+          base.controlPanel,
+        ];
 
       case "profile":
         return [base.home, base.invites];
@@ -79,11 +110,12 @@ export function useSideMenu(
   }, [
     context,
     currentUserRole,
-    navigation.home,
-    navigation.profile,
-    navigation.invites,
-    navigation.invitesSent,
-    navigation.controlPanel,
+    navigateHome,
+    navigateProfile,
+    navigateInvites,
+    navigateInvitesSent,
+    navigateControlPanel,
+    navigatePayments,
   ]);
 
   const footerItems = useMemo<MenuItem[]>(

@@ -1,9 +1,11 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, {
   AxiosError,
+  isAxiosError,
   type AxiosRequestConfig,
   type InternalAxiosRequestConfig,
 } from "axios";
+import * as ExpoCrypto from "expo-crypto";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -111,12 +113,12 @@ const onFailure = (wasHalfOpen: boolean) => {
   }
 };
 
-const getRetryDelay = (retryCount: number) => {
+const getRetryDelay = async (retryCount: number) => {
   const baseDelay = RETRY_CONFIG.baseDelayMs * 2 ** (retryCount - 1);
-  const jitter = Math.floor(Math.random() * 100);
+  const randomBytes = await ExpoCrypto.getRandomBytesAsync(1);
+  const jitter = randomBytes[0] % 100; // 0–99
   return Math.min(baseDelay + jitter, RETRY_CONFIG.maxDelayMs);
 };
-
 const isIdempotencyKeyPresent = (headers: AxiosRequestConfig["headers"]) => {
   if (!headers) return false;
   const normalized = headers as Record<string, unknown>;
@@ -222,13 +224,13 @@ api.interceptors.response.use(
       return Promise.reject(knownError);
     }
 
-    if (!axios.isAxiosError(error)) {
+    if (!isAxiosError(error)) {
       return Promise.reject(
         error instanceof Error ? error : new Error(String(error))
       );
     }
 
-    const axiosError = error as AxiosError;
+    const axiosError = error;
     const config = axiosError.config as RequestConfig | undefined;
     const wasHalfOpen = Boolean(config?._cbHalfOpen);
 
@@ -243,7 +245,7 @@ api.interceptors.response.use(
       const nextRetry = (config._retryCount ?? 0) + 1;
       config._retryCount = nextRetry;
       config._cbHalfOpen = false;
-      await sleep(getRetryDelay(nextRetry));
+      await sleep(await getRetryDelay(nextRetry));
       return api.request(config);
     }
 

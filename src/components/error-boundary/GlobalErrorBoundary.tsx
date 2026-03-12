@@ -23,7 +23,9 @@ export class GlobalErrorBoundary extends React.Component<
     };
   }
 
-  public static getDerivedStateFromError(error: Error): GlobalErrorBoundaryState {
+  public static getDerivedStateFromError(
+    error: Error
+  ): GlobalErrorBoundaryState {
     return {
       hasError: true,
       error,
@@ -72,7 +74,9 @@ export class GlobalErrorBoundary extends React.Component<
           onPress={this.handleRetry}
           className="mt-8 rounded-xl bg-indigo-600 px-5 py-3"
         >
-          <Text className="font-inter-semibold text-white">Tentar novamente</Text>
+          <Text className="font-inter-semibold text-white">
+            Tentar novamente
+          </Text>
         </TouchableOpacity>
       </View>
     );

@@ -1,22 +1,31 @@
 import OnboardingButtons from "@/src/features/auth/components/onboarding/OnboardingButtons";
 import RenderDots from "@/src/features/auth/components/onboarding/RenderDots";
 import RenderSlide from "@/src/features/auth/components/onboarding/RenderSlide";
-import { slides } from "@/src/features/auth/constants/slides";
+import {
+  slides,
+  type OnboardingSlide,
+} from "@/src/features/auth/constants/slides";
+import { useOnboardingAnimation } from "@/src/features/auth/hooks/useOnboardingAnimation";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
-import { Animated, Dimensions, FlatList, View } from "react-native";
-
-const { width, height } = Dimensions.get("window");
+import {
+  FlatList,
+  type ListRenderItemInfo,
+  useWindowDimensions,
+  View,
+} from "react-native";
+import Animated from "react-native-reanimated";
 
 export default function Onboarding() {
+  const { width, height } = useWindowDimensions();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const flatListRef = useRef<FlatList>(null);
-  const scrollX = useRef(new Animated.Value(0)).current;
+  const flatListRef = useRef<FlatList<OnboardingSlide>>(null);
+  const { scrollX, handleScroll } = useOnboardingAnimation();
 
   const handleNext = async () => {
     if (currentIndex < slides.length - 1) {
       flatListRef.current?.scrollToIndex({ index: currentIndex + 1 });
-      setCurrentIndex(currentIndex + 1);
+      setCurrentIndex((prev) => prev + 1);
     } else {
       router.replace("/(userProfile)/profile");
     }
@@ -28,29 +37,31 @@ export default function Onboarding() {
 
   const isLastSlide = currentIndex === slides.length - 1;
 
+  const renderSlide = ({
+    item,
+    index,
+  }: ListRenderItemInfo<OnboardingSlide>) => (
+    <RenderSlide
+      item={item}
+      index={index}
+      width={width}
+      height={height}
+      scrollX={scrollX}
+    />
+  );
+
   return (
     <View className="flex-1 bg-[#FAFAFA]">
       {/* Slides */}
       <Animated.FlatList
         ref={flatListRef}
         data={slides}
-        renderItem={({ item, index }) => (
-          <RenderSlide
-            item={item}
-            index={index}
-            width={width}
-            height={height}
-            scrollX={scrollX}
-          />
-        )}
+        renderItem={renderSlide}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item) => item.id}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-          { useNativeDriver: false }
-        )}
+        onScroll={handleScroll}
         onMomentumScrollEnd={(event) => {
           const index = Math.round(event.nativeEvent.contentOffset.x / width);
           setCurrentIndex(index);

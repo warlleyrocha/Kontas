@@ -1,6 +1,6 @@
 import IconGoogle from "@/assets/images/google-icon.svg";
 import { useAuth } from "@/src/features/auth/contexts/AuthContext";
-import { legalLinks, openLegalLink } from "@/src/constants/legal";
+import { legalLinks, openLegalLink } from "@/src/shared/constants/legal";
 import { getErrorMessage } from "@/src/services/httpError";
 import { showToast } from "@/src/utils/showToast";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
@@ -8,43 +8,46 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
-  Dimensions,
+  useWindowDimensions,
   Image,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 
-const { height } = Dimensions.get("window");
+type GoogleSignInResult = Awaited<ReturnType<typeof GoogleSignin.signIn>>;
+
+function getGoogleToken(userInfo: GoogleSignInResult): string | null {
+  return userInfo.data?.idToken ?? null;
+}
 
 export default function LoginScreen() {
   const router = useRouter();
   const [isSigningIn, setIsSigningIn] = useState(false);
   const { loginWithGoogle, error } = useAuth();
+  const { height } = useWindowDimensions();
 
   const handleGoogleLogin = async () => {
     if (isSigningIn) return; // Previne múltiplos cliques
 
     setIsSigningIn(true); // Desabilita o botão e mostra o loading
+    let shouldNavigateToHome = false;
+
     try {
       await GoogleSignin.hasPlayServices();
 
       const userInfo = await GoogleSignin.signIn();
-
-      const googleToken = userInfo.data?.idToken;
+      const googleToken = getGoogleToken(userInfo);
 
       if (!googleToken) {
-        throw new Error("Não foi possível obter o token do Google");
+        showToast.error("Não foi possível obter o token do Google");
+      } else {
+        const result = await loginWithGoogle(googleToken);
+
+        if (result) {
+          shouldNavigateToHome = true;
+        }
       }
-
-      // Enviar para seu backend
-      const result = await loginWithGoogle(googleToken);
-
-      if (!result) {
-        return;
-      }
-
-      router.replace("/");
     } catch (error) {
       console.error("Erro no login:", error);
       showToast.error(
@@ -53,8 +56,12 @@ export default function LoginScreen() {
           "Erro ao fazer login com Google. Tente novamente."
         )
       );
-    } finally {
-      setIsSigningIn(false);
+    }
+
+    setIsSigningIn(false);
+
+    if (shouldNavigateToHome) {
+      router.replace("/");
     }
   };
 

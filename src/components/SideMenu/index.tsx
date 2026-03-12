@@ -1,19 +1,17 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useMemo } from "react";
 import {
-  Animated,
-  Dimensions,
   Image,
   Modal,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  useWindowDimensions,
   View,
 } from "react-native";
+import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const MENU_WIDTH = Math.min(SCREEN_WIDTH * 0.65, 300);
+import { useSideMenuAnimation } from "./useSideMenuAnimation";
 
 export interface MenuItem {
   id: string;
@@ -49,15 +47,8 @@ function MenuItemComponent({ item, onClose }: MenuItemComponentProps) {
     setTimeout(item.onPress, 250);
   }, [item.onPress, onClose]);
 
-  const iconColor = useMemo(
-    () => (item.danger ? "#ef4444" : "#374151"),
-    [item.danger]
-  );
-
-  const textClassName = useMemo(
-    () => `text-base ${item.danger ? "text-red-500" : "text-gray-700"}`,
-    [item.danger]
-  );
+  const iconColor = item.danger ? "#ef4444" : "#374151";
+  const textClassName = `text-base ${item.danger ? "text-red-500" : "text-gray-700"}`;
 
   return (
     <TouchableOpacity
@@ -85,43 +76,10 @@ export function SideMenu({
   menuItems,
   footerItems,
 }: SideMenuProps) {
-  const slideAnim = useRef(new Animated.Value(-MENU_WIDTH)).current;
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-
-  const openMenu = useCallback(() => {
-    Animated.parallel([
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [slideAnim, fadeAnim]);
-
-  const closeMenu = useCallback(() => {
-    Animated.parallel([
-      Animated.timing(slideAnim, {
-        toValue: -MENU_WIDTH,
-        duration: 250,
-        useNativeDriver: true,
-      }),
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 250,
-        useNativeDriver: true,
-      }),
-    ]).start(onRequestClose);
-  }, [slideAnim, fadeAnim, onRequestClose]);
-
-  useEffect(() => {
-    openMenu();
-    return () => closeMenu();
-  }, [openMenu, closeMenu]);
+  const { width: screenWidth } = useWindowDimensions();
+  const menuWidth = Math.min(screenWidth * 0.65, 300);
+  const { closeMenu, backdropAnimatedStyle, panelAnimatedStyle } =
+    useSideMenuAnimation({ menuWidth, onRequestClose });
 
   const userInitial = useMemo(
     () => user.name.charAt(0).toUpperCase(),
@@ -129,21 +87,18 @@ export function SideMenu({
   );
 
   return (
-    <Modal transparent animationType="none">
+    <Modal transparent animationType="none" onRequestClose={closeMenu}>
       <View className="flex-1 flex-row">
         <TouchableWithoutFeedback onPress={closeMenu}>
           <Animated.View
             className="flex-1 bg-black/50"
-            style={{ opacity: fadeAnim }}
+            style={backdropAnimatedStyle}
           />
         </TouchableWithoutFeedback>
 
         <Animated.View
           className="h-full bg-white shadow-lg"
-          style={{
-            width: MENU_WIDTH,
-            transform: [{ translateX: slideAnim }],
-          }}
+          style={[{ width: menuWidth }, panelAnimatedStyle]}
         >
           <SafeAreaView className="flex-1">
             {/* User Header */}

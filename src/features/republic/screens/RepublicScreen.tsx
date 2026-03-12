@@ -1,16 +1,13 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
 import { ActivityIndicator, Text, View } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-
-import Tabs from "@/src/components/Tabs";
-import { AccountsTab } from "@/src/components/Tabs/Accounts";
-import { ResidentsTab } from "@/src/components/Tabs/Residents";
-import { ResumeTab } from "@/src/components/Tabs/Resume";
-
-import { EditRepublicModal } from "@/src/components/Modals/EditRepublicModal";
 import { SideMenu } from "@/src/components/SideMenu";
 import { useSideMenu } from "@/src/components/SideMenu/useSideMenu";
-
+import Tabs from "@/src/components/Tabs";
+import { ResumeTab } from "@/src/components/Tabs/Resume";
+import { AccountsTab } from "@/src/features/accounts";
+import { EditRepublicModal } from "@/src/features/republic/components/EditRepublicModal";
+import { ResidentsTab } from "@/src/features/residents";
 import { RepublicHeader } from "../components/RepublicHeader";
 import { useRepublicScreen } from "../hooks/useRepublicScreen";
 
@@ -22,6 +19,7 @@ export function RepublicScreen({ republicId }: Props) {
   const {
     republic,
     residents,
+    residentsCount,
     tab,
     setTab,
     isLoading,
@@ -35,6 +33,7 @@ export function RepublicScreen({ republicId }: Props) {
     handleSignOut,
     userMenu,
     currentUserRole,
+    currentResidentId,
   } = useRepublicScreen(republicId);
 
   const { menuItems, footerItems } = useSideMenu(
@@ -66,6 +65,7 @@ export function RepublicScreen({ republicId }: Props) {
     <View className="flex-1 bg-[#FAFAFA]">
       <RepublicHeader
         republic={republic}
+        numberResidents={residentsCount}
         isFavorited={isFavorited}
         onEdit={() => setShowEditModal(true)}
         onToggleFavorite={toggleFavorite}
@@ -75,9 +75,16 @@ export function RepublicScreen({ republicId }: Props) {
       <View className="flex-1 p-4">
         <Tabs value={tab} onChange={setTab} />
 
-        {tab === "contas" && <AccountsTab />}
+        {tab === "contas" && (
+          <AccountsTab
+            republicId={republicId}
+            currentResidentId={currentResidentId}
+          />
+        )}
         {tab === "moradores" && <ResidentsTab residents={residents} />}
-        {tab === "resumo" && <ResumeTab />}
+        {tab === "resumo" && (
+          <ResumeTab residents={residents} republicId={republicId} />
+        )}
       </View>
 
       <EditRepublicModal

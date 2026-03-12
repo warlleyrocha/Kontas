@@ -2,12 +2,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 
 import { useAuth } from "@/src/features/auth/contexts";
-import { useResidents } from "@/src/hooks/useResidents";
+import { useResidents } from "@/src/features/residents/hooks/useResidents";
 import { useRepublicList } from "./useRepublicList";
 import { useRepublicActions } from "./useRepublicActions";
+import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
-import type { TabKey } from "@/src/types/tabs";
+import type { TabKey } from "@/src/shared/types/tabs";
 
 import { showToast } from "@/src/utils/showToast";
 import { toastErrors } from "@/src/utils/toastMessages";
@@ -22,6 +23,7 @@ export function useRepublicScreen(republicId: string) {
     useRepublicActions();
 
   const { residents, fetchResidents } = useResidents();
+  const { registerRefresh } = useRefresh();
 
   const [republic, setRepublic] = useState<RepublicResponse | null>(null);
   const [tab, setTab] = useState<TabKey>("contas");
@@ -67,6 +69,22 @@ export function useRepublicScreen(republicId: string) {
       fetchResidents(republic.id);
     }
   }, [republic?.id, fetchResidents]);
+
+  // 🔹 Registrar refresh global (república + moradores)
+  const fetchData = useCallback(async () => {
+    const data = await fetchRepublicById(republicId);
+    if (data) {
+      setRepublic(data);
+      await fetchResidents(data.id);
+    }
+  }, [republicId, fetchRepublicById, fetchResidents]);
+
+  useEffect(() => {
+    return registerRefresh(`republic-${republicId}`, fetchData);
+  }, [registerRefresh, republicId, fetchData]);
+
+  // Obtém numero de moradores
+  const residentsCount = residents.length;
 
   const toggleFavorite = useCallback(() => {
     setIsFavorited((prev) => {
@@ -114,18 +132,21 @@ export function useRepublicScreen(republicId: string) {
     [user?.nome, user?.fotoPerfil, user?.email]
   );
 
-  const currentUserRole = useMemo(() => {
+  const currentResident = useMemo(() => {
     if (!user?.email) return null;
     const normalizedEmail = user.email.toLowerCase();
-    const currentUser = residents.find(
+    return residents.find(
       (resident) => resident.email.toLowerCase() === normalizedEmail
     );
-    return currentUser?.role ?? null;
   }, [residents, user?.email]);
+
+  const currentUserRole = currentResident?.role ?? null;
+  const currentResidentId = currentResident?.id ?? null;
 
   return {
     republic,
     residents,
+    residentsCount,
     tab,
     setTab,
     isLoading,
@@ -139,5 +160,6 @@ export function useRepublicScreen(republicId: string) {
     handleSignOut,
     userMenu,
     currentUserRole,
+    currentResidentId,
   };
 }

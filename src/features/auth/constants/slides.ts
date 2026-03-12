@@ -32,3 +32,5 @@ export const slides = [
     color: "#059669",
   },
 ];
+
+export type OnboardingSlide = (typeof slides)[number];

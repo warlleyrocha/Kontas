@@ -1,16 +1,62 @@
-import React from "react";
+import React, { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
 import EmptyRepublic from "@/src/features/user/components/CardsProfile/EmptyRepublic";
 import IncompleteProfile from "@/src/features/user/components/CardsProfile/IncompleteProfile";
 import RepublicList from "@/src/features/user/components/CardsProfile/RepublicList";
 import { EditProfileModal } from "@/src/features/user/components/EditProfileModal";
-import RepublicCard from "@/src/features/user/components/RepublicCard";
 
 import { MenuButton, SideMenu } from "@/src/components/SideMenu";
 import { maskPhone } from "@/src/utils/inputMasks";
 
 import { useProfileScreen } from "../hooks/useProfileScreen";
+
+interface ProfileContentProps {
+  readonly perfilCompleto: boolean;
+  readonly republicsLength: number;
+  readonly republics: ReturnType<typeof useProfileScreen>["republics"];
+  readonly refreshing: boolean;
+  readonly onContinueIncomplete: () => void;
+  readonly onCreateRepublic: () => void;
+  readonly onViewInvites: () => void;
+  readonly onSelectRepublic: (republicId: string) => void;
+  readonly onRefresh: () => void;
+}
+
+function ProfileContent({
+  perfilCompleto,
+  republicsLength,
+  republics,
+  refreshing,
+  onContinueIncomplete,
+  onCreateRepublic,
+  onViewInvites,
+  onSelectRepublic,
+  onRefresh,
+}: ProfileContentProps) {
+  if (!perfilCompleto) {
+    return <IncompleteProfile onContinue={onContinueIncomplete} />;
+  }
+
+  if (republicsLength === 0) {
+    return (
+      <EmptyRepublic
+        onCreateRepublic={onCreateRepublic}
+        onViewInvites={onViewInvites}
+      />
+    );
+  }
+
+  return (
+    <RepublicList
+      republics={republics}
+      onSelectRepublic={onSelectRepublic}
+      onCreateRepublic={onCreateRepublic}
+      refreshing={refreshing}
+      onRefresh={onRefresh}
+    />
+  );
+}
 
 export function ProfileScreen() {
   const {
@@ -26,7 +72,7 @@ export function ProfileScreen() {
     handleSaveProfile,
     handleCreateRepublic,
     handleViewInvites,
-    handleEditRepublic,
+    //handleEditRepublic,
     handleSelectRepublic,
     onRefresh,
 
@@ -35,47 +81,21 @@ export function ProfileScreen() {
     sideMenuUser,
   } = useProfileScreen();
 
+  const [profileImageError, setProfileImageError] = useState(false);
+
   if (!user) return null;
-
-  const renderContent = () => {
-    if (!user.perfilCompleto) {
-      return (
-        <IncompleteProfile onContinue={() => setShowEditProfileModal(true)} />
-      );
-    }
-
-    if (user.perfilCompleto && republics.length === 0) {
-      return (
-        <EmptyRepublic
-          onCreateRepublic={handleCreateRepublic}
-          onViewInvites={handleViewInvites}
-        />
-      );
-    }
-
-    return (
-      <RepublicList
-        republics={republics}
-        onEditRepublic={handleEditRepublic}
-        onSelectRepublic={handleSelectRepublic}
-        onCreateRepublic={handleCreateRepublic}
-        RepublicCard={RepublicCard}
-        refreshing={refreshing}
-        onRefresh={onRefresh}
-      />
-    );
-  };
 
   return (
     <View className="flex-1 bg-[#FAFAFA]">
       {/* HEADER */}
       <View className="mt-[24px] flex-row items-center gap-3 border-b border-b-black/10 bg-[#FAFAFA] px-[16px] py-4">
         <View className="h-[50px] w-[50px] items-center justify-center overflow-hidden rounded-full bg-gray-200">
-          {user.fotoPerfil ? (
+          {user.fotoPerfil && !profileImageError ? (
             <Image
               source={{ uri: user.fotoPerfil }}
               style={{ width: 50, height: 50, borderRadius: 25 }}
               resizeMode="cover"
+              onError={() => setProfileImageError(true)}
             />
           ) : (
             <Text className="text-xl font-bold text-gray-500">
@@ -96,7 +116,17 @@ export function ProfileScreen() {
       </View>
 
       {/* CONTENT */}
-      {renderContent()}
+      <ProfileContent
+        perfilCompleto={user.perfilCompleto}
+        republicsLength={republics.length}
+        republics={republics}
+        refreshing={refreshing}
+        onContinueIncomplete={() => setShowEditProfileModal(true)}
+        onCreateRepublic={handleCreateRepublic}
+        onViewInvites={handleViewInvites}
+        onSelectRepublic={handleSelectRepublic}
+        onRefresh={onRefresh}
+      />
 
       {/* MENU LATERAL */}
       {isMenuOpen && sideMenuUser && (

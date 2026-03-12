@@ -2,7 +2,7 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import React, { JSX } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
-import type { Tab, TabsProps } from "@/src/types/tabs";
+import type { Tab, TabsProps } from "@/src/shared/types/tabs";
 
 /* Tabs definidas */
 const tabs: Tab[] = [

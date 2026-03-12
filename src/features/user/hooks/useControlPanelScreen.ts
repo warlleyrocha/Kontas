@@ -5,7 +5,8 @@ import { useAuth } from "@/src/features/auth/contexts";
 import { useInvites } from "@/src/features/invites/hooks/useInvite";
 import { useRepublicList } from "../../republic/hooks/useRepublicList";
 import { useRepublicActions } from "../../republic/hooks/useRepublicActions";
-import { useRepublicResidents } from "@/src/hooks/useRepublicResidents";
+import { useRepublicResidents } from "@/src/shared/hooks/useRepublicResidents";
+import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import { showToast } from "@/src/utils/showToast";
 
@@ -26,11 +27,12 @@ export function useControlPanelScreen() {
     error: inviteError,
   } = useInvites();
 
+  const { refreshing, onRefresh, registerRefresh } = useRefresh();
+
   const [inviteRepublicId, setInviteRepublicId] = useState<string | undefined>(
     undefined
   );
   const [modalOpen, setModalOpen] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
   const [selectedRepublic, setSelectedRepublic] =
     useState<RepublicResponse | null>(null);
 
@@ -38,11 +40,9 @@ export function useControlPanelScreen() {
     fetchRepublics();
   }, [fetchRepublics]);
 
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await fetchRepublics();
-    setRefreshing(false);
-  }, [fetchRepublics]);
+  useEffect(() => {
+    return registerRefresh("control-panel", fetchRepublics);
+  }, [registerRefresh, fetchRepublics]);
 
   const handleDeleteRepublic = useCallback(
     async (republicId: string) => {
