@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, {
   AxiosError,
+  isAxiosError,
   type AxiosRequestConfig,
   type InternalAxiosRequestConfig,
 } from "axios";
@@ -223,13 +224,13 @@ api.interceptors.response.use(
       return Promise.reject(knownError);
     }
 
-    if (!axios.isAxiosError(error)) {
+    if (!isAxiosError(error)) {
       return Promise.reject(
         error instanceof Error ? error : new Error(String(error))
       );
     }
 
-    const axiosError = error as AxiosError;
+    const axiosError = error;
     const config = axiosError.config as RequestConfig | undefined;
     const wasHalfOpen = Boolean(config?._cbHalfOpen);
 
