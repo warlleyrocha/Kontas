@@ -1,5 +1,5 @@
 import { Feather } from "@expo/vector-icons";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -11,6 +11,10 @@ export default function CheckEmail() {
   );
 
   const inputRefs = useRef<(TextInput | null)[]>([]);
+
+  useEffect(() => {
+    inputRefs.current[0]?.focus();
+  }, []);
 
   const handleChangeText = (text: string, id: string) => {
     const index = code.findIndex((s) => s.id === id);
@@ -98,7 +102,6 @@ export default function CheckEmail() {
                 className="w-12 h-14 border-2 border-gray-300 rounded-lg text-center text-xl font-bold"
                 style={{ borderColor: slot.value ? "#6366f1" : "#d1d5db" }}
                 selectTextOnFocus
-                autoFocus={index === 0}
               />
             ))}
           </View>
