@@ -48,16 +48,19 @@ export function useAccountActions({
   );
 
   useEffect(() => {
+    const pendingDeleteTimeouts = pendingDeleteTimeoutsRef.current;
+    const pendingDeleteToastIds = pendingDeleteToastIdsRef.current;
+
     return () => {
-      pendingDeleteTimeoutsRef.current.forEach((timeoutId) => {
+      pendingDeleteTimeouts.forEach((timeoutId) => {
         clearTimeout(timeoutId);
       });
-      pendingDeleteTimeoutsRef.current.clear();
+      pendingDeleteTimeouts.clear();
 
-      pendingDeleteToastIdsRef.current.forEach((toastId) => {
+      pendingDeleteToastIds.forEach((toastId) => {
         toast.dismiss(toastId);
       });
-      pendingDeleteToastIdsRef.current.clear();
+      pendingDeleteToastIds.clear();
     };
   }, []);
 
