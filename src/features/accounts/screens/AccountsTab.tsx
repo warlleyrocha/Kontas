@@ -1,5 +1,5 @@
 import { Feather } from "@expo/vector-icons";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import {
   AccountSection,
@@ -7,6 +7,7 @@ import {
   AddAccountModal,
 } from "@/src/features/accounts/components";
 import { useAccountsTab } from "@/src/features/accounts/hooks/useAccountsTab";
+import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { formatMounthYear } from "@/src/utils/formats";
 
 interface AccountsTabProps {
@@ -44,6 +45,8 @@ export function AccountsTab({
     togglePaidAccounts,
     updatingResidentById,
   } = useAccountsTab({ republicId });
+
+  const { refreshing, onRefresh } = useRefresh();
 
   if (loading) {
     return (
@@ -104,6 +107,9 @@ export function AccountsTab({
     <View className="flex-1">
       <ScrollView
         contentContainerStyle={{ paddingVertical: 12, paddingBottom: 88 }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
         <View className="mb-4 px-4">
           <Text className="mb-2 text-sm font-semibold text-gray-700">

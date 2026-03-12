@@ -1,10 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, RefreshControl, ScrollView, Text, View } from "react-native";
 import type { ResidentResponse } from "@/src/shared/types/resident.types";
 import { MoradorRow } from "./MoradorRow";
 import { ResumoCard } from "./ResumoCard";
 import { useResumeTab } from "./useResumeTab";
+import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 
 interface Props {
   residents: ResidentResponse[];
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export const ResumeTab = ({ residents, republicId }: Props) => {
+  const { refreshing, onRefresh } = useRefresh();
   const {
     contas,
     isLoadingContas,
@@ -51,7 +53,12 @@ export const ResumeTab = ({ residents, republicId }: Props) => {
   ];
 
   return (
-    <ScrollView contentContainerStyle={{ paddingVertical: 12 }}>
+    <ScrollView
+      contentContainerStyle={{ paddingVertical: 12 }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <View className="flex-row flex-wrap justify-between">
         {resumoCards.map((card) => (
           <ResumoCard key={card.label} {...card} isLoading={isLoadingContas} />

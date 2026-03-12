@@ -6,6 +6,7 @@ import { useAccountData } from "./useAccountData";
 import { useAccountDerivedData } from "./useAccountDerivedData";
 import { useAccountFilters } from "./useAccountFilters";
 import { useAccountResidents } from "../useAccountResidents";
+import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 
 interface UseAccountListProps {
   readonly republicId: string;
@@ -46,6 +47,12 @@ export function useAccountList({ republicId }: UseAccountListProps) {
   useEffect(() => {
     void refresh();
   }, [refresh]);
+
+  const { registerRefresh } = useRefresh();
+
+  useEffect(() => {
+    return registerRefresh(`accounts-${republicId}`, refresh);
+  }, [registerRefresh, republicId, refresh]);
 
   return {
     // Estado

@@ -5,6 +5,7 @@ import { useAuth } from "@/src/features/auth/contexts";
 import { useResidents } from "@/src/features/residents/hooks/useResidents";
 import { useRepublicList } from "./useRepublicList";
 import { useRepublicActions } from "./useRepublicActions";
+import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import type { TabKey } from "@/src/shared/types/tabs";
@@ -22,6 +23,7 @@ export function useRepublicScreen(republicId: string) {
     useRepublicActions();
 
   const { residents, fetchResidents } = useResidents();
+  const { registerRefresh } = useRefresh();
 
   const [republic, setRepublic] = useState<RepublicResponse | null>(null);
   const [tab, setTab] = useState<TabKey>("contas");
@@ -67,6 +69,19 @@ export function useRepublicScreen(republicId: string) {
       fetchResidents(republic.id);
     }
   }, [republic?.id, fetchResidents]);
+
+  // 🔹 Registrar refresh global (república + moradores)
+  const fetchData = useCallback(async () => {
+    const data = await fetchRepublicById(republicId);
+    if (data) {
+      setRepublic(data);
+      await fetchResidents(data.id);
+    }
+  }, [republicId, fetchRepublicById, fetchResidents]);
+
+  useEffect(() => {
+    return registerRefresh(`republic-${republicId}`, fetchData);
+  }, [registerRefresh, republicId, fetchData]);
 
   // Obtém numero de moradores
   const residentsCount = residents.length;

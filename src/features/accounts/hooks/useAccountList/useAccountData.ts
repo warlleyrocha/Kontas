@@ -1,5 +1,5 @@
 // fetch, estado bruto, error, loading
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import { accountService } from "@/src/features/accounts/services/account.service";
 import { accountResidentsService } from "../../services/account-residents.service";
@@ -26,14 +26,18 @@ export function useAccountData({
   const [contas, setContas] = useState<Conta[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const hasLoadedRef = useRef(false);
 
   const fetchAccounts = useCallback(async (): Promise<Conta[]> => {
-    setLoading(true);
+    if (!hasLoadedRef.current) {
+      setLoading(true);
+    }
     setError(null);
 
     try {
       const data = await accountService.listarContasPorRepublica(republicId);
       setContas(data);
+      hasLoadedRef.current = true;
       return data;
     } catch (err) {
       const message = getErrorMessage(

@@ -1,9 +1,10 @@
 import type { ResidentResponse } from "@/src/shared/types/resident.types";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, RefreshControl, Text, View } from "react-native";
 import { ResidentCard } from "@/src/features/residents/components/ResidentCard";
 import { useTabResidents } from "@/src/features/residents/hooks/useTabResidents";
+import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 
 interface ResidentsTabProps {
   residents: ResidentResponse[];
@@ -11,6 +12,7 @@ interface ResidentsTabProps {
 
 export const ResidentsTab: React.FC<ResidentsTabProps> = ({ residents }) => {
   const { copiarChavePix } = useTabResidents();
+  const { refreshing, onRefresh } = useRefresh();
 
   const renderMorador = ({ item }: { item: ResidentResponse }) => {
     return <ResidentCard morador={item} onCopyPix={copiarChavePix} />;
@@ -37,6 +39,9 @@ export const ResidentsTab: React.FC<ResidentsTabProps> = ({ residents }) => {
         ListEmptyComponent={renderEmptyState}
         contentContainerStyle={{ paddingBottom: 130 }}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       />
     </View>
   );

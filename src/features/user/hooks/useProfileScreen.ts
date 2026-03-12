@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 
 import { useAuth } from "@/src/features/auth/contexts";
 import { useRepublicList } from "@/src/features/republic/hooks/useRepublicList";
+import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 
 import { useSideMenu } from "@/src/components/SideMenu/useSideMenu";
 
@@ -17,9 +18,10 @@ export function useProfileScreen() {
   const { user, logout, completeProfile, updateUser } = useAuth();
   const { republics, fetchRepublics } = useRepublicList();
 
+  const { refreshing, onRefresh, registerRefresh } = useRefresh();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
 
   const handleSignOut = useCallback(async () => {
     try {
@@ -103,11 +105,9 @@ export function useProfileScreen() {
     fetchRepublics();
   }, [user?.perfilCompleto, fetchRepublics]);
 
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await fetchRepublics();
-    setRefreshing(false);
-  }, [fetchRepublics]);
+  useEffect(() => {
+    return registerRefresh("profile", fetchRepublics);
+  }, [registerRefresh, fetchRepublics]);
 
   const { menuItems, footerItems } = useSideMenu("profile", handleSignOut);
 
