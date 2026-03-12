@@ -109,9 +109,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.log("🔵 Iniciando login com Google...");
         const data = await authService.googleLogin(googleToken);
 
-        // Salvar no AsyncStorage
-        await AsyncStorage.setItem("@app:token", data.token);
-        await AsyncStorage.setItem("@app:user", JSON.stringify(data.user));
+        // Salvar no AsyncStorage em paralelo
+        await Promise.all([
+          AsyncStorage.setItem("@app:token", data.token),
+          AsyncStorage.setItem("@app:user", JSON.stringify(data.user)),
+        ]);
 
         // Atualizar estado
         setUser(data.user);
