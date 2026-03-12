@@ -3,7 +3,7 @@ import { useState } from "react";
 import { republicService } from "../services/republic.service";
 import { useRouter } from "expo-router";
 import type { RepublicPost } from "../types/republic.types";
-import { showToast } from "@/src/utils/showToast";
+import { showToast } from "@/src/shared/utils/showToast";
 
 export function useRepublicActions() {
   const router = useRouter();

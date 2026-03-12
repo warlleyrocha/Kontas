@@ -1,10 +1,10 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import React from "react";
 import { ActivityIndicator, Text, View } from "react-native";
-import { SideMenu } from "@/src/components/SideMenu";
-import { useSideMenu } from "@/src/components/SideMenu/useSideMenu";
-import Tabs from "@/src/components/Tabs";
-import { ResumeTab } from "@/src/components/Tabs/Resume";
+import { SideMenu } from "@/src/shared/components/SideMenu";
+import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
+import Tabs from "@/src/shared/components/Tabs";
+import { ResumeTab } from "@/src/shared/components/Tabs/Resume";
 import { AccountsTab } from "@/src/features/accounts";
 import { EditRepublicModal } from "@/src/features/republic/components/EditRepublicModal";
 import { ResidentsTab } from "@/src/features/residents";
@@ -40,7 +40,7 @@ export function RepublicScreen({ republicId }: Props) {
     "home",
     handleSignOut,
     republic?.id,
-    currentUserRole
+    currentUserRole,
   );
 
   if (isLoading) {

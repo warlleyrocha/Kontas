@@ -3,7 +3,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
-import { MenuButton, SideMenu } from "@/src/components/SideMenu";
+import { MenuButton, SideMenu } from "@/src/shared/components/SideMenu";
 import { InvitesInboxContent } from "@/src/features/invites/components/InvitesInboxContent";
 import { useInvitesScreen } from "../hooks/useInvitesScreen";
 import { useInvites } from "../hooks/useInvite";

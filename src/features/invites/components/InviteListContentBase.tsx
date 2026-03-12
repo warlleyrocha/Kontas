@@ -1,4 +1,4 @@
-import { EmptyState } from "@/src/components/EmptyState";
+import { EmptyState } from "@/src/shared/components/EmptyState";
 import { type ComponentProps, type ReactNode } from "react";
 import { ScrollView } from "react-native";
 

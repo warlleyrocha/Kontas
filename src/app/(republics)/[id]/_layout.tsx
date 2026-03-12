@@ -1,4 +1,4 @@
-import { RouteErrorFallback } from "@/src/components/error-boundary/RouteErrorFallback";
+import { RouteErrorFallback } from "@/src/shared/components/error-boundary/RouteErrorFallback";
 import { Stack, type ErrorBoundaryProps } from "expo-router";
 
 export default function RepublicLayout() {

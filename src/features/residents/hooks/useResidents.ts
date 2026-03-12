@@ -1,6 +1,6 @@
 import { residentService } from "@/src/features/residents/services/resident.service";
 import { getErrorMessage } from "@/src/services/httpError";
-import { showToast } from "@/src/utils/showToast";
+import { showToast } from "@/src/shared/utils/showToast";
 import { ResidentResponse } from "@/src/shared/types/resident.types";
 import { useCallback, useState } from "react";
 
@@ -29,7 +29,7 @@ export function useResidents(): UseResidentReturn {
     } catch (error) {
       console.error("Erro ao buscar moradores:", error);
       showToast.error(
-        getErrorMessage(error, "Não foi possível carregar os moradores.")
+        getErrorMessage(error, "Não foi possível carregar os moradores."),
       );
       return null;
     } finally {

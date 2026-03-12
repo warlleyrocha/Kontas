@@ -10,10 +10,10 @@ import {
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Feather } from "@expo/vector-icons";
 
-import Header from "@/src/components/Header";
+import Header from "@/src/shared/components/Header";
 import { EditRepublicModal } from "@/src/features/republic/components/EditRepublicModal";
 import { InviteModal } from "@/src/features/invites/components/InviteModal";
-import LoadingScreen from "@/src/components/ui/loading-screen";
+import LoadingScreen from "@/src/shared/components/ui/loading-screen";
 
 import { useControlPanelScreen } from "../hooks/useControlPanelScreen";
 

@@ -8,7 +8,7 @@ import React, {
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import Header from "@/src/components/Header";
+import Header from "@/src/shared/components/Header";
 import {
   PaymentsEmptyState,
   PaymentsErrorState,
@@ -24,7 +24,7 @@ import type {
 import { accountResidentsService } from "@/src/features/accounts/services/account-residents.service";
 import { getMoradorStatusVisual } from "@/src/features/accounts/utils/accountStatus.utils";
 import { getErrorMessage } from "@/src/services/httpError";
-import { showToast } from "@/src/utils/showToast";
+import { showToast } from "@/src/shared/utils/showToast";
 
 type PaymentsState = {
   accounts: PaymentAccount[];

@@ -2,8 +2,8 @@ import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 
 import { useAuth } from "@/src/features/auth/contexts";
-import { useSideMenu } from "@/src/components/SideMenu/useSideMenu";
-import { toastErrors } from "@/src/utils/toastMessages";
+import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
+import { toastErrors } from "@/src/shared/utils/toastMessages";
 
 export function useInvitesScreen() {
   const router = useRouter();

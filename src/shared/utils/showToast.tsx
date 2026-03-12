@@ -1,5 +1,5 @@
 // utils/showToast.tsx
-import { Toast } from "@/src/components/ui/toast-custom";
+import { Toast } from "@/src/shared/components/ui/toast-custom";
 import { ReactNode } from "react";
 import { toast } from "sonner-native";
 

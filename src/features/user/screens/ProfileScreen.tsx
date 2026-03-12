@@ -6,8 +6,8 @@ import IncompleteProfile from "@/src/features/user/components/CardsProfile/Incom
 import RepublicList from "@/src/features/user/components/CardsProfile/RepublicList";
 import { EditProfileModal } from "@/src/features/user/components/EditProfileModal";
 
-import { MenuButton, SideMenu } from "@/src/components/SideMenu";
-import { maskPhone } from "@/src/utils/inputMasks";
+import { MenuButton, SideMenu } from "@/src/shared/components/SideMenu";
+import { maskPhone } from "@/src/shared/utils/inputMasks";
 
 import { useProfileScreen } from "../hooks/useProfileScreen";
 

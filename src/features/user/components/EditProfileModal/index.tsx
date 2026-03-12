@@ -14,7 +14,7 @@ import {
   EditProfileFormValues,
   useEditProfile,
 } from "../../hooks/useEditProfile";
-import { maskPhoneWrite } from "@/src/utils/inputMasks";
+import { maskPhoneWrite } from "@/src/shared/utils/inputMasks";
 
 export interface EditProfileModalProps extends EditProfileFormValues {
   visible: boolean;

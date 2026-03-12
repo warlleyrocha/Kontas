@@ -1,5 +1,5 @@
 import { ResidentResponse } from "@/src/shared/types/resident.types";
-import { showToast } from "@/src/utils/showToast";
+import { showToast } from "@/src/shared/utils/showToast";
 import * as Clipboard from "expo-clipboard";
 
 export const useTabResidents = () => {

@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
-import { MenuButton, SideMenu } from "@/src/components/SideMenu";
+import { MenuButton, SideMenu } from "@/src/shared/components/SideMenu";
 
 import { InvitesSentContent } from "../components/InvitesSentContent";
 import { useInvitesScreen } from "../hooks/useInvitesScreen";

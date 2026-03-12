@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity } from "react-native";
-import { formatDate } from "@/src/utils/formats";
+import { formatDate } from "@/src/shared/utils/formats";
 import { Ionicons } from "@expo/vector-icons";
 
 interface InviteCardProps {

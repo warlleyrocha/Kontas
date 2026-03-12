@@ -14,7 +14,7 @@ import {
 } from "@/src/features/accounts/components";
 import { useAccountsTab } from "@/src/features/accounts/hooks/useAccountsTab";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
-import { formatMounthYear } from "@/src/utils/formats";
+import { formatMounthYear } from "@/src/shared/utils/formats";
 
 interface AccountsTabProps {
   readonly republicId: string;

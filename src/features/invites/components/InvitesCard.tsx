@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Text, View } from "react-native";
 
-import { formatDate } from "@/src/utils/formats";
+import { formatDate } from "@/src/shared/utils/formats";
 
 import { getInviteStatusStyle } from "../constants/inviteStatusStyles";
 import type { Invite } from "../types/invite.types";

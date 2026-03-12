@@ -3,7 +3,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useEffect, useState } from "react";
 import { Alert } from "react-native";
 import { getErrorMessage } from "@/src/services/httpError";
-import { showToast } from "@/src/utils/showToast";
+import { showToast } from "@/src/shared/utils/showToast";
 
 interface UseEditRepublicModalParams {
   visible: boolean;
@@ -61,7 +61,7 @@ export default function useEditRepublicModal({
       if (status !== "granted") {
         Alert.alert(
           "Permissão necessária",
-          "Precisamos de permissão para acessar suas fotos."
+          "Precisamos de permissão para acessar suas fotos.",
         );
         return;
       }
@@ -80,7 +80,7 @@ export default function useEditRepublicModal({
     } catch (error) {
       console.error("Erro ao selecionar imagem:", error);
       showToast.error(
-        getErrorMessage(error, "Não foi possível selecionar a imagem.")
+        getErrorMessage(error, "Não foi possível selecionar a imagem."),
       );
     }
   };
@@ -114,7 +114,7 @@ export default function useEditRepublicModal({
     } catch (error) {
       console.error("Erro ao salvar dados da república:", error);
       showToast.error(
-        getErrorMessage(error, "Não foi possível salvar as alterações.")
+        getErrorMessage(error, "Não foi possível salvar as alterações."),
       );
     } finally {
       setIsUploading(false);

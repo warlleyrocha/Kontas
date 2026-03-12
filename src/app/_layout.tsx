@@ -1,8 +1,8 @@
-import LoadingScreen from "@/src/components/ui/loading-screen";
-import { Toaster } from "@/src/components/ui/sonner";
+import LoadingScreen from "@/src/shared/components/ui/loading-screen";
+import { Toaster } from "@/src/shared/components/ui/sonner";
 import { AuthProvider, useAuth } from "@/src/features/auth/contexts";
 import { RefreshProvider } from "@/src/shared/contexts/RefreshContext";
-import { GlobalErrorBoundary } from "@/src/components/error-boundary/GlobalErrorBoundary";
+import { GlobalErrorBoundary } from "@/src/shared/components/error-boundary/GlobalErrorBoundary";
 import {
   Inter_300Light,
   Inter_400Regular,

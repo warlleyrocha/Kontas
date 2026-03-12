@@ -7,7 +7,7 @@ import {
   User,
 } from "@/src/features/auth/types/auth.types";
 import { UpdateUserRequest } from "@/src/features/user/types/user.types";
-import { showToast } from "@/src/utils/showToast";
+import { showToast } from "@/src/shared/utils/showToast";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { router } from "expo-router";
@@ -129,7 +129,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
       }
     },
-    []
+    [],
   );
 
   // Logout
@@ -189,7 +189,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
       }
     },
-    []
+    [],
   );
 
   // Atualizar dados do usuário
@@ -239,7 +239,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       logout,
       updateUser,
       completeProfile,
-    ]
+    ],
   );
 
   return (

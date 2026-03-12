@@ -1,4 +1,4 @@
-import InputField from "@/src/components/ui/input-field";
+import InputField from "@/src/shared/components/ui/input-field";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
 import {

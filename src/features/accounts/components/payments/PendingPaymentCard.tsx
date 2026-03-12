@@ -7,7 +7,7 @@ import type {
   PaymentStatusFilter,
 } from "@/src/features/accounts/types/payments.types";
 import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
-import { formatDate } from "@/src/utils/formats";
+import { formatDate } from "@/src/shared/utils/formats";
 
 import { PendingPaymentResidentCard } from "./PendingPaymentResidentCard";
 
@@ -16,7 +16,7 @@ interface PendingPaymentCardProps {
   readonly confirmingResidentById: Record<string, boolean>;
   readonly onConfirmResidentPayment: (
     accountId: string,
-    residentId: string
+    residentId: string,
   ) => Promise<void> | void;
   readonly selectedStatus: PaymentStatusFilter;
 }

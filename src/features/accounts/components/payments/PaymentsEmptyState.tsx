@@ -1,6 +1,6 @@
 import React from "react";
 
-import { EmptyState } from "@/src/components/EmptyState";
+import { EmptyState } from "@/src/shared/components/EmptyState";
 import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import type { PaymentStatusFilter } from "@/src/features/accounts/types/payments.types";
 

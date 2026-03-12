@@ -6,11 +6,11 @@ import { useAuth } from "@/src/features/auth/contexts";
 import { useRepublicList } from "@/src/features/republic/hooks/useRepublicList";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 
-import { useSideMenu } from "@/src/components/SideMenu/useSideMenu";
+import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
 
-import { maskPhone } from "@/src/utils/inputMasks";
-import { showToast } from "@/src/utils/showToast";
-import { toastErrors } from "@/src/utils/toastMessages";
+import { maskPhone } from "@/src/shared/utils/inputMasks";
+import { showToast } from "@/src/shared/utils/showToast";
+import { toastErrors } from "@/src/shared/utils/toastMessages";
 
 export function useProfileScreen() {
   const router = useRouter();
@@ -42,7 +42,7 @@ export function useProfileScreen() {
       if (isCompletingProfile && (!phone || !pixKey)) {
         Alert.alert(
           "Campos Obrigatórios",
-          "Por favor, preencha o telefone e a chave Pix."
+          "Por favor, preencha o telefone e a chave Pix.",
         );
         return;
       }
@@ -68,14 +68,14 @@ export function useProfileScreen() {
         showToast.success(
           isCompletingProfile
             ? "Perfil salvo com sucesso!"
-            : "Perfil atualizado com sucesso!"
+            : "Perfil atualizado com sucesso!",
         );
       } catch (error) {
         console.log("Erro ao salvar o perfil:", error);
         toastErrors.profileUpdateFailed(error);
       }
     },
-    [user, completeProfile, updateUser]
+    [user, completeProfile, updateUser],
   );
 
   const handleCreateRepublic = useCallback(() => {
@@ -90,14 +90,14 @@ export function useProfileScreen() {
     (id: string) => {
       router.push("/"); // ajuste depois
     },
-    [router]
+    [router],
   );
 
   const handleSelectRepublic = useCallback(
     (id: string) => {
       router.push(`/(republics)/${id}`);
     },
-    [router]
+    [router],
   );
 
   useEffect(() => {

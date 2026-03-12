@@ -1,7 +1,7 @@
 import type { ResidentResponse } from "@/src/shared/types/resident.types";
 
 import { useResidentCard } from "@/src/features/residents/hooks/useResidentCard";
-import { getInitials } from "@/src/utils/getInitials";
+import { getInitials } from "@/src/shared/utils/getInitials";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";

@@ -3,7 +3,7 @@ import { useCallback, useState } from "react";
 import { republicService } from "../services/republic.service";
 import type { RepublicResponse } from "../types/republic.types";
 import { getErrorMessage } from "@/src/services/httpError";
-import { showToast } from "@/src/utils/showToast";
+import { showToast } from "@/src/shared/utils/showToast";
 
 export function useRepublicList() {
   const [republics, setRepublics] = useState<RepublicResponse[]>([]);
@@ -16,7 +16,7 @@ export function useRepublicList() {
     } catch (error) {
       console.error("Erro ao buscar repúblicas:", error);
       showToast.error(
-        getErrorMessage(error, "Não foi possível carregar as repúblicas.")
+        getErrorMessage(error, "Não foi possível carregar as repúblicas."),
       );
       setRepublics([]);
     } finally {
@@ -32,7 +32,7 @@ export function useRepublicList() {
     } catch (error) {
       console.error("Erro ao buscar república por ID:", error);
       showToast.error(
-        getErrorMessage(error, "Não foi possível carregar a república.")
+        getErrorMessage(error, "Não foi possível carregar a república."),
       );
       return null;
     }
