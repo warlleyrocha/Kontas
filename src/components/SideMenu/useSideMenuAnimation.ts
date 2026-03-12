@@ -49,7 +49,7 @@ export function useSideMenuAnimation({
           progress.value,
           [0, 1],
           [menuWidth, 0],
-          Extrapolation.CLAMP,
+          Extrapolation.CLAMP
         ),
       },
     ],

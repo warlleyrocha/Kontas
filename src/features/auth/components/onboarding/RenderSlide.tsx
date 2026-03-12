@@ -26,7 +26,11 @@ const RenderSlide: React.FC<RenderSlideProps> = ({
   scrollX,
 }) => {
   const animatedStyle = useAnimatedStyle(() => {
-    const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
+    const inputRange = [
+      (index - 1) * width,
+      index * width,
+      (index + 1) * width,
+    ];
 
     return {
       transform: [
@@ -35,7 +39,7 @@ const RenderSlide: React.FC<RenderSlideProps> = ({
             scrollX.value,
             inputRange,
             [0.8, 1, 0.8],
-            Extrapolation.CLAMP,
+            Extrapolation.CLAMP
           ),
         },
       ],
@@ -43,7 +47,7 @@ const RenderSlide: React.FC<RenderSlideProps> = ({
         scrollX.value,
         inputRange,
         [0.4, 1, 0.4],
-        Extrapolation.CLAMP,
+        Extrapolation.CLAMP
       ),
     };
   });

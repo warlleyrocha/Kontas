@@ -16,7 +16,7 @@ export class AppError extends Error {
 
   constructor(
     message: string,
-    options?: { status?: number; code?: string; originalError?: unknown },
+    options?: { status?: number; code?: string; originalError?: unknown }
   ) {
     super(message);
     this.name = "AppError";
@@ -28,7 +28,7 @@ export class AppError extends Error {
 
 export const toUserFriendlyError = (
   error: unknown,
-  options: UserFriendlyErrorOptions,
+  options: UserFriendlyErrorOptions
 ): AppError => {
   if (!isAxiosError(error)) {
     if (error instanceof AppError) return error;
@@ -54,7 +54,7 @@ export const toUserFriendlyError = (
   if (isTimeout) {
     return new AppError(
       options.timeoutMessage ?? "Tempo de resposta excedido. Tente novamente.",
-      { status, code, originalError: error },
+      { status, code, originalError: error }
     );
   }
 
@@ -62,7 +62,7 @@ export const toUserFriendlyError = (
   if (hasNoResponse) {
     return new AppError(
       options.networkMessage ?? "Falha de conexão. Verifique sua internet.",
-      { status, code, originalError: error },
+      { status, code, originalError: error }
     );
   }
 
@@ -81,7 +81,7 @@ export const isUnauthorizedError = (error: unknown): boolean => {
 
 export const getErrorMessage = (
   error: unknown,
-  fallback = "Ocorreu um erro. Tente novamente.",
+  fallback = "Ocorreu um erro. Tente novamente."
 ): string => {
   if (error instanceof AppError) return error.message;
   if (error instanceof Error) return error.message;

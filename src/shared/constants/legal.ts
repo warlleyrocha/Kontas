@@ -1,7 +1,6 @@
 import { Alert, Linking } from "react-native";
 
-const TERMS_OF_USE_URL =
-  process.env.EXPO_PUBLIC_TERMS_OF_USE_URL?.trim() ?? "";
+const TERMS_OF_USE_URL = process.env.EXPO_PUBLIC_TERMS_OF_USE_URL?.trim() ?? "";
 const PRIVACY_POLICY_URL =
   process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL?.trim() ?? "";
 

@@ -19,7 +19,7 @@ export function useControlPanelScreen() {
 
   const { getResidentsCount, isAdmin } = useRepublicResidents(
     republics,
-    user?.email,
+    user?.email
   );
   const {
     sendInvite,
@@ -30,7 +30,7 @@ export function useControlPanelScreen() {
   const { refreshing, onRefresh, registerRefresh } = useRefresh();
 
   const [inviteRepublicId, setInviteRepublicId] = useState<string | undefined>(
-    undefined,
+    undefined
   );
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedRepublic, setSelectedRepublic] =
@@ -63,10 +63,10 @@ export function useControlPanelScreen() {
               await deleteRepublic(republicId);
             },
           },
-        ],
+        ]
       );
     },
-    [deleteRepublic],
+    [deleteRepublic]
   );
 
   const handleEditRepublic = useCallback(
@@ -74,7 +74,7 @@ export function useControlPanelScreen() {
       setSelectedRepublic(republic);
       setShowEditModal(true);
     },
-    [setShowEditModal],
+    [setShowEditModal]
   );
 
   const handleCloseEditModal = useCallback(() => {
@@ -93,7 +93,7 @@ export function useControlPanelScreen() {
 
       handleCloseEditModal();
     },
-    [selectedRepublic, updateRepublic, handleCloseEditModal],
+    [selectedRepublic, updateRepublic, handleCloseEditModal]
   );
 
   const handleOpenInviteModal = useCallback((republicId: string) => {

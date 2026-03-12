@@ -32,15 +32,24 @@ function RenderDotItem({
   width,
 }: RenderDotItemProps) {
   const animatedStyle = useAnimatedStyle(() => {
-    const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
+    const inputRange = [
+      (index - 1) * width,
+      index * width,
+      (index + 1) * width,
+    ];
 
     return {
-      width: interpolate(scrollX.value, inputRange, [8, 24, 8], Extrapolation.CLAMP),
+      width: interpolate(
+        scrollX.value,
+        inputRange,
+        [8, 24, 8],
+        Extrapolation.CLAMP
+      ),
       opacity: interpolate(
         scrollX.value,
         inputRange,
         [0.3, 1, 0.3],
-        Extrapolation.CLAMP,
+        Extrapolation.CLAMP
       ),
     };
   });

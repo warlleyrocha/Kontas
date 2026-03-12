@@ -1,6 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { ActivityIndicator, RefreshControl, ScrollView, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  RefreshControl,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import type { ResidentResponse } from "@/src/shared/types/resident.types";
 import { MoradorRow } from "./MoradorRow";
 import { ResumoCard } from "./ResumoCard";

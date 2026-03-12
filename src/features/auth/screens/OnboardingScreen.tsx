@@ -8,7 +8,12 @@ import {
 import { useOnboardingAnimation } from "@/src/features/auth/hooks/useOnboardingAnimation";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
-import { FlatList, type ListRenderItemInfo, useWindowDimensions, View } from "react-native";
+import {
+  FlatList,
+  type ListRenderItemInfo,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import Animated from "react-native-reanimated";
 
 export default function Onboarding() {
@@ -32,7 +37,10 @@ export default function Onboarding() {
 
   const isLastSlide = currentIndex === slides.length - 1;
 
-  const renderSlide = ({ item, index }: ListRenderItemInfo<OnboardingSlide>) => (
+  const renderSlide = ({
+    item,
+    index,
+  }: ListRenderItemInfo<OnboardingSlide>) => (
     <RenderSlide
       item={item}
       index={index}

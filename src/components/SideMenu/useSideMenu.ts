@@ -8,7 +8,7 @@ export function useSideMenu(
   context: UserMenuContext,
   handleSignOut: () => void,
   republicId?: string,
-  currentUserRole?: ResidentRole | null,
+  currentUserRole?: ResidentRole | null
 ) {
   const router = useRouter();
 
@@ -134,7 +134,7 @@ export function useSideMenu(
         onPress: () =>
           void openLegalLink(
             legalLinks.privacyPolicy,
-            "Política de Privacidade",
+            "Política de Privacidade"
           ),
       },
       {
@@ -145,7 +145,7 @@ export function useSideMenu(
         danger: true,
       },
     ],
-    [handleSignOut],
+    [handleSignOut]
   );
 
   return { menuItems, footerItems };

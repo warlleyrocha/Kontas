@@ -14,7 +14,7 @@ interface PendingPaymentsListProps {
   readonly isRefreshing: boolean;
   readonly onConfirmResidentPayment: (
     accountId: string,
-    residentId: string,
+    residentId: string
   ) => Promise<void> | void;
   readonly onRefresh: () => void;
   readonly selectedStatus: PaymentStatusFilter;

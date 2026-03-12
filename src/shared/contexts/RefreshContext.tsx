@@ -19,7 +19,9 @@ const RefreshContext = createContext<RefreshContextValue>({
   registerRefresh: () => () => {},
 });
 
-export function RefreshProvider({ children }: Readonly<{ children: React.ReactNode }>) {
+export function RefreshProvider({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   const [refreshing, setRefreshing] = useState(false);
   const callbacks = useRef<Map<string, () => Promise<void>>>(new Map());
 
@@ -30,7 +32,7 @@ export function RefreshProvider({ children }: Readonly<{ children: React.ReactNo
         callbacks.current.delete(key);
       };
     },
-    [],
+    []
   );
 
   const onRefresh = useCallback(async () => {
@@ -41,13 +43,11 @@ export function RefreshProvider({ children }: Readonly<{ children: React.ReactNo
 
   const value = useMemo(
     () => ({ refreshing, onRefresh, registerRefresh }),
-    [refreshing, onRefresh, registerRefresh],
+    [refreshing, onRefresh, registerRefresh]
   );
 
   return (
-    <RefreshContext.Provider value={value}>
-      {children}
-    </RefreshContext.Provider>
+    <RefreshContext.Provider value={value}>{children}</RefreshContext.Provider>
   );
 }
 

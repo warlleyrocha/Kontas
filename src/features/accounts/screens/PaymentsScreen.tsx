@@ -35,7 +35,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
     Record<string, boolean>
   >({});
   const [selectedStatus, setSelectedStatus] = useState<PaymentStatusFilter>(
-    StatusPagamento.AGUARDANDO_CONFIRMACAO,
+    StatusPagamento.AGUARDANDO_CONFIRMACAO
   );
 
   const loadPayments = useCallback(
@@ -56,7 +56,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
               (resident) =>
                 getMoradorStatusVisual(resident) ===
                   StatusPagamento.AGUARDANDO_CONFIRMACAO ||
-                getMoradorStatusVisual(resident) === StatusPagamento.PAGO,
+                getMoradorStatusVisual(resident) === StatusPagamento.PAGO
             );
 
             if (relevantResidents.length === 0) {
@@ -67,7 +67,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
               ...account,
               residents: relevantResidents,
             };
-          }),
+          })
         );
 
         const filteredAccounts = accountsWithPayments
@@ -75,7 +75,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
           .sort(
             (firstAccount, secondAccount) =>
               new Date(firstAccount.vencimento).getTime() -
-              new Date(secondAccount.vencimento).getTime(),
+              new Date(secondAccount.vencimento).getTime()
           );
 
         setPaymentAccounts(filteredAccounts);
@@ -87,7 +87,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
         }
       }
     },
-    [fetchAccounts, fetchAccountResidents],
+    [fetchAccounts, fetchAccountResidents]
   );
 
   useEffect(() => {
@@ -126,17 +126,17 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
                         pagoEm: new Date().toISOString(),
                         status: StatusPagamento.PAGO,
                       }
-                    : resident,
+                    : resident
                 ),
               };
             })
-            .filter((account) => account.residents.length > 0),
+            .filter((account) => account.residents.length > 0)
         );
 
         showToast.success("Pagamento marcado como PAGO.");
       } catch (error) {
         showToast.error(
-          getErrorMessage(error, "Não foi possível atualizar o pagamento."),
+          getErrorMessage(error, "Não foi possível atualizar o pagamento.")
         );
       } finally {
         setConfirmingResidentById((previousState) => {
@@ -146,7 +146,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
         });
       }
     },
-    [confirmingResidentById],
+    [confirmingResidentById]
   );
 
   const filteredPaymentAccounts = useMemo(
@@ -158,7 +158,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
           }
 
           const filteredResidents = account.residents.filter(
-            (resident) => getMoradorStatusVisual(resident) === selectedStatus,
+            (resident) => getMoradorStatusVisual(resident) === selectedStatus
           );
 
           if (filteredResidents.length === 0) {
@@ -171,16 +171,16 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
           };
         })
         .filter((account): account is PaymentAccount => account !== null),
-    [paymentAccounts, selectedStatus],
+    [paymentAccounts, selectedStatus]
   );
 
   const filteredResidentsCount = useMemo(
     () =>
       filteredPaymentAccounts.reduce(
         (total, account) => total + account.residents.length,
-        0,
+        0
       ),
-    [filteredPaymentAccounts],
+    [filteredPaymentAccounts]
   );
 
   const subtitle = useMemo(() => {

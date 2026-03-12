@@ -1,5 +1,11 @@
 import { Feather } from "@expo/vector-icons";
-import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import {
   AccountSection,

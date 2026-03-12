@@ -26,7 +26,9 @@ export function InvitesCard({ invite }: InvitesCardProps) {
           <View
             className={`ml-2 rounded-full px-3 py-1 ${statusStyle.badgeColorClass}`}
           >
-            <Text className={`text-xs font-semibold ${statusStyle.textColorClass}`}>
+            <Text
+              className={`text-xs font-semibold ${statusStyle.textColorClass}`}
+            >
               {statusStyle.label}
             </Text>
           </View>

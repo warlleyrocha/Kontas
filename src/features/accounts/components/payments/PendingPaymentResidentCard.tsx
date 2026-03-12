@@ -15,7 +15,7 @@ interface PendingPaymentResidentCardProps {
   readonly isConfirming: boolean;
   readonly onConfirmResidentPayment: (
     accountId: string,
-    residentId: string,
+    residentId: string
   ) => Promise<void> | void;
   readonly resident: ContaMorador;
 }
@@ -99,7 +99,9 @@ export function PendingPaymentResidentCard({
           <View
             className={`rounded-full px-3 py-1 ${residentStatusBadgeClass}`}
           >
-            <Text className={`text-xs font-semibold ${residentStatusTextClass}`}>
+            <Text
+              className={`text-xs font-semibold ${residentStatusTextClass}`}
+            >
               {residentStatusLabel}
             </Text>
           </View>

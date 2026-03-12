@@ -16,7 +16,7 @@ interface PendingPaymentCardProps {
   readonly confirmingResidentById: Record<string, boolean>;
   readonly onConfirmResidentPayment: (
     accountId: string,
-    residentId: string,
+    residentId: string
   ) => Promise<void> | void;
   readonly selectedStatus: PaymentStatusFilter;
 }
@@ -78,7 +78,9 @@ export function PendingPaymentCard({
           </View>
 
           <View className="items-end rounded-3xl bg-[#F5F5F7] px-4 py-3">
-            <Text className="text-xs font-medium text-gray-400">Valor total</Text>
+            <Text className="text-xs font-medium text-gray-400">
+              Valor total
+            </Text>
             <Text className="mt-1 text-lg font-semibold text-[#111827]">
               {formatCurrency(account.valor)}
             </Text>

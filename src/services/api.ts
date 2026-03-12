@@ -10,7 +10,7 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 if (!API_URL) {
   throw new Error(
-    "EXPO_PUBLIC_API_URL não definida no runtime. Verifique o build preview/production.",
+    "EXPO_PUBLIC_API_URL não definida no runtime. Verifique o build preview/production."
   );
 }
 
@@ -122,7 +122,7 @@ const isIdempotencyKeyPresent = (headers: AxiosRequestConfig["headers"]) => {
   if (!headers) return false;
   const normalized = headers as Record<string, unknown>;
   return Object.keys(normalized).some(
-    (key) => key.toLowerCase() === "idempotency-key",
+    (key) => key.toLowerCase() === "idempotency-key"
   );
 };
 
@@ -172,7 +172,7 @@ const logError = (status: number | string, url?: string, data?: unknown) => {
 
 const createCircuitOpenError = () => {
   const error = new Error(
-    "Circuit Breaker aberto: aguardando tempo de reset.",
+    "Circuit Breaker aberto: aguardando tempo de reset."
   ) as Error & { code: string };
   error.name = "CircuitBreakerError";
   error.code = CIRCUIT_OPEN_CODE;
@@ -200,7 +200,7 @@ api.interceptors.request.use(
   },
 
   (error) =>
-    Promise.reject(error instanceof Error ? error : new Error(String(error))),
+    Promise.reject(error instanceof Error ? error : new Error(String(error)))
 );
 
 // Interceptor para visualizar respostas
@@ -225,7 +225,7 @@ api.interceptors.response.use(
 
     if (!axios.isAxiosError(error)) {
       return Promise.reject(
-        error instanceof Error ? error : new Error(String(error)),
+        error instanceof Error ? error : new Error(String(error))
       );
     }
 
@@ -236,7 +236,7 @@ api.interceptors.response.use(
     logError(
       axiosError.response?.status ?? "Network Error",
       config?.url,
-      axiosError.response?.data,
+      axiosError.response?.data
     );
 
     const retryable = shouldRetry(axiosError, config);
@@ -256,7 +256,7 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(
-      error instanceof Error ? error : new Error(String(error)),
+      error instanceof Error ? error : new Error(String(error))
     );
-  },
+  }
 );

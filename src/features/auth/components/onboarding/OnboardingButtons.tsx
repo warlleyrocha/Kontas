@@ -33,7 +33,7 @@ const OnboardingButtons: React.FC<OnboardingButtonsProps> = ({
       scrollX.value,
       [0, width * 0.3, width * 0.7, width],
       [1, 0.7, 0.2, 0],
-      Extrapolation.CLAMP,
+      Extrapolation.CLAMP
     ),
   }));
 
@@ -53,7 +53,9 @@ const OnboardingButtons: React.FC<OnboardingButtonsProps> = ({
       <Animated.View
         style={[
           skipAnimatedStyle,
-          currentIndex === 0 ? { overflow: "hidden" } : { height: 0, overflow: "hidden" },
+          currentIndex === 0
+            ? { overflow: "hidden" }
+            : { height: 0, overflow: "hidden" },
         ]}
       >
         {currentIndex === 0 && (

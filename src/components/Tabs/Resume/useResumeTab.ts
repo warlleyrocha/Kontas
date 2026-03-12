@@ -1,7 +1,10 @@
 import { useAccountActions } from "@/src/features/accounts/hooks/useAccountActions";
 import { useAccountData } from "@/src/features/accounts/hooks/useAccountList/useAccountData";
 import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
-import type { Conta, ListarContasResponse } from "@/src/features/accounts/types/account.types";
+import type {
+  Conta,
+  ListarContasResponse,
+} from "@/src/features/accounts/types/account.types";
 import type { ResidentResponse } from "@/src/shared/types/resident.types";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { useCallback, useEffect, useState } from "react";
@@ -13,7 +16,7 @@ const STATUS_PENDENTE = [
 
 async function calcularDividaMorador(
   moradorId: string,
-  fetchContasPorMorador: (id: string) => Promise<ListarContasResponse>,
+  fetchContasPorMorador: (id: string) => Promise<ListarContasResponse>
 ): Promise<{ id: string; total: number }> {
   const contas = await fetchContasPorMorador(moradorId);
   const total = contas
@@ -68,8 +71,8 @@ export function useResumeTab({
     try {
       const results = await Promise.all(
         residents.map((morador) =>
-          calcularDividaMorador(morador.id, fetchContasPorMorador),
-        ),
+          calcularDividaMorador(morador.id, fetchContasPorMorador)
+        )
       );
       const map: Record<string, number> = {};
       for (const { id, total } of results) {

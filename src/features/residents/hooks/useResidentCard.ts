@@ -9,7 +9,7 @@ import {
 
 export function useResidentCard(
   morador: ResidentResponse,
-  onCopyPix: (morador: ResidentResponse) => void,
+  onCopyPix: (morador: ResidentResponse) => void
 ) {
   const [expanded, setExpanded] = useState(false);
   const [copiado, setCopiado] = useState(false);
@@ -25,7 +25,7 @@ export function useResidentCard(
       opacity: animatedOpacity.value,
       overflow: "hidden",
     }),
-    [animatedHeight, animatedOpacity],
+    [animatedHeight, animatedOpacity]
   );
 
   useEffect(() => {

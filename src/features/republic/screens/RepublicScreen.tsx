@@ -82,7 +82,9 @@ export function RepublicScreen({ republicId }: Props) {
           />
         )}
         {tab === "moradores" && <ResidentsTab residents={residents} />}
-        {tab === "resumo" && <ResumeTab residents={residents} republicId={republicId} />}
+        {tab === "resumo" && (
+          <ResumeTab residents={residents} republicId={republicId} />
+        )}
       </View>
 
       <EditRepublicModal

@@ -29,7 +29,7 @@ export function useResidents(): UseResidentReturn {
     } catch (error) {
       console.error("Erro ao buscar moradores:", error);
       showToast.error(
-        getErrorMessage(error, "Não foi possível carregar os moradores."),
+        getErrorMessage(error, "Não foi possível carregar os moradores.")
       );
       return null;
     } finally {

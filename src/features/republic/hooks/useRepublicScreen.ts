@@ -91,7 +91,7 @@ export function useRepublicScreen(republicId: string) {
       showToast.success(
         prev
           ? "República removida dos favoritos"
-          : "República adicionada aos favoritos",
+          : "República adicionada aos favoritos"
       );
       return !prev;
     });
@@ -117,10 +117,10 @@ export function useRepublicScreen(republicId: string) {
       });
 
       setRepublic((prev) =>
-        prev ? { ...prev, nome, imagemRepublica: imagem } : null,
+        prev ? { ...prev, nome, imagemRepublica: imagem } : null
       );
     },
-    [republic, updateRepublic],
+    [republic, updateRepublic]
   );
 
   const userMenu = useMemo(
@@ -129,14 +129,14 @@ export function useRepublicScreen(republicId: string) {
       photo: user?.fotoPerfil,
       email: user?.email,
     }),
-    [user?.nome, user?.fotoPerfil, user?.email],
+    [user?.nome, user?.fotoPerfil, user?.email]
   );
 
   const currentResident = useMemo(() => {
     if (!user?.email) return null;
     const normalizedEmail = user.email.toLowerCase();
     return residents.find(
-      (resident) => resident.email.toLowerCase() === normalizedEmail,
+      (resident) => resident.email.toLowerCase() === normalizedEmail
     );
   }, [residents, user?.email]);
 
