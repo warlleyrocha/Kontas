@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
 import EmptyRepublic from "@/src/features/user/components/CardsProfile/EmptyRepublic";
@@ -81,6 +81,8 @@ export function ProfileScreen() {
     sideMenuUser,
   } = useProfileScreen();
 
+  const [profileImageError, setProfileImageError] = useState(false);
+
   if (!user) return null;
 
   return (
@@ -88,11 +90,12 @@ export function ProfileScreen() {
       {/* HEADER */}
       <View className="mt-[24px] flex-row items-center gap-3 border-b border-b-black/10 bg-[#FAFAFA] px-[16px] py-4">
         <View className="h-[50px] w-[50px] items-center justify-center overflow-hidden rounded-full bg-gray-200">
-          {user.fotoPerfil ? (
+          {user.fotoPerfil && !profileImageError ? (
             <Image
               source={{ uri: user.fotoPerfil }}
               style={{ width: 50, height: 50, borderRadius: 25 }}
               resizeMode="cover"
+              onError={() => setProfileImageError(true)}
             />
           ) : (
             <Text className="text-xl font-bold text-gray-500">

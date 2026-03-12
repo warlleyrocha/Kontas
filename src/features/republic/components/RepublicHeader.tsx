@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -23,18 +23,20 @@ export function RepublicHeader({
   onMenuOpen,
 }: RepublicHeaderProps) {
   const residentsLabel = numberResidents === 1 ? "Morador" : "Moradores";
+  const [imageError, setImageError] = useState(false);
 
   return (
     <View className="mt-[32px] flex-row gap-3 border-b border-b-black/10 bg-[#FAFAFA] px-[16px] py-4">
       {/* Imagem */}
-      <View className="h-[50px] w-[50px] items-center justify-center rounded-full bg-black">
-        {republic.imagemRepublica ? (
+      <View className="h-[50px] w-[50px] items-center justify-center rounded-full bg-gray-300">
+        {republic.imagemRepublica && !imageError ? (
           <Image
             source={{ uri: republic.imagemRepublica }}
             className="h-[50px] w-[50px] rounded-full"
+            onError={() => setImageError(true)}
           />
         ) : (
-          <Feather name="image" size={48} color="#6b7280" />
+          <Feather name="image" size={32} color="#6b7280" />
         )}
       </View>
 

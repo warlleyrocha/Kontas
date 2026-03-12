@@ -1,5 +1,6 @@
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
 interface RepublicaCardProps {
@@ -16,6 +17,7 @@ export default function RepublicCard({
   onSelect,
 }: RepublicaCardProps) {
   const residentsLabel = residentsCount === 1 ? "Morador" : "Moradores";
+  const [imageError, setImageError] = useState(false);
 
   return (
     <TouchableOpacity
@@ -25,11 +27,12 @@ export default function RepublicCard({
     >
       {/* Imagem */}
       <View className="h-36 w-full items-center justify-center overflow-hidden bg-gray-100">
-        {republic.imagemRepublica ? (
+        {republic.imagemRepublica && !imageError ? (
           <Image
             source={{ uri: republic.imagemRepublica }}
             style={{ width: "100%", height: "100%" }}
             resizeMode="cover"
+            onError={() => setImageError(true)}
           />
         ) : (
           <Text className="text-5xl">🏠</Text>
