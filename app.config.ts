@@ -106,7 +106,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         backgroundImage: ADAPTIVE_ICON_BACK,
       },
       splash: {
-        image: "./assets/images/splash-icon-kontas.png",
+        image: "./assets/images/splash.png",
         resizeMode: "cover",
         backgroundColor: "#ffffff",
       },
@@ -124,7 +124,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       [
         "expo-splash-screen",
         {
-          image: "./assets/images/splash-icon-kontas.png",
+          image: "./assets/images/splash.png",
           resizeMode: "cover",
           backgroundColor: "#ffffff",
         },
@@ -159,7 +159,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
 // Configuração dinâmica baseada no ambiente
 export const getDynamicAppConfig = (
-  environment: "development" | "preview" | "production"
+  environment: "development" | "preview" | "production",
 ) => {
   if (environment === "production") {
     return {

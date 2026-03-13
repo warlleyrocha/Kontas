@@ -22,7 +22,7 @@
         "backgroundImage": "./assets/images/app-icon/res/mipmap-xxxhdpi/app-icon_adaptive_back.png"
       },
       "splash": {
-        "image": "./assets/images/splash-icon-kontas.png",
+        "image": "./assets/images/splash.png",
         "resizeMode": "cover",
         "backgroundColor": "#ffffff"
       },
@@ -40,7 +40,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon-kontas.png",
+          "image": "./assets/images/splash.png",
           "resizeMode": "cover",
           "backgroundColor": "#ffffff"
         }
