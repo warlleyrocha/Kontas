@@ -30,6 +30,7 @@ export const showToast = {
     const id = toast.custom(
       <ToastConfirm
         message={message}
+        duration={CONFIRM_DURATION}
         onConfirm={() => {
           toast.dismiss(id);
           onConfirm();

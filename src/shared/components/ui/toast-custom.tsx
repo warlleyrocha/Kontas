@@ -2,8 +2,8 @@
 import Feather from "@expo/vector-icons/Feather";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import React, { ReactNode } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
+import { Animated, Text, TouchableOpacity, View } from "react-native";
 
 export type ToastVariant = "success" | "error" | "info";
 
@@ -41,6 +41,7 @@ export function Toast({ message, variant = "info", icon }: ToastProps) {
 
 export interface ToastConfirmProps {
   readonly message: string;
+  readonly duration: number;
   readonly confirmLabel?: string;
   readonly cancelLabel?: string;
   readonly onConfirm: () => void;
@@ -49,15 +50,42 @@ export interface ToastConfirmProps {
 
 export function ToastConfirm({
   message,
+  duration,
   confirmLabel = "Excluir",
   cancelLabel = "Cancelar",
   onConfirm,
   onCancel,
 }: ToastConfirmProps) {
+  const progressAnim = useRef(new Animated.Value(1)).current;
+  const [barWidth, setBarWidth] = useState(0);
+
+  useEffect(() => {
+    if (barWidth === 0) return;
+    Animated.timing(progressAnim, {
+      toValue: 0,
+      duration,
+      useNativeDriver: false,
+    }).start();
+  }, [barWidth, duration, progressAnim]);
+
   return (
     <View className="mx-4 overflow-hidden rounded-2xl bg-white shadow-lg shadow-black/20">
-      {/* Faixa de atenção no topo */}
-      <View className="h-1 w-full bg-red-500" />
+      {/* Barra de progresso */}
+      <View
+        className="h-1 w-full bg-gray-100"
+        onLayout={(e) => setBarWidth(e.nativeEvent.layout.width)}
+      >
+        <Animated.View
+          style={{
+            width: progressAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0, barWidth],
+            }),
+            height: 4,
+            backgroundColor: "#EF4444",
+          }}
+        />
+      </View>
 
       {/* Conteúdo */}
       <View className="px-5 pb-1 pt-4">
