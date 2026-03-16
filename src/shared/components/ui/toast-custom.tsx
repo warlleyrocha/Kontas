@@ -1,5 +1,6 @@
 // components/ui/toast-custom.tsx
-import { Feather, MaterialIcons } from "@expo/vector-icons";
+import Feather from "@expo/vector-icons/Feather";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import React, { ReactNode } from "react";
 import { Text, View } from "react-native";
 

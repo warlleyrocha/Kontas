@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, {
   Extrapolation,
@@ -19,7 +19,7 @@ interface OnboardingButtonsProps {
   width: number;
 }
 
-const OnboardingButtons: React.FC<OnboardingButtonsProps> = ({
+const OnboardingButtons: FC<OnboardingButtonsProps> = ({
   isLastSlide,
   currentIndex,
   slides,

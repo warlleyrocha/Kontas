@@ -1,4 +1,4 @@
-import { Feather } from "@expo/vector-icons";
+import Feather from "@expo/vector-icons/Feather";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import type { MoradorDivisao, TipoDivisao } from "../../hooks/useAccountForm";

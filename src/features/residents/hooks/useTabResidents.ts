@@ -1,6 +1,6 @@
 import { ResidentResponse } from "@/src/shared/types/resident.types";
 import { showToast } from "@/src/shared/utils/showToast";
-import * as Clipboard from "expo-clipboard";
+import { setStringAsync } from "expo-clipboard";
 
 export const useTabResidents = () => {
   const copiarChavePix = async (morador: ResidentResponse) => {
@@ -9,7 +9,7 @@ export const useTabResidents = () => {
       return;
     }
 
-    await Clipboard.setStringAsync(morador.chavePix);
+    await setStringAsync(morador.chavePix);
     showToast.info("Chave copiada para a área de transferência.");
   };
 

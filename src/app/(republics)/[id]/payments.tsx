@@ -5,7 +5,6 @@ import {
   useLocalSearchParams,
   type ErrorBoundaryProps,
 } from "expo-router";
-import React from "react";
 
 export default function PaymentsRoute() {
   const { id: republicId } = useLocalSearchParams<{ id?: string }>();

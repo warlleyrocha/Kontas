@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Text, TouchableOpacity, View } from "react-native";
 
 import { AccountCard } from "./AccountCard";
@@ -22,12 +22,12 @@ interface AccountSectionProps {
   readonly currentResidentId: string | null;
   readonly onConfirmResidentPayment: (
     accountId: string,
-    accountResidentId: string
+    accountResidentId: string,
   ) => Promise<void> | void;
   readonly onDelete: (accountId: string) => void;
   readonly onPatch: (
     accountId: string,
-    metodoPagamento: MetodoPagamento
+    metodoPagamento: MetodoPagamento,
   ) => Promise<void> | void;
 }
 

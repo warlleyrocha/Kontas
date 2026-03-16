@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Image,
   RefreshControl,
@@ -8,7 +7,7 @@ import {
   View,
 } from "react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { Feather } from "@expo/vector-icons";
+import Feather from "@expo/vector-icons/Feather";
 
 import Header from "@/src/shared/components/Header";
 import { EditRepublicModal } from "@/src/features/republic/components/EditRepublicModal";

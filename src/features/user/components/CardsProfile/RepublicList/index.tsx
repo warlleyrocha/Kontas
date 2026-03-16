@@ -1,7 +1,7 @@
 import { useRepublicResidents } from "@/src/shared/hooks/useRepublicResidents";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import RepublicCard from "@/src/features/user/components/RepublicCard";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   RefreshControl,
   ScrollView,

@@ -5,7 +5,7 @@ import axios, {
   type AxiosRequestConfig,
   type InternalAxiosRequestConfig,
 } from "axios";
-import * as ExpoCrypto from "expo-crypto";
+import { getRandomBytesAsync } from "expo-crypto";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -115,7 +115,7 @@ const onFailure = (wasHalfOpen: boolean) => {
 
 const getRetryDelay = async (retryCount: number) => {
   const baseDelay = RETRY_CONFIG.baseDelayMs * 2 ** (retryCount - 1);
-  const randomBytes = await ExpoCrypto.getRandomBytesAsync(1);
+  const randomBytes = await getRandomBytesAsync(1);
   const jitter = randomBytes[0] % 100; // 0–99
   return Math.min(baseDelay + jitter, RETRY_CONFIG.maxDelayMs);
 };

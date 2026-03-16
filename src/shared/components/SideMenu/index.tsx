@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import React, { useCallback, useMemo } from "react";
 import {
   Image,
@@ -83,7 +83,7 @@ export function SideMenu({
 
   const userInitial = useMemo(
     () => user.name.charAt(0).toUpperCase(),
-    [user.name]
+    [user.name],
   );
 
   return (

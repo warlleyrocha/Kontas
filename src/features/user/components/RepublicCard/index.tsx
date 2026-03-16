@@ -1,5 +1,5 @@
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import React, { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 

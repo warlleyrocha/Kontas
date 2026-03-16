@@ -1,6 +1,6 @@
 import type { ResidentResponse } from "@/src/shared/types/resident.types";
-import { Feather } from "@expo/vector-icons";
-import React from "react";
+import Feather from "@expo/vector-icons/Feather";
+import type { FC } from "react";
 import { FlatList, RefreshControl, Text, View } from "react-native";
 import { ResidentCard } from "@/src/features/residents/components/ResidentCard";
 import { useTabResidents } from "@/src/features/residents/hooks/useTabResidents";
@@ -10,7 +10,7 @@ interface ResidentsTabProps {
   residents: ResidentResponse[];
 }
 
-export const ResidentsTab: React.FC<ResidentsTabProps> = ({ residents }) => {
+export const ResidentsTab: FC<ResidentsTabProps> = ({ residents }) => {
   const { copiarChavePix } = useTabResidents();
   const { refreshing, onRefresh } = useRefresh();
 

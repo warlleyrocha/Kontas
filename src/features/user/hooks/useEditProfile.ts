@@ -1,4 +1,4 @@
-import * as ImagePicker from "expo-image-picker";
+import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
 import { useState } from "react";
 import { Alert } from "react-native";
 import { getErrorMessage } from "@/src/services/httpError";
@@ -58,7 +58,7 @@ export function useEditProfile({
   const selectPhoto = async () => {
     try {
       const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
+        await requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
           "Permissão necessária",
@@ -66,7 +66,7 @@ export function useEditProfile({
         );
         return;
       }
-      const result = await ImagePicker.launchImageLibraryAsync({
+      const result = await launchImageLibraryAsync({
         mediaTypes: ["images"],
         allowsEditing: true,
         aspect: [1, 1],

@@ -1,5 +1,4 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import React from "react";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { ActivityIndicator, Text, View } from "react-native";
 import { SideMenu } from "@/src/shared/components/SideMenu";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";

@@ -1,4 +1,3 @@
-import React from "react";
 import { Text, View } from "react-native";
 import type { ResidentResponse } from "@/src/shared/types/resident.types";
 

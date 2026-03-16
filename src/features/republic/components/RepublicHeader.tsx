@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import Feather from "@expo/vector-icons/Feather";
 
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import { MenuButton } from "@/src/shared/components/SideMenu";

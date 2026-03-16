@@ -1,5 +1,5 @@
-import { Feather } from "@expo/vector-icons";
-import React from "react";
+import Feather from "@expo/vector-icons/Feather";
+import type { FC } from "react";
 import {
   Image,
   KeyboardAvoidingView,
@@ -21,7 +21,7 @@ export interface EditProfileModalProps extends EditProfileFormValues {
   currentPhone?: string;
 }
 
-export const EditProfileModal: React.FC<EditProfileModalProps> = ({
+export const EditProfileModal: FC<EditProfileModalProps> = ({
   visible,
   onClose,
   currentName,

@@ -1,4 +1,4 @@
-import { Feather } from "@expo/vector-icons";
+import Feather from "@expo/vector-icons/Feather";
 import React, { useEffect, useRef } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -7,7 +7,7 @@ export default function CheckEmail() {
   const baseId = React.useId();
 
   const [code, setCode] = React.useState(() =>
-    Array.from({ length: 6 }, (_, i) => ({ id: `${baseId}-${i}`, value: "" }))
+    Array.from({ length: 6 }, (_, i) => ({ id: `${baseId}-${i}`, value: "" })),
   );
 
   const inputRefs = useRef<(TextInput | null)[]>([]);

@@ -1,4 +1,3 @@
-import React from "react";
 
 import { EmptyState } from "@/src/shared/components/EmptyState";
 import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";

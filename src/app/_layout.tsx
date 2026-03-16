@@ -22,14 +22,14 @@ import {
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
-import React, { useEffect } from "react";
+import { preventAutoHideAsync, hideAsync } from "expo-splash-screen";
+import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "../../global.css";
 
-import * as Sentry from "@sentry/react-native";
+import { feedbackIntegration, init, mobileReplayIntegration, wrap } from "@sentry/react-native";
 
-Sentry.init({
+init({
   dsn: "https://da32d972451786e6c1a0aea2f4024516@o4510817801928704.ingest.us.sentry.io/4510818996322304",
 
   // Adds more context data to events (IP address, cookies, user, etc.)
@@ -43,15 +43,15 @@ Sentry.init({
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1,
   integrations: [
-    Sentry.mobileReplayIntegration(),
-    Sentry.feedbackIntegration(),
+    mobileReplayIntegration(),
+    feedbackIntegration(),
   ],
 
   // uncomment the line below to enable Spotlight (https://spotlightjs.com)
   // spotlight: __DEV__,
 });
 
-SplashScreen.preventAutoHideAsync();
+preventAutoHideAsync();
 
 GoogleSignin.configure({
   iosClientId:
@@ -92,7 +92,7 @@ function RootLayout() {
 
   useEffect(() => {
     if (loaded) {
-      SplashScreen.hideAsync();
+      hideAsync();
     }
   }, [loaded]);
 
@@ -112,4 +112,4 @@ function RootLayout() {
   );
 }
 
-export default Sentry.wrap(RootLayout);
+export default wrap(RootLayout);
