@@ -1,15 +1,25 @@
 import React, { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
+import { EditRepublicModal } from "@/src/features/republic/components/EditRepublicModal";
+import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import EmptyRepublic from "@/src/features/user/components/CardsProfile/EmptyRepublic";
 import IncompleteProfile from "@/src/features/user/components/CardsProfile/IncompleteProfile";
 import RepublicList from "@/src/features/user/components/CardsProfile/RepublicList";
 import { EditProfileModal } from "@/src/features/user/components/EditProfileModal";
+import { RepublicContextMenu } from "@/src/features/user/components/RepublicContextMenu";
 
 import { MenuButton, SideMenu } from "@/src/shared/components/SideMenu";
 import { maskPhone } from "@/src/shared/utils/inputMasks";
 
 import { useProfileScreen } from "../hooks/useProfileScreen";
+
+interface CardPosition {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 
 interface ProfileContentProps {
   readonly perfilCompleto: boolean;
@@ -20,6 +30,7 @@ interface ProfileContentProps {
   readonly onCreateRepublic: () => void;
   readonly onViewInvites: () => void;
   readonly onSelectRepublic: (republicId: string) => void;
+  readonly onLongPressRepublic: (republic: RepublicResponse, position: CardPosition) => void;
   readonly onRefresh: () => void;
 }
 
@@ -32,6 +43,7 @@ function ProfileContent({
   onCreateRepublic,
   onViewInvites,
   onSelectRepublic,
+  onLongPressRepublic,
   onRefresh,
 }: ProfileContentProps) {
   if (!perfilCompleto) {
@@ -51,6 +63,7 @@ function ProfileContent({
     <RepublicList
       republics={republics}
       onSelectRepublic={onSelectRepublic}
+      onLongPressRepublic={onLongPressRepublic}
       onCreateRepublic={onCreateRepublic}
       refreshing={refreshing}
       onRefresh={onRefresh}
@@ -67,13 +80,23 @@ export function ProfileScreen() {
     setIsMenuOpen,
     showEditProfileModal,
     setShowEditProfileModal,
+    showEditRepublicModal,
     refreshing,
+
+    contextMenuVisible,
+    contextMenuPosition,
+    selectedRepublic,
 
     handleSaveProfile,
     handleCreateRepublic,
     handleViewInvites,
-    //handleEditRepublic,
     handleSelectRepublic,
+    handleLongPressRepublic,
+    handleCloseContextMenu,
+    handleOpenEditFromMenu,
+    handleCloseEditModal,
+    handleSaveRepublicEdit,
+    handleDeleteFromMenu,
     onRefresh,
 
     menuItems,
@@ -125,6 +148,7 @@ export function ProfileScreen() {
         onCreateRepublic={handleCreateRepublic}
         onViewInvites={handleViewInvites}
         onSelectRepublic={handleSelectRepublic}
+        onLongPressRepublic={handleLongPressRepublic}
         onRefresh={onRefresh}
       />
 
@@ -152,6 +176,24 @@ export function ProfileScreen() {
         currentPhoto={user.fotoPerfil}
         currentPhone={maskPhone(user.telefone ?? "")}
         onSave={handleSaveProfile}
+      />
+
+      {/* MODAL EDITAR REPÚBLICA */}
+      <EditRepublicModal
+        visible={showEditRepublicModal}
+        onClose={handleCloseEditModal}
+        currentName={selectedRepublic?.nome ?? ""}
+        currentImage={selectedRepublic?.imagemRepublica}
+        onSave={handleSaveRepublicEdit}
+      />
+
+      {/* CONTEXT MENU — pressão longa no card */}
+      <RepublicContextMenu
+        visible={contextMenuVisible}
+        position={contextMenuPosition}
+        onClose={handleCloseContextMenu}
+        onEdit={handleOpenEditFromMenu}
+        onDelete={handleDeleteFromMenu}
       />
     </View>
   );

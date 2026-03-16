@@ -10,20 +10,27 @@ import {
   View,
 } from "react-native";
 
+interface CardPosition {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 interface RepublicListProps {
   readonly republics: RepublicResponse[];
-  //readonly onEditRepublic: (id: string) => void;
   readonly onSelectRepublic: (id: string) => void;
   readonly onCreateRepublic: () => void;
+  readonly onLongPressRepublic?: (republic: RepublicResponse, position: CardPosition) => void;
   readonly refreshing?: boolean;
   readonly onRefresh?: () => void | Promise<void>;
 }
 
 export default function RepublicList({
   republics,
-  //onEditRepublic,
   onSelectRepublic,
   onCreateRepublic,
+  onLongPressRepublic,
   refreshing = false,
   onRefresh,
 }: RepublicListProps) {
@@ -53,8 +60,8 @@ export default function RepublicList({
             key={republic.id}
             republic={republic}
             residentsCount={getResidentsCount(republic.id)}
-            //onEdit={() => onEditRepublic(republic.id)}
             onSelect={() => onSelectRepublic(republic.id)}
+            onLongPress={onLongPressRepublic}
           />
         ))}
       </View>
