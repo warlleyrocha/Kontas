@@ -94,7 +94,7 @@ export default function LoginScreen() {
         </View>
 
         <TouchableOpacity
-          className={`mt-44 h-[50px] w-[345px] flex-row items-center justify-center gap-3 rounded-lg ${
+          className={`mt-20 h-[50px] w-[345px] flex-row items-center justify-center gap-3 rounded-lg ${
             isSigningIn ? "bg-gray-300" : "bg-[#ececec]"
           }`}
           onPress={handleGoogleLogin}
