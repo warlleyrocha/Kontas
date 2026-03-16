@@ -174,12 +174,16 @@ export function SideMenu({
 
 interface MenuButtonProps {
   readonly onPress: () => void;
+  readonly hasNotification?: boolean;
 }
 
-export function MenuButton({ onPress }: MenuButtonProps) {
+export function MenuButton({ onPress, hasNotification }: MenuButtonProps) {
   return (
     <TouchableOpacity onPress={onPress} className="p-2" activeOpacity={0.7}>
       <Ionicons name="menu" size={28} color="#374151" />
+      {hasNotification && (
+        <View className="absolute right-1 top-1 h-3 w-3 rounded-full bg-yellow-400" />
+      )}
     </TouchableOpacity>
   );
 }

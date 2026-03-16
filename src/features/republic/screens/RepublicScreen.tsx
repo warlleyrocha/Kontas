@@ -68,6 +68,7 @@ export function RepublicScreen({ republicId }: Props) {
         onEdit={() => setShowEditModal(true)}
         onToggleFavorite={toggleFavorite}
         onMenuOpen={() => setIsMenuOpen(true)}
+        hasNotification={menuItems.some((item) => (item.badge ?? 0) > 0)}
       />
 
       <View className="flex-1 p-4">

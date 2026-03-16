@@ -13,6 +13,7 @@ interface RepublicHeaderProps {
   readonly onEdit: () => void;
   readonly onToggleFavorite: () => void;
   readonly onMenuOpen: () => void;
+  readonly hasNotification?: boolean;
 }
 
 export function RepublicHeader({
@@ -22,6 +23,7 @@ export function RepublicHeader({
   onEdit,
   onToggleFavorite,
   onMenuOpen,
+  hasNotification,
 }: RepublicHeaderProps) {
   const residentsLabel = numberResidents === 1 ? "Morador" : "Moradores";
   const [imageError, setImageError] = useState(false);
@@ -73,7 +75,7 @@ export function RepublicHeader({
       </TouchableOpacity>
 
       {/* Menu lateral */}
-      <MenuButton onPress={onMenuOpen} />
+      <MenuButton onPress={onMenuOpen} hasNotification={hasNotification} />
     </View>
   );
 }

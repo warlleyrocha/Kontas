@@ -136,7 +136,10 @@ export function ProfileScreen() {
           <Text className="text-sm text-gray-500">Configurar perfil</Text>
         </TouchableOpacity>
 
-        <MenuButton onPress={() => setIsMenuOpen(true)} />
+        <MenuButton
+          onPress={() => setIsMenuOpen(true)}
+          hasNotification={menuItems.some((item) => (item.badge ?? 0) > 0)}
+        />
       </View>
 
       {/* CONTENT */}
