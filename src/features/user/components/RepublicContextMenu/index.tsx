@@ -26,6 +26,7 @@ interface RepublicContextMenuProps {
   readonly onClose: () => void;
   readonly onEdit: () => void;
   readonly onDelete: () => void;
+  readonly onInvite: () => void;
   readonly isAdmin?: boolean;
 }
 
@@ -35,6 +36,7 @@ export function RepublicContextMenu({
   onClose,
   onEdit,
   onDelete,
+  onInvite,
   isAdmin = false,
 }: RepublicContextMenuProps) {
   const scaleAnim = useRef(new Animated.Value(0.85)).current;
@@ -65,7 +67,9 @@ export function RepublicContextMenu({
 
   const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
-  const menuTotalHeight = isAdmin ? MENU_ITEM_HEIGHT * 2 + 1 : MENU_ITEM_HEIGHT;
+  // Admin: Editar + Convidar + Deletar (3 itens, 2 separadores)
+  // Não-admin: apenas Editar (1 item)
+  const menuTotalHeight = isAdmin ? MENU_ITEM_HEIGHT * 3 + 2 : MENU_ITEM_HEIGHT;
 
   // Posição horizontal: centralizado no card, mantendo dentro da tela
   let menuX = position.x + position.width / 2 - MENU_WIDTH / 2;
@@ -132,9 +136,27 @@ export function RepublicContextMenu({
                 </View>
               </TouchableOpacity>
 
-              {/* Deletar — visível apenas para admins */}
+              {/* Convidar novo morador e Deletar — visíveis apenas para admins */}
               {isAdmin && (
                 <>
+                  <View className="h-px bg-[#E5E5EA]" />
+                  <TouchableOpacity
+                    onPress={onInvite}
+                    activeOpacity={0.7}
+                    className="h-[52px] justify-center"
+                  >
+                    <View className="flex-row items-center justify-between px-4">
+                      <Text className="font-mulish-medium text-base text-[#1C1C1E]">
+                        Convidar novo morador
+                      </Text>
+                      <MaterialCommunityIcons
+                        name="account-plus-outline"
+                        size={20}
+                        color="#3B82F6"
+                      />
+                    </View>
+                  </TouchableOpacity>
+
                   <View className="h-px bg-[#E5E5EA]" />
                   <TouchableOpacity
                     onPress={onDelete}

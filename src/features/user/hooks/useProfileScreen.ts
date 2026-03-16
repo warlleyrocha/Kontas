@@ -155,6 +155,17 @@ export function useProfileScreen() {
     });
   }, [selectedRepublic, deleteRepublic, fetchRepublics]);
 
+  const [showInviteModal, setShowInviteModal] = useState(false);
+
+  const handleInviteFromMenu = useCallback(() => {
+    setContextMenuVisible(false);
+    setShowInviteModal(true);
+  }, []);
+
+  const handleCloseInviteModal = useCallback(() => {
+    setShowInviteModal(false);
+  }, []);
+
   useEffect(() => {
     if (!user?.perfilCompleto) return;
     fetchRepublics();
@@ -207,6 +218,9 @@ export function useProfileScreen() {
     handleCloseEditModal,
     handleSaveRepublicEdit,
     handleDeleteFromMenu,
+    showInviteModal,
+    handleInviteFromMenu,
+    handleCloseInviteModal,
     isAdmin,
     onRefresh,
 

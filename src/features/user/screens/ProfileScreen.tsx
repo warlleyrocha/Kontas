@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
+import { InviteModal } from "@/src/features/invites/components/InviteModal";
+import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
 import { EditRepublicModal } from "@/src/features/republic/components/EditRepublicModal";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import EmptyRepublic from "@/src/features/user/components/CardsProfile/EmptyRepublic";
@@ -97,6 +99,9 @@ export function ProfileScreen() {
     handleCloseEditModal,
     handleSaveRepublicEdit,
     handleDeleteFromMenu,
+    showInviteModal,
+    handleInviteFromMenu,
+    handleCloseInviteModal,
     isAdmin,
     onRefresh,
 
@@ -104,6 +109,8 @@ export function ProfileScreen() {
     footerItems,
     sideMenuUser,
   } = useProfileScreen();
+
+  const { sendInvite, sendLoading, sendError } = useInvitesContext();
 
   const [profileImageError, setProfileImageError] = useState(false);
 
@@ -198,7 +205,18 @@ export function ProfileScreen() {
         onClose={handleCloseContextMenu}
         onEdit={handleOpenEditFromMenu}
         onDelete={handleDeleteFromMenu}
+        onInvite={handleInviteFromMenu}
         isAdmin={isAdmin(selectedRepublic?.id ?? "")}
+      />
+
+      {/* MODAL CONVIDAR MORADOR */}
+      <InviteModal
+        open={showInviteModal}
+        onClose={handleCloseInviteModal}
+        republicaId={selectedRepublic?.id ?? ""}
+        sendInvite={sendInvite}
+        loading={sendLoading}
+        error={sendError}
       />
     </View>
   );
