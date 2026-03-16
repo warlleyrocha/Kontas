@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { useAuth } from "@/src/features/auth/contexts";
 import { useRepublicList } from "@/src/features/republic/hooks/useRepublicList";
 import { useRepublicActions } from "@/src/features/republic/hooks/useRepublicActions";
+import { useRepublicResidents } from "@/src/shared/hooks/useRepublicResidents";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
 
@@ -28,6 +29,7 @@ export function useProfileScreen() {
   const { user, logout, completeProfile, updateUser } = useAuth();
   const { republics, fetchRepublics } = useRepublicList();
   const { deleteRepublic, updateRepublic, showEditModal, setShowEditModal } = useRepublicActions();
+  const { isAdmin } = useRepublicResidents(republics, user?.email);
 
   const { refreshing, onRefresh, registerRefresh } = useRefresh();
 
@@ -205,6 +207,7 @@ export function useProfileScreen() {
     handleCloseEditModal,
     handleSaveRepublicEdit,
     handleDeleteFromMenu,
+    isAdmin,
     onRefresh,
 
     // side menu

@@ -12,7 +12,6 @@ import {
 
 const MENU_WIDTH = 220;
 const MENU_ITEM_HEIGHT = 52;
-const MENU_TOTAL_HEIGHT = MENU_ITEM_HEIGHT * 2 + 1; // 2 items + divider
 
 interface CardPosition {
   x: number;
@@ -27,6 +26,7 @@ interface RepublicContextMenuProps {
   readonly onClose: () => void;
   readonly onEdit: () => void;
   readonly onDelete: () => void;
+  readonly isAdmin?: boolean;
 }
 
 export function RepublicContextMenu({
@@ -35,6 +35,7 @@ export function RepublicContextMenu({
   onClose,
   onEdit,
   onDelete,
+  isAdmin = false,
 }: RepublicContextMenuProps) {
   const scaleAnim = useRef(new Animated.Value(0.85)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
@@ -64,6 +65,8 @@ export function RepublicContextMenu({
 
   const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
+  const menuTotalHeight = isAdmin ? MENU_ITEM_HEIGHT * 2 + 1 : MENU_ITEM_HEIGHT;
+
   // Posição horizontal: centralizado no card, mantendo dentro da tela
   let menuX = position.x + position.width / 2 - MENU_WIDTH / 2;
   menuX = Math.max(12, Math.min(menuX, SCREEN_WIDTH - MENU_WIDTH - 12));
@@ -71,11 +74,11 @@ export function RepublicContextMenu({
   // Posição vertical: abaixo do card se tiver espaço, senão acima
   const spaceBelow = SCREEN_HEIGHT - (position.y + position.height);
   const menuY =
-    spaceBelow >= MENU_TOTAL_HEIGHT + 20
+    spaceBelow >= menuTotalHeight + 20
       ? position.y + position.height + 8
-      : position.y - MENU_TOTAL_HEIGHT - 8;
+      : position.y - menuTotalHeight - 8;
 
-  const translateYOutput = spaceBelow >= MENU_TOTAL_HEIGHT + 20 ? -8 : 8;
+  const translateYOutput = spaceBelow >= menuTotalHeight + 20 ? -8 : 8;
 
   return (
     <Modal
@@ -129,26 +132,28 @@ export function RepublicContextMenu({
                 </View>
               </TouchableOpacity>
 
-              {/* Divider */}
-              <View className="h-px bg-[#E5E5EA]" />
-
-              {/* Deletar */}
-              <TouchableOpacity
-                onPress={onDelete}
-                activeOpacity={0.7}
-                className="h-[52px] justify-center"
-              >
-                <View className="flex-row items-center justify-between px-4">
-                  <Text className="font-mulish-medium text-base text-red-500">
-                    Deletar república
-                  </Text>
-                  <MaterialCommunityIcons
-                    name="delete-outline"
-                    size={20}
-                    color="#EF4444"
-                  />
-                </View>
-              </TouchableOpacity>
+              {/* Deletar — visível apenas para admins */}
+              {isAdmin && (
+                <>
+                  <View className="h-px bg-[#E5E5EA]" />
+                  <TouchableOpacity
+                    onPress={onDelete}
+                    activeOpacity={0.7}
+                    className="h-[52px] justify-center"
+                  >
+                    <View className="flex-row items-center justify-between px-4">
+                      <Text className="font-mulish-medium text-base text-red-500">
+                        Deletar república
+                      </Text>
+                      <MaterialCommunityIcons
+                        name="delete-outline"
+                        size={20}
+                        color="#EF4444"
+                      />
+                    </View>
+                  </TouchableOpacity>
+                </>
+              )}
             </Animated.View>
           </TouchableWithoutFeedback>
         </View>

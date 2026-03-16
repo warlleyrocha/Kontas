@@ -97,6 +97,7 @@ export function ProfileScreen() {
     handleCloseEditModal,
     handleSaveRepublicEdit,
     handleDeleteFromMenu,
+    isAdmin,
     onRefresh,
 
     menuItems,
@@ -194,6 +195,7 @@ export function ProfileScreen() {
         onClose={handleCloseContextMenu}
         onEdit={handleOpenEditFromMenu}
         onDelete={handleDeleteFromMenu}
+        isAdmin={isAdmin(selectedRepublic?.id ?? "")}
       />
     </View>
   );
