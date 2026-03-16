@@ -11,16 +11,8 @@ import {
 } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
+import type { MenuItem, MenuSubItem } from "@/src/shared/types/sideMenu";
 import { useSideMenuAnimation } from "./useSideMenuAnimation";
-
-export interface MenuItem {
-  id: string;
-  label: string;
-  onPress: () => void;
-  icon?: keyof typeof Ionicons.glyphMap;
-  danger?: boolean;
-  badge?: number;
-}
 
 interface UserInfo {
   name: string;
@@ -28,6 +20,7 @@ interface UserInfo {
   email?: string | null;
   pixKey?: string | null;
   phone?: string | null;
+  roleLabel?: string | null;
 }
 
 interface SideMenuProps {
@@ -40,39 +33,140 @@ interface SideMenuProps {
 interface MenuItemComponentProps {
   readonly item: MenuItem;
   readonly onClose: () => void;
+  readonly isExpanded: boolean;
+  readonly onToggleExpand: (itemId: string) => void;
 }
 
-function MenuItemComponent({ item, onClose }: MenuItemComponentProps) {
+interface MenuSubItemComponentProps {
+  readonly item: MenuSubItem;
+  readonly onClose: () => void;
+}
+
+function MenuSubItemComponent({
+  item,
+  onClose,
+}: MenuSubItemComponentProps) {
+  const [imageError, setImageError] = useState(false);
+
   const handlePress = useCallback(() => {
     onClose();
     setTimeout(item.onPress, 250);
   }, [item.onPress, onClose]);
 
+  const itemInitial = useMemo(
+    () => item.label.charAt(0).toUpperCase(),
+    [item.label],
+  );
+
+  return (
+    <TouchableOpacity
+      className={`flex-row items-center gap-3 rounded-xl px-3 py-2 ${
+        item.active ? "bg-gray-100" : ""
+      }`}
+      onPress={handlePress}
+    >
+      <View className="h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-gray-200">
+        {item.image && !imageError ? (
+          <Image
+            source={{ uri: item.image }}
+            style={{ width: 36, height: 36, borderRadius: 18 }}
+            resizeMode="cover"
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <Text className="text-sm font-semibold text-gray-500">
+            {itemInitial}
+          </Text>
+        )}
+      </View>
+
+      <Text
+        className={`flex-1 text-sm ${
+          item.active
+            ? "font-semibold text-gray-900"
+            : "font-normal text-gray-500"
+        }`}
+      >
+        {item.label}
+      </Text>
+    </TouchableOpacity>
+  );
+}
+
+function MenuItemComponent({
+  item,
+  onClose,
+  isExpanded,
+  onToggleExpand,
+}: MenuItemComponentProps) {
+  const isExpandable = !!item.children;
+
+  const handlePress = useCallback(() => {
+    if (isExpandable) {
+      onToggleExpand(item.id);
+      return;
+    }
+
+    if (!item.onPress) return;
+
+    onClose();
+    setTimeout(item.onPress, 250);
+  }, [isExpandable, item.id, item.onPress, onClose, onToggleExpand]);
+
   const iconColor = item.danger ? "#ef4444" : "#374151";
   const textClassName = `text-base ${item.danger ? "text-red-500" : "text-gray-700"}`;
 
   return (
-    <TouchableOpacity
-      className="flex-row items-center px-4 py-3"
-      onPress={handlePress}
-    >
-      {item.icon && (
+    <View>
+      <TouchableOpacity
+        className="flex-row items-center px-4 py-3"
+        onPress={handlePress}
+      >
         <Ionicons
           name={item.icon}
           size={20}
           color={iconColor}
           style={{ marginRight: 12 }}
         />
-      )}
-      <Text className={textClassName}>{item.label}</Text>
-      {!!item.badge && item.badge > 0 && (
-        <View className="ml-2 h-5 min-w-5 items-center justify-center rounded-full bg-yellow-400 px-1">
-          <Text className="text-xs font-semibold text-gray-800">
-            {item.badge > 99 ? "99+" : item.badge}
-          </Text>
+        <Text className={textClassName}>{item.label}</Text>
+
+        <View className="ml-auto flex-row items-center">
+          {!!item.badge && item.badge > 0 && (
+            <View className="mr-2 h-5 min-w-5 items-center justify-center rounded-full bg-yellow-400 px-1">
+              <Text className="text-xs font-semibold text-gray-800">
+                {item.badge > 99 ? "99+" : item.badge}
+              </Text>
+            </View>
+          )}
+
+          {isExpandable && (
+            <Ionicons
+              name={isExpanded ? "chevron-up" : "chevron-down"}
+              size={18}
+              color="#6B7280"
+            />
+          )}
+        </View>
+      </TouchableOpacity>
+
+      {isExpandable && isExpanded && (
+        <View className="pb-2 pl-12 pr-4">
+          {item.children && item.children.length > 0 ? (
+            item.children.map((child) => (
+              <MenuSubItemComponent
+                key={child.id}
+                item={child}
+                onClose={onClose}
+              />
+            ))
+          ) : (
+            <Text className="px-3 py-2 text-sm text-gray-400">
+              {item.emptyLabel ?? "Nenhuma república disponível"}
+            </Text>
+          )}
         </View>
       )}
-    </TouchableOpacity>
+    </View>
   );
 }
 
@@ -95,6 +189,13 @@ export function SideMenu({
   );
 
   const [photoError, setPhotoError] = useState(false);
+  const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
+
+  const handleToggleExpand = useCallback((itemId: string) => {
+    setExpandedItemId((currentId) =>
+      currentId === itemId ? null : itemId,
+    );
+  }, []);
 
   return (
     <Modal transparent animationType="none" onRequestClose={closeMenu}>
@@ -112,8 +213,8 @@ export function SideMenu({
         >
           <SafeAreaView className="flex-1">
             {/* User Header */}
-            <View className="flex-row items-center justify-center gap-3 border-b border-gray-100 px-[40px] py-1 ">
-              <View className="mb-3 h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-gray-200">
+            <View className="flex-row items-start gap-3 border-b border-gray-100 px-5 py-3">
+              <View className="h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-gray-200">
                 {user.photo && !photoError ? (
                   <Image
                     source={{ uri: user.photo }}
@@ -128,16 +229,49 @@ export function SideMenu({
                 )}
               </View>
 
-              <View>
-                <Text className="text-lg font-semibold">{user.name}</Text>
+              <View className="min-w-0 flex-1">
+                <View className="flex-row items-center gap-2">
+                  <Text
+                    className="flex-1 text-lg font-semibold"
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {user.name}
+                  </Text>
+                  {user.roleLabel && (
+                    <View className="rounded-full bg-sky-100 px-2.5 py-1">
+                      <Text className="text-xs font-semibold text-sky-700">
+                        {user.roleLabel}
+                      </Text>
+                    </View>
+                  )}
+                </View>
                 {user.email && (
-                  <Text className="text-sm text-gray-500">{user.email}</Text>
+                  <Text
+                    className="text-sm text-gray-500"
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {user.email}
+                  </Text>
                 )}
                 {user.phone && (
-                  <Text className="text-sm text-gray-500">{user.phone}</Text>
+                  <Text
+                    className="text-sm text-gray-500"
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {user.phone}
+                  </Text>
                 )}
                 {user.pixKey && (
-                  <Text className="text-sm text-gray-500">{user.pixKey}</Text>
+                  <Text
+                    className="text-sm text-gray-500"
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {user.pixKey}
+                  </Text>
                 )}
               </View>
             </View>
@@ -149,6 +283,8 @@ export function SideMenu({
                   key={item.id}
                   item={item}
                   onClose={closeMenu}
+                  isExpanded={expandedItemId === item.id}
+                  onToggleExpand={handleToggleExpand}
                 />
               ))}
             </View>
@@ -161,6 +297,8 @@ export function SideMenu({
                     key={item.id}
                     item={item}
                     onClose={closeMenu}
+                    isExpanded={false}
+                    onToggleExpand={handleToggleExpand}
                   />
                 ))}
               </View>

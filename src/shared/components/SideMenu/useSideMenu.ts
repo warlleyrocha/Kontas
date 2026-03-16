@@ -1,11 +1,13 @@
 import { useRouter } from "expo-router";
 import { useCallback, useMemo } from "react";
+import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import { legalLinks, openLegalLink } from "@/src/shared/constants/legal";
 import { ResidentRole } from "@/src/shared/types/resident.types";
 import { MenuItem, UserMenuContext } from "@/src/shared/types/sideMenu";
 
 interface SideMenuOptions {
   republicId?: string;
+  republics?: RepublicResponse[];
   currentUserRole?: ResidentRole | null;
   /** Badge em "Meus Convites" — convites recebidos pelo usuário com status PENDENTE */
   pendingInvitesCount?: number;
@@ -22,16 +24,13 @@ export function useSideMenu(
 ) {
   const {
     republicId,
+    republics = [],
     currentUserRole,
     pendingInvitesCount,
     pendingInvitesSentCount,
     pendingPaymentsCount,
   } = options;
   const router = useRouter();
-
-  const navigateHome = useCallback(() => {
-    router.push("/");
-  }, [router]);
 
   const navigateProfile = useCallback(() => {
     router.push("/(userProfile)/profile");
@@ -59,13 +58,34 @@ export function useSideMenu(
     });
   }, [republicId, router]);
 
+  const navigateToRepublic = useCallback(
+    (targetRepublicId: string) => {
+      if (targetRepublicId === republicId) return;
+      router.push(`/(republics)/${targetRepublicId}`);
+    },
+    [republicId, router],
+  );
+
+  const republicMenuItems = useMemo(
+    () =>
+      republics.map((republic) => ({
+        id: `republic-${republic.id}`,
+        label: republic.nome,
+        image: republic.imagemRepublica,
+        onPress: () => navigateToRepublic(republic.id),
+        active: republic.id === republicId,
+      })),
+    [navigateToRepublic, republicId, republics],
+  );
+
   const menuItems = useMemo<MenuItem[]>(() => {
     const base = {
-      home: {
-        id: "home",
-        label: "Início",
-        icon: "home-outline" as const,
-        onPress: navigateHome,
+      switchRepublic: {
+        id: "switchRepublic",
+        label: "Trocar República",
+        icon: "swap-horizontal-outline" as const,
+        children: republicMenuItems,
+        emptyLabel: "Nenhuma república vinculada",
       },
       profile: {
         id: "profile",
@@ -100,15 +120,18 @@ export function useSideMenu(
     switch (context) {
       case "home":
         if (currentUserRole === ResidentRole.USER) {
-          return [base.home, base.profile, base.invitesSent];
+          return [base.profile, base.switchRepublic, base.invitesSent];
         }
-        return [base.profile, base.invitesSent, base.payments];
+        return [
+          base.profile,
+          base.switchRepublic,
+
+          base.invitesSent,
+          base.payments,
+        ];
 
       case "profile":
-        return [base.home, base.invites];
-
-      case "invite":
-        return [base.home, base.profile, base.invites];
+        return [base.invites];
 
       default:
         return [];
@@ -119,11 +142,11 @@ export function useSideMenu(
     pendingInvitesCount,
     pendingInvitesSentCount,
     pendingPaymentsCount,
-    navigateHome,
     navigateProfile,
     navigateInvites,
     navigateInvitesSent,
     navigatePayments,
+    republicMenuItems,
   ]);
 
   const footerItems = useMemo<MenuItem[]>(

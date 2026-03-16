@@ -13,12 +13,13 @@ import type { TabKey } from "@/src/shared/types/tabs";
 import { showToast } from "@/src/shared/utils/showToast";
 import { toastErrors } from "@/src/shared/utils/toastMessages";
 import { getErrorMessage } from "@/src/services/httpError";
+import { ResidentRole } from "@/src/shared/types/resident.types";
 
 export function useRepublicScreen(republicId: string) {
   const router = useRouter();
   const { user, logout } = useAuth();
 
-  const { fetchRepublicById } = useRepublicList();
+  const { republics, fetchRepublics, fetchRepublicById } = useRepublicList();
   const { updateRepublic, showEditModal, setShowEditModal } =
     useRepublicActions();
 
@@ -62,6 +63,11 @@ export function useRepublicScreen(republicId: string) {
 
     loadRepublic();
   }, [republicId, fetchRepublicById, router]);
+
+  useEffect(() => {
+    if (!user?.perfilCompleto) return;
+    void fetchRepublics();
+  }, [fetchRepublics, user?.perfilCompleto]);
 
   // 🔹 Carregar moradores
   useEffect(() => {
@@ -123,15 +129,6 @@ export function useRepublicScreen(republicId: string) {
     [republic, updateRepublic],
   );
 
-  const userMenu = useMemo(
-    () => ({
-      name: user?.nome ?? "Usuário",
-      photo: user?.fotoPerfil,
-      email: user?.email,
-    }),
-    [user?.nome, user?.fotoPerfil, user?.email],
-  );
-
   const currentResident = useMemo(() => {
     if (!user?.email) return null;
     const normalizedEmail = user.email.toLowerCase();
@@ -142,6 +139,23 @@ export function useRepublicScreen(republicId: string) {
 
   const currentUserRole = currentResident?.role ?? null;
   const currentResidentId = currentResident?.id ?? null;
+  let roleLabel: string | null = null;
+
+  if (currentUserRole === ResidentRole.ADMIN) {
+    roleLabel = "Admin";
+  } else if (currentUserRole === ResidentRole.USER) {
+    roleLabel = "Morador";
+  }
+
+  const userMenu = useMemo(
+    () => ({
+      name: user?.nome ?? "Usuário",
+      photo: user?.fotoPerfil,
+      email: user?.email,
+      roleLabel,
+    }),
+    [roleLabel, user?.nome, user?.fotoPerfil, user?.email],
+  );
 
   return {
     republic,
@@ -161,5 +175,6 @@ export function useRepublicScreen(republicId: string) {
     userMenu,
     currentUserRole,
     currentResidentId,
+    republics,
   };
 }

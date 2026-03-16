@@ -177,7 +177,10 @@ export function useProfileScreen() {
 
   const { pendingCount } = useInvitesContext();
 
-  const { menuItems, footerItems } = useSideMenu("profile", handleSignOut, { pendingInvitesCount: pendingCount });
+  const { menuItems, footerItems } = useSideMenu("profile", handleSignOut, {
+    republics,
+    pendingInvitesCount: pendingCount,
+  });
 
   const sideMenuUser = useMemo(() => {
     if (!user) return null;

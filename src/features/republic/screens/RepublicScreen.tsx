@@ -40,6 +40,7 @@ export function RepublicScreen({ republicId }: Props) {
     userMenu,
     currentUserRole,
     currentResidentId,
+    republics,
   } = useRepublicScreen(republicId);
 
   const { pendingCount, invitesSentByRepublic, fetchInvitesByRepublic } =
@@ -68,6 +69,7 @@ export function RepublicScreen({ republicId }: Props) {
 
   const { menuItems, footerItems } = useSideMenu("home", handleSignOut, {
     republicId: republic?.id,
+    republics,
     currentUserRole,
     pendingInvitesCount: pendingCount,
     pendingInvitesSentCount,
