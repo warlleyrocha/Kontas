@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { useAuth } from "@/src/features/auth/contexts";
 import { useRepublicList } from "@/src/features/republic/hooks/useRepublicList";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
+import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
 
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
 
@@ -109,7 +110,9 @@ export function useProfileScreen() {
     return registerRefresh("profile", fetchRepublics);
   }, [registerRefresh, fetchRepublics]);
 
-  const { menuItems, footerItems } = useSideMenu("profile", handleSignOut);
+  const { pendingCount } = useInvitesContext();
+
+  const { menuItems, footerItems } = useSideMenu("profile", handleSignOut, undefined, undefined, pendingCount);
 
   const sideMenuUser = useMemo(() => {
     if (!user) return null;

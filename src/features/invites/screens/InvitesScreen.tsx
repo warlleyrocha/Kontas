@@ -1,12 +1,11 @@
-import React, { useEffect } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
+import { Text, TouchableOpacity, View } from "react-native";
 
-import { MenuButton, SideMenu } from "@/src/shared/components/SideMenu";
 import { InvitesInboxContent } from "@/src/features/invites/components/InvitesInboxContent";
+import { MenuButton, SideMenu } from "@/src/shared/components/SideMenu";
+
 import { useInvitesScreen } from "../hooks/useInvitesScreen";
-import { useInvites } from "../hooks/useInvite";
 
 export function InvitesScreen() {
   const router = useRouter();
@@ -17,13 +16,12 @@ export function InvitesScreen() {
     handleAcceptInvite,
     handleRejectInvite,
     error,
-  } = useInvites();
-  const { isMenuOpen, setIsMenuOpen, menuItems, footerItems, sideMenuUser } =
-    useInvitesScreen();
-
-  useEffect(() => {
-    fetchInvitesByUser();
-  }, [fetchInvitesByUser]);
+    isMenuOpen,
+    setIsMenuOpen,
+    menuItems,
+    footerItems,
+    sideMenuUser,
+  } = useInvitesScreen();
 
   return (
     <View className="flex-1 bg-[#FAFAFA]">
