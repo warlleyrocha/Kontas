@@ -3,10 +3,7 @@ import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
-import { MenuButton, SideMenu } from "@/src/shared/components/SideMenu";
-
 import { InvitesSentContent } from "../components/InvitesSentContent";
-import { useInvitesScreen } from "../hooks/useInvitesScreen";
 import { useInvites } from "../hooks/useInvite";
 
 interface InvitesSentScreenProps {
@@ -16,8 +13,6 @@ interface InvitesSentScreenProps {
 export function InvitesSentScreen({ republicId }: InvitesSentScreenProps) {
   const router = useRouter();
   const { invites, fetchInvites, error } = useInvites();
-  const { isMenuOpen, setIsMenuOpen, menuItems, footerItems, sideMenuUser } =
-    useInvitesScreen();
 
   useEffect(() => {
     fetchInvites(republicId);
@@ -36,8 +31,6 @@ export function InvitesSentScreen({ republicId }: InvitesSentScreenProps) {
             {invites.length} {invites.length === 1 ? "convite" : "convites"}
           </Text>
         </View>
-
-        <MenuButton onPress={() => setIsMenuOpen(true)} />
       </View>
 
       <InvitesSentContent
@@ -46,15 +39,6 @@ export function InvitesSentScreen({ republicId }: InvitesSentScreenProps) {
         onRetry={() => fetchInvites(republicId)}
         onEmptyStatePress={() => router.back()}
       />
-
-      {isMenuOpen && sideMenuUser && (
-        <SideMenu
-          onRequestClose={() => setIsMenuOpen(false)}
-          user={sideMenuUser}
-          menuItems={menuItems}
-          footerItems={footerItems}
-        />
-      )}
     </View>
   );
 }

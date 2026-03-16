@@ -3,7 +3,6 @@ import { useRouter } from "expo-router";
 import { Text, TouchableOpacity, View } from "react-native";
 
 import { InvitesInboxContent } from "@/src/features/invites/components/InvitesInboxContent";
-import { MenuButton, SideMenu } from "@/src/shared/components/SideMenu";
 
 import { useInvitesScreen } from "../hooks/useInvitesScreen";
 
@@ -16,11 +15,6 @@ export function InvitesScreen() {
     handleAcceptInvite,
     handleRejectInvite,
     error,
-    isMenuOpen,
-    setIsMenuOpen,
-    menuItems,
-    footerItems,
-    sideMenuUser,
   } = useInvitesScreen();
 
   return (
@@ -37,8 +31,6 @@ export function InvitesScreen() {
             {invitesByUser.length === 1 ? "pendente" : "pendentes"}
           </Text>
         </View>
-
-        <MenuButton onPress={() => setIsMenuOpen(true)} />
       </View>
 
       <InvitesInboxContent
@@ -49,15 +41,6 @@ export function InvitesScreen() {
         onAcceptInvite={handleAcceptInvite}
         onRejectInvite={handleRejectInvite}
       />
-
-      {isMenuOpen && sideMenuUser && (
-        <SideMenu
-          onRequestClose={() => setIsMenuOpen(false)}
-          user={sideMenuUser}
-          menuItems={menuItems}
-          footerItems={footerItems}
-        />
-      )}
     </View>
   );
 }
