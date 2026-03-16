@@ -1,5 +1,5 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   Image,
   Modal,
@@ -94,6 +94,8 @@ export function SideMenu({
     [user.name],
   );
 
+  const [photoError, setPhotoError] = useState(false);
+
   return (
     <Modal transparent animationType="none" onRequestClose={closeMenu}>
       <View className="flex-1 flex-row">
@@ -112,11 +114,12 @@ export function SideMenu({
             {/* User Header */}
             <View className="flex-row items-center justify-center gap-3 border-b border-gray-100 px-[40px] py-1 ">
               <View className="mb-3 h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-gray-200">
-                {user.photo ? (
+                {user.photo && !photoError ? (
                   <Image
                     source={{ uri: user.photo }}
                     style={{ width: 64, height: 64, borderRadius: 32 }}
                     resizeMode="cover"
+                    onError={() => setPhotoError(true)}
                   />
                 ) : (
                   <Text className="text-2xl font-bold text-gray-500">
