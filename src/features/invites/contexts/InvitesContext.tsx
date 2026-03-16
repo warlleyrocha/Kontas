@@ -8,6 +8,7 @@ import React, {
   useState,
 } from "react";
 
+import { useAuth } from "@/src/features/auth/contexts";
 import { inviteService } from "@/src/features/invites/services/invite.service";
 import {
   GetInvitesByUser,
@@ -32,6 +33,7 @@ export function InvitesProvider({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const [invitesByUser, setInvitesByUser] = useState<GetInvitesByUser[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,8 +49,10 @@ export function InvitesProvider({
   }, []);
 
   useEffect(() => {
-    void fetchInvitesByUser();
-  }, [fetchInvitesByUser]);
+    if (isAuthenticated) {
+      void fetchInvitesByUser();
+    }
+  }, [isAuthenticated, fetchInvitesByUser]);
 
   const handleAcceptInvite = useCallback(
     async (inviteId: string, republicaId: string) => {

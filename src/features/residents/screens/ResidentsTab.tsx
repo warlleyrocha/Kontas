@@ -12,9 +12,10 @@ import { useInvites } from "@/src/features/invites/hooks/useInvite";
 interface ResidentsTabProps {
   residents: ResidentResponse[];
   republicId: string;
+  isAdmin?: boolean;
 }
 
-export const ResidentsTab: FC<ResidentsTabProps> = ({ residents, republicId }) => {
+export const ResidentsTab: FC<ResidentsTabProps> = ({ residents, republicId, isAdmin }) => {
   const { copiarChavePix } = useTabResidents();
   const { refreshing, onRefresh } = useRefresh();
   const { sendInvite, loading, error } = useInvites();
@@ -50,7 +51,7 @@ export const ResidentsTab: FC<ResidentsTabProps> = ({ residents, republicId }) =
         }
       />
 
-      <AddAccountButton onPress={() => setModalOpen(true)} />
+      {isAdmin && <AddAccountButton onPress={() => setModalOpen(true)} />}
       <InviteModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}

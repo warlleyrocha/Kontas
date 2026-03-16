@@ -9,6 +9,7 @@ import { EditRepublicModal } from "@/src/features/republic/components/EditRepubl
 import { ResidentsTab } from "@/src/features/residents";
 import { RepublicHeader } from "../components/RepublicHeader";
 import { useRepublicScreen } from "../hooks/useRepublicScreen";
+import { ResidentRole } from "@/src/shared/types/resident.types";
 
 interface Props {
   readonly republicId: string;
@@ -78,7 +79,7 @@ export function RepublicScreen({ republicId }: Props) {
             currentResidentId={currentResidentId}
           />
         )}
-        {tab === "moradores" && <ResidentsTab residents={residents} republicId={republicId} />}
+        {tab === "moradores" && <ResidentsTab residents={residents} republicId={republicId} isAdmin={currentUserRole === ResidentRole.ADMIN} />}
         {tab === "resumo" && (
           <ResumeTab residents={residents} republicId={republicId} />
         )}
