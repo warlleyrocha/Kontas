@@ -33,7 +33,7 @@ export function InvitesScreen() {
         </TouchableOpacity>
 
         <View className="flex-1">
-          <Text className="text-lg font-semibold">Convites</Text>
+          <Text className="text-lg font-semibold">Meus Convites</Text>
           <Text className="text-sm text-gray-500">
             {invitesByUser.length}{" "}
             {invitesByUser.length === 1 ? "pendente" : "pendentes"}
