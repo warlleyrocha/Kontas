@@ -7,8 +7,9 @@ import React, {
 } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
 
-import Header from "@/src/shared/components/Header";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   PaymentsEmptyState,
   PaymentsErrorState,
@@ -81,6 +82,7 @@ interface PaymentsScreenProps {
 }
 
 export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
+  const router = useRouter();
   const { error, fetchAccounts, fetchAccountResidents } = useAccountData({
     republicId,
   });
@@ -290,6 +292,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
   } else if (filteredPaymentAccounts.length === 0) {
     content = (
       <PaymentsEmptyState
+        isRefreshing={isRefreshing}
         onRefresh={() => void loadPayments(true)}
         selectedStatus={selectedStatus}
       />
@@ -298,9 +301,18 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
 
   return (
     <SafeAreaView key={republicId} className="flex-1 bg-[#FAFAFA]">
-      <Header title="Pagamentos" />
+      <View className="flex-row items-center gap-3 border-b border-b-black/10 bg-[#FAFAFA] px-[16px] pb-4">
+        <TouchableOpacity onPress={() => router.back()} className="p-1">
+          <Ionicons name="arrow-back" size={24} color="#374151" />
+        </TouchableOpacity>
 
-      <View className="flex-1 px-4 pb-4">
+        <View className="flex-1">
+          <Text className="text-lg font-semibold">Pagamentos</Text>
+          <Text className="text-sm text-gray-500">{subtitle}</Text>
+        </View>
+      </View>
+
+      <View className="flex-1 px-4 py-4">
         <View className="mb-4">
           <Text className="mb-2 text-sm font-semibold text-gray-700">
             Filtrar por status:
@@ -335,7 +347,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
             })}
           </ScrollView>
         </View>
-        <Text className="mb-4 text-sm text-gray-500">{subtitle}</Text>
+
         {content}
       </View>
     </SafeAreaView>
