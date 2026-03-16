@@ -80,7 +80,7 @@ export function RepublicScreen({ republicId }: Props) {
             currentResidentId={currentResidentId}
           />
         )}
-        {tab === "moradores" && <ResidentsTab residents={residents} />}
+        {tab === "moradores" && <ResidentsTab residents={residents} republicId={republicId} />}
         {tab === "resumo" && (
           <ResumeTab residents={residents} republicId={republicId} />
         )}

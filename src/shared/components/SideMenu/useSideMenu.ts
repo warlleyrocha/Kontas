@@ -8,7 +8,7 @@ export function useSideMenu(
   context: UserMenuContext,
   handleSignOut: () => void,
   republicId?: string,
-  currentUserRole?: ResidentRole | null
+  currentUserRole?: ResidentRole | null,
 ) {
   const router = useRouter();
 
@@ -32,10 +32,6 @@ export function useSideMenu(
       params: { id: republicId },
     });
   }, [republicId, router]);
-
-  const navigateControlPanel = useCallback(() => {
-    router.push("/(userProfile)/control-panel");
-  }, [router]);
 
   const navigatePayments = useCallback(() => {
     if (!republicId) return;
@@ -62,7 +58,7 @@ export function useSideMenu(
       },
       invites: {
         id: "invites",
-        label: "Convites",
+        label: "Meus Convites",
         icon: "mail-outline" as const,
         onPress: navigateInvites,
       },
@@ -72,12 +68,7 @@ export function useSideMenu(
         icon: "mail-outline" as const,
         onPress: navigateInvitesSent,
       },
-      controlPanel: {
-        id: "controlPanel",
-        label: "Painel de Controle",
-        icon: "grid-outline" as const,
-        onPress: navigateControlPanel,
-      },
+
       payments: {
         id: "payment",
         label: "Pagamentos",
@@ -91,12 +82,7 @@ export function useSideMenu(
         if (currentUserRole === ResidentRole.USER) {
           return [base.home, base.profile, base.invitesSent];
         }
-        return [
-          base.profile,
-          base.invitesSent,
-          base.payments,
-          base.controlPanel,
-        ];
+        return [base.profile, base.invitesSent, base.payments];
 
       case "profile":
         return [base.home, base.invites];
@@ -114,7 +100,6 @@ export function useSideMenu(
     navigateProfile,
     navigateInvites,
     navigateInvitesSent,
-    navigateControlPanel,
     navigatePayments,
   ]);
 
@@ -134,7 +119,7 @@ export function useSideMenu(
         onPress: () =>
           void openLegalLink(
             legalLinks.privacyPolicy,
-            "Política de Privacidade"
+            "Política de Privacidade",
           ),
       },
       {
@@ -145,7 +130,7 @@ export function useSideMenu(
         danger: true,
       },
     ],
-    [handleSignOut]
+    [handleSignOut],
   );
 
   return { menuItems, footerItems };
