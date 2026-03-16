@@ -1,13 +1,15 @@
-import type { ResidentResponse } from "@/src/shared/types/resident.types";
 import Feather from "@expo/vector-icons/Feather";
 import { type FC, useState } from "react";
 import { FlatList, RefreshControl, Text, View } from "react-native";
+
+import { InviteModal } from "@/src/features/invites/components/InviteModal";
+import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
 import { ResidentCard } from "@/src/features/residents/components/ResidentCard";
 import { useTabResidents } from "@/src/features/residents/hooks/useTabResidents";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
+import type { ResidentResponse } from "@/src/shared/types/resident.types";
+
 import { AddAccountButton } from "../../accounts/components";
-import { InviteModal } from "@/src/features/invites/components/InviteModal";
-import { useInvites } from "@/src/features/invites/hooks/useInvite";
 
 interface ResidentsTabProps {
   residents: ResidentResponse[];
@@ -15,10 +17,16 @@ interface ResidentsTabProps {
   isAdmin?: boolean;
 }
 
-export const ResidentsTab: FC<ResidentsTabProps> = ({ residents, republicId, isAdmin }) => {
+export const ResidentsTab: FC<ResidentsTabProps> = ({
+  residents,
+  republicId,
+  isAdmin,
+}) => {
   const { copiarChavePix } = useTabResidents();
   const { refreshing, onRefresh } = useRefresh();
-  const { sendInvite, loading, error } = useInvites();
+
+  const { sendInvite, sendLoading, sendError } = useInvitesContext();
+
   const [modalOpen, setModalOpen] = useState(false);
 
   const renderMorador = ({ item }: { item: ResidentResponse }) => {
@@ -57,8 +65,8 @@ export const ResidentsTab: FC<ResidentsTabProps> = ({ residents, republicId, isA
         onClose={() => setModalOpen(false)}
         republicaId={republicId}
         sendInvite={sendInvite}
-        loading={loading}
-        error={error}
+        loading={sendLoading}
+        error={sendError}
       />
     </View>
   );
