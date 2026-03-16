@@ -28,13 +28,9 @@ export function useInvitesScreen() {
     handleRejectInvite,
   } = useInvitesContext();
 
-  const { menuItems, footerItems } = useSideMenu(
-    "invite",
-    handleSignOut,
-    undefined,
-    undefined,
-    pendingCount,
-  );
+  const { menuItems, footerItems } = useSideMenu("invite", handleSignOut, {
+    pendingInvitesCount: pendingCount,
+  });
 
   const sideMenuUser = useMemo(() => {
     return { name: user?.nome ?? "Usuário", photo: user?.fotoPerfil };

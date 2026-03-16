@@ -35,12 +35,10 @@ export function RepublicScreen({ republicId }: Props) {
     currentResidentId,
   } = useRepublicScreen(republicId);
 
-  const { menuItems, footerItems } = useSideMenu(
-    "home",
-    handleSignOut,
-    republic?.id,
+  const { menuItems, footerItems } = useSideMenu("home", handleSignOut, {
+    republicId: republic?.id,
     currentUserRole,
-  );
+  });
 
   if (isLoading) {
     return (

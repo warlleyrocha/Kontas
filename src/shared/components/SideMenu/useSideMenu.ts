@@ -4,13 +4,18 @@ import { legalLinks, openLegalLink } from "@/src/shared/constants/legal";
 import { ResidentRole } from "@/src/shared/types/resident.types";
 import { MenuItem, UserMenuContext } from "@/src/shared/types/sideMenu";
 
+interface SideMenuOptions {
+  republicId?: string;
+  currentUserRole?: ResidentRole | null;
+  pendingInvitesCount?: number;
+}
+
 export function useSideMenu(
   context: UserMenuContext,
   handleSignOut: () => void,
-  republicId?: string,
-  currentUserRole?: ResidentRole | null,
-  pendingInvitesCount?: number,
+  options: SideMenuOptions = {},
 ) {
+  const { republicId, currentUserRole, pendingInvitesCount } = options;
   const router = useRouter();
 
   const navigateHome = useCallback(() => {
