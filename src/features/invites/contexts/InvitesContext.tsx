@@ -142,7 +142,29 @@ export function InvitesProvider({
     setSendLoading(true);
     setSendError(null);
     try {
-      return await inviteService.sendInvite(payload);
+      const invite = await inviteService.sendInvite(payload);
+
+      setInvitesSentByRepublic((prev) => {
+        const republicId = invite.republicaId ?? payload.republicaId;
+        const currentInvites = prev[republicId] ?? [];
+        const alreadyExists = currentInvites.some((item) => item.id === invite.id);
+
+        if (alreadyExists) {
+          return {
+            ...prev,
+            [republicId]: currentInvites.map((item) =>
+              item.id === invite.id ? invite : item,
+            ),
+          };
+        }
+
+        return {
+          ...prev,
+          [republicId]: [invite, ...currentInvites],
+        };
+      });
+
+      return invite;
     } catch (err) {
       const message = getErrorMessage(err, "Erro ao enviar convite.");
       setSendError(message);

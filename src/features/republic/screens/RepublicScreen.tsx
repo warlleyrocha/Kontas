@@ -1,5 +1,5 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 
 import { useAccountList } from "@/src/features/accounts/hooks/useAccountList";
@@ -42,7 +42,12 @@ export function RepublicScreen({ republicId }: Props) {
     currentResidentId,
   } = useRepublicScreen(republicId);
 
-  const { pendingCount, invitesSentByRepublic } = useInvitesContext();
+  const { pendingCount, invitesSentByRepublic, fetchInvitesByRepublic } =
+    useInvitesContext();
+
+  useEffect(() => {
+    void fetchInvitesByRepublic(republicId);
+  }, [fetchInvitesByRepublic, republicId]);
 
   // Convites enviados pela república ainda sem resposta do convidado.
   // Derivado do cache do InvitesContext — sem custo extra de rede.
