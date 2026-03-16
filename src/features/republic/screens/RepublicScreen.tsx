@@ -1,15 +1,21 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useMemo } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
+
+import { useAccountList } from "@/src/features/accounts/hooks/useAccountList";
+import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
+import { StatusInvite } from "@/src/features/invites/types/invite.types";
+import { EditRepublicModal } from "@/src/features/republic/components/EditRepublicModal";
+import { ResidentsTab } from "@/src/features/residents";
+import { AccountsTab } from "@/src/features/accounts";
 import { SideMenu } from "@/src/shared/components/SideMenu";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
 import Tabs from "@/src/shared/components/Tabs";
 import { ResumeTab } from "@/src/shared/components/Tabs/Resume";
-import { AccountsTab } from "@/src/features/accounts";
-import { EditRepublicModal } from "@/src/features/republic/components/EditRepublicModal";
-import { ResidentsTab } from "@/src/features/residents";
+import { ResidentRole } from "@/src/shared/types/resident.types";
+
 import { RepublicHeader } from "../components/RepublicHeader";
 import { useRepublicScreen } from "../hooks/useRepublicScreen";
-import { ResidentRole } from "@/src/shared/types/resident.types";
 
 interface Props {
   readonly republicId: string;
@@ -36,9 +42,31 @@ export function RepublicScreen({ republicId }: Props) {
     currentResidentId,
   } = useRepublicScreen(republicId);
 
+  const { pendingCount, invitesSentByRepublic } = useInvitesContext();
+
+  // Convites enviados pela república ainda sem resposta do convidado.
+  // Derivado do cache do InvitesContext — sem custo extra de rede.
+  const pendingInvitesSentCount = useMemo(
+    () =>
+      (invitesSentByRepublic[republicId] ?? []).filter(
+        (i) => i.status === StatusInvite.PENDENTE,
+      ).length,
+    [invitesSentByRepublic, republicId],
+  );
+
+  // Contas da república ainda não pagas.
+  // Nota: useAccountList também é chamado por AccountsTab (mesmo republicId),
+  // o que gera um fetch duplo no mount. Tradeoff aceitável até que o estado
+  // de contas seja elevado para um contexto global.
+  const { contasOrdenadas } = useAccountList({ republicId });
+  const pendingPaymentsCount = contasOrdenadas.abertas.length;
+
   const { menuItems, footerItems } = useSideMenu("home", handleSignOut, {
     republicId: republic?.id,
     currentUserRole,
+    pendingInvitesCount: pendingCount,
+    pendingInvitesSentCount,
+    pendingPaymentsCount,
   });
 
   if (isLoading) {

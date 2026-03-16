@@ -7,7 +7,12 @@ import { MenuItem, UserMenuContext } from "@/src/shared/types/sideMenu";
 interface SideMenuOptions {
   republicId?: string;
   currentUserRole?: ResidentRole | null;
+  /** Badge em "Meus Convites" — convites recebidos pelo usuário com status PENDENTE */
   pendingInvitesCount?: number;
+  /** Badge em "Convites Enviados" — convites enviados pela república com status PENDENTE */
+  pendingInvitesSentCount?: number;
+  /** Badge em "Pagamentos" — contas da república ainda não pagas */
+  pendingPaymentsCount?: number;
 }
 
 export function useSideMenu(
@@ -15,7 +20,13 @@ export function useSideMenu(
   handleSignOut: () => void,
   options: SideMenuOptions = {},
 ) {
-  const { republicId, currentUserRole, pendingInvitesCount } = options;
+  const {
+    republicId,
+    currentUserRole,
+    pendingInvitesCount,
+    pendingInvitesSentCount,
+    pendingPaymentsCount,
+  } = options;
   const router = useRouter();
 
   const navigateHome = useCallback(() => {
@@ -74,6 +85,7 @@ export function useSideMenu(
         label: "Convites Enviados",
         icon: "mail-outline" as const,
         onPress: navigateInvitesSent,
+        badge: pendingInvitesSentCount,
       },
 
       payments: {
@@ -81,6 +93,7 @@ export function useSideMenu(
         label: "Pagamentos",
         icon: "wallet-outline" as const,
         onPress: navigatePayments,
+        badge: pendingPaymentsCount,
       },
     };
 
@@ -104,6 +117,8 @@ export function useSideMenu(
     context,
     currentUserRole,
     pendingInvitesCount,
+    pendingInvitesSentCount,
+    pendingPaymentsCount,
     navigateHome,
     navigateProfile,
     navigateInvites,
