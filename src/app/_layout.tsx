@@ -1,6 +1,7 @@
 import LoadingScreen from "@/src/shared/components/ui/loading-screen";
 import { Toaster } from "@/src/shared/components/ui/sonner";
 import { AuthProvider, useAuth } from "@/src/features/auth/contexts";
+import { RepublicListProvider } from "@/src/features/republic/contexts/RepublicListContext";
 import { InvitesProvider } from "@/src/features/invites/contexts/InvitesContext";
 import { RefreshProvider } from "@/src/shared/contexts/RefreshContext";
 import { GlobalErrorBoundary } from "@/src/shared/components/error-boundary/GlobalErrorBoundary";
@@ -103,12 +104,14 @@ function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <GlobalErrorBoundary>
         <AuthProvider>
-          <InvitesProvider>
-            <RefreshProvider>
-              <RootStack />
-              <Toaster position="bottom-center" />
-            </RefreshProvider>
-          </InvitesProvider>
+          <RepublicListProvider>
+            <InvitesProvider>
+              <RefreshProvider>
+                <RootStack />
+                <Toaster position="bottom-center" />
+              </RefreshProvider>
+            </InvitesProvider>
+          </RepublicListProvider>
         </AuthProvider>
       </GlobalErrorBoundary>
     </GestureHandlerRootView>
