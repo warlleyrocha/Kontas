@@ -19,6 +19,7 @@ export interface MenuItem {
   onPress: () => void;
   icon?: keyof typeof Ionicons.glyphMap;
   danger?: boolean;
+  badge?: number;
 }
 
 interface UserInfo {
@@ -64,6 +65,13 @@ function MenuItemComponent({ item, onClose }: MenuItemComponentProps) {
         />
       )}
       <Text className={textClassName}>{item.label}</Text>
+      {!!item.badge && item.badge > 0 && (
+        <View className="ml-2 h-5 min-w-5 items-center justify-center rounded-full bg-yellow-400 px-1">
+          <Text className="text-xs font-semibold text-gray-800">
+            {item.badge > 99 ? "99+" : item.badge}
+          </Text>
+        </View>
+      )}
     </TouchableOpacity>
   );
 }

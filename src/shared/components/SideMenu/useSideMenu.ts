@@ -9,6 +9,7 @@ export function useSideMenu(
   handleSignOut: () => void,
   republicId?: string,
   currentUserRole?: ResidentRole | null,
+  pendingInvitesCount?: number,
 ) {
   const router = useRouter();
 
@@ -61,6 +62,7 @@ export function useSideMenu(
         label: "Meus Convites",
         icon: "mail-outline" as const,
         onPress: navigateInvites,
+        badge: pendingInvitesCount,
       },
       invitesSent: {
         id: "invitesSent",
@@ -96,6 +98,7 @@ export function useSideMenu(
   }, [
     context,
     currentUserRole,
+    pendingInvitesCount,
     navigateHome,
     navigateProfile,
     navigateInvites,

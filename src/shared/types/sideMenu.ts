@@ -14,4 +14,5 @@ export interface MenuItem {
     | "log-out-outline";
   onPress: () => void;
   danger?: boolean;
+  badge?: number;
 }
