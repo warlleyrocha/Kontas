@@ -1,3 +1,4 @@
+import { useAuth } from "@/src/features/auth/contexts";
 import { useResidents } from "@/src/features/residents/hooks/useResidents";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import { ResidentRole } from "@/src/shared/types/resident.types";
@@ -7,6 +8,7 @@ export function useRepublicResidents(
   republics: RepublicResponse[],
   currentUserEmail?: string | null
 ) {
+  const { isAuthenticated } = useAuth();
   const { fetchResidents } = useResidents();
   const [residentsCount, setResidentsCount] = useState<Record<string, number>>(
     {}
@@ -17,7 +19,7 @@ export function useRepublicResidents(
   const [loading, setLoading] = useState(false);
 
   const loadResidentsCount = useCallback(async () => {
-    if (republics.length === 0) {
+    if (!isAuthenticated || republics.length === 0) {
       setResidentsCount({});
       setUserRolesByRepublic({});
       return;
@@ -62,7 +64,7 @@ export function useRepublicResidents(
     } finally {
       setLoading(false);
     }
-  }, [republics, fetchResidents, currentUserEmail]);
+  }, [isAuthenticated, republics, fetchResidents, currentUserEmail]);
 
   useEffect(() => {
     loadResidentsCount();
