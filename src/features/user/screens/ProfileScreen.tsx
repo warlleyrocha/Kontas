@@ -36,7 +36,7 @@ interface ProfileContentProps {
   readonly onSelectRepublic: (republicId: string) => void;
   readonly onLongPressRepublic: (
     republic: RepublicResponse,
-    position: CardPosition,
+    position: CardPosition
   ) => void;
   readonly onRefresh: () => void;
 }

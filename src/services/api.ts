@@ -38,7 +38,6 @@ const circuitBreaker = {
   halfOpenInFlight: false,
 };
 
-
 const canProceed = (): { allowed: boolean; halfOpen: boolean } => {
   if (circuitBreaker.state === "OPEN") {
     if (Date.now() >= circuitBreaker.nextAttempt) {

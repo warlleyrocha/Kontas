@@ -26,16 +26,16 @@ interface AccountCardProps {
   onLongPress?: (position: CardPosition) => void;
   onConfirmResidentPayment?: (
     accountId: string,
-    accountResidentId: string,
+    accountResidentId: string
   ) => Promise<void> | void;
   onPatch?: (
     accountId: string,
-    metodoPagamento: MetodoPagamento,
+    metodoPagamento: MetodoPagamento
   ) => Promise<void> | void;
 }
 
 const normalizeMetodoPagamento = (
-  metodoPagamento: string | null,
+  metodoPagamento: string | null
 ): MetodoPagamento => {
   if (!metodoPagamento) return MetodoPagamento.PIX; // fallback
 
@@ -105,120 +105,119 @@ export const AccountCard = ({
 
   return (
     <View ref={cardRef}>
-    <TouchableOpacity
-      onPress={() => {}}
-      onLongPress={handleLongPress}
-      delayLongPress={400}
-      activeOpacity={0.7}
-    >
-      <View
-        className={`mb-3 rounded-lg bg-white shadow-sm ${
-          vencida ? "border border-orange-300 bg-orange-50" : ""
-        }`}
+      <TouchableOpacity
+        onPress={() => {}}
+        onLongPress={handleLongPress}
+        delayLongPress={400}
+        activeOpacity={0.7}
       >
-        {/* HEADER: Status + Descrição + Valor */}
-        <View className="flex-row items-center justify-between border-b border-gray-100 px-4 py-3">
-          <TouchableOpacity
-            className="flex-1 flex-row items-center gap-2"
-            disabled={paga || isPatching}
-            onPress={async (e) => {
-              e.stopPropagation();
-              await handlePatchAccount();
-            }}
-          >
-            <AccountStatusIcon
-              icon={contaStatusIcon}
-              size={24}
-              isLoading={isPatching}
-            />
-            <Text
-              className={`flex-1 text-base font-semibold ${
-                paga ? "text-gray-400 line-through" : "text-gray-800"
-              }`}
+        <View
+          className={`mb-3 rounded-lg bg-white shadow-sm ${
+            vencida ? "border border-orange-300 bg-orange-50" : ""
+          }`}
+        >
+          {/* HEADER: Status + Descrição + Valor */}
+          <View className="flex-row items-center justify-between border-b border-gray-100 px-4 py-3">
+            <TouchableOpacity
+              className="flex-1 flex-row items-center gap-2"
+              disabled={paga || isPatching}
+              onPress={async (e) => {
+                e.stopPropagation();
+                await handlePatchAccount();
+              }}
             >
-              {conta.descricao}
-            </Text>
-          </TouchableOpacity>
-
-          <Text className="ml-2 font-bold text-teal">
-            R$ {conta.valor.toFixed(2)}
-          </Text>
-        </View>
-
-        {/* INFO SECUNDÁRIAS: Data + Responsável */}
-        <View className="border-b border-gray-100 px-4 py-3">
-          <View className="flex-row items-center justify-between gap-4">
-            {/* Responsável */}
-            <View className="rounded-md border border-teal/40 px-2 py-1">
-              <Text className="text-xs text-teal">
-                Responsável: {criadoPorNome}
+              <AccountStatusIcon
+                icon={contaStatusIcon}
+                size={24}
+                isLoading={isPatching}
+              />
+              <Text
+                className={`flex-1 text-base font-semibold ${
+                  paga ? "text-gray-400 line-through" : "text-gray-800"
+                }`}
+              >
+                {conta.descricao}
               </Text>
-            </View>
+            </TouchableOpacity>
 
-            {/* Data */}
-            <View className="flex-row items-center gap-1">
-              <Ionicons name="calendar-outline" size={16} color="#337176" />
-              <Text className="text-sm text-gray-600">{vencimentoLabel}</Text>
-            </View>
+            <Text className="ml-2 font-bold text-teal">
+              R$ {conta.valor.toFixed(2)}
+            </Text>
           </View>
-        </View>
 
-        {/* MORADORES - DROPDOWN */}
-        <View className="border-b border-gray-100">
-          <TouchableOpacity
-            onPress={(e) => {
-              e.stopPropagation();
-              onToggleExpand();
-            }}
-            className="flex-row items-center justify-between px-4 py-3"
-          >
-            <View className="flex-row items-center gap-2">
-              <Ionicons name="people-outline" size={18} color="#337176" />
-              <Text className="font-semibold text-gray-700">Moradores</Text>
-              <View className="rounded-full bg-teal/15 px-2 py-0.5">
-                <Text className="text-xs font-semibold text-teal">
-                  {isLoadingMoradores ? "..." : moradores.length}
+          {/* INFO SECUNDÁRIAS: Data + Responsável */}
+          <View className="border-b border-gray-100 px-4 py-3">
+            <View className="flex-row items-center justify-between gap-4">
+              {/* Responsável */}
+              <View className="rounded-md border border-teal/40 px-2 py-1">
+                <Text className="text-xs text-teal">
+                  Responsável: {criadoPorNome}
                 </Text>
               </View>
-            </View>
-            <MaterialCommunityIcons
-              name={expanded ? "chevron-up" : "chevron-down"}
-              size={24}
-              color="#337176"
-            />
-          </TouchableOpacity>
 
-          {/* CONTEÚDO: Lista de Moradores */}
-          {expanded && (
-            <View className="border-t border-teal/10 bg-teal/5">
-              <AccountResidentsContent
-                accountId={conta.id}
-                moradores={moradores}
-                isLoadingMoradores={isLoadingMoradores}
-                updatingResidentById={updatingResidentById}
-                currentResidentId={currentResidentId}
-                onConfirmResidentPayment={onConfirmResidentPayment}
-              />
+              {/* Data */}
+              <View className="flex-row items-center gap-1">
+                <Ionicons name="calendar-outline" size={16} color="#337176" />
+                <Text className="text-sm text-gray-600">{vencimentoLabel}</Text>
+              </View>
             </View>
-          )}
-        </View>
+          </View>
 
-        {/* FOOTER: Ações */}
-        <View className="flex-row gap-2 px-4 py-3">
-          {/* Copiar PIX */}
-          {!paga && (
+          {/* MORADORES - DROPDOWN */}
+          <View className="border-b border-gray-100">
             <TouchableOpacity
-              onPress={() => {}}
-              className="flex-1 flex-row items-center justify-center rounded-md border border-teal/40 py-2"
+              onPress={(e) => {
+                e.stopPropagation();
+                onToggleExpand();
+              }}
+              className="flex-row items-center justify-between px-4 py-3"
             >
-              <Feather name="copy" size={16} color="#337176" />
-              <Text className="ml-2 text-sm text-gray-700">Copiar PIX</Text>
+              <View className="flex-row items-center gap-2">
+                <Ionicons name="people-outline" size={18} color="#337176" />
+                <Text className="font-semibold text-gray-700">Moradores</Text>
+                <View className="rounded-full bg-teal/15 px-2 py-0.5">
+                  <Text className="text-xs font-semibold text-teal">
+                    {isLoadingMoradores ? "..." : moradores.length}
+                  </Text>
+                </View>
+              </View>
+              <MaterialCommunityIcons
+                name={expanded ? "chevron-up" : "chevron-down"}
+                size={24}
+                color="#337176"
+              />
             </TouchableOpacity>
-          )}
 
+            {/* CONTEÚDO: Lista de Moradores */}
+            {expanded && (
+              <View className="border-t border-teal/10 bg-teal/5">
+                <AccountResidentsContent
+                  accountId={conta.id}
+                  moradores={moradores}
+                  isLoadingMoradores={isLoadingMoradores}
+                  updatingResidentById={updatingResidentById}
+                  currentResidentId={currentResidentId}
+                  onConfirmResidentPayment={onConfirmResidentPayment}
+                />
+              </View>
+            )}
+          </View>
+
+          {/* FOOTER: Ações */}
+          <View className="flex-row gap-2 px-4 py-3">
+            {/* Copiar PIX */}
+            {!paga && (
+              <TouchableOpacity
+                onPress={() => {}}
+                className="flex-1 flex-row items-center justify-center rounded-md border border-teal/40 py-2"
+              >
+                <Feather name="copy" size={16} color="#337176" />
+                <Text className="ml-2 text-sm text-gray-700">Copiar PIX</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
     </View>
   );
 };

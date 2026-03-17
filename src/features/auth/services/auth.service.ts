@@ -37,7 +37,11 @@ export const authService = {
 
       logger.info("Auth", "Perfil completado com sucesso no backend");
     } catch (error) {
-      logger.error("Auth", "Erro ao completar perfil", error instanceof Error ? error : undefined);
+      logger.error(
+        "Auth",
+        "Erro ao completar perfil",
+        error instanceof Error ? error : undefined
+      );
       throw toUserFriendlyError(error, {
         defaultMessage: "Erro ao completar perfil.",
         statusMessages: {

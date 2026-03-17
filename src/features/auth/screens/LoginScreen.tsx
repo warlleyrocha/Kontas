@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import IconGoogle from "@/assets/images/google-icon.svg";
+import ImageLogin from "@/assets/images/image-login.webp";
 import { useAuth } from "@/src/features/auth/contexts/AuthContext";
 import { getErrorMessage } from "@/src/services/httpError";
 import { legalLinks, openLegalLink } from "@/src/shared/constants/legal";
@@ -70,7 +71,7 @@ export default function LoginScreen() {
   return (
     <View className="flex-1 items-center bg-white">
       <Image
-        source={require("@/assets/images/image-login.webp")}
+        source={ImageLogin}
         style={{
           width: "100%",
           height: height * 0.5,

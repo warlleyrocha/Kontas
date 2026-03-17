@@ -12,8 +12,8 @@ import {
 } from "react-native";
 import ImageDefault from "@/assets/images/image-register.webp";
 import InputField from "@/src/shared/components/ui/input-field";
-import { useRepublicActions } from "../hooks/useRepublicActions";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
+import { useRepublicActions } from "../hooks/useRepublicActions";
 import { useRepublicForm } from "../hooks/useRepublicForm";
 
 export function RegisterRepublicScreen() {

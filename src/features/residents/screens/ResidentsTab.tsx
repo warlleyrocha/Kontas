@@ -7,9 +7,8 @@ import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContex
 import { ResidentCard } from "@/src/features/residents/components/ResidentCard";
 import { useTabResidents } from "@/src/features/residents/hooks/useTabResidents";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
-import type { ResidentResponse } from "@/src/shared/types/resident.types";
-
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
+import type { ResidentResponse } from "@/src/shared/types/resident.types";
 import { AddAccountButton } from "../../accounts/components";
 
 interface ResidentsTabProps {

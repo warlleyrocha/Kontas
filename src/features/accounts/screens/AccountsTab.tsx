@@ -75,7 +75,7 @@ export function AccountsTab({
     (accountId: string, position: CardPosition) => {
       setContextMenu({ visible: true, accountId, position });
     },
-    [],
+    []
   );
 
   const handleContextMenuClose = useCallback(() => {

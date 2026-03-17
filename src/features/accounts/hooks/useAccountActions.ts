@@ -4,8 +4,8 @@ import { toast } from "@/src/shared/components/ui/sonner";
 import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
 import { AccountRecoveryToast } from "../components";
-import { accountResidentsService } from "../services/account-residents.service";
 import { accountService } from "../services/account.service";
+import { accountResidentsService } from "../services/account-residents.service";
 import type {
   CriarContaComMoradoresRequest,
   ListarContasResponse,
@@ -71,7 +71,9 @@ export function useAccountActions({
 
       try {
         const { moradorIds, ...contaPayload } = data;
-        logger.debug("Accounts", "Payload de submit", { metodoPagamento: data.metodoPagamento });
+        logger.debug("Accounts", "Payload de submit", {
+          metodoPagamento: data.metodoPagamento,
+        });
         const conta = await accountService.criarConta(contaPayload);
 
         if (moradorIds.length > 0) {

@@ -32,7 +32,11 @@ export const republicService = {
 
       return response.data;
     } catch (error) {
-      logger.error("Republic", "Erro ao buscar repúblicas", error instanceof Error ? error : undefined);
+      logger.error(
+        "Republic",
+        "Erro ao buscar repúblicas",
+        error instanceof Error ? error : undefined
+      );
       throw toUserFriendlyError(error, {
         defaultMessage: "Erro ao obter repúblicas.",
         statusMessages: {

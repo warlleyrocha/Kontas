@@ -14,11 +14,11 @@ export function useComponentLogger(name: string) {
   // Loga cada re-render com contador
   logger.debug(name, `render #${renderCount.current}`);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: executa apenas no mount/unmount
   useEffect(() => {
     logger.info(name, "mounted");
     return () => {
       logger.info(name, "unmounted");
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }

@@ -2,8 +2,8 @@
 import { useMemo } from "react";
 
 import {
-  StatusConta,
   type Conta,
+  StatusConta,
 } from "@/src/features/accounts/types/account.types";
 
 interface UseAccountDerivedDataProps {
@@ -31,7 +31,7 @@ export function useAccountDerivedData({
     return contas.map((conta) => {
       const vencimento = new Date(conta.vencimento);
       const mesReferencia = `${vencimento.getFullYear()}-${String(
-        vencimento.getMonth() + 1,
+        vencimento.getMonth() + 1
       ).padStart(2, "0")}`;
       return { ...conta, mesReferencia };
     });

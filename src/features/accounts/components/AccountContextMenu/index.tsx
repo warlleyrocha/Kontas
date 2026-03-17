@@ -64,17 +64,19 @@ function useContextMenuAnimation(translateYOutput: number) {
           if (finished && callback) {
             scheduleOnRN(callback);
           }
-        },
+        }
       );
     },
-    [opacity, scale],
+    [opacity, scale]
   );
 
   const menuAnimatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
     transform: [
       { scale: scale.value },
-      { translateY: interpolate(scale.value, [0.85, 1], [translateYOutput, 0]) },
+      {
+        translateY: interpolate(scale.value, [0.85, 1], [translateYOutput, 0]),
+      },
     ],
   }));
 
@@ -92,12 +94,9 @@ export function AccountContextMenu({
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const resolvedPosition = position ?? { x: 0, y: 0, width: 0, height: 0 };
 
-  const menuTotalHeight = isAdmin
-    ? MENU_ITEM_HEIGHT * 2 + 1
-    : MENU_ITEM_HEIGHT;
+  const menuTotalHeight = isAdmin ? MENU_ITEM_HEIGHT * 2 + 1 : MENU_ITEM_HEIGHT;
 
-  let menuX =
-    resolvedPosition.x + resolvedPosition.width / 2 - MENU_WIDTH / 2;
+  let menuX = resolvedPosition.x + resolvedPosition.width / 2 - MENU_WIDTH / 2;
   menuX = Math.max(12, Math.min(menuX, screenWidth - MENU_WIDTH - 12));
 
   const spaceBelow =

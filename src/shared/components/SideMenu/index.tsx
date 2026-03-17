@@ -71,9 +71,7 @@ function MenuSubItemComponent({ item, onClose }: MenuSubItemComponentProps) {
             onError={() => setImageError(true)}
           />
         ) : (
-          <Text className="text-sm font-semibold text-teal">
-            {itemInitial}
-          </Text>
+          <Text className="text-sm font-semibold text-teal">{itemInitial}</Text>
         )}
       </View>
 
