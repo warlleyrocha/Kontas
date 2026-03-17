@@ -1,5 +1,4 @@
 import Feather from "@expo/vector-icons/Feather";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import React, { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
@@ -9,19 +8,15 @@ import { MenuButton } from "@/src/shared/components/SideMenu";
 interface RepublicHeaderProps {
   readonly republic: RepublicResponse;
   readonly numberResidents: number;
-  readonly isFavorited: boolean;
   readonly onEdit: () => void;
-  readonly onToggleFavorite: () => void;
   readonly onMenuOpen: () => void;
   readonly hasNotification?: boolean;
 }
 
 export function RepublicHeader({
   republic,
-  isFavorited,
   numberResidents,
   onEdit,
-  onToggleFavorite,
   onMenuOpen,
   hasNotification,
 }: RepublicHeaderProps) {
@@ -56,22 +51,6 @@ export function RepublicHeader({
         <Text className="text-sm text-gray-500">
           {numberResidents} {residentsLabel}
         </Text>
-      </TouchableOpacity>
-
-      {/* Favorito */}
-      <TouchableOpacity
-        onPress={onToggleFavorite}
-        className="items-center justify-center rounded-full p-2 mb-2"
-        accessibilityRole="button"
-        accessibilityLabel={
-          isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"
-        }
-      >
-        <MaterialCommunityIcons
-          name={isFavorited ? "star" : "star-outline"}
-          size={22}
-          color={isFavorited ? "#f59e0b" : "#6b7280"}
-        />
       </TouchableOpacity>
 
       {/* Menu lateral */}

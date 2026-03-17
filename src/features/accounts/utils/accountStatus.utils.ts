@@ -45,19 +45,19 @@ export function getContaStatusVisual(conta: Conta): StatusConta {
     atrasadaPorVencimento = vencimento < new Date();
   }
 
-  if (conta.pago || conta.status === StatusConta.PAGO) {
-    return StatusConta.PAGO;
+  if (conta.status === StatusConta.PAGA) {
+    return StatusConta.PAGA;
   }
 
-  if (conta.status === StatusConta.ATRASADO || atrasadaPorVencimento) {
-    return StatusConta.ATRASADO;
+  if (conta.status === StatusConta.ATRASADA || atrasadaPorVencimento) {
+    return StatusConta.ATRASADA;
   }
 
   return StatusConta.PENDENTE;
 }
 
 export function getContaStatusIcon(statusConta: StatusConta): ContaStatusIcon {
-  if (statusConta === StatusConta.PAGO) {
+  if (statusConta === StatusConta.PAGA) {
     return {
       library: "material",
       name: "payment",
@@ -65,7 +65,7 @@ export function getContaStatusIcon(statusConta: StatusConta): ContaStatusIcon {
     };
   }
 
-  if (statusConta === StatusConta.ATRASADO) {
+  if (statusConta === StatusConta.ATRASADA) {
     return {
       library: "material-community",
       name: "alert-circle-outline",

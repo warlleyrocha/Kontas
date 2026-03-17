@@ -46,8 +46,8 @@ export default function RepublicList({
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={["#6366F1"]} // Cor do loading (Android)
-            tintColor="#6366F1" // Cor do loading (iOS)
+            colors={["#337176"]} // Cor do loading (Android)
+            tintColor="#337176" // Cor do loading (iOS)
           />
         ) : undefined
       }
@@ -70,11 +70,11 @@ export default function RepublicList({
 
       <TouchableOpacity
         onPress={onCreateRepublic}
-        className="mb-6 mt-2 flex-row items-center justify-center rounded-xl border-2 border-dashed border-indigo-300 bg-indigo-50 px-6 py-4"
+        className="mb-6 mt-2 flex-row items-center justify-center rounded-xl border-2 border-dashed border-teal/40 bg-teal/5 px-6 py-4"
         activeOpacity={0.8}
       >
-        <Ionicons name="add-circle-outline" size={24} color="#6366F1" />
-        <Text className="ml-2 text-base font-semibold text-indigo-600">
+        <Ionicons name="add-circle-outline" size={24} color="#337176" />
+        <Text className="ml-2 text-base font-semibold text-teal">
           Adicionar Nova República
         </Text>
       </TouchableOpacity>

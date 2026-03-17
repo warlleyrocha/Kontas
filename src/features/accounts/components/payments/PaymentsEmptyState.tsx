@@ -31,10 +31,10 @@ function getEmptyStateContent(selectedStatus: PaymentStatusFilter) {
   }
 
   return {
-    bgColor: "bg-slate-100",
+    bgColor: "bg-teal/10",
     description:
       "Não há pagamentos com status PAGO ou aguardando confirmação no momento.",
-    iconColor: "#475569",
+    iconColor: "#337176",
     title: "Nenhum pagamento encontrado",
   };
 }

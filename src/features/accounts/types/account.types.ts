@@ -3,8 +3,8 @@ import { ContaMorador } from "@/src/features/accounts/types/accountResidents.typ
 // Enums
 export enum StatusConta {
   PENDENTE = "PENDENTE",
-  PAGO = "PAGO",
-  ATRASADO = "ATRASADO",
+  PAGA = "PAGA",
+  ATRASADA = "ATRASADA",
 }
 
 export enum MetodoPagamento {
@@ -23,7 +23,7 @@ export type Conta = {
   republicaId: string;
   criadoPorId: string;
   criadoPorNome: string;
-  metodoPagamento: string;
+  metodoPagamento: string | null;
   pago: boolean;
   pagoEm?: Date | null;
   criadoEm: string;

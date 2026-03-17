@@ -59,7 +59,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
             <View className="mb-6 flex-row items-center justify-between">
               <Text className="text-xl font-semibold">Enviar convite</Text>
               <TouchableOpacity onPress={onClose}>
-                <Feather name="x" size={24} color="#374151" />
+                <Feather name="x" size={24} color="#337176" />
               </TouchableOpacity>
             </View>
 
@@ -86,7 +86,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
               <TouchableOpacity
                 onPress={handleSubmit}
                 disabled={loading}
-                className="flex-1 items-center rounded-lg bg-indigo-600 py-3"
+                className="flex-1 items-center rounded-lg bg-teal py-3"
               >
                 {loading ? (
                   <ActivityIndicator color="#fff" />

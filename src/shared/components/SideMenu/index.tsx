@@ -58,11 +58,11 @@ function MenuSubItemComponent({ item, onClose }: MenuSubItemComponentProps) {
   return (
     <TouchableOpacity
       className={`flex-row items-center gap-3 rounded-xl px-3 py-2 ${
-        item.active ? "bg-gray-100" : ""
+        item.active ? "bg-teal/10" : ""
       }`}
       onPress={handlePress}
     >
-      <View className="h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-gray-200">
+      <View className="h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-teal/15">
         {item.image && !imageError ? (
           <Image
             source={{ uri: item.image }}
@@ -71,7 +71,7 @@ function MenuSubItemComponent({ item, onClose }: MenuSubItemComponentProps) {
             onError={() => setImageError(true)}
           />
         ) : (
-          <Text className="text-sm font-semibold text-gray-500">
+          <Text className="text-sm font-semibold text-teal">
             {itemInitial}
           </Text>
         )}
@@ -80,7 +80,7 @@ function MenuSubItemComponent({ item, onClose }: MenuSubItemComponentProps) {
       <Text
         className={`flex-1 text-sm ${
           item.active
-            ? "font-semibold text-gray-900"
+            ? "font-semibold text-teal-dark"
             : "font-normal text-gray-500"
         }`}
       >
@@ -110,7 +110,7 @@ function MenuItemComponent({
     setTimeout(item.onPress, 250);
   }, [isExpandable, item.id, item.onPress, onClose, onToggleExpand]);
 
-  const iconColor = item.danger ? "#ef4444" : "#374151";
+  const iconColor = item.danger ? "#ef4444" : "#337176";
   const textClassName = `text-base ${item.danger ? "text-red-500" : "text-gray-700"}`;
 
   return (
@@ -140,7 +140,7 @@ function MenuItemComponent({
             <Ionicons
               name={isExpanded ? "chevron-up" : "chevron-down"}
               size={18}
-              color="#6B7280"
+              color="#337176"
             />
           )}
         </View>
@@ -209,7 +209,7 @@ export function SideMenu({
           <SafeAreaView className="flex-1">
             {/* User Header */}
             <View className="flex-row items-start gap-3 border-b border-gray-100 px-5 py-3">
-              <View className="h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-gray-200">
+              <View className="h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-teal/20">
                 {user.photo && !photoError ? (
                   <Image
                     source={{ uri: user.photo }}
@@ -218,7 +218,7 @@ export function SideMenu({
                     onError={() => setPhotoError(true)}
                   />
                 ) : (
-                  <Text className="text-2xl font-bold text-gray-500">
+                  <Text className="text-2xl font-bold text-teal">
                     {userInitial}
                   </Text>
                 )}
@@ -234,8 +234,8 @@ export function SideMenu({
                     {user.name}
                   </Text>
                   {user.roleLabel && (
-                    <View className="rounded-full bg-sky-100 px-2.5 py-1">
-                      <Text className="text-xs font-semibold text-sky-700">
+                    <View className="rounded-full bg-teal/15 px-2.5 py-1">
+                      <Text className="text-xs font-semibold text-teal-dark">
                         {user.roleLabel}
                       </Text>
                     </View>
@@ -313,7 +313,7 @@ interface MenuButtonProps {
 export function MenuButton({ onPress, hasNotification }: MenuButtonProps) {
   return (
     <TouchableOpacity onPress={onPress} className="p-2" activeOpacity={0.7}>
-      <Ionicons name="menu" size={28} color="#374151" />
+      <Ionicons name="menu" size={28} color="#337176" />
       {hasNotification && (
         <View className="absolute right-1 top-1 h-3 w-3 rounded-full bg-yellow-400" />
       )}

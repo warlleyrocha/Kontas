@@ -1,7 +1,7 @@
 import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
 import { Conta, MetodoPagamento, StatusConta } from "../../types/account.types";
@@ -10,6 +10,7 @@ import {
   getContaStatusVisual,
   parseContaVencimento,
 } from "../../utils/accountStatus.utils";
+import { type CardPosition } from "../AccountContextMenu";
 import { AccountStatusIcon } from "../shared/AccountStatusIcon";
 import { AccountResidentsContent } from "./AccountResidentsContent";
 
@@ -22,18 +23,22 @@ interface AccountCardProps {
   isLoadingMoradores: boolean;
   updatingResidentById: Record<string, boolean>;
   currentResidentId: string | null;
+  onLongPress?: (position: CardPosition) => void;
   onConfirmResidentPayment?: (
     accountId: string,
-    accountResidentId: string
+    accountResidentId: string,
   ) => Promise<void> | void;
-  onDelete?: (accountId: string) => Promise<void> | void;
   onPatch?: (
     accountId: string,
-    metodoPagamento: MetodoPagamento
+    metodoPagamento: MetodoPagamento,
   ) => Promise<void> | void;
 }
 
-const normalizeMetodoPagamento = (metodoPagamento: string): MetodoPagamento => {
+const normalizeMetodoPagamento = (
+  metodoPagamento: string | null,
+): MetodoPagamento => {
+  if (!metodoPagamento) return MetodoPagamento.PIX; // fallback
+
   const normalized = metodoPagamento
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -60,10 +65,11 @@ export const AccountCard = ({
   isLoadingMoradores,
   updatingResidentById,
   currentResidentId,
+  onLongPress,
   onConfirmResidentPayment,
-  onDelete,
   onPatch,
 }: AccountCardProps) => {
+  const cardRef = useRef<View>(null);
   const [isPatching, setIsPatching] = useState(false);
   const vencimento = parseContaVencimento(conta.vencimento);
   const contaStatusVisual = getContaStatusVisual(conta);
@@ -72,8 +78,14 @@ export const AccountCard = ({
     ? vencimento.toLocaleDateString("pt-BR")
     : "Data inválida";
 
-  const paga = contaStatusVisual === StatusConta.PAGO;
-  const vencida = contaStatusVisual === StatusConta.ATRASADO;
+  const paga = contaStatusVisual === StatusConta.PAGA;
+  const vencida = contaStatusVisual === StatusConta.ATRASADA;
+
+  const handleLongPress = () => {
+    cardRef.current?.measure((_x, _y, width, height, pageX, pageY) => {
+      onLongPress?.({ x: pageX, y: pageY, width, height });
+    });
+  };
 
   const handlePatchAccount = async () => {
     if (paga || isPatching || !onPatch) {
@@ -92,8 +104,11 @@ export const AccountCard = ({
   };
 
   return (
+    <View ref={cardRef}>
     <TouchableOpacity
       onPress={() => {}}
+      onLongPress={handleLongPress}
+      delayLongPress={400}
       activeOpacity={0.7}
     >
       <View
@@ -125,7 +140,7 @@ export const AccountCard = ({
             </Text>
           </TouchableOpacity>
 
-          <Text className="ml-2 font-bold text-indigo-600">
+          <Text className="ml-2 font-bold text-teal">
             R$ {conta.valor.toFixed(2)}
           </Text>
         </View>
@@ -134,15 +149,15 @@ export const AccountCard = ({
         <View className="border-b border-gray-100 px-4 py-3">
           <View className="flex-row items-center justify-between gap-4">
             {/* Responsável */}
-            <View className="rounded-md border border-indigo-600 px-2 py-1">
-              <Text className="text-xs text-indigo-600">
+            <View className="rounded-md border border-teal/40 px-2 py-1">
+              <Text className="text-xs text-teal">
                 Responsável: {criadoPorNome}
               </Text>
             </View>
 
             {/* Data */}
             <View className="flex-row items-center gap-1">
-              <Ionicons name="calendar-outline" size={16} color="#4b5563" />
+              <Ionicons name="calendar-outline" size={16} color="#337176" />
               <Text className="text-sm text-gray-600">{vencimentoLabel}</Text>
             </View>
           </View>
@@ -158,10 +173,10 @@ export const AccountCard = ({
             className="flex-row items-center justify-between px-4 py-3"
           >
             <View className="flex-row items-center gap-2">
-              <Ionicons name="people-outline" size={18} color="#4b5563" />
+              <Ionicons name="people-outline" size={18} color="#337176" />
               <Text className="font-semibold text-gray-700">Moradores</Text>
-              <View className="rounded-full bg-indigo-100 px-2 py-0.5">
-                <Text className="text-xs font-semibold text-indigo-600">
+              <View className="rounded-full bg-teal/15 px-2 py-0.5">
+                <Text className="text-xs font-semibold text-teal">
                   {isLoadingMoradores ? "..." : moradores.length}
                 </Text>
               </View>
@@ -169,13 +184,13 @@ export const AccountCard = ({
             <MaterialCommunityIcons
               name={expanded ? "chevron-up" : "chevron-down"}
               size={24}
-              color="#6b7280"
+              color="#337176"
             />
           </TouchableOpacity>
 
           {/* CONTEÚDO: Lista de Moradores */}
           {expanded && (
-            <View className="border-t border-gray-100 bg-gray-50">
+            <View className="border-t border-teal/10 bg-teal/5">
               <AccountResidentsContent
                 accountId={conta.id}
                 moradores={moradores}
@@ -194,26 +209,17 @@ export const AccountCard = ({
           {!paga && (
             <TouchableOpacity
               onPress={() => {}}
-              className="flex-1 flex-row items-center justify-center rounded-md border border-indigo-600 py-2"
+              className="flex-1 flex-row items-center justify-center rounded-md border border-teal/40 py-2"
             >
-              <Feather name="copy" size={16} color="#4b5563" />
+              <Feather name="copy" size={16} color="#337176" />
               <Text className="ml-2 text-sm text-gray-700">Copiar PIX</Text>
             </TouchableOpacity>
           )}
 
-          {/* Deletar */}
-          <TouchableOpacity
-            onPress={async (e) => {
-              e.stopPropagation();
-              await onDelete?.(conta.id);
-            }}
-            className="flex-row items-center justify-center rounded-md bg-red-50 px-4 py-2"
-          >
-            <Feather name="trash-2" size={16} color="#dc2626" />
-          </TouchableOpacity>
         </View>
       </View>
     </TouchableOpacity>
+    </View>
   );
 };
 

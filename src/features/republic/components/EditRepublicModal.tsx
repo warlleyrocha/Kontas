@@ -60,7 +60,7 @@ export const EditRepublicModal: FC<EditRepublicModalProps> = ({
               <Text className="text-lg font-semibold">Editar República</Text>
 
               <TouchableOpacity onPress={handleClose} className="p-2">
-                <Feather name="x" size={24} color="#374151" />
+                <Feather name="x" size={24} color="#337176" />
               </TouchableOpacity>
             </View>
 
@@ -70,17 +70,17 @@ export const EditRepublicModal: FC<EditRepublicModalProps> = ({
               onPress={selecionarImagem}
               className="mb-6 items-center"
             >
-              <View className="h-28 w-28 items-center justify-center rounded-full bg-indigo-100">
+              <View className="h-28 w-28 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-teal/40 bg-teal/10">
                 {imagemUri ? (
                   <Image
                     source={{ uri: imagemUri }}
                     className="h-28 w-28 rounded-full"
                   />
                 ) : (
-                  <Feather name="user" size={56} color="#4f46e5" />
+                  <Feather name="camera" size={40} color="#337176" />
                 )}
               </View>
-              <Text className="mt-2 text-sm text-indigo-600">
+              <Text className="mt-2 text-sm text-teal">
                 Toque para alterar a foto
               </Text>
             </TouchableOpacity>
@@ -103,7 +103,7 @@ export const EditRepublicModal: FC<EditRepublicModalProps> = ({
             <View className="flex-row gap-3 pb-6">
               <TouchableOpacity
                 onPress={salvar}
-                className="flex-1 items-center rounded-lg bg-indigo-600 py-3"
+                className="flex-1 items-center rounded-lg bg-teal py-3"
               >
                 <Text className="font-semibold text-white">Salvar</Text>
               </TouchableOpacity>

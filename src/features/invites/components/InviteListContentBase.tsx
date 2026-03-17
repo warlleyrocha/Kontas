@@ -46,5 +46,9 @@ export function InviteListContentBase({
     return <EmptyState {...emptyState} />;
   }
 
-  return <ScrollView className="flex-1 px-4 pt-4">{children}</ScrollView>;
+  return (
+    <ScrollView className="flex-1 bg-teal/5 px-4 pt-4">
+      {children}
+    </ScrollView>
+  );
 }

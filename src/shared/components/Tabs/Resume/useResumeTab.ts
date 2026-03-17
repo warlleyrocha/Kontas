@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAccountActions } from "@/src/features/accounts/hooks/useAccountActions";
 import { useAccountData } from "@/src/features/accounts/hooks/useAccountList/useAccountData";
-import type {
-  Conta,
-  ListarContasResponse,
+import {
+  StatusConta,
+  type Conta,
+  type ListarContasResponse,
 } from "@/src/features/accounts/types/account.types";
 import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
@@ -100,8 +101,8 @@ export function useResumeTab({
     return registerRefresh(`resume-${republicId}`, fetchAll);
   }, [registerRefresh, republicId, fetchAll]);
 
-  const contasPagas = contas.filter((c) => c.pago);
-  const contasPendentes = contas.filter((c) => !c.pago);
+  const contasPagas = contas.filter((c) => c.status === StatusConta.PAGA);
+  const contasPendentes = contas.filter((c) => c.status !== StatusConta.PAGA);
 
   return {
     contas,

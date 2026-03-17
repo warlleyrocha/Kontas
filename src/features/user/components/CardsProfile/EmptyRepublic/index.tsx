@@ -32,7 +32,7 @@ export default function EmptyRepublic({
           {/* Botão principal */}
           <TouchableOpacity
             onPress={onCreateRepublic}
-            className="mb-3 w-full overflow-hidden rounded-2xl bg-indigo-600 px-6 py-4 shadow-lg shadow-indigo-500/30"
+            className="mb-3 w-full overflow-hidden rounded-2xl bg-teal px-6 py-4 shadow-lg shadow-teal/30"
             activeOpacity={0.9}
           >
             <Text className="text-center text-base font-bold text-white">
@@ -42,7 +42,7 @@ export default function EmptyRepublic({
 
           {/* Link secundário */}
           <TouchableOpacity onPress={onViewInvites} activeOpacity={0.7}>
-            <Text className="text-center text-sm font-medium text-indigo-600">
+            <Text className="text-center text-sm font-medium text-teal">
               Ver meus convites
             </Text>
           </TouchableOpacity>

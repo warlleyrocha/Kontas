@@ -115,7 +115,7 @@ export default function RepublicCard({
 
           <View className="mt-2 flex-row items-center justify-between">
             <View className="flex-row items-center">
-              <Ionicons name="people-outline" size={14} color="#3B82F6" />
+              <Ionicons name="people-outline" size={14} color="#337176" />
               <Text className="ml-1 text-sm font-medium text-gray-600">
                 {residentsCount} {residentsLabel}
               </Text>

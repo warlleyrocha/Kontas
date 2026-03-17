@@ -53,22 +53,22 @@ export function PendingPaymentCard({
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <View className="mb-4 rounded-3xl border border-[#E7E7EA] bg-white p-5">
+    <View className="mb-4 rounded-3xl border border-teal/10 bg-white p-5">
       <TouchableOpacity
         activeOpacity={0.85}
         onPress={() => setExpanded((previousState) => !previousState)}
       >
         <View className="flex-row items-start justify-between gap-4">
           <View className="flex-1">
-            <Text className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+            <Text className="text-xs font-semibold uppercase tracking-wide text-teal-dark/60">
               Pagamento
             </Text>
             <Text className="mt-2 text-xl font-semibold text-[#111827]">
               {account.descricao}
             </Text>
             <View className="mt-4 flex-row flex-wrap gap-2">
-              <View className="flex-row items-center gap-2 rounded-full bg-[#F5F5F7] px-3 py-2">
-                <Feather name="calendar" size={14} color="#6B7280" />
+              <View className="flex-row items-center gap-2 rounded-full bg-teal/5 px-3 py-2">
+                <Feather name="calendar" size={14} color="#337176" />
                 <Text className="text-xs font-medium text-gray-600">
                   Vence em {formatDate(account.vencimento)}
                 </Text>
@@ -76,7 +76,7 @@ export function PendingPaymentCard({
             </View>
           </View>
 
-          <View className="items-end rounded-3xl bg-[#F5F5F7] px-4 py-3">
+          <View className="items-end rounded-3xl bg-teal/5 px-4 py-3">
             <Text className="text-xs font-medium text-gray-400">
               Valor total
             </Text>
@@ -89,21 +89,21 @@ export function PendingPaymentCard({
           </View>
         </View>
 
-        <View className="mt-5 flex-row items-center justify-between rounded-full bg-[#F5F5F7] px-4 py-3">
+        <View className="mt-5 flex-row items-center justify-between rounded-full bg-teal/5 px-4 py-3">
           <Text className="text-sm font-medium text-gray-600">
             {expanded ? "Ocultar detalhes" : "Ver detalhes do pagamento"}
           </Text>
           <Feather
             name={expanded ? "chevron-up" : "chevron-down"}
             size={18}
-            color="#6B7280"
+            color="#337176"
           />
         </View>
       </TouchableOpacity>
 
       {expanded && (
-        <View className="mt-4 rounded-3xl bg-[#F5F5F7] p-3">
-          <Text className="px-1 text-xs font-medium uppercase tracking-wide text-gray-400">
+        <View className="mt-4 rounded-3xl bg-teal/5 p-3">
+          <Text className="px-1 text-xs font-medium uppercase tracking-wide text-teal-dark/60">
             {getSectionTitle(selectedStatus)}
           </Text>
 

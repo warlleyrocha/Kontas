@@ -13,7 +13,7 @@ export function AddAccountModalActions({
     <View className="mt-[10px] flex-row gap-3">
       <TouchableOpacity
         onPress={onSubmit}
-        className="flex-1 items-center rounded-md bg-indigo-600 py-3"
+        className="flex-1 items-center rounded-md bg-teal py-3"
       >
         <Text className="font-medium text-white">Adicionar Conta</Text>
       </TouchableOpacity>

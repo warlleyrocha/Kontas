@@ -12,6 +12,7 @@ import {
   MetodoPagamento,
   StatusConta,
 } from "../../types/account.types";
+import { Toaster } from "@/src/shared/components/ui/sonner";
 import { AddAccountModalActions } from "./AddAccountModalActions";
 import { AddAccountModalFormSection } from "./AddAccountModalFormSection";
 import { AddAccountModalHeader } from "./AddAccountModalHeader";
@@ -160,6 +161,7 @@ export default function AddAccountModal({
           </View>
         </View>
       </KeyboardAvoidingView>
+      <Toaster position="top-center" />
     </Modal>
   );
 }

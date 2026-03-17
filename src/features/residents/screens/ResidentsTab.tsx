@@ -39,7 +39,7 @@ export const ResidentsTab: FC<ResidentsTabProps> = ({
 
   const renderEmptyState = () => (
     <View className="flex-1 items-center justify-center py-20">
-      <Feather name="users" size={64} color="#D1D5DB" />
+      <Feather name="users" size={64} color="#337176" />
       <Text className="mt-4 text-base text-gray-500">
         Nenhum morador cadastrado
       </Text>

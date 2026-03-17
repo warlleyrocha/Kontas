@@ -32,8 +32,8 @@ function DivisionOption({
       className={`flex-row items-center ${className ?? ""}`}
     >
       <View
-        className={`mr-3 h-4 w-4 rounded-full border border-indigo-600 ${
-          selected ? "bg-indigo-600" : "bg-transparent"
+        className={`mr-3 h-4 w-4 rounded-full border border-teal ${
+          selected ? "bg-teal" : "bg-transparent"
         }`}
       />
       <Text>{label}</Text>
@@ -79,14 +79,14 @@ export function AddAccountModalResidentsSection({
           {moradoresDivisao.map((morador) => (
             <View
               key={morador.moradorId}
-              className="flex-row items-center justify-between rounded-md bg-gray-50 px-3 py-2"
+              className="flex-row items-center justify-between rounded-md bg-teal/5 px-3 py-2"
             >
               <View className="flex-row items-center">
                 <TouchableOpacity
                   onPress={() => onToggleMorador(morador.moradorId)}
                   className={`mr-3 h-6 w-6 items-center justify-center rounded-sm border ${
                     morador.checked
-                      ? "border-indigo-600 bg-indigo-600"
+                      ? "border-teal bg-teal"
                       : "border-gray-300 bg-white"
                   }`}
                 >
@@ -113,7 +113,7 @@ export function AddAccountModalResidentsSection({
                   className={`rounded px-2 py-1 text-right ${
                     morador.checked && tipoDivisao === "custom"
                       ? "bg-white"
-                      : "bg-gray-100 text-gray-500"
+                      : "bg-white text-gray-900"
                   }`}
                 />
               </View>

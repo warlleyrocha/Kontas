@@ -21,34 +21,30 @@ import { scheduleOnRN } from "react-native-worklets";
 const MENU_WIDTH = 220;
 const MENU_ITEM_HEIGHT = 52;
 
-interface CardPosition {
+export interface CardPosition {
   x: number;
   y: number;
   width: number;
   height: number;
 }
 
-interface RepublicContextMenuProps {
+interface AccountContextMenuProps {
   readonly visible: boolean;
   readonly position: CardPosition | null;
   readonly onClose: () => void;
   readonly onEdit: () => void;
   readonly onDelete: () => void;
-  readonly onInvite: () => void;
   readonly isAdmin?: boolean;
 }
 
-function useRepublicContextMenuAnimation(translateYOutput: number) {
+function useContextMenuAnimation(translateYOutput: number) {
   const scale = useSharedValue(0.85);
   const opacity = useSharedValue(0);
 
   const handleOpen = useCallback(() => {
     scale.value = 0.85;
     opacity.value = 0;
-    scale.value = withSpring(1, {
-      stiffness: 260,
-      damping: 18,
-    });
+    scale.value = withSpring(1, { stiffness: 260, damping: 18 });
     opacity.value = withTiming(1, {
       duration: 150,
       easing: Easing.out(Easing.ease),
@@ -63,58 +59,47 @@ function useRepublicContextMenuAnimation(translateYOutput: number) {
       });
       scale.value = withTiming(
         0.85,
-        {
-          duration: 120,
-          easing: Easing.in(Easing.ease),
-        },
+        { duration: 120, easing: Easing.in(Easing.ease) },
         (finished) => {
           if (finished && callback) {
             scheduleOnRN(callback);
           }
-        }
+        },
       );
     },
-    [opacity, scale]
+    [opacity, scale],
   );
 
   const menuAnimatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
     transform: [
       { scale: scale.value },
-      {
-        translateY: interpolate(scale.value, [0.85, 1], [translateYOutput, 0]),
-      },
+      { translateY: interpolate(scale.value, [0.85, 1], [translateYOutput, 0]) },
     ],
   }));
 
-  return {
-    handleOpen,
-    handleClose,
-    menuAnimatedStyle,
-  };
+  return { handleOpen, handleClose, menuAnimatedStyle };
 }
 
-export function RepublicContextMenu({
+export function AccountContextMenu({
   visible,
   position,
   onClose,
   onEdit,
   onDelete,
-  onInvite,
   isAdmin = false,
-}: RepublicContextMenuProps) {
+}: AccountContextMenuProps) {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const resolvedPosition = position ?? { x: 0, y: 0, width: 0, height: 0 };
 
-  // Admin: Editar + Convidar + Deletar (3 itens, 2 separadores)
-  // Não-admin: apenas Editar (1 item)
-  const menuTotalHeight = isAdmin ? MENU_ITEM_HEIGHT * 3 + 2 : MENU_ITEM_HEIGHT;
+  const menuTotalHeight = isAdmin
+    ? MENU_ITEM_HEIGHT * 2 + 1
+    : MENU_ITEM_HEIGHT;
 
-  // Posição horizontal: centralizado no card, mantendo dentro da tela
-  let menuX = resolvedPosition.x + resolvedPosition.width / 2 - MENU_WIDTH / 2;
+  let menuX =
+    resolvedPosition.x + resolvedPosition.width / 2 - MENU_WIDTH / 2;
   menuX = Math.max(12, Math.min(menuX, screenWidth - MENU_WIDTH - 12));
 
-  // Posição vertical: abaixo do card se tiver espaço, senão acima
   const spaceBelow =
     screenHeight - (resolvedPosition.y + resolvedPosition.height);
   const menuY =
@@ -125,7 +110,7 @@ export function RepublicContextMenu({
   const translateYOutput = spaceBelow >= menuTotalHeight + 20 ? -8 : 8;
 
   const { handleOpen, handleClose, menuAnimatedStyle } =
-    useRepublicContextMenuAnimation(translateYOutput);
+    useContextMenuAnimation(translateYOutput);
 
   const handleOverlayPress = useCallback(() => {
     handleClose(onClose);
@@ -134,10 +119,6 @@ export function RepublicContextMenu({
   const handleEditPress = useCallback(() => {
     handleClose(onEdit);
   }, [handleClose, onEdit]);
-
-  const handleInvitePress = useCallback(() => {
-    handleClose(onInvite);
-  }, [handleClose, onInvite]);
 
   const handleDeletePress = useCallback(() => {
     handleClose(onDelete);
@@ -177,7 +158,7 @@ export function RepublicContextMenu({
               >
                 <View className="flex-row items-center justify-between px-4">
                   <Text className="font-mulish-medium text-base text-[#1C1C1E]">
-                    Editar república
+                    Editar conta
                   </Text>
                   <MaterialCommunityIcons
                     name="pencil-outline"
@@ -187,27 +168,9 @@ export function RepublicContextMenu({
                 </View>
               </TouchableOpacity>
 
-              {/* Convidar novo morador e Deletar — visíveis apenas para admins */}
+              {/* Deletar — visível apenas para admins */}
               {isAdmin && (
                 <>
-                  <View className="h-px bg-[#E5E5EA]" />
-                  <TouchableOpacity
-                    onPress={handleInvitePress}
-                    activeOpacity={0.7}
-                    className="h-[52px] justify-center"
-                  >
-                    <View className="flex-row items-center justify-between px-4">
-                      <Text className="font-mulish-medium text-base text-[#1C1C1E]">
-                        Convidar novo morador
-                      </Text>
-                      <MaterialCommunityIcons
-                        name="account-plus-outline"
-                        size={20}
-                        color="#337176"
-                      />
-                    </View>
-                  </TouchableOpacity>
-
                   <View className="h-px bg-[#E5E5EA]" />
                   <TouchableOpacity
                     onPress={handleDeletePress}
@@ -216,7 +179,7 @@ export function RepublicContextMenu({
                   >
                     <View className="flex-row items-center justify-between px-4">
                       <Text className="font-mulish-medium text-base text-red-500">
-                        Deletar república
+                        Deletar conta
                       </Text>
                       <MaterialCommunityIcons
                         name="delete-outline"

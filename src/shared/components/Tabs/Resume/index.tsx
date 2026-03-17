@@ -35,9 +35,9 @@ export const ResumeTab = ({ residents, republicId }: Props) => {
     {
       label: "Total de Contas",
       value: totalValor,
-      icon: <Ionicons name="cash-outline" size={20} color="#2563eb" />,
+      icon: <Ionicons name="cash-outline" size={20} color="#337176" />,
       description: `${contas.length} contas registradas`,
-      color: "#2563eb",
+      color: "#337176",
     },
     {
       label: "Contas Pagas",
@@ -51,9 +51,9 @@ export const ResumeTab = ({ residents, republicId }: Props) => {
     {
       label: "Pendentes",
       value: totalPendente,
-      icon: <Ionicons name="alert-circle-outline" size={20} color="#f97316" />,
+      icon: <Ionicons name="alert-circle-outline" size={20} color="#C87223" />,
       description: `${quantidadePendentes} contas a pagar`,
-      color: "#f97316",
+      color: "#C87223",
     },
   ];
 
@@ -70,7 +70,7 @@ export const ResumeTab = ({ residents, republicId }: Props) => {
         ))}
       </View>
 
-      <View className="rounded-lg bg-white p-4 shadow-sm">
+      <View className="rounded-lg border border-teal/10 bg-white p-4 shadow-sm">
         <View className="mb-3">
           <Text className="text-base font-semibold">Dívidas por Morador</Text>
           <Text className="text-sm text-gray-500">
@@ -79,7 +79,7 @@ export const ResumeTab = ({ residents, republicId }: Props) => {
         </View>
 
         {isLoadingDividas ? (
-          <ActivityIndicator size="small" />
+          <ActivityIndicator size="small" color="#337176" />
         ) : (
           <View className="gap-3 space-y-3">
             {residents.map((morador) => (

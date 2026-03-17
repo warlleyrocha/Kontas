@@ -4,9 +4,9 @@ export interface GoogleLoginRequest {
 
 export interface User {
   id: string;
-  nome: string;
+  nome?: string;
   email: string;
-  fotoPerfil: string;
+  fotoPerfil?: string | null;
   perfilCompleto: boolean;
   telefone?: string;
   chavePix?: string;

@@ -8,11 +8,11 @@ interface MoradorRowProps {
 
 export const MoradorRow = ({ morador, valor }: MoradorRowProps) => {
   const isPendente = valor > 0;
-  const valorColor = isPendente ? "text-orange-600" : "text-green-600";
-  const borderColor = isPendente ? "border-orange-600" : "border-green-600";
+  const valorColor = isPendente ? "text-brand-orange" : "text-green-600";
+  const borderColor = isPendente ? "border-brand-orange" : "border-green-600";
 
   return (
-    <View className="flex-row items-center justify-between rounded-lg bg-gray-50 p-4">
+    <View className="flex-row items-center justify-between rounded-lg bg-teal/5 p-4">
       <View>
         <Text className="text-base">{morador.nome}</Text>
         {morador.chavePix ? (

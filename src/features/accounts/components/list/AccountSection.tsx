@@ -2,6 +2,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Text, TouchableOpacity, View } from "react-native";
 import type { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
 import type { Conta, MetodoPagamento } from "../../types/account.types";
+import { type CardPosition } from "../AccountContextMenu";
 import { AccountCard } from "./AccountCard";
 
 interface AccountSectionProps {
@@ -19,11 +20,11 @@ interface AccountSectionProps {
   readonly errorResidentsById: Record<string, boolean>;
   readonly updatingResidentById: Record<string, boolean>;
   readonly currentResidentId: string | null;
+  readonly onLongPress: (accountId: string, position: CardPosition) => void;
   readonly onConfirmResidentPayment: (
     accountId: string,
     accountResidentId: string
   ) => Promise<void> | void;
-  readonly onDelete: (accountId: string) => Promise<void> | void;
   readonly onPatch: (
     accountId: string,
     metodoPagamento: MetodoPagamento
@@ -45,8 +46,8 @@ export function AccountSection({
   errorResidentsById,
   updatingResidentById,
   currentResidentId,
+  onLongPress,
   onConfirmResidentPayment,
-  onDelete,
   onPatch,
 }: AccountSectionProps) {
   if (contas.length === 0) {
@@ -79,11 +80,10 @@ export function AccountSection({
             onToggleExpand={() => onToggleExpand(conta.id)}
             moradores={accountResidentsById[conta.id] ?? []}
             isLoadingMoradores={Boolean(loadingResidentsById[conta.id])}
-            //isErrorMoradores={Boolean(errorResidentsById[conta.id])}
             updatingResidentById={updatingResidentById}
             currentResidentId={currentResidentId}
+            onLongPress={(position) => onLongPress(conta.id, position)}
             onConfirmResidentPayment={onConfirmResidentPayment}
-            onDelete={onDelete}
             onPatch={onPatch}
           />
         ))}

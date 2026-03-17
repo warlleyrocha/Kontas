@@ -4,12 +4,6 @@ export enum ResidentRole {
   USER = "USER",
 }
 
-export enum ResidentStatus {
-  ATIVO = "ATIVO",
-  INATIVO = "INATIVO",
-  PENDENTE = "PENDENTE",
-}
-
 // Request Types
 export interface CreateResidentRequest {
   usuarioId: string;
@@ -21,9 +15,8 @@ export interface ResidentResponse {
   id: string;
   nome: string;
   email: string;
-  fotoPerfil: string;
-  chavePix: string;
-  telefone: string;
+  fotoPerfil: string | null;
+  chavePix: string | null;
+  telefone: string | null;
   role: ResidentRole;
-  status: ResidentStatus;
 }

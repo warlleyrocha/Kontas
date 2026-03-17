@@ -21,7 +21,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   description,
   buttonText,
   onPress,
-  buttonClassName = "bg-indigo-600",
+  buttonClassName = "bg-teal",
   containerClassName = "",
 }) => {
   return (
