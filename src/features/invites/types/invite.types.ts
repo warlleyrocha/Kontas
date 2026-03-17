@@ -22,17 +22,11 @@ export interface PatchInviteStatusResponse {
   status: StatusInvite;
 }
 
-export interface GetInvitesByRepublicId {
-  id: string;
-  usuarioId: string;
-  status: string;
-}
-
 export interface GetInvitesByUser {
   id: string;
   email: string;
   republicaId: string;
-  status: string;
+  status: StatusInvite;
   criadoEm: string;
   atualizadoEm: string;
 }

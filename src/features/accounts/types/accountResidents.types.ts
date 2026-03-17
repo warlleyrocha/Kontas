@@ -28,15 +28,6 @@ export interface ContaMoradorIdParams {
   id: string;
 }
 
-export interface AtualizarVisibilidadeContaMoradorRequest
-  extends ContaMoradorIdParams {
+export interface AtualizarVisibilidadeContaMoradorRequest extends ContaMoradorIdParams {
   visivel: boolean;
-}
-
-export interface ListarContasResponse {
-  id: string;
-  nome: string;
-  valor: number;
-  dataVencimento: string;
-  moradores: ContaMorador[];
 }

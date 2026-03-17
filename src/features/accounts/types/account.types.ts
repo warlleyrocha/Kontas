@@ -23,7 +23,7 @@ export type Conta = {
   republicaId: string;
   criadoPorId: string;
   criadoPorNome: string;
-  metodoPagamento: string;
+  metodoPagamento: string | null;
   pago: boolean;
   pagoEm?: Date | null;
   criadoEm: string;
