@@ -1,5 +1,5 @@
 import Feather from "@expo/vector-icons/Feather";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   RefreshControl,
   ScrollView,
@@ -13,6 +13,10 @@ import {
   AddAccountButton,
   AddAccountModal,
 } from "@/src/features/accounts/components";
+import {
+  AccountContextMenu,
+  type CardPosition,
+} from "@/src/features/accounts/components/AccountContextMenu";
 import { useAccountsTab } from "@/src/features/accounts/hooks/useAccountsTab";
 import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import { getMoradorStatusVisual } from "@/src/features/accounts/utils/accountStatus.utils";
@@ -23,12 +27,14 @@ import { formatMounthYear } from "@/src/shared/utils/formats";
 interface AccountsTabProps {
   readonly republicId: string;
   readonly currentResidentId: string | null;
+  readonly isAdmin?: boolean;
   readonly onPendingPaymentsCountChange?: (count: number) => void;
 }
 
 export function AccountsTab({
   republicId,
   currentResidentId,
+  isAdmin = false,
   onPendingPaymentsCountChange,
 }: AccountsTabProps) {
   useComponentLogger("AccountsTab");
@@ -58,6 +64,30 @@ export function AccountsTab({
     togglePaidAccounts,
     updatingResidentById,
   } = useAccountsTab({ republicId });
+
+  const [contextMenu, setContextMenu] = useState<{
+    visible: boolean;
+    accountId: string | null;
+    position: CardPosition | null;
+  }>({ visible: false, accountId: null, position: null });
+
+  const handleAccountLongPress = useCallback(
+    (accountId: string, position: CardPosition) => {
+      setContextMenu({ visible: true, accountId, position });
+    },
+    [],
+  );
+
+  const handleContextMenuClose = useCallback(() => {
+    setContextMenu((prev) => ({ ...prev, visible: false }));
+  }, []);
+
+  const handleContextMenuDelete = useCallback(() => {
+    handleContextMenuClose();
+    if (contextMenu.accountId) {
+      void handleDelete(contextMenu.accountId);
+    }
+  }, [contextMenu.accountId, handleContextMenuClose, handleDelete]);
 
   const { refreshing, onRefresh } = useRefresh();
   const pendingPaymentsCount = useMemo(
@@ -216,8 +246,8 @@ export function AccountsTab({
               errorResidentsById={errorResidentsById}
               updatingResidentById={updatingResidentById}
               currentResidentId={currentResidentId}
+              onLongPress={handleAccountLongPress}
               onConfirmResidentPayment={confirmResidentPayment}
-              onDelete={handleDelete}
               onPatch={handlePatchAndRefresh}
             />
 
@@ -236,8 +266,8 @@ export function AccountsTab({
               errorResidentsById={errorResidentsById}
               updatingResidentById={updatingResidentById}
               currentResidentId={currentResidentId}
+              onLongPress={handleAccountLongPress}
               onConfirmResidentPayment={confirmResidentPayment}
-              onDelete={handleDelete}
               onPatch={handlePatchAndRefresh}
             />
           </View>
@@ -254,6 +284,15 @@ export function AccountsTab({
           republicId={republicId}
         />
       )}
+
+      <AccountContextMenu
+        visible={contextMenu.visible}
+        position={contextMenu.position}
+        isAdmin={isAdmin}
+        onClose={handleContextMenuClose}
+        onEdit={() => {}}
+        onDelete={handleContextMenuDelete}
+      />
     </View>
   );
 }

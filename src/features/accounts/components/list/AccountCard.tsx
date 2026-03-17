@@ -1,7 +1,7 @@
 import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
 import { Conta, MetodoPagamento, StatusConta } from "../../types/account.types";
@@ -10,6 +10,7 @@ import {
   getContaStatusVisual,
   parseContaVencimento,
 } from "../../utils/accountStatus.utils";
+import { type CardPosition } from "../AccountContextMenu";
 import { AccountStatusIcon } from "../shared/AccountStatusIcon";
 import { AccountResidentsContent } from "./AccountResidentsContent";
 
@@ -22,11 +23,11 @@ interface AccountCardProps {
   isLoadingMoradores: boolean;
   updatingResidentById: Record<string, boolean>;
   currentResidentId: string | null;
+  onLongPress?: (position: CardPosition) => void;
   onConfirmResidentPayment?: (
     accountId: string,
     accountResidentId: string,
   ) => Promise<void> | void;
-  onDelete?: (accountId: string) => Promise<void> | void;
   onPatch?: (
     accountId: string,
     metodoPagamento: MetodoPagamento,
@@ -64,10 +65,11 @@ export const AccountCard = ({
   isLoadingMoradores,
   updatingResidentById,
   currentResidentId,
+  onLongPress,
   onConfirmResidentPayment,
-  onDelete,
   onPatch,
 }: AccountCardProps) => {
+  const cardRef = useRef<View>(null);
   const [isPatching, setIsPatching] = useState(false);
   const vencimento = parseContaVencimento(conta.vencimento);
   const contaStatusVisual = getContaStatusVisual(conta);
@@ -78,6 +80,12 @@ export const AccountCard = ({
 
   const paga = contaStatusVisual === StatusConta.PAGA;
   const vencida = contaStatusVisual === StatusConta.ATRASADA;
+
+  const handleLongPress = () => {
+    cardRef.current?.measure((_x, _y, width, height, pageX, pageY) => {
+      onLongPress?.({ x: pageX, y: pageY, width, height });
+    });
+  };
 
   const handlePatchAccount = async () => {
     if (paga || isPatching || !onPatch) {
@@ -96,7 +104,13 @@ export const AccountCard = ({
   };
 
   return (
-    <TouchableOpacity onPress={() => {}} activeOpacity={0.7}>
+    <View ref={cardRef}>
+    <TouchableOpacity
+      onPress={() => {}}
+      onLongPress={handleLongPress}
+      delayLongPress={400}
+      activeOpacity={0.7}
+    >
       <View
         className={`mb-3 rounded-lg bg-white shadow-sm ${
           vencida ? "border border-orange-300 bg-orange-50" : ""
@@ -202,19 +216,10 @@ export const AccountCard = ({
             </TouchableOpacity>
           )}
 
-          {/* Deletar */}
-          <TouchableOpacity
-            onPress={async (e) => {
-              e.stopPropagation();
-              await onDelete?.(conta.id);
-            }}
-            className="flex-row items-center justify-center rounded-md bg-red-50 px-4 py-2"
-          >
-            <Feather name="trash-2" size={16} color="#dc2626" />
-          </TouchableOpacity>
         </View>
       </View>
     </TouchableOpacity>
+    </View>
   );
 };
 
