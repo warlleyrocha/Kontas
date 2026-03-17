@@ -107,9 +107,9 @@ export const AccountCard = ({
           <TouchableOpacity
             className="flex-1 flex-row items-center gap-2"
             disabled={paga || isPatching}
-            onPress={(e) => {
+            onPress={async (e) => {
               e.stopPropagation();
-              void handlePatchAccount();
+              await handlePatchAccount();
             }}
           >
             <AccountStatusIcon
@@ -204,9 +204,9 @@ export const AccountCard = ({
 
           {/* Deletar */}
           <TouchableOpacity
-            onPress={(e) => {
+            onPress={async (e) => {
               e.stopPropagation();
-              void onDelete?.(conta.id);
+              await onDelete?.(conta.id);
             }}
             className="flex-row items-center justify-center rounded-md bg-red-50 px-4 py-2"
           >

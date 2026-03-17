@@ -1,7 +1,7 @@
 import { Text, TouchableOpacity, View } from "react-native";
 
 interface AddAccountModalActionsProps {
-  readonly onSubmit: () => void;
+  readonly onSubmit: () => Promise<void> | void;
   readonly onCancel: () => void;
 }
 

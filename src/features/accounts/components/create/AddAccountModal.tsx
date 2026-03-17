@@ -83,7 +83,7 @@ export default function AddAccountModal({
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Converte a data para formato ISO string
     const vencimentoISO = vencimento.toISOString();
 
@@ -105,7 +105,7 @@ export default function AddAccountModal({
       moradorIds,
     };
 
-    void onSubmit(payload);
+    await onSubmit(payload);
   };
 
   return (

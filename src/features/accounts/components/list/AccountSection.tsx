@@ -24,7 +24,7 @@ interface AccountSectionProps {
     accountId: string,
     accountResidentId: string,
   ) => Promise<void> | void;
-  readonly onDelete: (accountId: string) => void;
+  readonly onDelete: (accountId: string) => Promise<void> | void;
   readonly onPatch: (
     accountId: string,
     metodoPagamento: MetodoPagamento,

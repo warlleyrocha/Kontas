@@ -50,7 +50,7 @@ export function AccountResidentRow({
       }`}
     >
       <TouchableOpacity
-        onPress={(e) => {
+        onPress={async (e) => {
           e.stopPropagation();
 
           if (
@@ -63,7 +63,7 @@ export function AccountResidentRow({
             return;
           }
 
-          void onConfirmResidentPayment(accountId, morador.id);
+          await onConfirmResidentPayment(accountId, morador.id);
         }}
         disabled={
           moradorPago ||
