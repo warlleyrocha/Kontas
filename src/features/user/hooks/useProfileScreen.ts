@@ -204,8 +204,8 @@ export function useProfileScreen() {
   const sideMenuUser = useMemo(() => {
     if (!user) return null;
     return {
-      name: user.nome,
-      photo: user.fotoPerfil,
+      name: user.nome ?? "",
+      photo: user.fotoPerfil ?? null,
       email: user.email,
       pixKey: user.chavePix,
       phone: maskPhone(user.telefone ?? ""),

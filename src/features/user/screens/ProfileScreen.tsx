@@ -36,7 +36,7 @@ interface ProfileContentProps {
   readonly onSelectRepublic: (republicId: string) => void;
   readonly onLongPressRepublic: (
     republic: RepublicResponse,
-    position: CardPosition
+    position: CardPosition,
   ) => void;
   readonly onRefresh: () => void;
 }
@@ -140,7 +140,7 @@ export function ProfileScreen() {
             />
           ) : (
             <Text className="text-xl font-bold text-teal">
-              {user.nome.charAt(0).toUpperCase()}
+              {user.nome?.charAt(0).toUpperCase() ?? "?"}
             </Text>
           )}
         </View>
@@ -149,7 +149,9 @@ export function ProfileScreen() {
           className="flex-1"
           onPress={() => setShowEditProfileModal(true)}
         >
-          <Text className="text-base font-semibold">{user.nome}</Text>
+          <Text className="text-base font-semibold">
+            {user.nome ?? "Sem nome"}
+          </Text>
           <Text className="text-sm text-gray-500">Configurar perfil</Text>
         </TouchableOpacity>
 
@@ -193,9 +195,9 @@ export function ProfileScreen() {
         key={`editmodal-${user.chavePix}-${user.telefone}`}
         visible={showEditProfileModal}
         onClose={() => setShowEditProfileModal(false)}
-        currentName={user.nome}
+        currentName={user.nome ?? "Sem nome"}
         currentPixKey={user.chavePix}
-        currentPhoto={user.fotoPerfil}
+        currentPhoto={user.fotoPerfil ?? undefined}
         currentPhone={maskPhone(user.telefone ?? "")}
         onSave={handleSaveProfile}
       />
