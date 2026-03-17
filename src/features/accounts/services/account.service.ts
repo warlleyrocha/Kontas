@@ -22,8 +22,9 @@ export const accountService = {
       throw toUserFriendlyError(error, {
         defaultMessage: "Erro ao criar conta.",
         statusMessages: {
-          400: "Requisição inválida.",
+          400: "Descrição não pode ser vazia.",
           401: "Não autenticado.",
+          403: "Apenas ADMIN pode criar contas.",
           500: "Erro interno do servidor.",
         },
       });
@@ -32,13 +33,17 @@ export const accountService = {
 
   // Método para listar contas de uma república
   listarContasPorRepublica: async (
-    republicaId: string
+    republicaId: string,
   ): Promise<ListarContasRepublic> => {
     try {
       const response = await api.get<ListarContasRepublic>(
-        `/contas/republica/${republicaId}`
+        `/contas/republica/${republicaId}`,
       );
-      logger.table("Accounts", `Contas da república ${republicaId}`, response.data as object);
+      logger.table(
+        "Accounts",
+        `Contas da república ${republicaId}`,
+        response.data as object,
+      );
       return response.data;
     } catch (error) {
       throw toUserFriendlyError(error, {
@@ -93,7 +98,10 @@ export const accountService = {
     metodoPagamento,
   }: MarcarContaPaga): Promise<void> => {
     try {
-      await api.patch(`/contas/${id}`, { status: StatusConta.PAGA, metodoPagamento });
+      await api.patch(`/contas/${id}`, {
+        status: StatusConta.PAGA,
+        metodoPagamento,
+      });
       logger.info("Accounts", `Conta ${id} marcada como paga`);
     } catch (error) {
       throw toUserFriendlyError(error, {
