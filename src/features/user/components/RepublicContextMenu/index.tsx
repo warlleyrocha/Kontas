@@ -2,11 +2,11 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import React, { useEffect, useRef } from "react";
 import {
   Animated,
-  Dimensions,
   Modal,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  useWindowDimensions,
   View,
 } from "react-native";
 
@@ -39,6 +39,7 @@ export function RepublicContextMenu({
   onInvite,
   isAdmin = false,
 }: RepublicContextMenuProps) {
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const scaleAnim = useRef(new Animated.Value(0.85)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
 
@@ -65,18 +66,16 @@ export function RepublicContextMenu({
 
   if (!position) return null;
 
-  const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
-
   // Admin: Editar + Convidar + Deletar (3 itens, 2 separadores)
   // Não-admin: apenas Editar (1 item)
   const menuTotalHeight = isAdmin ? MENU_ITEM_HEIGHT * 3 + 2 : MENU_ITEM_HEIGHT;
 
   // Posição horizontal: centralizado no card, mantendo dentro da tela
   let menuX = position.x + position.width / 2 - MENU_WIDTH / 2;
-  menuX = Math.max(12, Math.min(menuX, SCREEN_WIDTH - MENU_WIDTH - 12));
+  menuX = Math.max(12, Math.min(menuX, screenWidth - MENU_WIDTH - 12));
 
   // Posição vertical: abaixo do card se tiver espaço, senão acima
-  const spaceBelow = SCREEN_HEIGHT - (position.y + position.height);
+  const spaceBelow = screenHeight - (position.y + position.height);
   const menuY =
     spaceBelow >= menuTotalHeight + 20
       ? position.y + position.height + 8
@@ -96,16 +95,12 @@ export function RepublicContextMenu({
         <View className="flex-1 bg-black/35">
           <TouchableWithoutFeedback>
             <Animated.View
-              className="absolute overflow-hidden rounded-[14px] bg-white shadow-lg"
+              className="absolute overflow-hidden rounded-[14px] bg-white"
               style={{
                 top: menuY,
                 left: menuX,
                 width: MENU_WIDTH,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 8 },
-                shadowOpacity: 0.18,
-                shadowRadius: 24,
-                elevation: 12,
+                boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.18)",
                 opacity: opacityAnim,
                 transform: [
                   { scale: scaleAnim },
