@@ -89,9 +89,11 @@
 
 :heavy_check_mark: Caixa de entrada de convites
 
+:heavy_check_mark: Visualização de convites enviados por república
+
 :heavy_check_mark: Aceite e recusa
 
-:heavy_check_mark: Controle de convites enviados por república
+:heavy_check_mark: Navegação padronizada nas telas de convites
 
 ### Gestão de Moradores
 
@@ -113,6 +115,10 @@
 
 :heavy_check_mark: Separação entre contas pendentes e pagas
 
+:heavy_check_mark: Menu contextual por toque longo no card da conta
+
+:heavy_check_mark: Remoção de contas com restrição por perfil (`ADMIN`)
+
 :heavy_check_mark: Marcação e remoção de contas (com undo)
 
 ### Controle Financeiro
@@ -127,9 +133,11 @@
 
 - Dívida por morador
 
-### Fluxo de Pagamento
+### Fluxo de contas e pagamentos
 
-:heavy_check_mark: Fluxo de status do pagamento: `PENDENTE` → `AGUARDANDO_CONFIRMAÇÃO` → `PAGO`
+:heavy_check_mark: Status da conta: `PENDENTE`, `PAGA` e `ATRASADA`
+
+:heavy_check_mark: Fluxo de status do pagamento por morador: `PENDENTE` → `AGUARDANDO_CONFIRMACAO` → `PAGO`
 
 :heavy_check_mark: Confirmação de pagamentos pelo admin
 
@@ -162,7 +170,7 @@ src/
 │   └── queryClient.ts           # Configuração global do React Query
 │
 └── shared/
-    ├── components/               # Header, SideMenu, Tabs, error boundaries, UI base
+    ├── components/               # ScreenLayout, SideMenu, Tabs, error boundaries, UI base
     ├── contexts/                 # RefreshContext para coordenação global de recargas
     ├── hooks/                    # Hooks compartilhados entre features
     ├── types/                    # Tipos globais (Resident, Resume, assets)
@@ -322,6 +330,7 @@ Repositório da API: `https://github.com/Ameglebm/kontas-back-end`
 - **Timeout** — 10 segundos por requisição
 - **Logs HTTP** — integração com o logger estruturado do app
 - **Normalização de erros** — mensagens amigáveis independente do formato da API
+- **Compatibilidade com payloads nulos/opcionais** — a UI trata campos como `nome`, `fotoPerfil`, `telefone`, `chavePix` e `metodoPagamento` conforme o retorno atual da API
 
 ### Endpoints consumidos
 
@@ -362,7 +371,7 @@ docker-compose run --rm node-sonar
 
 :memo: A UI do modal de conta já oferece "Valores customizados", mas o payload atual só envia `moradorIds` e `valorTotal`.
 
-:memo: O frontend ainda não possui fluxo de edição de conta.
+:memo: O menu contextual da conta já existe, mas a ação de edição ainda não foi implementada no frontend.
 
 :memo: O botão de copiar Pix no card da conta ainda é placeholder no frontend.
 
