@@ -9,6 +9,17 @@ module.exports = {
   presets: [require("nativewind/preset")],
   theme: {
     extend: {
+      colors: {
+        teal: {
+          DEFAULT: "#337176",
+          dark: "#1A4045",
+        },
+        brand: {
+          orange: "#C87223",
+          teal: "#337176",
+          "teal-dark": "#1A4045",
+        },
+      },
       fontFamily: {
         // Inter variants (nomes exatos do Expo Google Fonts)
         inter: ["Inter_400Regular"],
@@ -34,5 +45,19 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require("tailwindcss/plugin")(({ addUtilities }) => {
+      addUtilities({
+        ".text-shadow-sm": {
+          "text-shadow": "0 1px 3px rgba(0,0,0,0.4)",
+        },
+        ".text-shadow": {
+          "text-shadow": "0 2px 6px rgba(0,0,0,0.55)",
+        },
+        ".text-shadow-lg": {
+          "text-shadow": "0 4px 12px rgba(0,0,0,0.7)",
+        },
+      });
+    }),
+  ],
 };
