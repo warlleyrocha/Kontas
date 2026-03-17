@@ -1,9 +1,12 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 
 import { useAccountList } from "@/src/features/accounts/hooks/useAccountList";
-import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
+import {
+  useInvitesByRepublicQuery,
+  usePendingInvitesCount,
+} from "@/src/features/invites/contexts/InvitesContext";
 import { StatusInvite } from "@/src/features/invites/types/invite.types";
 import { EditRepublicModal } from "@/src/features/republic/components/EditRepublicModal";
 import { ResidentsTab } from "@/src/features/residents";
@@ -43,21 +46,17 @@ export function RepublicScreen({ republicId }: Props) {
     republics,
   } = useRepublicScreen(republicId);
 
-  const { pendingCount, invitesSentByRepublic, fetchInvitesByRepublic } =
-    useInvitesContext();
-
-  useEffect(() => {
-    void fetchInvitesByRepublic(republicId);
-  }, [fetchInvitesByRepublic, republicId]);
+  const pendingCount = usePendingInvitesCount();
+  const invitesSentQuery = useInvitesByRepublicQuery(republicId);
 
   // Convites enviados pela república ainda sem resposta do convidado.
-  // Derivado do cache do InvitesContext — sem custo extra de rede.
+  // Derivado do cache do React Query por republicId.
   const pendingInvitesSentCount = useMemo(
     () =>
-      (invitesSentByRepublic[republicId] ?? []).filter(
+      (invitesSentQuery.data ?? []).filter(
         (i) => i.status === StatusInvite.PENDENTE,
       ).length,
-    [invitesSentByRepublic, republicId],
+    [invitesSentQuery.data],
   );
 
   // Contas da república ainda não pagas.

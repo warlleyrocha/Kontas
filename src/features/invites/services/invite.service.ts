@@ -1,4 +1,5 @@
 import { api } from "@/src/services/api";
+import { isAxiosError } from "axios";
 import {
   Invite,
   InviteRequest,
@@ -27,13 +28,20 @@ export const inviteService = {
   },
 
   // Método para listar convites de uma república
-  getInvitesByRepublicId: async (republicaId: string): Promise<Invite[]> => {
+  getInvitesByRepublicId: async (
+    republicaId: string,
+    signal?: AbortSignal,
+  ): Promise<Invite[]> => {
     try {
       const response = await api.get<Invite[]>(
-        `/convites/republica/${republicaId}`
+        `/convites/republica/${republicaId}`,
+        { signal },
       );
       return response.data;
     } catch (error) {
+      if (isAxiosError(error) && error.code === "ERR_CANCELED") {
+        throw error;
+      }
       throw toUserFriendlyError(error, {
         defaultMessage: "Erro ao obter convites.",
         statusMessages: {
@@ -46,12 +54,17 @@ export const inviteService = {
   },
 
   // Método para listar convites por usuario
-  getInvitesByUser: async (): Promise<GetInvitesByUser[]> => {
+  getInvitesByUser: async (signal?: AbortSignal): Promise<GetInvitesByUser[]> => {
     console.log("🌐 Chamando GET /convites/me...");
     try {
-      const response = await api.get<GetInvitesByUser[]>("/convites/me");
+      const response = await api.get<GetInvitesByUser[]>("/convites/me", {
+        signal,
+      });
       return response.data;
     } catch (error) {
+      if (isAxiosError(error) && error.code === "ERR_CANCELED") {
+        throw error;
+      }
       console.error("Erro no getInvitesByUser", error);
       throw toUserFriendlyError(error, {
         defaultMessage: "Erro ao obter convites.",

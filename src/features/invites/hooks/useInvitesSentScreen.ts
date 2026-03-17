@@ -1,36 +1,32 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { useRouter } from "expo-router";
 
-import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
+import {
+  useInvitesByRepublicQuery,
+} from "@/src/features/invites/contexts/InvitesContext";
+import { getErrorMessage } from "@/src/services/httpError";
 
 export function useInvitesSentScreen(republicId: string) {
   const router = useRouter();
-
-  const {
-    invitesSentByRepublic,
-    invitesSentError,
-    invitesSentLoading,
-    fetchInvitesByRepublic,
-  } = useInvitesContext();
-
-  const invites = invitesSentByRepublic[republicId] ?? [];
-
-  useEffect(() => {
-    fetchInvitesByRepublic(republicId);
-  }, [republicId, fetchInvitesByRepublic]);
+  const invitesQuery = useInvitesByRepublicQuery(republicId);
 
   const handleRetry = useCallback(() => {
-    fetchInvitesByRepublic(republicId);
-  }, [republicId, fetchInvitesByRepublic]);
+    void invitesQuery.refetch();
+  }, [invitesQuery]);
 
   const handleEmptyStatePress = useCallback(() => {
     router.back();
   }, [router]);
 
   return {
-    invites,
-    error: invitesSentError,
-    loading: invitesSentLoading,
+    invites: invitesQuery.data ?? [],
+    error: invitesQuery.error
+      ? getErrorMessage(
+          invitesQuery.error,
+          "Não foi possível carregar os convites enviados.",
+        )
+      : null,
+    loading: invitesQuery.isLoading || invitesQuery.isFetching,
     handleRetry,
     handleEmptyStatePress,
   };
