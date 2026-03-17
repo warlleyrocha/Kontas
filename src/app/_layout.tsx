@@ -2,9 +2,9 @@ import LoadingScreen from "@/src/shared/components/ui/loading-screen";
 import { Toaster } from "@/src/shared/components/ui/sonner";
 import { AuthProvider, useAuth } from "@/src/features/auth/contexts";
 import { RepublicListProvider } from "@/src/features/republic/contexts/RepublicListContext";
-import { InvitesProvider } from "@/src/features/invites/contexts/InvitesContext";
 import { RefreshProvider } from "@/src/shared/contexts/RefreshContext";
 import { GlobalErrorBoundary } from "@/src/shared/components/error-boundary/GlobalErrorBoundary";
+import { queryClient } from "@/src/services/queryClient";
 import {
   Inter_300Light,
   Inter_400Regular,
@@ -22,6 +22,7 @@ import {
   Mulish_900Black,
 } from "@expo-google-fonts/mulish";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { preventAutoHideAsync, hideAsync } from "expo-splash-screen";
@@ -103,16 +104,16 @@ function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <GlobalErrorBoundary>
-        <AuthProvider>
-          <RepublicListProvider>
-            <InvitesProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <RepublicListProvider>
               <RefreshProvider>
                 <RootStack />
                 <Toaster position="bottom-center" />
               </RefreshProvider>
-            </InvitesProvider>
-          </RepublicListProvider>
-        </AuthProvider>
+            </RepublicListProvider>
+          </AuthProvider>
+        </QueryClientProvider>
       </GlobalErrorBoundary>
     </GestureHandlerRootView>
   );
