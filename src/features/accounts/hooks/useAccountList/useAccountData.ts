@@ -24,7 +24,7 @@ export function useAccountData({
   republicId,
 }: UseAccountDataProps): UseAccountDataReturn {
   const [contas, setContas] = useState<Conta[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const hasLoadedRef = useRef(false);
 

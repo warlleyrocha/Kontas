@@ -4,8 +4,9 @@ import { useResidents } from "@/src/features/residents/hooks/useResidents";
 import { MetodoPagamento } from "../types/account.types";
 
 interface UseAccountFormParams {
-  republicId: string;
-  onClose: () => void;
+  readonly republicId: string;
+  readonly visible: boolean;
+  readonly onClose: () => void;
 }
 
 export type TipoDivisao = "equal" | "custom";
@@ -61,7 +62,11 @@ function createInitialFormData(): AccountFormData {
   };
 }
 
-export function useAccountForm({ republicId, onClose }: UseAccountFormParams) {
+export function useAccountForm({
+  republicId,
+  visible,
+  onClose,
+}: UseAccountFormParams) {
   const { residents, fetchResidents } = useResidents();
   const [formData, setFormData] = useState<AccountFormData>(
     createInitialFormData
@@ -71,11 +76,13 @@ export function useAccountForm({ republicId, onClose }: UseAccountFormParams) {
 
   // Buscar moradores da API quando o componente montar
   useEffect(() => {
+    if (!visible) return;
+
     const loadResidents = async () => {
       await fetchResidents(republicId);
     };
-    loadResidents();
-  }, [republicId, fetchResidents]);
+    void loadResidents();
+  }, [fetchResidents, republicId, visible]);
 
   const applySplitByType = useCallback(
     (list: MoradorDivisao[], type: TipoDivisao, totalValue: string) => {

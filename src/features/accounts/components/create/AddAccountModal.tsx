@@ -59,7 +59,7 @@ export default function AddAccountModal({
     handleSetTipoDivisao,
     handleToggleMorador,
     handleMoradorValorChange,
-  } = useAccountForm({ onClose, republicId });
+  } = useAccountForm({ onClose, republicId, visible });
   // Destructuring
   const {
     descricao,

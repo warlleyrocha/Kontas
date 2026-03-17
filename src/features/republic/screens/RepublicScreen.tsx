@@ -1,14 +1,8 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { AccountsTab } from "@/src/features/accounts";
-import { useAccountList } from "@/src/features/accounts/hooks/useAccountList";
-import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
-import { getMoradorStatusVisual } from "@/src/features/accounts/utils/accountStatus.utils";
-import {
-  useInvitesByRepublicQuery,
-  usePendingInvitesCount,
-} from "@/src/features/invites/contexts/InvitesContext";
+import { useInvitesByRepublicQuery } from "@/src/features/invites/contexts/InvitesContext";
 import { StatusInvite } from "@/src/features/invites/types/invite.types";
 import { EditRepublicModal } from "@/src/features/republic/components/EditRepublicModal";
 import { ResidentsTab } from "@/src/features/residents";
@@ -16,10 +10,9 @@ import { SideMenu } from "@/src/shared/components/SideMenu";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
 import Tabs from "@/src/shared/components/Tabs";
 import { ResumeTab } from "@/src/shared/components/Tabs/Resume";
-import { ResidentRole } from "@/src/shared/types/resident.types";
-
-import { RepublicHeader } from "../components/RepublicHeader";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
+import { ResidentRole } from "@/src/shared/types/resident.types";
+import { RepublicHeader } from "../components/RepublicHeader";
 import { useRepublicScreen } from "../hooks/useRepublicScreen";
 
 interface Props {
@@ -43,13 +36,16 @@ export function RepublicScreen({ republicId }: Props) {
     setShowEditModal,
     handleSaveRepublic,
     handleSignOut,
+    handleOpenMenu,
     userMenu,
     currentUserRole,
     currentResidentId,
     republics,
   } = useRepublicScreen(republicId);
+  const [pendingPaymentsByRepublic, setPendingPaymentsByRepublic] = useState<
+    Record<string, number>
+  >({});
 
-  const pendingCount = usePendingInvitesCount();
   const invitesSentQuery = useInvitesByRepublicQuery(republicId);
 
   // Convites enviados pela república ainda sem resposta do convidado.
@@ -62,32 +58,27 @@ export function RepublicScreen({ republicId }: Props) {
     [invitesSentQuery.data]
   );
 
-  // Badge de "Pagamentos" representa moradores aguardando confirmação na
-  // tela de conferência do admin, não apenas contas em aberto.
-  // Nota: useAccountList também é chamado por AccountsTab (mesmo republicId),
-  // o que gera um fetch duplo no mount. Tradeoff aceitável até que o estado
-  // de contas seja elevado para um contexto global.
-  const { accountResidentsById } = useAccountList({ republicId });
-  const pendingPaymentsCount = useMemo(
-    () =>
-      Object.values(accountResidentsById).reduce(
-        (total, residents) =>
-          total +
-          residents.filter(
-            (resident) =>
-              getMoradorStatusVisual(resident) ===
-              StatusPagamento.AGUARDANDO_CONFIRMACAO
-          ).length,
-        0
-      ),
-    [accountResidentsById]
+  const pendingPaymentsCount = pendingPaymentsByRepublic[republicId] ?? 0;
+  const handlePendingPaymentsCountChange = useCallback(
+    (count: number) => {
+      setPendingPaymentsByRepublic((current) => {
+        if (current[republicId] === count) {
+          return current;
+        }
+
+        return {
+          ...current,
+          [republicId]: count,
+        };
+      });
+    },
+    [republicId]
   );
 
   const { menuItems, footerItems } = useSideMenu("home", handleSignOut, {
     republicId: republic?.id,
     republics,
     currentUserRole,
-    pendingInvitesCount: pendingCount,
     pendingInvitesSentCount,
     pendingPaymentsCount,
   });
@@ -118,7 +109,7 @@ export function RepublicScreen({ republicId }: Props) {
         isFavorited={isFavorited}
         onEdit={() => setShowEditModal(true)}
         onToggleFavorite={toggleFavorite}
-        onMenuOpen={() => setIsMenuOpen(true)}
+        onMenuOpen={() => void handleOpenMenu()}
         hasNotification={menuItems.some((item) => (item.badge ?? 0) > 0)}
       />
 
@@ -129,6 +120,7 @@ export function RepublicScreen({ republicId }: Props) {
           <AccountsTab
             republicId={republicId}
             currentResidentId={currentResidentId}
+            onPendingPaymentsCountChange={handlePendingPaymentsCountChange}
           />
         )}
         {tab === "moradores" && (

@@ -8,6 +8,7 @@ import { getErrorMessage } from "@/src/services/httpError";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { ResidentRole } from "@/src/shared/types/resident.types";
 import type { TabKey } from "@/src/shared/types/tabs";
+import { logger } from "@/src/shared/utils/logger";
 
 import { showToast } from "@/src/shared/utils/showToast";
 import { toastErrors } from "@/src/shared/utils/toastMessages";
@@ -63,11 +64,6 @@ export function useRepublicScreen(republicId: string) {
     loadRepublic();
   }, [republicId, fetchRepublicById, router]);
 
-  useEffect(() => {
-    if (!user?.perfilCompleto) return;
-    void fetchRepublics();
-  }, [fetchRepublics, user?.perfilCompleto]);
-
   // 🔹 Carregar moradores
   useEffect(() => {
     if (republic?.id) {
@@ -111,6 +107,28 @@ export function useRepublicScreen(republicId: string) {
       toastErrors.logoutFailed(error);
     }
   }, [logout, router]);
+
+  const handleOpenMenu = useCallback(async () => {
+    if (
+      user?.perfilCompleto &&
+      !republics.some((item) => item.id === republicId)
+    ) {
+      try {
+        await fetchRepublics();
+      } catch (error) {
+        logger.warn(
+          "Republic",
+          "Falha ao atualizar lista de repúblicas no menu",
+          {
+            republicId,
+            error: getErrorMessage(error, "Erro ao carregar repúblicas"),
+          }
+        );
+      }
+    }
+
+    setIsMenuOpen(true);
+  }, [fetchRepublics, republicId, republics, user?.perfilCompleto]);
 
   const handleSaveRepublic = useCallback(
     async (nome: string, imagem?: string) => {
@@ -171,6 +189,7 @@ export function useRepublicScreen(republicId: string) {
     setShowEditModal,
     handleSaveRepublic,
     handleSignOut,
+    handleOpenMenu,
     userMenu,
     currentUserRole,
     currentResidentId,
