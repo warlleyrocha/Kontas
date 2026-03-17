@@ -72,8 +72,8 @@ export const AccountCard = ({
     ? vencimento.toLocaleDateString("pt-BR")
     : "Data inválida";
 
-  const paga = contaStatusVisual === StatusConta.PAGO;
-  const vencida = contaStatusVisual === StatusConta.ATRASADO;
+  const paga = contaStatusVisual === StatusConta.PAGA;
+  const vencida = contaStatusVisual === StatusConta.ATRASADA;
 
   const handlePatchAccount = async () => {
     if (paga || isPatching || !onPatch) {

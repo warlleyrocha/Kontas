@@ -4,6 +4,7 @@ import {
   ListarContasRepublic,
   MarcarContaPaga,
   RemoverContaParams,
+  StatusConta,
 } from "@/src/features/accounts/types/account.types";
 import { api } from "@/src/services/api";
 import { toUserFriendlyError } from "@/src/services/httpError";
@@ -92,7 +93,7 @@ export const accountService = {
     metodoPagamento,
   }: MarcarContaPaga): Promise<void> => {
     try {
-      await api.patch(`/contas/${id}`, { status: "PAGA", metodoPagamento });
+      await api.patch(`/contas/${id}`, { status: StatusConta.PAGA, metodoPagamento });
       logger.info("Accounts", `Conta ${id} marcada como paga`);
     } catch (error) {
       throw toUserFriendlyError(error, {

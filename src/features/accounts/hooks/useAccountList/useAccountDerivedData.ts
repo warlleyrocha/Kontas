@@ -1,7 +1,10 @@
 // contasAdaptadas, mesesDisponiveis, contasOrdenadas
 import { useMemo } from "react";
 
-import type { Conta } from "@/src/features/accounts/types/account.types";
+import {
+  StatusConta,
+  type Conta,
+} from "@/src/features/accounts/types/account.types";
 
 interface UseAccountDerivedDataProps {
   contas: Conta[];
@@ -28,7 +31,7 @@ export function useAccountDerivedData({
     return contas.map((conta) => {
       const vencimento = new Date(conta.vencimento);
       const mesReferencia = `${vencimento.getFullYear()}-${String(
-        vencimento.getMonth() + 1
+        vencimento.getMonth() + 1,
       ).padStart(2, "0")}`;
       return { ...conta, mesReferencia };
     });
@@ -46,8 +49,8 @@ export function useAccountDerivedData({
         : contasAdaptadas.filter((c) => c.mesReferencia === mesSelecionado);
 
     return {
-      abertas: filtradas.filter((c) => !c.pago),
-      pagas: filtradas.filter((c) => c.pago),
+      abertas: filtradas.filter((c) => c.status !== StatusConta.PAGA),
+      pagas: filtradas.filter((c) => c.status === StatusConta.PAGA),
     };
   }, [contasAdaptadas, mesSelecionado]);
 
