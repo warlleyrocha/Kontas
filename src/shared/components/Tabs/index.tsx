@@ -1,4 +1,3 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import React, { JSX } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
@@ -17,13 +16,19 @@ const tabs: Tab[] = [
   {
     key: "moradores",
     label: "Moradores",
-    icon: (color) => <Ionicons name="people-outline" size={20} color={color} />,
+    icon: (color) => (
+      <MaterialCommunityIcons
+        name="account-group-outline"
+        size={20}
+        color={color}
+      />
+    ),
   },
   {
     key: "resumo",
     label: "Resumo",
     icon: (color) => (
-      <Ionicons name="stats-chart-outline" size={20} color={color} />
+      <MaterialCommunityIcons name="chart-bar" size={20} color={color} />
     ),
   },
 ];
@@ -34,10 +39,10 @@ export default function Tabs({
   onChange,
 }: Readonly<TabsProps>): JSX.Element {
   return (
-    <View className="my-[10px] flex-row justify-between rounded-full bg-[#ececf0] p-1 px-[16px] shadow">
+    <View className="my-[10px] flex-row justify-between rounded-full bg-teal/5 p-1 border border-teal-50 px-[16px]">
       {tabs.map((tab) => {
         const isActive = value === tab.key;
-        const color = isActive ? "#000" : "#6b6b6b";
+        const color = isActive ? "#337176" : "#6b6b6b";
 
         return (
           <TouchableOpacity
@@ -50,7 +55,7 @@ export default function Tabs({
             <View className="">{tab.icon(color)}</View>
 
             <Text
-              className={isActive ? "text-black" : "text-gray-600"}
+              className={isActive ? "font-semibold text-teal" : "text-gray-500"}
               style={{ fontSize: 14 }}
             >
               {tab.label}

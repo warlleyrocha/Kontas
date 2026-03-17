@@ -11,7 +11,7 @@ export function AddAccountButton({ onPress }: AddAccountButtonProps) {
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel="Adicionar nova conta"
-      className="absolute bottom-6 right-6 h-14 w-14 items-center justify-center rounded-full bg-indigo-600 shadow-lg"
+      className="absolute bottom-6 right-6 h-14 w-14 items-center justify-center rounded-full bg-teal shadow-lg shadow-teal/30"
     >
       <Feather name="plus" size={28} color="white" />
     </TouchableOpacity>

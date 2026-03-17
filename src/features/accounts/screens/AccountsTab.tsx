@@ -130,7 +130,7 @@ export function AccountsTab({
         </View>
 
         <View className="mt-6 items-center rounded-lg bg-white p-6 shadow-lg">
-          <Feather name="dollar-sign" size={48} color="#9ca3af" />
+          <Feather name="dollar-sign" size={48} color="#337176" />
           <Text className="mt-4 text-center text-gray-500">
             Nenhuma conta cadastrada ainda.{"\n"}
             Toque no botão para adicionar.
@@ -147,7 +147,7 @@ export function AccountsTab({
           className="mt-6 items-center rounded-lg bg-white p-6 shadow-lg"
           onPress={openAccountModal}
         >
-          <Feather name="dollar-sign" size={48} color="#9ca3af" />
+          <Feather name="dollar-sign" size={48} color="#337176" />
           <Text className="mt-4 text-center text-gray-500">
             Nenhuma conta cadastrada ainda.{"\n"}
             Toque no botão para adicionar.
@@ -187,8 +187,8 @@ export function AccountsTab({
               onPress={() => setMesSelecionado("todos")}
               className={`rounded-full px-4 py-2 ${
                 mesSelecionado === "todos"
-                  ? "bg-indigo-600"
-                  : "border border-gray-300 bg-white"
+                  ? "bg-teal"
+                  : "border border-teal/20 bg-white"
               }`}
             >
               <Text
@@ -206,8 +206,8 @@ export function AccountsTab({
                 onPress={() => setMesSelecionado(mesAno)}
                 className={`rounded-full px-4 py-2 ${
                   mesSelecionado === mesAno
-                    ? "bg-indigo-600"
-                    : "border border-gray-300 bg-white"
+                    ? "bg-teal"
+                    : "border border-teal/20 bg-white"
                 }`}
               >
                 <Text
@@ -224,7 +224,7 @@ export function AccountsTab({
 
         {hasNoAccounts && mesSelecionado !== "todos" ? (
           <View className="mx-4 mt-6 items-center rounded-lg bg-white p-6 shadow-sm">
-            <Feather name="calendar" size={48} color="#9ca3af" />
+            <Feather name="calendar" size={48} color="#337176" />
             <Text className="mt-4 text-center text-gray-500">
               Nenhuma conta encontrada para {formatMounthYear(mesSelecionado)}.
             </Text>
@@ -236,9 +236,9 @@ export function AccountsTab({
               contas={contasOrdenadas.abertas}
               visivel={mostrarContasAbertas}
               onToggle={toggleOpenAccounts}
-              headerBg="bg-blue-50"
-              headerTextColor="text-blue-800"
-              headerIconColor="#1e40af"
+              headerBg="bg-teal/10"
+              headerTextColor="text-teal-dark"
+              headerIconColor="#337176"
               expandedAccountId={expandedAccountId}
               onToggleExpand={handleToggleExpand}
               accountResidentsById={accountResidentsById}

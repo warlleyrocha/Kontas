@@ -18,7 +18,7 @@ export const ResumoCard = ({
   color,
   isLoading,
 }: ResumoCardProps) => (
-  <View className="mb-4 w-full rounded-lg bg-white p-4 shadow-sm md:w-[32%]">
+  <View className="mb-4 w-full rounded-lg border border-teal/10 bg-white p-4 shadow-sm md:w-[32%]">
     <View className="pb-3">
       <Text className="text-gray-500">{label}</Text>
       <View className="mt-2 flex-row items-center gap-2">

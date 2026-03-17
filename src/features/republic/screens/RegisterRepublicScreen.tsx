@@ -54,83 +54,76 @@ export function RegisterRepublicScreen() {
           source={ImageDefault}
           style={{
             width: "100%",
-            minHeight: height * 0.4,
+            minHeight: height * 0.35,
           }}
-          className="items-center justify-center"
+          className="items-center justify-end"
           resizeMode="cover"
         >
-          <View className="items-center justify-center gap-[24px] py-12">
-            <View className="h-[81px] w-[81px] items-center justify-center rounded-full bg-[#111928]">
-              <Text className="font-inter-semibold text-[36px] text-white">
-                iF
-              </Text>
-            </View>
-
+          <View className="absolute inset-0 bg-black/40" />
+          <View className="w-full items-start px-6 pb-10 pt-6">
             <Text
-              className="text-center font-inter-semibold leading-[22px] text-white"
-              style={{
-                fontSize: width > 400 ? 25 : 24,
-                lineHeight: width > 400 ? 28 : 24,
-                paddingHorizontal: width * 0.1,
-              }}
+              className="font-inter-semibold text-white text-shadow"
+              style={{ fontSize: 28, lineHeight: 34 }}
             >
-              Cadastre sua {"\n"} República
+              Cadastre sua{"\n"}República
+            </Text>
+            <Text className="mt-1 font-mulish text-sm text-white text-shadow-sm">
+              Personalize e comece a gerenciar
             </Text>
           </View>
         </ImageBackground>
 
         <View
-          className="flex-1 items-center rounded-t-[24px] bg-[#FAFAFA] px-4 pb-8"
+          className="flex-1 rounded-t-[24px] bg-[#FAFAFA] px-6 pb-8"
           style={{
             width: width,
-            marginTop: -25,
-            paddingTop: 48,
+            marginTop: -20,
+            paddingTop: 32,
           }}
         >
           {/* Seleção de Imagem */}
-          <View className="mb-6 w-full items-center">
+          <View className="mb-8 items-center">
             <TouchableOpacity
               onPress={handleSelectImageRepublic}
+              activeOpacity={0.8}
               className="items-center"
             >
-              <View className="h-32 w-32 items-center justify-center rounded-full bg-gray-200">
+              <View className="h-28 w-28 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-teal/40 bg-teal/10">
                 {republicImage ? (
                   <Image
                     source={{ uri: republicImage }}
-                    className="h-32 w-32 rounded-full"
+                    className="h-28 w-28 rounded-full"
                   />
                 ) : (
-                  <Feather name="image" size={48} color="#6b7280" />
+                  <Feather name="camera" size={32} color="#337176" />
                 )}
               </View>
-              <Text className="mt-3 font-mulish text-sm text-indigo-600">
-                {republicImage
-                  ? "Toque para alterar a imagem"
-                  : "Adicionar imagem"}
+              <Text className="mt-3 font-mulish text-sm text-teal">
+                {republicImage ? "Alterar foto" : "Adicionar foto"}
               </Text>
             </TouchableOpacity>
           </View>
 
           {/* Campo de Nome da República */}
-          <View className="mb-6 w-full">
+          <View className="mb-8 w-full">
             <InputField
-              label="Nome"
-              placeholder="Digite o nome da sua república"
+              label="Nome da república"
+              placeholder="Ex: República dos Amigos"
               value={republicName}
               onChangeText={setRepublicName}
             />
           </View>
 
-          {/* Spacer - empurra o botão para baixo */}
-          <View className="min-h-[20px] flex-1" />
+          <View className="flex-1" />
 
           <TouchableOpacity
-            className={`w-full rounded-lg px-4 py-3 ${isButtonDisabled ? "bg-gray-400" : "bg-indigo-600"}`}
+            className={`w-full rounded-xl px-4 py-4 ${isButtonDisabled ? "bg-gray-300" : "bg-teal"}`}
             onPress={handleSubmit}
             disabled={isButtonDisabled}
+            activeOpacity={0.85}
           >
-            <Text className="text-center font-inter-medium text-lg text-white">
-              Cadastrar
+            <Text className="text-center font-inter-semibold text-base text-white">
+              Cadastrar República
             </Text>
           </TouchableOpacity>
         </View>

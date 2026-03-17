@@ -59,7 +59,7 @@ function RenderDotItem({
       className="mx-1 h-2 rounded-full"
       style={[
         animatedStyle,
-        { backgroundColor: index === currentIndex ? slide.color : "#6a6b5f" },
+        { backgroundColor: index === currentIndex ? slide.color : "#337176" + "40" },
       ]}
     />
   );

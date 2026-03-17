@@ -68,17 +68,17 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
               onPress={selectPhoto}
               className="mb-6 items-center"
             >
-              <View className="h-28 w-28 items-center justify-center rounded-full bg-indigo-100">
+              <View className="h-28 w-28 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-teal/40 bg-teal/10">
                 {photoUri ? (
                   <Image
                     source={{ uri: photoUri }}
                     className="h-28 w-28 rounded-full"
                   />
                 ) : (
-                  <Feather name="user" size={56} color="#4f46e5" />
+                  <Feather name="user" size={56} color="#337176" />
                 )}
               </View>
-              <Text className="mt-2 text-sm text-indigo-600">
+              <Text className="mt-2 text-sm text-teal">
                 Toque para alterar a foto
               </Text>
             </TouchableOpacity>
@@ -130,7 +130,7 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
             <View className="flex-row gap-3">
               <TouchableOpacity
                 onPress={handleSave}
-                className="flex-1 items-center rounded-lg bg-indigo-600 py-3"
+                className="flex-1 items-center rounded-lg bg-teal py-3"
               >
                 <Text className="font-semibold text-white">Salvar</Text>
               </TouchableOpacity>

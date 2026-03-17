@@ -16,7 +16,7 @@ export function AddAccountModalHeader({ onClose }: AddAccountModalHeaderProps) {
       </View>
 
       <TouchableOpacity onPress={onClose} className="p-2">
-        <Feather name="x" size={24} color="#374151" />
+        <Feather name="x" size={24} color="#337176" />
       </TouchableOpacity>
     </View>
   );

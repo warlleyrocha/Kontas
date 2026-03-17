@@ -102,8 +102,8 @@ export default function LoginScreen() {
           onPress={handleGoogleLogin}
           disabled={isSigningIn} // Desabilita o botão durante o login
         >
-          {isSigningIn ? ( // Se isSigningIn for true, mostra o ActivityIndicator
-            <ActivityIndicator size="small" color="#4F46E5" />
+          {isSigningIn ? (
+            <ActivityIndicator size="small" color="#337176" />
           ) : (
             <>
               <IconGoogle style={{ width: 24, height: 24 }} />
@@ -117,7 +117,7 @@ export default function LoginScreen() {
         <Text className="px-12 text-center text-xs leading-5 text-gray-500">
           Ao continuar, você concorda com nossos{" "}
           <Text
-            className="font-semibold text-indigo-600"
+            className="font-semibold text-teal"
             onPress={() =>
               openLegalLink(legalLinks.termsOfUse, "Termos de Uso")
             }
@@ -126,7 +126,7 @@ export default function LoginScreen() {
           </Text>{" "}
           e{" "}
           <Text
-            className="font-semibold text-indigo-600"
+            className="font-semibold text-teal"
             onPress={() =>
               openLegalLink(legalLinks.privacyPolicy, "Política de Privacidade")
             }

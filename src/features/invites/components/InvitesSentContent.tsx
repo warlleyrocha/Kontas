@@ -22,8 +22,8 @@ export function InvitesSentContent({
       onRetry={onRetry}
       emptyState={{
         icon: "paper-plane-outline",
-        iconColor: "#9CA3AF",
-        bgColor: "bg-gray-100",
+        iconColor: "#337176",
+        bgColor: "bg-teal/10",
         title: "Nenhum convite enviado",
         description:
           "Você ainda não enviou convites para esta república. Convide pessoas para se juntarem a você!",

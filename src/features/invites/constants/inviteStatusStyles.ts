@@ -1,5 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import type { ComponentProps } from "react";
+import type { ViewStyle } from "react-native";
 
 import { StatusInvite } from "../types/invite.types";
 
@@ -7,6 +8,7 @@ type IconName = ComponentProps<typeof Ionicons>["name"];
 
 type InviteStatusStyle = {
   badgeColorClass: string;
+  badgeStyle?: ViewStyle;
   textColorClass: string;
   iconColor: string;
   iconName: IconName;
@@ -16,6 +18,13 @@ type InviteStatusStyle = {
 export const INVITE_STATUS_STYLES: Record<StatusInvite, InviteStatusStyle> = {
   [StatusInvite.PENDENTE]: {
     badgeColorClass: "bg-yellow-100",
+    badgeStyle: {
+      elevation: 2,
+      shadowColor: "#F59E0B",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.16,
+      shadowRadius: 6,
+    },
     textColorClass: "text-yellow-800",
     iconColor: "#F59E0B",
     iconName: "time-outline",

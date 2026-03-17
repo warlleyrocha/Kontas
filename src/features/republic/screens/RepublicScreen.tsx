@@ -30,8 +30,6 @@ export function RepublicScreen({ republicId }: Props) {
     isLoading,
     isMenuOpen,
     setIsMenuOpen,
-    isFavorited,
-    toggleFavorite,
     showEditModal,
     setShowEditModal,
     handleSaveRepublic,
@@ -106,9 +104,7 @@ export function RepublicScreen({ republicId }: Props) {
       <RepublicHeader
         republic={republic}
         numberResidents={residentsCount}
-        isFavorited={isFavorited}
         onEdit={() => setShowEditModal(true)}
-        onToggleFavorite={toggleFavorite}
         onMenuOpen={() => void handleOpenMenu()}
         hasNotification={menuItems.some((item) => (item.badge ?? 0) > 0)}
       />

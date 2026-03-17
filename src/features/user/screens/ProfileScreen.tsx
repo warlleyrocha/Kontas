@@ -130,7 +130,7 @@ export function ProfileScreen() {
     <View className="flex-1 bg-[#FAFAFA]">
       {/* HEADER */}
       <View className="mt-[24px] flex-row items-center gap-3 border-b border-b-black/10 bg-[#FAFAFA] px-[16px] py-4">
-        <View className="h-[50px] w-[50px] items-center justify-center overflow-hidden rounded-full bg-gray-200">
+        <View className="h-[50px] w-[50px] items-center justify-center overflow-hidden rounded-full bg-teal/20">
           {user.fotoPerfil && !profileImageError ? (
             <Image
               source={{ uri: user.fotoPerfil }}
@@ -139,7 +139,7 @@ export function ProfileScreen() {
               onError={() => setProfileImageError(true)}
             />
           ) : (
-            <Text className="text-xl font-bold text-gray-500">
+            <Text className="text-xl font-bold text-teal">
               {user.nome.charAt(0).toUpperCase()}
             </Text>
           )}

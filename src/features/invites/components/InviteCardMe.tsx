@@ -75,7 +75,7 @@ export default function InviteCardMe({
 
             <TouchableOpacity
               onPress={onAccept}
-              className="flex-1 flex-row items-center justify-center rounded-xl bg-indigo-600 py-3"
+              className="flex-1 flex-row items-center justify-center rounded-xl bg-teal py-3"
               activeOpacity={0.8}
             >
               <Ionicons name="checkmark" size={18} color="white" />

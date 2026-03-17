@@ -307,7 +307,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
     <SafeAreaView key={republicId} className="flex-1 bg-[#FAFAFA]">
       <View className="flex-row items-center gap-3 border-b border-b-black/10 bg-[#FAFAFA] px-[16px] pb-4">
         <TouchableOpacity onPress={() => router.back()} className="p-1">
-          <Ionicons name="arrow-back" size={24} color="#374151" />
+          <Ionicons name="arrow-back" size={24} color="#337176" />
         </TouchableOpacity>
 
         <View className="flex-1">
@@ -335,8 +335,8 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
                   onPress={() => setSelectedStatus(option.value)}
                   className={`rounded-full px-4 py-2 ${
                     selected
-                      ? "bg-indigo-600"
-                      : "border border-gray-300 bg-white"
+                      ? "bg-teal"
+                      : "border border-teal/20 bg-white"
                   }`}
                 >
                   <Text

@@ -18,7 +18,7 @@ export function InvitesSentScreen({ republicId }: InvitesSentScreenProps) {
     <View className="flex-1 bg-[#FAFAFA]">
       <View className="mt-[32px] flex-row items-center gap-3 border-b border-b-black/10 bg-[#FAFAFA] px-[16px] py-4">
         <TouchableOpacity onPress={handleEmptyStatePress} className="p-1">
-          <Ionicons name="arrow-back" size={24} color="#374151" />
+          <Ionicons name="arrow-back" size={24} color="#337176" />
         </TouchableOpacity>
 
         <View className="flex-1">

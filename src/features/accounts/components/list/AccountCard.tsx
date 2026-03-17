@@ -140,7 +140,7 @@ export const AccountCard = ({
             </Text>
           </TouchableOpacity>
 
-          <Text className="ml-2 font-bold text-indigo-600">
+          <Text className="ml-2 font-bold text-teal">
             R$ {conta.valor.toFixed(2)}
           </Text>
         </View>
@@ -149,15 +149,15 @@ export const AccountCard = ({
         <View className="border-b border-gray-100 px-4 py-3">
           <View className="flex-row items-center justify-between gap-4">
             {/* Responsável */}
-            <View className="rounded-md border border-indigo-600 px-2 py-1">
-              <Text className="text-xs text-indigo-600">
+            <View className="rounded-md border border-teal/40 px-2 py-1">
+              <Text className="text-xs text-teal">
                 Responsável: {criadoPorNome}
               </Text>
             </View>
 
             {/* Data */}
             <View className="flex-row items-center gap-1">
-              <Ionicons name="calendar-outline" size={16} color="#4b5563" />
+              <Ionicons name="calendar-outline" size={16} color="#337176" />
               <Text className="text-sm text-gray-600">{vencimentoLabel}</Text>
             </View>
           </View>
@@ -173,10 +173,10 @@ export const AccountCard = ({
             className="flex-row items-center justify-between px-4 py-3"
           >
             <View className="flex-row items-center gap-2">
-              <Ionicons name="people-outline" size={18} color="#4b5563" />
+              <Ionicons name="people-outline" size={18} color="#337176" />
               <Text className="font-semibold text-gray-700">Moradores</Text>
-              <View className="rounded-full bg-indigo-100 px-2 py-0.5">
-                <Text className="text-xs font-semibold text-indigo-600">
+              <View className="rounded-full bg-teal/15 px-2 py-0.5">
+                <Text className="text-xs font-semibold text-teal">
                   {isLoadingMoradores ? "..." : moradores.length}
                 </Text>
               </View>
@@ -184,13 +184,13 @@ export const AccountCard = ({
             <MaterialCommunityIcons
               name={expanded ? "chevron-up" : "chevron-down"}
               size={24}
-              color="#6b7280"
+              color="#337176"
             />
           </TouchableOpacity>
 
           {/* CONTEÚDO: Lista de Moradores */}
           {expanded && (
-            <View className="border-t border-gray-100 bg-gray-50">
+            <View className="border-t border-teal/10 bg-teal/5">
               <AccountResidentsContent
                 accountId={conta.id}
                 moradores={moradores}
@@ -209,9 +209,9 @@ export const AccountCard = ({
           {!paga && (
             <TouchableOpacity
               onPress={() => {}}
-              className="flex-1 flex-row items-center justify-center rounded-md border border-indigo-600 py-2"
+              className="flex-1 flex-row items-center justify-center rounded-md border border-teal/40 py-2"
             >
-              <Feather name="copy" size={16} color="#4b5563" />
+              <Feather name="copy" size={16} color="#337176" />
               <Text className="ml-2 text-sm text-gray-700">Copiar PIX</Text>
             </TouchableOpacity>
           )}

@@ -163,7 +163,7 @@ export function AccountContextMenu({
                   <MaterialCommunityIcons
                     name="pencil-outline"
                     size={20}
-                    color="#3B82F6"
+                    color="#337176"
                   />
                 </View>
               </TouchableOpacity>

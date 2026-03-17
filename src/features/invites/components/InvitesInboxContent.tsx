@@ -26,8 +26,8 @@ export function InvitesInboxContent({
       onRetry={onRetry}
       emptyState={{
         icon: "mail-open-outline",
-        iconColor: "#9CA3AF",
-        bgColor: "bg-gray-100",
+        iconColor: "#337176",
+        bgColor: "bg-teal/10",
         title: "Nenhum convite pendente",
         description:
           "Quando alguém te convidar para uma república, o convite aparecerá aqui.",

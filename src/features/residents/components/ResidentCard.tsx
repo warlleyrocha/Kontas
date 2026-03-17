@@ -23,10 +23,10 @@ export const ResidentCard: FC<ResidentCardProps> = ({ morador, onCopyPix }) => {
   } = useResidentCard(morador, onCopyPix);
 
   return (
-    <View className="rounded-3xl border border-[#E7E7EA] bg-white p-5">
+    <View className="rounded-3xl border border-teal/10 bg-white p-5">
       <View className="flex-row items-start justify-between gap-4">
         <View className="flex-1 flex-row items-center gap-3">
-          <View className="h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-[#F2F2F7]">
+          <View className="h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-teal/15">
             {morador.fotoPerfil && !imageError ? (
               <Image
                 source={{ uri: morador.fotoPerfil }}
@@ -34,7 +34,7 @@ export const ResidentCard: FC<ResidentCardProps> = ({ morador, onCopyPix }) => {
                 onError={() => setImageError(true)}
               />
             ) : (
-              <Text className="text-sm font-semibold text-[#111827]">
+              <Text className="text-sm font-semibold text-teal">
                 {getInitials(morador.nome)}
               </Text>
             )}
@@ -58,34 +58,36 @@ export const ResidentCard: FC<ResidentCardProps> = ({ morador, onCopyPix }) => {
         accessibilityLabel={
           expanded ? "Recolher detalhes" : "Ver mais detalhes"
         }
-        className="mt-4 flex-row items-center justify-between rounded-full bg-[#F5F5F7] px-4 py-3"
+        className="mt-4 flex-row items-center justify-between rounded-full bg-teal/5 px-4 py-3"
       >
-        <Text className="text-sm font-medium text-gray-600">
+        <Text className="text-sm font-mulish-medium text-gray-900">
           Ver mais detalhes
         </Text>
         <Feather
           name={expanded ? "chevron-up" : "chevron-down"}
           size={18}
-          color="#6B7280"
+          color="#337176"
         />
       </TouchableOpacity>
 
       <Animated.View style={animatedStyle}>
-        <View className="mt-4 rounded-3xl bg-[#F5F5F7] p-4">
-          <Text className="text-xs font-medium uppercase tracking-wide text-gray-400">
+        <View className="mt-4 rounded-3xl bg-teal/5 p-4">
+          <Text className="text-xs font-mulish-bold uppercase tracking-wide text-teal-dark/100">
             Contato
           </Text>
 
           <View className="mt-3 gap-3">
             <View>
-              <Text className="text-xs font-medium text-gray-500">Email</Text>
+              <Text className="text-xs font-mulish-medium text-teal-dark/100">
+                Email
+              </Text>
               <Text className="mt-1 text-sm text-[#111827]" numberOfLines={1}>
                 {morador.email || "Não informado"}
               </Text>
             </View>
 
             <View>
-              <Text className="text-xs font-medium text-gray-500">
+              <Text className="text-xs font-mulish-medium text-teal-dark/100">
                 Telefone
               </Text>
               <Text className="mt-1 text-sm text-[#111827]" numberOfLines={1}>
@@ -94,7 +96,7 @@ export const ResidentCard: FC<ResidentCardProps> = ({ morador, onCopyPix }) => {
             </View>
           </View>
 
-          <Text className="mt-4 text-xs font-medium uppercase tracking-wide text-gray-400">
+          <Text className="mt-4 text-xs font-mulish-bold uppercase tracking-wide text-teal-dark/100">
             Chave PIX
           </Text>
 
@@ -116,7 +118,7 @@ export const ResidentCard: FC<ResidentCardProps> = ({ morador, onCopyPix }) => {
                 {copiado ? (
                   <Ionicons name="checkmark" size={18} color="#16a34a" />
                 ) : (
-                  <Feather name="copy" size={18} color="#374151" />
+                  <Feather name="copy" size={18} color="#337176" />
                 )}
               </TouchableOpacity>
             ) : null}

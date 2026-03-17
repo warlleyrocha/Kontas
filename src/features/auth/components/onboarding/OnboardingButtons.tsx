@@ -64,7 +64,7 @@ const OnboardingButtons: FC<OnboardingButtonsProps> = ({
             onPress={handleSkip}
             activeOpacity={0.7}
           >
-            <Text className="w-full text-center font-mulish-medium text-[16px] leading-[18px] text-slate-500">
+            <Text className="w-full text-center font-mulish-medium text-[16px] leading-[18px] text-teal/60">
               Pular
             </Text>
           </TouchableOpacity>

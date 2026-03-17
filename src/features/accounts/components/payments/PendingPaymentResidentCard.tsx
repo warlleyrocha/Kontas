@@ -73,8 +73,8 @@ export function PendingPaymentResidentCard({
       <View className="flex-row items-center justify-between gap-3">
         <View className="flex-1">
           <View className="flex-row items-center gap-3">
-            <View className="h-11 w-11 items-center justify-center rounded-full bg-[#F2F2F7]">
-              <Text className="text-sm font-semibold text-[#111827]">
+            <View className="h-11 w-11 items-center justify-center rounded-full bg-teal/15">
+              <Text className="text-sm font-semibold text-teal">
                 {getInitials(resident.moradorNome)}
               </Text>
             </View>
@@ -115,7 +115,7 @@ export function PendingPaymentResidentCard({
             await onConfirmResidentPayment(accountId, resident.id);
           }}
           className={`mt-4 min-h-11 flex-row items-center justify-center rounded-full px-4 ${
-            isConfirming ? "bg-[#D1D5DB]" : "bg-[#111827]"
+            isConfirming ? "bg-gray-300" : "bg-teal-dark"
           }`}
         >
           {isConfirming ? (

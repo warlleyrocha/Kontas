@@ -182,7 +182,7 @@ export function RepublicContextMenu({
                   <MaterialCommunityIcons
                     name="pencil-outline"
                     size={20}
-                    color="#3B82F6"
+                    color="#337176"
                   />
                 </View>
               </TouchableOpacity>
@@ -203,7 +203,7 @@ export function RepublicContextMenu({
                       <MaterialCommunityIcons
                         name="account-plus-outline"
                         size={20}
-                        color="#3B82F6"
+                        color="#337176"
                       />
                     </View>
                   </TouchableOpacity>
