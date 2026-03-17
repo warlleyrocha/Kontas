@@ -4,6 +4,7 @@ import React, {
   useContext,
   useEffect,
   useState,
+  useMemo,
 } from "react";
 
 import { useAuth } from "@/src/features/auth/contexts";
@@ -64,10 +65,13 @@ export function RepublicListProvider({
     }
   }, []);
 
+  const contextValue = useMemo(
+    () => ({ republics, setRepublics, fetchRepublics, fetchRepublicById }),
+    [republics, fetchRepublics, fetchRepublicById],
+  );
+
   return (
-    <RepublicListContext.Provider
-      value={{ republics, setRepublics, fetchRepublics, fetchRepublicById }}
-    >
+    <RepublicListContext.Provider value={contextValue}>
       {children}
     </RepublicListContext.Provider>
   );
