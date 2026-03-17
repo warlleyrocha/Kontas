@@ -32,8 +32,17 @@ export const toUserFriendlyError = (
 ): AppError => {
   if (!isAxiosError(error)) {
     if (error instanceof AppError) return error;
-    if (error instanceof Error)
-      return new AppError(error.message, { originalError: error });
+    if (error instanceof Error) {
+      const errorWithMetadata = error as Error & {
+        code?: string;
+        status?: number;
+      };
+      return new AppError(error.message, {
+        status: errorWithMetadata.status,
+        code: errorWithMetadata.code,
+        originalError: error,
+      });
+    }
     return new AppError(options.defaultMessage, { originalError: error });
   }
 
