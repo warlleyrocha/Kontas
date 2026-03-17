@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
-
-import { getErrorMessage } from "@/src/services/httpError";
 import type { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
+import { getErrorMessage } from "@/src/services/httpError";
+import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { showToast } from "@/src/shared/utils/showToast";
 import { accountResidentsService } from "../services/account-residents.service";
 import type { Conta } from "../types/account.types";
@@ -18,13 +18,14 @@ interface UseAccountResidentsReturn {
   loadResidents: (contas: Conta[]) => Promise<void>;
   confirmResidentPayment: (
     accountId: string,
-    accountResidentId: string,
+    accountResidentId: string
   ) => Promise<void>;
 }
 
 export function useAccountResidents({
   fetchAccountResidents,
 }: UseAccountResidentsProps): UseAccountResidentsReturn {
+  const { refreshAll } = useRefresh();
   const [accountResidentsById, setAccountResidentsById] = useState<
     Record<string, ContaMorador[]>
   >({});
@@ -54,7 +55,7 @@ export function useAccountResidents({
           acc[conta.id] = true;
           return acc;
         },
-        {},
+        {}
       );
       setLoadingResidentsById(loadingMap);
 
@@ -62,7 +63,7 @@ export function useAccountResidents({
         contas.map(async (conta) => {
           const moradores = await fetchAccountResidents(conta.id);
           return [conta.id, moradores] as const;
-        }),
+        })
       );
 
       const residentsMap: Record<string, ContaMorador[]> = {};
@@ -82,7 +83,7 @@ export function useAccountResidents({
       setErrorResidentsById(errorMap);
       setLoadingResidentsById({});
     },
-    [fetchAccountResidents],
+    [fetchAccountResidents]
   );
 
   const confirmResidentPayment = useCallback(
@@ -108,13 +109,14 @@ export function useAccountResidents({
           [accountId]: updatedResidents,
         }));
 
+        await refreshAll();
         showToast.success("Pagamento do morador enviado para confirmação.");
       } catch (error) {
         showToast.error(
           getErrorMessage(
             error,
-            "Não foi possível confirmar pagamento do morador.",
-          ),
+            "Não foi possível confirmar pagamento do morador."
+          )
         );
       } finally {
         setUpdatingResidentById((previousState) => {
@@ -124,7 +126,7 @@ export function useAccountResidents({
         });
       }
     },
-    [fetchAccountResidents, updatingResidentById],
+    [fetchAccountResidents, refreshAll, updatingResidentById]
   );
 
   return {

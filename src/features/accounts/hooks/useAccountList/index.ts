@@ -1,18 +1,18 @@
 // orquestrador, interface pública inalterada
 
-import { useCallback, useEffect } from "react";
-
+import { useCallback, useEffect, useId } from "react";
+import { useRefresh } from "@/src/shared/contexts/RefreshContext";
+import { useAccountResidents } from "../useAccountResidents";
 import { useAccountData } from "./useAccountData";
 import { useAccountDerivedData } from "./useAccountDerivedData";
 import { useAccountFilters } from "./useAccountFilters";
-import { useAccountResidents } from "../useAccountResidents";
-import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 
 interface UseAccountListProps {
   readonly republicId: string;
 }
 
 export function useAccountList({ republicId }: UseAccountListProps) {
+  const refreshRegistrationId = useId();
   const { contas, loading, error, fetchAccounts, fetchAccountResidents } =
     useAccountData({ republicId });
 
@@ -51,8 +51,11 @@ export function useAccountList({ republicId }: UseAccountListProps) {
   const { registerRefresh } = useRefresh();
 
   useEffect(() => {
-    return registerRefresh(`accounts-${republicId}`, refresh);
-  }, [registerRefresh, republicId, refresh]);
+    return registerRefresh(
+      `accounts-${republicId}-${refreshRegistrationId}`,
+      refresh
+    );
+  }, [refreshRegistrationId, registerRefresh, republicId, refresh]);
 
   return {
     // Estado

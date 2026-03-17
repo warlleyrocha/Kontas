@@ -1,8 +1,10 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useMemo } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
-
+import { AccountsTab } from "@/src/features/accounts";
 import { useAccountList } from "@/src/features/accounts/hooks/useAccountList";
+import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
+import { getMoradorStatusVisual } from "@/src/features/accounts/utils/accountStatus.utils";
 import {
   useInvitesByRepublicQuery,
   usePendingInvitesCount,
@@ -10,7 +12,6 @@ import {
 import { StatusInvite } from "@/src/features/invites/types/invite.types";
 import { EditRepublicModal } from "@/src/features/republic/components/EditRepublicModal";
 import { ResidentsTab } from "@/src/features/residents";
-import { AccountsTab } from "@/src/features/accounts";
 import { SideMenu } from "@/src/shared/components/SideMenu";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
 import Tabs from "@/src/shared/components/Tabs";
@@ -54,17 +55,31 @@ export function RepublicScreen({ republicId }: Props) {
   const pendingInvitesSentCount = useMemo(
     () =>
       (invitesSentQuery.data ?? []).filter(
-        (i) => i.status === StatusInvite.PENDENTE,
+        (i) => i.status === StatusInvite.PENDENTE
       ).length,
-    [invitesSentQuery.data],
+    [invitesSentQuery.data]
   );
 
-  // Contas da república ainda não pagas.
+  // Badge de "Pagamentos" representa moradores aguardando confirmação na
+  // tela de conferência do admin, não apenas contas em aberto.
   // Nota: useAccountList também é chamado por AccountsTab (mesmo republicId),
   // o que gera um fetch duplo no mount. Tradeoff aceitável até que o estado
   // de contas seja elevado para um contexto global.
-  const { contasOrdenadas } = useAccountList({ republicId });
-  const pendingPaymentsCount = contasOrdenadas.abertas.length;
+  const { accountResidentsById } = useAccountList({ republicId });
+  const pendingPaymentsCount = useMemo(
+    () =>
+      Object.values(accountResidentsById).reduce(
+        (total, residents) =>
+          total +
+          residents.filter(
+            (resident) =>
+              getMoradorStatusVisual(resident) ===
+              StatusPagamento.AGUARDANDO_CONFIRMACAO
+          ).length,
+        0
+      ),
+    [accountResidentsById]
+  );
 
   const { menuItems, footerItems } = useSideMenu("home", handleSignOut, {
     republicId: republic?.id,
@@ -114,7 +129,13 @@ export function RepublicScreen({ republicId }: Props) {
             currentResidentId={currentResidentId}
           />
         )}
-        {tab === "moradores" && <ResidentsTab residents={residents} republicId={republicId} isAdmin={currentUserRole === ResidentRole.ADMIN} />}
+        {tab === "moradores" && (
+          <ResidentsTab
+            residents={residents}
+            republicId={republicId}
+            isAdmin={currentUserRole === ResidentRole.ADMIN}
+          />
+        )}
         {tab === "resumo" && (
           <ResumeTab residents={residents} republicId={republicId} />
         )}

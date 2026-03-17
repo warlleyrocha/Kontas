@@ -13,14 +13,14 @@ interface SideMenuOptions {
   pendingInvitesCount?: number;
   /** Badge em "Convites Enviados" — convites enviados pela república com status PENDENTE */
   pendingInvitesSentCount?: number;
-  /** Badge em "Pagamentos" — contas da república ainda não pagas */
+  /** Badge em "Pagamentos" — moradores aguardando confirmação do admin */
   pendingPaymentsCount?: number;
 }
 
 export function useSideMenu(
   context: UserMenuContext,
   handleSignOut: () => void,
-  options: SideMenuOptions = {},
+  options: SideMenuOptions = {}
 ) {
   const {
     republicId,
@@ -63,7 +63,7 @@ export function useSideMenu(
       if (targetRepublicId === republicId) return;
       router.push(`/(republics)/${targetRepublicId}`);
     },
-    [republicId, router],
+    [republicId, router]
   );
 
   const republicMenuItems = useMemo(
@@ -75,7 +75,7 @@ export function useSideMenu(
         onPress: () => navigateToRepublic(republic.id),
         active: republic.id === republicId,
       })),
-    [navigateToRepublic, republicId, republics],
+    [navigateToRepublic, republicId, republics]
   );
 
   const menuItems = useMemo<MenuItem[]>(() => {
@@ -165,7 +165,7 @@ export function useSideMenu(
         onPress: () =>
           void openLegalLink(
             legalLinks.privacyPolicy,
-            "Política de Privacidade",
+            "Política de Privacidade"
           ),
       },
       {
@@ -176,7 +176,7 @@ export function useSideMenu(
         danger: true,
       },
     ],
-    [handleSignOut],
+    [handleSignOut]
   );
 
   return { menuItems, footerItems };
