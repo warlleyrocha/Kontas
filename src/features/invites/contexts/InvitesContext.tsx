@@ -19,7 +19,10 @@ const inviteKeys = {
     [...inviteKeys.all, "republic", republicId] as const,
 };
 
-function updateInviteList(currentInvites: Invite[] | undefined, invite: Invite) {
+function updateInviteList(
+  currentInvites: Invite[] | undefined,
+  invite: Invite,
+) {
   const invites = currentInvites ?? [];
   const alreadyExists = invites.some((item) => item.id === invite.id);
 
@@ -82,7 +85,9 @@ export function useUpdateInviteStatusMutation() {
       queryClient.setQueryData<GetInvitesByUser[]>(
         inviteKeys.byUser(),
         (currentInvites) =>
-          (currentInvites ?? []).filter((invite) => invite.id !== variables.inviteId),
+          (currentInvites ?? []).filter(
+            (invite) => invite.id !== variables.inviteId,
+          ),
       );
     },
   });
@@ -110,33 +115,39 @@ export function useInvitesContext() {
   const sendInviteAsync = sendInviteMutation.mutateAsync;
   const pendingCount = useMemo(
     () =>
-      invitesByUser.filter(
-        (invite) => invite.status === StatusInvite.PENDENTE,
-      ).length,
+      invitesByUser.filter((invite) => invite.status === StatusInvite.PENDENTE)
+        .length,
     [invitesByUser],
   );
 
   const fetchInvitesByUser = useCallback(async () => {
     await refetchInvitesByUser();
   }, [refetchInvitesByUser]);
-
   const handleAcceptInvite = useCallback(
     async (inviteId: string, republicaId: string) => {
-      await updateInviteStatus({
-        inviteId,
-        status: StatusInvite.ACEITO,
-      });
-      router.replace(`/(republics)/${republicaId}`);
+      try {
+        await updateInviteStatus({
+          inviteId,
+          status: StatusInvite.ACEITO,
+        });
+        router.replace(`/(republics)/${republicaId}`);
+      } catch (error) {
+        console.error("Erro ao aceitar convite:", error);
+      }
     },
     [router, updateInviteStatus],
   );
 
   const handleRejectInvite = useCallback(
     async (inviteId: string) => {
-      await updateInviteStatus({
-        inviteId,
-        status: StatusInvite.RECUSADO,
-      });
+      try {
+        await updateInviteStatus({
+          inviteId,
+          status: StatusInvite.RECUSADO,
+        });
+      } catch (error) {
+        console.error("Erro ao recusar convite:", error);
+      }
     },
     [updateInviteStatus],
   );
