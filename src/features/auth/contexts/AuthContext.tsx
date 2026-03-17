@@ -10,12 +10,14 @@ import { UpdateUserRequest } from "@/src/features/user/types/user.types";
 import { showToast } from "@/src/shared/utils/showToast";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import React, {
   createContext,
   ReactNode,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from "react";
 
@@ -37,18 +39,15 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 // Provider para envolver o app
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const queryClient = useQueryClient();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true); // Começa true para verificar auth
   const [error, setError] = useState<string | null>(null);
   const [republicData, setRepublicData] = useState(null);
-
-  // Ao montar o componente, verificar se há usuário logado
-  useEffect(() => {
-    checkAuth();
-  }, []);
+  const wasAuthenticatedRef = useRef(false);
 
   // Função para verificar autenticação
-  const checkAuth = async () => {
+  const checkAuth = React.useCallback(async () => {
     try {
       console.log("🔄 Verificando autenticação...");
 
@@ -84,6 +83,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           console.error("⛔ Token inválido ou expirado");
 
           // Token inválido → limpar tudo
+          await queryClient.cancelQueries();
           await AsyncStorage.multiRemove(["@app:token", "@app:user"]);
           setUser(null);
         } else {
@@ -97,7 +97,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [queryClient]);
+
+  // Ao montar o componente, verificar se há usuário logado
+  useEffect(() => {
+    void checkAuth();
+  }, [checkAuth]);
 
   // Login com Google
   const loginWithGoogle = React.useCallback(
@@ -137,6 +142,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       console.log("🔄 Fazendo logout...");
 
+      await queryClient.cancelQueries();
+
       // Limpa a sessão do app e a conta mantida pelo Google Sign-In.
       await Promise.allSettled([
         AsyncStorage.multiRemove(["@app:token", "@app:user", "republic-data"]),
@@ -155,7 +162,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error("❌ Erro ao fazer logout:", error);
     }
-  }, []);
+  }, [queryClient]);
 
   // Completar perfil
   const completeProfile = React.useCallback(
@@ -217,6 +224,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     });
   }, []);
+
+  useEffect(() => {
+    const isAuthenticated = Boolean(user);
+
+    if (wasAuthenticatedRef.current && !isAuthenticated) {
+      queryClient.clear();
+    }
+
+    wasAuthenticatedRef.current = isAuthenticated;
+  }, [queryClient, user]);
 
   const contextValue = React.useMemo(
     () => ({
