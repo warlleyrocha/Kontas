@@ -1,7 +1,14 @@
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import React, { useCallback, useRef, useState } from "react";
-import { Animated, Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
+import Animated, {
+  cancelAnimation,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 
 interface CardPosition {
   x: number;
@@ -20,6 +27,33 @@ interface RepublicaCardProps {
   ) => void;
 }
 
+function useRepublicCardAnimation() {
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const shrink = useCallback(() => {
+    cancelAnimation(scale);
+    scale.value = withTiming(0.93, { duration: 400 });
+  }, [scale]);
+
+  const reset = useCallback(() => {
+    cancelAnimation(scale);
+    scale.value = withSpring(1, {
+      stiffness: 200,
+      damping: 16,
+    });
+  }, [scale]);
+
+  return {
+    animatedStyle,
+    shrink,
+    reset,
+  };
+}
+
 export default function RepublicCard({
   republic,
   residentsCount = 0,
@@ -29,43 +63,26 @@ export default function RepublicCard({
   const residentsLabel = residentsCount === 1 ? "Morador" : "Moradores";
   const [imageError, setImageError] = useState(false);
   const cardRef = useRef<View>(null);
-  const [scaleAnim] = useState(new Animated.Value(1));
-  const pressAnimation = useRef<Animated.CompositeAnimation | null>(null);
+  const { animatedStyle, shrink, reset } = useRepublicCardAnimation();
 
   const handlePressIn = useCallback(() => {
-    pressAnimation.current = Animated.timing(scaleAnim, {
-      toValue: 0.93,
-      duration: 400, // sincroniza com delayLongPress
-      useNativeDriver: true,
-    });
-    pressAnimation.current.start();
-  }, [scaleAnim]);
+    shrink();
+  }, [shrink]);
 
   const handlePressOut = useCallback(() => {
-    pressAnimation.current?.stop();
-    Animated.spring(scaleAnim, {
-      toValue: 1,
-      useNativeDriver: true,
-      tension: 200,
-      friction: 10,
-    }).start();
-  }, [scaleAnim]);
+    reset();
+  }, [reset]);
 
   const handleLongPress = useCallback(() => {
     if (!onLongPress) return;
-    Animated.spring(scaleAnim, {
-      toValue: 1,
-      useNativeDriver: true,
-      tension: 200,
-      friction: 10,
-    }).start();
+    reset();
     cardRef.current?.measure((_x, _y, width, height, pageX, pageY) => {
       onLongPress(republic, { x: pageX, y: pageY, width, height });
     });
-  }, [onLongPress, republic, scaleAnim]);
+  }, [onLongPress, republic, reset]);
 
   return (
-    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+    <Animated.View style={animatedStyle}>
       <TouchableOpacity
         ref={cardRef}
         onPress={onSelect}

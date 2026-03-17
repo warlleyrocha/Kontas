@@ -15,23 +15,16 @@ export function useResidentCard(
   const [copiado, setCopiado] = useState(false);
   const [imageError, setImageError] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   const animatedHeight = useSharedValue(0);
   const animatedOpacity = useSharedValue(0);
-
   const animatedStyle = useAnimatedStyle(
     () => ({
       maxHeight: animatedHeight.value,
       opacity: animatedOpacity.value,
       overflow: "hidden",
     }),
-    [animatedHeight, animatedOpacity]
+    [animatedHeight, animatedOpacity],
   );
-
-  useEffect(() => {
-    animatedHeight.value = withTiming(expanded ? 500 : 0, { duration: 300 });
-    animatedOpacity.value = withTiming(expanded ? 1 : 0, { duration: 250 });
-  }, [expanded, animatedHeight, animatedOpacity]);
 
   useEffect(() => {
     return () => {
@@ -40,7 +33,10 @@ export function useResidentCard(
   }, []);
 
   function toggleExpanded() {
-    setExpanded((prev) => !prev);
+    const nextExpanded = !expanded;
+    setExpanded(nextExpanded);
+    animatedHeight.value = withTiming(nextExpanded ? 500 : 0, { duration: 300 });
+    animatedOpacity.value = withTiming(nextExpanded ? 1 : 0, { duration: 250 });
   }
 
   function handleCopyPix() {

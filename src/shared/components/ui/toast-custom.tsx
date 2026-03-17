@@ -2,8 +2,14 @@
 import Feather from "@expo/vector-icons/Feather";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import React, { ReactNode, useEffect, useState } from "react";
-import { Animated, Text, TouchableOpacity, View } from "react-native";
+import React, { ReactNode, useCallback } from "react";
+import { Text, TouchableOpacity, View } from "react-native";
+import Animated, {
+  cancelAnimation,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 export type ToastVariant = "success" | "error" | "info";
 
@@ -48,6 +54,32 @@ export interface ToastConfirmProps {
   readonly onCancel: () => void;
 }
 
+function useToastConfirmAnimation(duration: number) {
+  const progress = useSharedValue(1);
+  const barWidth = useSharedValue(0);
+
+  const handleProgressLayout = useCallback(
+    (width: number) => {
+      if (width === 0) return;
+
+      barWidth.value = width;
+      cancelAnimation(progress);
+      progress.value = 1;
+      progress.value = withTiming(0, { duration });
+    },
+    [barWidth, duration, progress],
+  );
+
+  const progressBarStyle = useAnimatedStyle(() => ({
+    width: barWidth.value * progress.value,
+  }));
+
+  return {
+    handleProgressLayout,
+    progressBarStyle,
+  };
+}
+
 export function ToastConfirm({
   message,
   duration,
@@ -56,34 +88,18 @@ export function ToastConfirm({
   onConfirm,
   onCancel,
 }: ToastConfirmProps) {
-  const [progressAnim] = useState(new Animated.Value(1));
-  const [barWidth, setBarWidth] = useState(0);
-
-  useEffect(() => {
-    if (barWidth === 0) return;
-    Animated.timing(progressAnim, {
-      toValue: 0,
-      duration,
-      useNativeDriver: false,
-    }).start();
-  }, [barWidth, duration, progressAnim]);
+  const { handleProgressLayout, progressBarStyle } =
+    useToastConfirmAnimation(duration);
 
   return (
     <View className="mx-4 overflow-hidden rounded-2xl bg-white shadow-lg shadow-black/20">
       {/* Barra de progresso */}
       <View
         className="h-1 w-full bg-gray-100"
-        onLayout={(e) => setBarWidth(e.nativeEvent.layout.width)}
+        onLayout={(e) => handleProgressLayout(e.nativeEvent.layout.width)}
       >
         <Animated.View
-          style={{
-            width: progressAnim.interpolate({
-              inputRange: [0, 1],
-              outputRange: [0, barWidth],
-            }),
-            height: 4,
-            backgroundColor: "#EF4444",
-          }}
+          style={[progressBarStyle, { height: 4, backgroundColor: "#EF4444" }]}
         />
       </View>
 
