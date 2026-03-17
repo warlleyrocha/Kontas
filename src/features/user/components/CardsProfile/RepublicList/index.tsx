@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import RepublicCard from "@/src/features/user/components/RepublicCard";
-import { useRepublicResidents } from "@/src/shared/hooks/useRepublicResidents";
 
 interface CardPosition {
   x: number;
@@ -27,6 +26,7 @@ interface RepublicListProps {
   ) => void;
   readonly refreshing?: boolean;
   readonly onRefresh?: () => void | Promise<void>;
+  readonly getResidentsCount: (republicId: string) => number;
 }
 
 export default function RepublicList({
@@ -36,9 +36,8 @@ export default function RepublicList({
   onLongPressRepublic,
   refreshing = false,
   onRefresh,
+  getResidentsCount,
 }: RepublicListProps) {
-  const { getResidentsCount } = useRepublicResidents(republics);
-
   return (
     <ScrollView
       className="flex-1 px-6 pt-6"

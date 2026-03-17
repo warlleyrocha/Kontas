@@ -1,3 +1,4 @@
+import { useIsFocused } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert } from "react-native";
@@ -24,12 +25,19 @@ interface CardPosition {
 
 export function useProfileScreen() {
   const router = useRouter();
+  const isFocused = useIsFocused();
 
   const { user, logout, completeProfile, updateUser } = useAuth();
   const { republics, fetchRepublics } = useRepublicList();
   const { deleteRepublic, updateRepublic, showEditModal, setShowEditModal } =
     useRepublicActions();
-  const { isAdmin } = useRepublicResidents(republics, user?.email);
+  const { getResidentsCount, isAdmin } = useRepublicResidents(
+    republics,
+    user?.email,
+    isFocused
+  );
+  const { pendingCount, sendInvite, sendLoading, sendError } =
+    useInvitesContext();
 
   const { refreshing, onRefresh, registerRefresh } = useRefresh();
 
@@ -46,7 +54,11 @@ export function useProfileScreen() {
       await logout();
       router.replace("/");
     } catch (error) {
-      logger.error("User", "Erro ao fazer logout", error instanceof Error ? error : undefined);
+      logger.error(
+        "User",
+        "Erro ao fazer logout",
+        error instanceof Error ? error : undefined
+      );
       toastErrors.logoutFailed(error);
     }
   }, [logout, router]);
@@ -89,7 +101,11 @@ export function useProfileScreen() {
             : "Perfil atualizado com sucesso!"
         );
       } catch (error) {
-        logger.error("User", "Erro ao salvar perfil", error instanceof Error ? error : undefined);
+        logger.error(
+          "User",
+          "Erro ao salvar perfil",
+          error instanceof Error ? error : undefined
+        );
         toastErrors.profileUpdateFailed(error);
       }
     },
@@ -180,8 +196,6 @@ export function useProfileScreen() {
     return registerRefresh("profile", fetchRepublics);
   }, [registerRefresh, fetchRepublics]);
 
-  const { pendingCount } = useInvitesContext();
-
   const { menuItems, footerItems } = useSideMenu("profile", handleSignOut, {
     republics,
     pendingInvitesCount: pendingCount,
@@ -201,6 +215,7 @@ export function useProfileScreen() {
   return {
     user,
     republics,
+    getResidentsCount,
 
     // UI state
     isMenuOpen,
@@ -236,5 +251,8 @@ export function useProfileScreen() {
     menuItems,
     footerItems,
     sideMenuUser,
+    sendInvite,
+    sendLoading,
+    sendError,
   };
 }

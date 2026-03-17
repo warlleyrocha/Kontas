@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
 import { InviteModal } from "@/src/features/invites/components/InviteModal";
-import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
 import { EditRepublicModal } from "@/src/features/republic/components/EditRepublicModal";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import EmptyRepublic from "@/src/features/user/components/CardsProfile/EmptyRepublic";
@@ -12,9 +11,8 @@ import { EditProfileModal } from "@/src/features/user/components/EditProfileModa
 import { RepublicContextMenu } from "@/src/features/user/components/RepublicContextMenu";
 
 import { MenuButton, SideMenu } from "@/src/shared/components/SideMenu";
-import { maskPhone } from "@/src/shared/utils/inputMasks";
-
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
+import { maskPhone } from "@/src/shared/utils/inputMasks";
 import { useProfileScreen } from "../hooks/useProfileScreen";
 
 interface CardPosition {
@@ -28,6 +26,9 @@ interface ProfileContentProps {
   readonly perfilCompleto: boolean;
   readonly republicsLength: number;
   readonly republics: ReturnType<typeof useProfileScreen>["republics"];
+  readonly getResidentsCount: ReturnType<
+    typeof useProfileScreen
+  >["getResidentsCount"];
   readonly refreshing: boolean;
   readonly onContinueIncomplete: () => void;
   readonly onCreateRepublic: () => void;
@@ -44,6 +45,7 @@ function ProfileContent({
   perfilCompleto,
   republicsLength,
   republics,
+  getResidentsCount,
   refreshing,
   onContinueIncomplete,
   onCreateRepublic,
@@ -68,6 +70,7 @@ function ProfileContent({
   return (
     <RepublicList
       republics={republics}
+      getResidentsCount={getResidentsCount}
       onSelectRepublic={onSelectRepublic}
       onLongPressRepublic={onLongPressRepublic}
       onCreateRepublic={onCreateRepublic}
@@ -82,6 +85,7 @@ export function ProfileScreen() {
   const {
     user,
     republics,
+    getResidentsCount,
 
     isMenuOpen,
     setIsMenuOpen,
@@ -113,9 +117,10 @@ export function ProfileScreen() {
     menuItems,
     footerItems,
     sideMenuUser,
+    sendInvite,
+    sendLoading,
+    sendError,
   } = useProfileScreen();
-
-  const { sendInvite, sendLoading, sendError } = useInvitesContext();
 
   const [profileImageError, setProfileImageError] = useState(false);
 
@@ -159,6 +164,7 @@ export function ProfileScreen() {
         perfilCompleto={user.perfilCompleto}
         republicsLength={republics.length}
         republics={republics}
+        getResidentsCount={getResidentsCount}
         refreshing={refreshing}
         onContinueIncomplete={() => setShowEditProfileModal(true)}
         onCreateRepublic={handleCreateRepublic}
