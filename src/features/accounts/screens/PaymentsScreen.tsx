@@ -1,5 +1,3 @@
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { useRouter } from "expo-router";
 import React, {
   useCallback,
   useEffect,
@@ -8,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+
 import {
   PaymentsEmptyState,
   PaymentsErrorState,
@@ -24,6 +22,7 @@ import type {
 } from "@/src/features/accounts/types/payments.types";
 import { getMoradorStatusVisual } from "@/src/features/accounts/utils/accountStatus.utils";
 import { getErrorMessage } from "@/src/services/httpError";
+import { ScreenLayout } from "@/src/shared/components/ScreenLayout";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 import { showToast } from "@/src/shared/utils/showToast";
@@ -84,7 +83,6 @@ interface PaymentsScreenProps {
 
 export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
   useComponentLogger("PaymentsScreen");
-  const router = useRouter();
   const { refreshAll } = useRefresh();
   const { error, fetchAccounts, fetchAccountResidents } = useAccountData({
     republicId,
@@ -304,18 +302,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
   }
 
   return (
-    <SafeAreaView key={republicId} className="flex-1 bg-[#FAFAFA]">
-      <View className="flex-row items-center gap-3 border-b border-b-black/10 bg-[#FAFAFA] px-[16px] pb-4">
-        <TouchableOpacity onPress={() => router.back()} className="p-1">
-          <Ionicons name="arrow-back" size={24} color="#337176" />
-        </TouchableOpacity>
-
-        <View className="flex-1">
-          <Text className="text-lg font-semibold">Pagamentos</Text>
-          <Text className="text-sm text-gray-500">{subtitle}</Text>
-        </View>
-      </View>
-
+    <ScreenLayout key={republicId} title="Pagamentos" subtitle={subtitle}>
       <View className="flex-1 px-4 py-4">
         <View className="mb-4">
           <Text className="mb-2 text-sm font-semibold text-gray-700">
@@ -354,6 +341,6 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
 
         {content}
       </View>
-    </SafeAreaView>
+    </ScreenLayout>
   );
 }
