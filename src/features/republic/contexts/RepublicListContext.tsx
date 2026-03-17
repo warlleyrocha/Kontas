@@ -1,4 +1,10 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 import { useAuth } from "@/src/features/auth/contexts";
 import { republicService } from "@/src/features/republic/services/republic.service";
@@ -17,7 +23,11 @@ const RepublicListContext = createContext<RepublicListContextData>(
   {} as RepublicListContextData,
 );
 
-export function RepublicListProvider({ children }: { children: React.ReactNode }) {
+export function RepublicListProvider({
+  children,
+}: {
+  readonly children: React.ReactNode;
+}) {
   const { isAuthenticated } = useAuth();
   const [republics, setRepublics] = useState<RepublicResponse[]>([]);
 
@@ -66,7 +76,9 @@ export function RepublicListProvider({ children }: { children: React.ReactNode }
 export function useRepublicListContext() {
   const context = useContext(RepublicListContext);
   if (!context) {
-    throw new Error("useRepublicListContext deve ser usado dentro de RepublicListProvider");
+    throw new Error(
+      "useRepublicListContext deve ser usado dentro de RepublicListProvider",
+    );
   }
   return context;
 }
