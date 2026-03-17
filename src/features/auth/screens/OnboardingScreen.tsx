@@ -15,8 +15,10 @@ import {
   slides,
 } from "@/src/features/auth/constants/slides";
 import { useOnboardingAnimation } from "@/src/features/auth/hooks/useOnboardingAnimation";
+import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 
 export default function Onboarding() {
+  useComponentLogger("OnboardingScreen");
   const { width, height } = useWindowDimensions();
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList<OnboardingSlide>>(null);

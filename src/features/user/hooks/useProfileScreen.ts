@@ -11,6 +11,7 @@ import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { useRepublicResidents } from "@/src/shared/hooks/useRepublicResidents";
 import { maskPhone } from "@/src/shared/utils/inputMasks";
+import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
 import { toastErrors } from "@/src/shared/utils/toastMessages";
 
@@ -45,7 +46,7 @@ export function useProfileScreen() {
       await logout();
       router.replace("/");
     } catch (error) {
-      console.error("❌ Erro ao fazer logout:", error);
+      logger.error("User", "Erro ao fazer logout", error instanceof Error ? error : undefined);
       toastErrors.logoutFailed(error);
     }
   }, [logout, router]);
@@ -88,7 +89,7 @@ export function useProfileScreen() {
             : "Perfil atualizado com sucesso!"
         );
       } catch (error) {
-        console.log("Erro ao salvar o perfil:", error);
+        logger.error("User", "Erro ao salvar perfil", error instanceof Error ? error : undefined);
         toastErrors.profileUpdateFailed(error);
       }
     },

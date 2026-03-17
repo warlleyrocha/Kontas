@@ -9,6 +9,7 @@ import { useTabResidents } from "@/src/features/residents/hooks/useTabResidents"
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import type { ResidentResponse } from "@/src/shared/types/resident.types";
 
+import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 import { AddAccountButton } from "../../accounts/components";
 
 interface ResidentsTabProps {
@@ -22,6 +23,7 @@ export const ResidentsTab: FC<ResidentsTabProps> = ({
   republicId,
   isAdmin,
 }) => {
+  useComponentLogger("ResidentsTab");
   const { copiarChavePix } = useTabResidents();
   const { refreshing, onRefresh } = useRefresh();
 

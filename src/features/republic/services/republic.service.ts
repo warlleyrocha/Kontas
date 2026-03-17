@@ -4,6 +4,7 @@ import {
 } from "@/src/features/republic/types/republic.types";
 import { api } from "@/src/services/api";
 import { toUserFriendlyError } from "@/src/services/httpError";
+import { logger } from "@/src/shared/utils/logger";
 
 export const republicService = {
   // Método para criar uma nova república
@@ -25,13 +26,13 @@ export const republicService = {
 
   //Método para obter a lista de repúblicas
   getRepublics: async (): Promise<RepublicResponse[]> => {
-    console.log("🌐 Chamando GET /republicas...");
+    logger.info("Republic", "Buscando lista de repúblicas");
     try {
       const response = await api.get<RepublicResponse[]>("/republicas");
 
       return response.data;
     } catch (error) {
-      console.error("❌ Erro no getRepublics:", error);
+      logger.error("Republic", "Erro ao buscar repúblicas", error instanceof Error ? error : undefined);
       throw toUserFriendlyError(error, {
         defaultMessage: "Erro ao obter repúblicas.",
         statusMessages: {

@@ -2,6 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { Text, TouchableOpacity, View } from "react-native";
 
 import { InvitesSentContent } from "../components/InvitesSentContent";
+import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 import { useInvitesSentScreen } from "../hooks/useInvitesSentScreen";
 
 interface InvitesSentScreenProps {
@@ -9,6 +10,7 @@ interface InvitesSentScreenProps {
 }
 
 export function InvitesSentScreen({ republicId }: InvitesSentScreenProps) {
+  useComponentLogger("InvitesSentScreen");
   const { invites, error, handleRetry, handleEmptyStatePress } =
     useInvitesSentScreen(republicId);
 

@@ -11,6 +11,7 @@ import { useAuth } from "@/src/features/auth/contexts";
 import { republicService } from "@/src/features/republic/services/republic.service";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import { getErrorMessage } from "@/src/services/httpError";
+import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
 
 interface RepublicListContextData {
@@ -43,13 +44,13 @@ export function RepublicListProvider({
       const data = await republicService.getRepublics();
       setRepublics(data);
     } catch (error) {
-      console.error("Erro ao buscar repúblicas:", error);
+      logger.error("Republic", "Erro ao buscar repúblicas", error instanceof Error ? error : undefined);
       showToast.error(
         getErrorMessage(error, "Não foi possível carregar as repúblicas.")
       );
       setRepublics([]);
     } finally {
-      console.log("Busca de repúblicas finalizada.");
+      logger.info("Republic", "Busca de repúblicas finalizada");
     }
   }, []);
 
@@ -57,7 +58,7 @@ export function RepublicListProvider({
     try {
       return await republicService.getRepublicById(id);
     } catch (error) {
-      console.error("Erro ao buscar república por ID:", error);
+      logger.error("Republic", "Erro ao buscar república por ID", error instanceof Error ? error : undefined);
       showToast.error(
         getErrorMessage(error, "Não foi possível carregar a república.")
       );

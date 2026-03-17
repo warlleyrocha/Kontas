@@ -25,6 +25,7 @@ import type {
 import { getMoradorStatusVisual } from "@/src/features/accounts/utils/accountStatus.utils";
 import { getErrorMessage } from "@/src/services/httpError";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
+import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 import { showToast } from "@/src/shared/utils/showToast";
 
 type PaymentsState = {
@@ -82,6 +83,7 @@ interface PaymentsScreenProps {
 }
 
 export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
+  useComponentLogger("PaymentsScreen");
   const router = useRouter();
   const { refreshAll } = useRefresh();
   const { error, fetchAccounts, fetchAccountResidents } = useAccountData({

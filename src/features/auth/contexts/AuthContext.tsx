@@ -19,6 +19,7 @@ import {
 import { userService } from "@/src/features/user/services/user.service";
 import { UpdateUserRequest } from "@/src/features/user/types/user.types";
 import { getErrorMessage, isUnauthorizedError } from "@/src/services/httpError";
+import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
 
 // Interface do que o Context vai fornecer
@@ -41,7 +42,9 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true); // Começa true para verificar auth
+  // Controla apenas o bootstrap da sessão para não desmontar a árvore
+  // durante ações como login e completeProfile.
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [republicData, setRepublicData] = useState(null);
   const wasAuthenticatedRef = useRef(false);
@@ -49,7 +52,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Função para verificar autenticação
   const checkAuth = React.useCallback(async () => {
     try {
-      console.log("🔄 Verificando autenticação...");
+      logger.info("Auth", "Verificando autenticação");
 
       // Buscar token e user do AsyncStorage
       const [storedToken, storedUser] = await Promise.all([
@@ -59,7 +62,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // Se não tem token, não está logado
       if (!storedToken) {
-        console.log("⚠️ Nenhum token encontrado");
+        logger.warn("Auth", "Nenhum token encontrado");
         setLoading(false);
         return;
       }
@@ -73,14 +76,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Validar token com o backend
       try {
         const userData = await userService.fetchUser();
-        console.log("✅ Token válido. Usuário autenticado");
+        logger.info("Auth", "Token válido. Usuário autenticado");
 
         // Atualizar estado e cache se os dados mudaram
         setUser(userData);
         await AsyncStorage.setItem("@app:user", JSON.stringify(userData));
       } catch (error) {
         if (isUnauthorizedError(error)) {
-          console.error("⛔ Token inválido ou expirado");
+          logger.warn("Auth", "Token inválido ou expirado");
 
           // Token inválido → limpar tudo
           await queryClient.cancelQueries();
@@ -89,11 +92,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } else {
           // Em falhas transitórias de rede, preserva sessão local e tenta novamente depois.
           const message = getErrorMessage(error, "Erro ao validar sessão");
-          console.warn("⚠️ Falha transitória ao validar sessão:", message);
+          logger.warn("Auth", "Falha transitória ao validar sessão", {
+            message,
+          });
         }
       }
     } catch (error) {
-      console.error("❌ Erro na verificação de auth:", error);
+      logger.error(
+        "Auth",
+        "Erro na verificação de auth",
+        error instanceof Error ? error : undefined
+      );
     } finally {
       setLoading(false);
     }
@@ -107,11 +116,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Login com Google
   const loginWithGoogle = React.useCallback(
     async (googleToken: string): Promise<AuthResponse | null> => {
-      setLoading(true);
       setError(null);
 
       try {
-        console.log("🔵 Iniciando login com Google...");
+        logger.info("Auth", "Iniciando login com Google");
         const data = await authService.googleLogin(googleToken);
 
         // Salvar no AsyncStorage em paralelo
@@ -123,15 +131,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Atualizar estado
         setUser(data.user);
 
-        console.log("✅ Login bem-sucedido");
+        logger.info("Auth", "Login bem-sucedido");
         return data;
       } catch (error) {
         const errorMessage = getErrorMessage(error, "Erro desconhecido");
-        console.error("❌ Erro no login:", errorMessage);
+        logger.error("Auth", "Erro no login", new Error(errorMessage));
         setError(errorMessage);
         return null;
-      } finally {
-        setLoading(false);
       }
     },
     []
@@ -140,7 +146,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Logout
   const logout = React.useCallback(async () => {
     try {
-      console.log("🔄 Fazendo logout...");
+      logger.info("Auth", "Iniciando logout");
 
       await queryClient.cancelQueries();
 
@@ -158,9 +164,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Redirecionar para login
       router.replace("/(auth)/login");
 
-      console.log("✅ Logout realizado");
+      logger.info("Auth", "Logout realizado com sucesso");
     } catch (error) {
-      console.error("❌ Erro ao fazer logout:", error);
+      logger.error(
+        "Auth",
+        "Erro ao fazer logout",
+        error instanceof Error ? error : undefined
+      );
     }
   }, [queryClient]);
 
@@ -168,11 +178,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const completeProfile = React.useCallback(
     async (data: CompleteProfileRequest) => {
       try {
-        setLoading(true);
-
         // 1️⃣ Enviar dados para o backend
         await authService.completeProfile(data);
-        console.log("✅ Dados enviados com sucesso");
+        logger.info("Auth", "Dados do perfil enviados com sucesso");
 
         const updatedUser = await userService.fetchUser();
 
@@ -182,18 +190,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // 4️⃣ Atualizar AsyncStorage
         await AsyncStorage.setItem("@app:user", JSON.stringify(updatedUser));
 
-        console.log("✅ Perfil completado e sincronizado");
+        logger.info("Auth", "Perfil completado e sincronizado");
       } catch (error) {
         const errorMessage = getErrorMessage(error, "Erro ao completar perfil");
-        console.error("❌ Erro ao completar perfil:", errorMessage);
+        logger.error(
+          "Auth",
+          "Erro ao completar perfil",
+          new Error(errorMessage)
+        );
 
         setError(errorMessage);
 
         showToast.error(errorMessage);
 
         throw error;
-      } finally {
-        setLoading(false);
       }
     },
     []
@@ -203,11 +213,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const updateUser = React.useCallback(async (data: UpdateUserRequest) => {
     try {
       const userData = await userService.updateUser(data);
-      console.log("✅ Usuário atualizado");
+      logger.info("Auth", "Usuário atualizado com sucesso");
       setUser(userData);
       await AsyncStorage.setItem("@app:user", JSON.stringify(userData));
     } catch (error) {
-      console.error("❌ Erro ao atualizar usuário:", error);
+      logger.error(
+        "Auth",
+        "Erro ao atualizar usuário",
+        error instanceof Error ? error : undefined
+      );
       throw error;
     }
   }, []);
@@ -219,7 +233,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           const parsed = JSON.parse(json);
           setRepublicData(parsed);
         } catch (error) {
-          console.warn("Erro ao parsear republic-data", error);
+          logger.warn("Auth", "Erro ao parsear republic-data", {
+            error: String(error),
+          });
         }
       }
     });

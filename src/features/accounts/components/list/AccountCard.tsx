@@ -93,7 +93,7 @@ export const AccountCard = ({
 
   return (
     <TouchableOpacity
-      onPress={() => console.log("Editar conta", conta.id)}
+      onPress={() => {}}
       activeOpacity={0.7}
     >
       <View
@@ -193,7 +193,7 @@ export const AccountCard = ({
           {/* Copiar PIX */}
           {!paga && (
             <TouchableOpacity
-              onPress={() => console.log("Copiar PIX")}
+              onPress={() => {}}
               className="flex-1 flex-row items-center justify-center rounded-md border border-indigo-600 py-2"
             >
               <Feather name="copy" size={16} color="#4b5563" />

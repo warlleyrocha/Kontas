@@ -14,6 +14,7 @@ import { RepublicContextMenu } from "@/src/features/user/components/RepublicCont
 import { MenuButton, SideMenu } from "@/src/shared/components/SideMenu";
 import { maskPhone } from "@/src/shared/utils/inputMasks";
 
+import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 import { useProfileScreen } from "../hooks/useProfileScreen";
 
 interface CardPosition {
@@ -77,6 +78,7 @@ function ProfileContent({
 }
 
 export function ProfileScreen() {
+  useComponentLogger("ProfileScreen");
   const {
     user,
     republics,

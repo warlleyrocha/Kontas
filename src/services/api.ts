@@ -4,6 +4,7 @@ import axios, {
   type InternalAxiosRequestConfig,
   isAxiosError,
 } from "axios";
+import { logger } from "@/src/shared/utils/logger";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -37,7 +38,6 @@ const circuitBreaker = {
   halfOpenInFlight: false,
 };
 
-const SHOULD_LOG_HTTP = process.env.NODE_ENV !== "production";
 
 const canProceed = (): { allowed: boolean; halfOpen: boolean } => {
   if (circuitBreaker.state === "OPEN") {
@@ -101,19 +101,15 @@ const shouldCountAsCircuitFailure = (error: AxiosError) => {
 };
 
 const logResponse = (status: number, url?: string, data?: unknown) => {
-  if (!SHOULD_LOG_HTTP) return;
-  console.log(`\n✅ ${status} ${url}`);
-  if (data !== undefined) {
-    console.log(JSON.stringify(data, null, 2));
+  if (Array.isArray(data)) {
+    logger.table("API", `✅ ${status} ${url}`, data);
+  } else {
+    logger.info("API", `✅ ${status} ${url}`, data);
   }
 };
 
 const logError = (status: number | string, url?: string, data?: unknown) => {
-  if (!SHOULD_LOG_HTTP) return;
-  console.log(`\n❌ ${status} ${url}`);
-  if (data !== undefined) {
-    console.log(JSON.stringify(data, null, 2));
-  }
+  logger.warn("API", `❌ ${status} ${url}`, data);
 };
 
 const createCircuitOpenError = () => {
@@ -142,6 +138,13 @@ api.interceptors.request.use(
         config.headers["Authorization"] = `Bearer ${token}`;
       }
     }
+
+    logger.debug(
+      "API",
+      `➡️ ${String(config.method).toUpperCase()} ${config.url}`,
+      config.data ?? config.params
+    );
+
     return config;
   },
 
@@ -163,9 +166,7 @@ api.interceptors.response.use(
   async (error) => {
     const knownError = error as Error & { code?: string };
     if (knownError.code === CIRCUIT_OPEN_CODE) {
-      if (SHOULD_LOG_HTTP) {
-        console.log("\n⛔ Circuit breaker aberto: requisição bloqueada.");
-      }
+      logger.warn("API", "⛔ Circuit breaker aberto: requisição bloqueada.");
       return Promise.reject(knownError);
     }
 

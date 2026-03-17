@@ -8,6 +8,7 @@ import {
 } from "@/src/features/invites/types/invite.types";
 import { api } from "@/src/services/api";
 import { toUserFriendlyError } from "@/src/services/httpError";
+import { logger } from "@/src/shared/utils/logger";
 
 export const inviteService = {
   // Método para enviar um convite
@@ -57,7 +58,7 @@ export const inviteService = {
   getInvitesByUser: async (
     signal?: AbortSignal
   ): Promise<GetInvitesByUser[]> => {
-    console.log("🌐 Chamando GET /convites/me...");
+    logger.info("Invites", "Buscando convites do usuário");
     try {
       const response = await api.get<GetInvitesByUser[]>("/convites/me", {
         signal,
@@ -67,7 +68,7 @@ export const inviteService = {
       if (isAxiosError(error) && error.code === "ERR_CANCELED") {
         throw error;
       }
-      console.error("Erro no getInvitesByUser", error);
+      logger.error("Invites", "Erro ao buscar convites do usuário", error instanceof Error ? error : undefined);
       throw toUserFriendlyError(error, {
         defaultMessage: "Erro ao obter convites.",
         statusMessages: {

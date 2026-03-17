@@ -14,6 +14,7 @@ import {
 } from "@/src/features/accounts/components";
 import { useAccountsTab } from "@/src/features/accounts/hooks/useAccountsTab";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
+import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 import { formatMounthYear } from "@/src/shared/utils/formats";
 
 interface AccountsTabProps {
@@ -25,6 +26,7 @@ export function AccountsTab({
   republicId,
   currentResidentId,
 }: AccountsTabProps) {
+  useComponentLogger("AccountsTab");
   const {
     accountResidentsById,
     closeAccountModal,

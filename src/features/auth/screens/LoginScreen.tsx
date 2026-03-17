@@ -13,6 +13,7 @@ import IconGoogle from "@/assets/images/google-icon.svg";
 import { useAuth } from "@/src/features/auth/contexts/AuthContext";
 import { getErrorMessage } from "@/src/services/httpError";
 import { legalLinks, openLegalLink } from "@/src/shared/constants/legal";
+import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 import { showToast } from "@/src/shared/utils/showToast";
 
 type GoogleSignInResult = Awaited<ReturnType<typeof GoogleSignin.signIn>>;
@@ -22,6 +23,7 @@ function getGoogleToken(userInfo: GoogleSignInResult): string | null {
 }
 
 export default function LoginScreen() {
+  useComponentLogger("LoginScreen");
   const router = useRouter();
   const [isSigningIn, setIsSigningIn] = useState(false);
   const { loginWithGoogle, error } = useAuth();

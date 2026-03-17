@@ -1,4 +1,5 @@
 import { toUserFriendlyError } from "@/src/services/httpError";
+import { logger } from "@/src/shared/utils/logger";
 import { api } from "../../../services/api";
 import {
   AuthResponse,
@@ -30,13 +31,13 @@ export const authService = {
   // Completar dados do perfil
   completeProfile: async (data: CompleteProfileRequest): Promise<void> => {
     try {
-      console.log("📤 Enviando dados do perfil para o backend...");
+      logger.debug("Auth", "Payload de completar perfil", data);
 
       await api.post("/auth/completar-dados", data);
 
-      console.log("✅ Perfil completado com sucesso no backend");
+      logger.info("Auth", "Perfil completado com sucesso no backend");
     } catch (error) {
-      console.error("❌ Erro ao completar perfil:", error);
+      logger.error("Auth", "Erro ao completar perfil", error instanceof Error ? error : undefined);
       throw toUserFriendlyError(error, {
         defaultMessage: "Erro ao completar perfil.",
         statusMessages: {

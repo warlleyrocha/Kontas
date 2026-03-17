@@ -1,10 +1,11 @@
 import { createElement, useCallback, useEffect, useRef, useState } from "react";
 import { getErrorMessage } from "@/src/services/httpError";
 import { toast } from "@/src/shared/components/ui/sonner";
+import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
 import { AccountRecoveryToast } from "../components";
-import { accountService } from "../services/account.service";
 import { accountResidentsService } from "../services/account-residents.service";
+import { accountService } from "../services/account.service";
 import type {
   CriarContaComMoradoresRequest,
   ListarContasResponse,
@@ -70,7 +71,7 @@ export function useAccountActions({
 
       try {
         const { moradorIds, ...contaPayload } = data;
-        console.log(data.metodoPagamento);
+        logger.debug("Accounts", "Payload de submit", { metodoPagamento: data.metodoPagamento });
         const conta = await accountService.criarConta(contaPayload);
 
         if (moradorIds.length > 0) {

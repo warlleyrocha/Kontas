@@ -4,9 +4,11 @@ import { Text, TouchableOpacity, View } from "react-native";
 
 import { InvitesInboxContent } from "@/src/features/invites/components/InvitesInboxContent";
 
+import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 import { useInvitesScreen } from "../hooks/useInvitesScreen";
 
 export function InvitesScreen() {
+  useComponentLogger("InvitesScreen");
   const router = useRouter();
 
   const {

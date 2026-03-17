@@ -7,6 +7,7 @@ import {
 } from "@/src/features/accounts/types/accountResidents.types";
 import { api } from "@/src/services/api";
 import { toUserFriendlyError } from "@/src/services/httpError";
+import { logger } from "@/src/shared/utils/logger";
 
 export const accountResidentsService = {
   vincularMoradores: async (
@@ -39,10 +40,7 @@ export const accountResidentsService = {
       const response = await api.get<ListarContasResponse>(
         `/contas-moradores/conta/${contaId}`
       );
-      console.log(
-        `Contas listadas para os moradores ${contaId}:`,
-        response.data
-      );
+      logger.table("AccountResidents", `Contas dos moradores da conta ${contaId}`, response.data as object);
       return response.data;
     } catch (error) {
       throw toUserFriendlyError(error, {
@@ -63,7 +61,7 @@ export const accountResidentsService = {
       const response = await api.get<ListarContasResponse>(
         `contas-moradores/morador/${moradorId}`
       );
-      console.log(`Lista de contas do morador ${moradorId}: `, response.data);
+      logger.table("AccountResidents", `Contas do morador ${moradorId}`, response.data as object);
       return response.data;
     } catch (error) {
       throw toUserFriendlyError(error, {
@@ -83,7 +81,7 @@ export const accountResidentsService = {
   }: ContaMoradorIdParams): Promise<void> => {
     try {
       await api.patch(`/contas-moradores/${id}/pagar`);
-      console.log(`Pagamento da conta ${id} enviado para o ADMIN`);
+      logger.info("AccountResidents", `Pagamento da conta ${id} enviado para confirmação do ADMIN`);
     } catch (error) {
       throw toUserFriendlyError(error, {
         defaultMessage: "Erro ao marcar conta como paga",
@@ -106,7 +104,7 @@ export const accountResidentsService = {
       const response = await api.patch<ContaMorador>(
         `/contas-moradores/${id}/confirmar`
       );
-      console.log(`Pagamento da conta ${id} confirmado pelo ADMIN`);
+      logger.info("AccountResidents", `Pagamento da conta ${id} confirmado pelo ADMIN`);
       return response.data;
     } catch (error) {
       throw toUserFriendlyError(error, {
@@ -131,7 +129,7 @@ export const accountResidentsService = {
         `/contas-moradores/${id}/visibilidade`,
         { visivel }
       );
-      console.log(`Visibilidade da conta ${id} atualizada pelo ADMIN`);
+      logger.info("AccountResidents", `Visibilidade da conta ${id} atualizada pelo ADMIN`);
       return response.data;
     } catch (error) {
       throw toUserFriendlyError(error, {

@@ -13,9 +13,11 @@ import {
 import ImageDefault from "@/assets/images/image-register.webp";
 import InputField from "@/src/shared/components/ui/input-field";
 import { useRepublicActions } from "../hooks/useRepublicActions";
+import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 import { useRepublicForm } from "../hooks/useRepublicForm";
 
 export function RegisterRepublicScreen() {
+  useComponentLogger("RegisterRepublicScreen");
   const { width, height } = useWindowDimensions();
 
   const {

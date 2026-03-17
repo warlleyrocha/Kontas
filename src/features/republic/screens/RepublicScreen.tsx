@@ -19,6 +19,7 @@ import { ResumeTab } from "@/src/shared/components/Tabs/Resume";
 import { ResidentRole } from "@/src/shared/types/resident.types";
 
 import { RepublicHeader } from "../components/RepublicHeader";
+import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 import { useRepublicScreen } from "../hooks/useRepublicScreen";
 
 interface Props {
@@ -26,6 +27,7 @@ interface Props {
 }
 
 export function RepublicScreen({ republicId }: Props) {
+  useComponentLogger("RepublicScreen");
   const {
     republic,
     residents,
