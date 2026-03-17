@@ -1,13 +1,3 @@
-import { authService } from "@/src/features/auth/services/auth.service";
-import { userService } from "@/src/features/user/services/user.service";
-import { getErrorMessage, isUnauthorizedError } from "@/src/services/httpError";
-import {
-  AuthResponse,
-  CompleteProfileRequest,
-  User,
-} from "@/src/features/auth/types/auth.types";
-import { UpdateUserRequest } from "@/src/features/user/types/user.types";
-import { showToast } from "@/src/shared/utils/showToast";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useQueryClient } from "@tanstack/react-query";
@@ -20,6 +10,16 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { authService } from "@/src/features/auth/services/auth.service";
+import {
+  AuthResponse,
+  CompleteProfileRequest,
+  User,
+} from "@/src/features/auth/types/auth.types";
+import { userService } from "@/src/features/user/services/user.service";
+import { UpdateUserRequest } from "@/src/features/user/types/user.types";
+import { getErrorMessage, isUnauthorizedError } from "@/src/services/httpError";
+import { showToast } from "@/src/shared/utils/showToast";
 
 // Interface do que o Context vai fornecer
 interface AuthContextData {
@@ -134,7 +134,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
       }
     },
-    [],
+    []
   );
 
   // Logout
@@ -196,7 +196,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
       }
     },
-    [],
+    []
   );
 
   // Atualizar dados do usuário
@@ -256,7 +256,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       logout,
       updateUser,
       completeProfile,
-    ],
+    ]
   );
 
   return (

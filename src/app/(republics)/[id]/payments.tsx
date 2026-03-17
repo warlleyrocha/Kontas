@@ -1,10 +1,10 @@
-import { RouteErrorFallback } from "@/src/shared/components/error-boundary/RouteErrorFallback";
-import PaymentsScreen from "@/src/features/accounts/screens/PaymentsScreen";
 import {
+  type ErrorBoundaryProps,
   Redirect,
   useLocalSearchParams,
-  type ErrorBoundaryProps,
 } from "expo-router";
+import PaymentsScreen from "@/src/features/accounts/screens/PaymentsScreen";
+import { RouteErrorFallback } from "@/src/shared/components/error-boundary/RouteErrorFallback";
 
 export default function PaymentsRoute() {
   const { id: republicId } = useLocalSearchParams<{ id?: string }>();

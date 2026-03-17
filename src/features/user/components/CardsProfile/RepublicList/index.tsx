@@ -1,6 +1,3 @@
-import { useRepublicResidents } from "@/src/shared/hooks/useRepublicResidents";
-import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
-import RepublicCard from "@/src/features/user/components/RepublicCard";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   RefreshControl,
@@ -9,6 +6,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
+import RepublicCard from "@/src/features/user/components/RepublicCard";
+import { useRepublicResidents } from "@/src/shared/hooks/useRepublicResidents";
 
 interface CardPosition {
   x: number;
@@ -21,7 +21,10 @@ interface RepublicListProps {
   readonly republics: RepublicResponse[];
   readonly onSelectRepublic: (id: string) => void;
   readonly onCreateRepublic: () => void;
-  readonly onLongPressRepublic?: (republic: RepublicResponse, position: CardPosition) => void;
+  readonly onLongPressRepublic?: (
+    republic: RepublicResponse,
+    position: CardPosition
+  ) => void;
   readonly refreshing?: boolean;
   readonly onRefresh?: () => void | Promise<void>;
 }

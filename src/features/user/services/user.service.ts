@@ -1,6 +1,6 @@
-import { UpdateUserRequest, User } from "../types/user.types";
-import { api } from "../../../services/api";
 import { toUserFriendlyError } from "@/src/services/httpError";
+import { api } from "../../../services/api";
+import { UpdateUserRequest, User } from "../types/user.types";
 
 export const userService = {
   //Método para buscar dados

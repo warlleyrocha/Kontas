@@ -1,19 +1,19 @@
-import IconGoogle from "@/assets/images/google-icon.svg";
-import { useAuth } from "@/src/features/auth/contexts/AuthContext";
-import { legalLinks, openLegalLink } from "@/src/shared/constants/legal";
-import { getErrorMessage } from "@/src/services/httpError";
-import { showToast } from "@/src/shared/utils/showToast";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
-  useWindowDimensions,
   Image,
   Text,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from "react-native";
+import IconGoogle from "@/assets/images/google-icon.svg";
+import { useAuth } from "@/src/features/auth/contexts/AuthContext";
+import { getErrorMessage } from "@/src/services/httpError";
+import { legalLinks, openLegalLink } from "@/src/shared/constants/legal";
+import { showToast } from "@/src/shared/utils/showToast";
 
 type GoogleSignInResult = Awaited<ReturnType<typeof GoogleSignin.signIn>>;
 
@@ -53,8 +53,8 @@ export default function LoginScreen() {
       showToast.error(
         getErrorMessage(
           error,
-          "Erro ao fazer login com Google. Tente novamente.",
-        ),
+          "Erro ao fazer login com Google. Tente novamente."
+        )
       );
     }
 

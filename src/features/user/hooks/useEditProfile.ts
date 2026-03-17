@@ -1,4 +1,7 @@
-import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
+import {
+  launchImageLibraryAsync,
+  requestMediaLibraryPermissionsAsync,
+} from "expo-image-picker";
 import { useState } from "react";
 import { Alert } from "react-native";
 import { getErrorMessage } from "@/src/services/httpError";
@@ -14,7 +17,7 @@ export interface EditProfileFormValues {
     name: string,
     pixKey?: string,
     photo?: string,
-    phone?: string,
+    phone?: string
   ) => void;
 }
 
@@ -48,7 +51,7 @@ export function useEditProfile({
     } catch (error) {
       console.error("Erro ao salvar:", error);
       showToast.error(
-        getErrorMessage(error, "Não foi possível salvar as alterações."),
+        getErrorMessage(error, "Não foi possível salvar as alterações.")
       );
     } finally {
       setIsUploading(false);
@@ -57,12 +60,11 @@ export function useEditProfile({
 
   const selectPhoto = async () => {
     try {
-      const { status } =
-        await requestMediaLibraryPermissionsAsync();
+      const { status } = await requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
           "Permissão necessária",
-          "Precisamos de permissão para acessar suas fotos.",
+          "Precisamos de permissão para acessar suas fotos."
         );
         return;
       }
@@ -78,7 +80,7 @@ export function useEditProfile({
     } catch (error) {
       console.error("Erro ao selecionar imagem:", error);
       showToast.error(
-        getErrorMessage(error, "Não foi possível selecionar a imagem."),
+        getErrorMessage(error, "Não foi possível selecionar a imagem.")
       );
     }
   };

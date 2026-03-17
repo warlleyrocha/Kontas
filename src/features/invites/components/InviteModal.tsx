@@ -1,4 +1,3 @@
-import type { InviteRequest } from "@/src/features/invites/types/invite.types";
 import Feather from "@expo/vector-icons/Feather";
 import React, { useState } from "react";
 import {
@@ -11,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import type { InviteRequest } from "@/src/features/invites/types/invite.types";
 
 interface InviteModalProps {
   open: boolean;

@@ -1,2 +1,2 @@
 // components/ui/sonner.tsx
-export { toast, Toaster } from "sonner-native";
+export { Toaster, toast } from "sonner-native";

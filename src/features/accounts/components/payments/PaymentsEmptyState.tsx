@@ -1,4 +1,3 @@
-
 import { RefreshControl, ScrollView } from "react-native";
 
 import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";

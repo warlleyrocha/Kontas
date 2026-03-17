@@ -1,9 +1,7 @@
-import { useCallback } from "react";
 import { useRouter } from "expo-router";
+import { useCallback } from "react";
 
-import {
-  useInvitesByRepublicQuery,
-} from "@/src/features/invites/contexts/InvitesContext";
+import { useInvitesByRepublicQuery } from "@/src/features/invites/contexts/InvitesContext";
 import { getErrorMessage } from "@/src/services/httpError";
 
 export function useInvitesSentScreen(republicId: string) {
@@ -23,7 +21,7 @@ export function useInvitesSentScreen(republicId: string) {
     error: invitesQuery.error
       ? getErrorMessage(
           invitesQuery.error,
-          "Não foi possível carregar os convites enviados.",
+          "Não foi possível carregar os convites enviados."
         )
       : null,
     loading: invitesQuery.isLoading || invitesQuery.isFetching,

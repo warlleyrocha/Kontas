@@ -1,21 +1,17 @@
-import type { ResidentResponse } from "@/src/shared/types/resident.types";
-
-import { useResidentCard } from "@/src/features/residents/hooks/useResidentCard";
-import { getInitials } from "@/src/shared/utils/getInitials";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import type { FC } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import Animated from "react-native-reanimated";
+import { useResidentCard } from "@/src/features/residents/hooks/useResidentCard";
+import type { ResidentResponse } from "@/src/shared/types/resident.types";
+import { getInitials } from "@/src/shared/utils/getInitials";
 
 interface ResidentCardProps {
   morador: ResidentResponse;
   onCopyPix: (morador: ResidentResponse) => void;
 }
 
-export const ResidentCard: FC<ResidentCardProps> = ({
-  morador,
-  onCopyPix,
-}) => {
+export const ResidentCard: FC<ResidentCardProps> = ({ morador, onCopyPix }) => {
   const {
     expanded,
     copiado,

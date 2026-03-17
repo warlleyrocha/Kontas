@@ -2,11 +2,11 @@
 import { useCallback, useRef, useState } from "react";
 
 import { accountService } from "@/src/features/accounts/services/account.service";
-import { accountResidentsService } from "../../services/account-residents.service";
-import { getErrorMessage } from "@/src/services/httpError";
-import { showToast } from "@/src/shared/utils/showToast";
 import type { Conta } from "@/src/features/accounts/types/account.types";
 import type { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
+import { getErrorMessage } from "@/src/services/httpError";
+import { showToast } from "@/src/shared/utils/showToast";
+import { accountResidentsService } from "../../services/account-residents.service";
 
 interface UseAccountDataProps {
   readonly republicId: string;
@@ -42,7 +42,7 @@ export function useAccountData({
     } catch (err) {
       const message = getErrorMessage(
         err,
-        "Não foi possível carregar as contas.",
+        "Não foi possível carregar as contas."
       );
       console.error("Erro ao buscar contas:", err);
       showToast.error(message);
@@ -61,14 +61,14 @@ export function useAccountData({
       } catch (err) {
         const message = getErrorMessage(
           err,
-          "Não foi possível carregar os moradores da conta.",
+          "Não foi possível carregar os moradores da conta."
         );
         console.error("Erro ao buscar moradores da conta:", err);
         showToast.error(message);
         return [];
       }
     },
-    [],
+    []
   );
 
   return {

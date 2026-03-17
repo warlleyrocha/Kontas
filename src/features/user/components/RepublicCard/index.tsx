@@ -1,4 +1,3 @@
-import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import React, { useCallback, useRef, useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
@@ -9,6 +8,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from "react-native-reanimated";
+import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 
 interface CardPosition {
   x: number;
@@ -23,7 +23,7 @@ interface RepublicaCardProps {
   readonly onSelect: () => void;
   readonly onLongPress?: (
     republic: RepublicResponse,
-    position: CardPosition,
+    position: CardPosition
   ) => void;
 }
 

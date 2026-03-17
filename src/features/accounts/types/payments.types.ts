@@ -1,5 +1,5 @@
-import type { ContaMorador, StatusPagamento } from "./accountResidents.types";
 import type { Conta } from "./account.types";
+import type { ContaMorador, StatusPagamento } from "./accountResidents.types";
 
 export interface PaymentAccount extends Conta {
   readonly residents: ContaMorador[];

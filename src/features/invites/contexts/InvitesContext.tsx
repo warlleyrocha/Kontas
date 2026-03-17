@@ -21,7 +21,7 @@ const inviteKeys = {
 
 function updateInviteList(
   currentInvites: Invite[] | undefined,
-  invite: Invite,
+  invite: Invite
 ) {
   const invites = currentInvites ?? [];
   const alreadyExists = invites.some((item) => item.id === invite.id);
@@ -64,7 +64,7 @@ export function useSendInviteMutation() {
 
       queryClient.setQueryData<Invite[]>(
         inviteKeys.byRepublic(republicId),
-        (currentInvites) => updateInviteList(currentInvites, invite),
+        (currentInvites) => updateInviteList(currentInvites, invite)
       );
     },
   });
@@ -86,8 +86,8 @@ export function useUpdateInviteStatusMutation() {
         inviteKeys.byUser(),
         (currentInvites) =>
           (currentInvites ?? []).filter(
-            (invite) => invite.id !== variables.inviteId,
-          ),
+            (invite) => invite.id !== variables.inviteId
+          )
       );
     },
   });
@@ -100,7 +100,7 @@ export function usePendingInvitesCount() {
     () =>
       (data ?? []).filter((invite) => invite.status === StatusInvite.PENDENTE)
         .length,
-    [data],
+    [data]
   );
 }
 
@@ -117,7 +117,7 @@ export function useInvitesContext() {
     () =>
       invitesByUser.filter((invite) => invite.status === StatusInvite.PENDENTE)
         .length,
-    [invitesByUser],
+    [invitesByUser]
   );
 
   const fetchInvitesByUser = useCallback(async () => {
@@ -135,7 +135,7 @@ export function useInvitesContext() {
         console.error("Erro ao aceitar convite:", error);
       }
     },
-    [router, updateInviteStatus],
+    [router, updateInviteStatus]
   );
 
   const handleRejectInvite = useCallback(
@@ -149,14 +149,14 @@ export function useInvitesContext() {
         console.error("Erro ao recusar convite:", error);
       }
     },
-    [updateInviteStatus],
+    [updateInviteStatus]
   );
 
   const error = inboxQuery.error ?? updateInviteStatusMutation.error;
   const sendError = sendInviteMutation.error;
   const sendInvite = useCallback(
     (payload: InviteRequest) => sendInviteAsync(payload),
-    [sendInviteAsync],
+    [sendInviteAsync]
   );
 
   return {

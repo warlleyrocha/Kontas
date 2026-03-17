@@ -1,8 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, {
   AxiosError,
-  isAxiosError,
   type InternalAxiosRequestConfig,
+  isAxiosError,
 } from "axios";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;

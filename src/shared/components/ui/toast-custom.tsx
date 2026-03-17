@@ -67,7 +67,7 @@ function useToastConfirmAnimation(duration: number) {
       progress.value = 1;
       progress.value = withTiming(0, { duration });
     },
-    [barWidth, duration, progress],
+    [barWidth, duration, progress]
   );
 
   const progressBarStyle = useAnimatedStyle(() => ({

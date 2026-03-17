@@ -10,11 +10,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { maskPhoneWrite } from "@/src/shared/utils/inputMasks";
 import {
   EditProfileFormValues,
   useEditProfile,
 } from "../../hooks/useEditProfile";
-import { maskPhoneWrite } from "@/src/shared/utils/inputMasks";
 
 export interface EditProfileModalProps extends EditProfileFormValues {
   visible: boolean;

@@ -1,10 +1,3 @@
-import LoadingScreen from "@/src/shared/components/ui/loading-screen";
-import { Toaster } from "@/src/shared/components/ui/sonner";
-import { AuthProvider, useAuth } from "@/src/features/auth/contexts";
-import { RepublicListProvider } from "@/src/features/republic/contexts/RepublicListContext";
-import { RefreshProvider } from "@/src/shared/contexts/RefreshContext";
-import { GlobalErrorBoundary } from "@/src/shared/components/error-boundary/GlobalErrorBoundary";
-import { queryClient } from "@/src/services/queryClient";
 import {
   Inter_300Light,
   Inter_400Regular,
@@ -25,12 +18,24 @@ import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
-import { preventAutoHideAsync, hideAsync } from "expo-splash-screen";
+import { hideAsync, preventAutoHideAsync } from "expo-splash-screen";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { AuthProvider, useAuth } from "@/src/features/auth/contexts";
+import { RepublicListProvider } from "@/src/features/republic/contexts/RepublicListContext";
+import { queryClient } from "@/src/services/queryClient";
+import { GlobalErrorBoundary } from "@/src/shared/components/error-boundary/GlobalErrorBoundary";
+import LoadingScreen from "@/src/shared/components/ui/loading-screen";
+import { Toaster } from "@/src/shared/components/ui/sonner";
+import { RefreshProvider } from "@/src/shared/contexts/RefreshContext";
 import "../../global.css";
 
-import { feedbackIntegration, init, mobileReplayIntegration, wrap } from "@sentry/react-native";
+import {
+  feedbackIntegration,
+  init,
+  mobileReplayIntegration,
+  wrap,
+} from "@sentry/react-native";
 
 init({
   dsn: "https://da32d972451786e6c1a0aea2f4024516@o4510817801928704.ingest.us.sentry.io/4510818996322304",
@@ -45,10 +50,7 @@ init({
   // Configure Session Replay
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1,
-  integrations: [
-    mobileReplayIntegration(),
-    feedbackIntegration(),
-  ],
+  integrations: [mobileReplayIntegration(), feedbackIntegration()],
 
   // uncomment the line below to enable Spotlight (https://spotlightjs.com)
   // spotlight: __DEV__,

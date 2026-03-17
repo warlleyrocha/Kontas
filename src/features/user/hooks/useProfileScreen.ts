@@ -1,20 +1,18 @@
+import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert } from "react-native";
-import { useRouter } from "expo-router";
 
 import { useAuth } from "@/src/features/auth/contexts";
-import { useRepublicList } from "@/src/features/republic/hooks/useRepublicList";
-import { useRepublicActions } from "@/src/features/republic/hooks/useRepublicActions";
-import { useRepublicResidents } from "@/src/shared/hooks/useRepublicResidents";
-import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
-
+import { useRepublicActions } from "@/src/features/republic/hooks/useRepublicActions";
+import { useRepublicList } from "@/src/features/republic/hooks/useRepublicList";
+import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
-
+import { useRefresh } from "@/src/shared/contexts/RefreshContext";
+import { useRepublicResidents } from "@/src/shared/hooks/useRepublicResidents";
 import { maskPhone } from "@/src/shared/utils/inputMasks";
 import { showToast } from "@/src/shared/utils/showToast";
 import { toastErrors } from "@/src/shared/utils/toastMessages";
-import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 
 interface CardPosition {
   x: number;
@@ -28,7 +26,8 @@ export function useProfileScreen() {
 
   const { user, logout, completeProfile, updateUser } = useAuth();
   const { republics, fetchRepublics } = useRepublicList();
-  const { deleteRepublic, updateRepublic, showEditModal, setShowEditModal } = useRepublicActions();
+  const { deleteRepublic, updateRepublic, showEditModal, setShowEditModal } =
+    useRepublicActions();
   const { isAdmin } = useRepublicResidents(republics, user?.email);
 
   const { refreshing, onRefresh, registerRefresh } = useRefresh();
@@ -36,8 +35,10 @@ export function useProfileScreen() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [contextMenuVisible, setContextMenuVisible] = useState(false);
-  const [contextMenuPosition, setContextMenuPosition] = useState<CardPosition | null>(null);
-  const [selectedRepublic, setSelectedRepublic] = useState<RepublicResponse | null>(null);
+  const [contextMenuPosition, setContextMenuPosition] =
+    useState<CardPosition | null>(null);
+  const [selectedRepublic, setSelectedRepublic] =
+    useState<RepublicResponse | null>(null);
 
   const handleSignOut = useCallback(async () => {
     try {
@@ -58,7 +59,7 @@ export function useProfileScreen() {
       if (isCompletingProfile && (!phone || !pixKey)) {
         Alert.alert(
           "Campos Obrigatórios",
-          "Por favor, preencha o telefone e a chave Pix.",
+          "Por favor, preencha o telefone e a chave Pix."
         );
         return;
       }
@@ -84,14 +85,14 @@ export function useProfileScreen() {
         showToast.success(
           isCompletingProfile
             ? "Perfil salvo com sucesso!"
-            : "Perfil atualizado com sucesso!",
+            : "Perfil atualizado com sucesso!"
         );
       } catch (error) {
         console.log("Erro ao salvar o perfil:", error);
         toastErrors.profileUpdateFailed(error);
       }
     },
-    [user, completeProfile, updateUser],
+    [user, completeProfile, updateUser]
   );
 
   const handleCreateRepublic = useCallback(() => {
@@ -106,7 +107,7 @@ export function useProfileScreen() {
     (id: string) => {
       router.push(`/(republics)/${id}`);
     },
-    [router],
+    [router]
   );
 
   const handleLongPressRepublic = useCallback(
@@ -115,7 +116,7 @@ export function useProfileScreen() {
       setContextMenuPosition(position);
       setContextMenuVisible(true);
     },
-    [],
+    []
   );
 
   const handleCloseContextMenu = useCallback(() => {
@@ -135,11 +136,14 @@ export function useProfileScreen() {
   const handleSaveRepublicEdit = useCallback(
     async (name: string, image?: string) => {
       if (!selectedRepublic) return;
-      await updateRepublic(selectedRepublic.id, { nome: name, imagemRepublica: image });
+      await updateRepublic(selectedRepublic.id, {
+        nome: name,
+        imagemRepublica: image,
+      });
       handleCloseEditModal();
       fetchRepublics();
     },
-    [selectedRepublic, updateRepublic, handleCloseEditModal, fetchRepublics],
+    [selectedRepublic, updateRepublic, handleCloseEditModal, fetchRepublics]
   );
 
   const handleDeleteFromMenu = useCallback(() => {

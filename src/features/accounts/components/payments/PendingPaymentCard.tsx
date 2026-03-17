@@ -1,12 +1,11 @@
+import Feather from "@expo/vector-icons/Feather";
 import React, { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import Feather from "@expo/vector-icons/Feather";
-
+import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import type {
   PaymentAccount,
   PaymentStatusFilter,
 } from "@/src/features/accounts/types/payments.types";
-import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import { formatDate } from "@/src/shared/utils/formats";
 
 import { PendingPaymentResidentCard } from "./PendingPaymentResidentCard";
@@ -16,7 +15,7 @@ interface PendingPaymentCardProps {
   readonly confirmingResidentById: Record<string, boolean>;
   readonly onConfirmResidentPayment: (
     accountId: string,
-    residentId: string,
+    residentId: string
   ) => Promise<void> | void;
   readonly selectedStatus: PaymentStatusFilter;
 }

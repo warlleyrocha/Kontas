@@ -1,11 +1,10 @@
-import type { ResidentResponse } from "@/src/shared/types/resident.types";
-
 import { useEffect, useRef, useState } from "react";
 import {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import type { ResidentResponse } from "@/src/shared/types/resident.types";
 
 export function useResidentCard(
   morador: ResidentResponse,
@@ -23,7 +22,7 @@ export function useResidentCard(
       opacity: animatedOpacity.value,
       overflow: "hidden",
     }),
-    [animatedHeight, animatedOpacity],
+    [animatedHeight, animatedOpacity]
   );
 
   useEffect(() => {
@@ -35,7 +34,9 @@ export function useResidentCard(
   function toggleExpanded() {
     const nextExpanded = !expanded;
     setExpanded(nextExpanded);
-    animatedHeight.value = withTiming(nextExpanded ? 500 : 0, { duration: 300 });
+    animatedHeight.value = withTiming(nextExpanded ? 500 : 0, {
+      duration: 300,
+    });
     animatedOpacity.value = withTiming(nextExpanded ? 1 : 0, { duration: 250 });
   }
 

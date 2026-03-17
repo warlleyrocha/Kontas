@@ -1,6 +1,6 @@
+import type { ErrorBoundaryProps } from "expo-router";
 import { InvitesScreen } from "@/src/features/invites";
 import { RouteErrorFallback } from "@/src/shared/components/error-boundary/RouteErrorFallback";
-import type { ErrorBoundaryProps } from "expo-router";
 
 export default function InvitesRoute() {
   return <InvitesScreen />;

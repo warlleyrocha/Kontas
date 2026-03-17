@@ -1,10 +1,10 @@
+import { toUserFriendlyError } from "@/src/services/httpError";
+import { api } from "../../../services/api";
 import {
   AuthResponse,
   CompleteProfileRequest,
   GoogleLoginRequest,
 } from "../types/auth.types";
-import { api } from "../../../services/api";
-import { toUserFriendlyError } from "@/src/services/httpError";
 
 export const authService = {
   // Método para login com Google

@@ -1,7 +1,5 @@
-import InputField from "@/src/shared/components/ui/input-field";
 import Feather from "@expo/vector-icons/Feather";
 import {
-  useWindowDimensions,
   Image,
   ImageBackground,
   KeyboardAvoidingView,
@@ -9,12 +7,13 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from "react-native";
-
 import ImageDefault from "@/assets/images/image-register.webp";
-import { useRepublicForm } from "../hooks/useRepublicForm";
+import InputField from "@/src/shared/components/ui/input-field";
 import { useRepublicActions } from "../hooks/useRepublicActions";
+import { useRepublicForm } from "../hooks/useRepublicForm";
 
 export function RegisterRepublicScreen() {
   const { width, height } = useWindowDimensions();

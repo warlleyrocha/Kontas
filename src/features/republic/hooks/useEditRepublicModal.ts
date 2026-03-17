@@ -1,5 +1,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from "expo-image-picker";
+import {
+  launchImageLibraryAsync,
+  requestMediaLibraryPermissionsAsync,
+} from "expo-image-picker";
 import { useEffect, useState } from "react";
 import { Alert } from "react-native";
 import { getErrorMessage } from "@/src/services/httpError";
@@ -55,13 +58,12 @@ export default function useEditRepublicModal({
   const selecionarImagem = async () => {
     try {
       // Solicitar permissão
-      const { status } =
-        await requestMediaLibraryPermissionsAsync();
+      const { status } = await requestMediaLibraryPermissionsAsync();
 
       if (status !== "granted") {
         Alert.alert(
           "Permissão necessária",
-          "Precisamos de permissão para acessar suas fotos.",
+          "Precisamos de permissão para acessar suas fotos."
         );
         return;
       }
@@ -80,7 +82,7 @@ export default function useEditRepublicModal({
     } catch (error) {
       console.error("Erro ao selecionar imagem:", error);
       showToast.error(
-        getErrorMessage(error, "Não foi possível selecionar a imagem."),
+        getErrorMessage(error, "Não foi possível selecionar a imagem.")
       );
     }
   };
@@ -114,7 +116,7 @@ export default function useEditRepublicModal({
     } catch (error) {
       console.error("Erro ao salvar dados da república:", error);
       showToast.error(
-        getErrorMessage(error, "Não foi possível salvar as alterações."),
+        getErrorMessage(error, "Não foi possível salvar as alterações.")
       );
     } finally {
       setIsUploading(false);

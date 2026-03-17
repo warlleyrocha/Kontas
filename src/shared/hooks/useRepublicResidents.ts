@@ -1,8 +1,8 @@
-import { useAuth } from "@/src/features/auth/contexts";
-import { useResidents } from "@/src/features/residents/hooks/useResidents";
-import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
-import { ResidentRole } from "@/src/shared/types/resident.types";
 import { useCallback, useEffect, useState } from "react";
+import { useAuth } from "@/src/features/auth/contexts";
+import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
+import { useResidents } from "@/src/features/residents/hooks/useResidents";
+import { ResidentRole } from "@/src/shared/types/resident.types";
 
 export function useRepublicResidents(
   republics: RepublicResponse[],

@@ -1,19 +1,18 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "expo-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useAuth } from "@/src/features/auth/contexts";
-import { useResidents } from "@/src/features/residents/hooks/useResidents";
-import { useRepublicList } from "./useRepublicList";
-import { useRepublicActions } from "./useRepublicActions";
-import { useRefresh } from "@/src/shared/contexts/RefreshContext";
-
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
+import { useResidents } from "@/src/features/residents/hooks/useResidents";
+import { getErrorMessage } from "@/src/services/httpError";
+import { useRefresh } from "@/src/shared/contexts/RefreshContext";
+import { ResidentRole } from "@/src/shared/types/resident.types";
 import type { TabKey } from "@/src/shared/types/tabs";
 
 import { showToast } from "@/src/shared/utils/showToast";
 import { toastErrors } from "@/src/shared/utils/toastMessages";
-import { getErrorMessage } from "@/src/services/httpError";
-import { ResidentRole } from "@/src/shared/types/resident.types";
+import { useRepublicActions } from "./useRepublicActions";
+import { useRepublicList } from "./useRepublicList";
 
 export function useRepublicScreen(republicId: string) {
   const router = useRouter();
@@ -97,7 +96,7 @@ export function useRepublicScreen(republicId: string) {
       showToast.success(
         prev
           ? "República removida dos favoritos"
-          : "República adicionada aos favoritos",
+          : "República adicionada aos favoritos"
       );
       return !prev;
     });
@@ -123,17 +122,17 @@ export function useRepublicScreen(republicId: string) {
       });
 
       setRepublic((prev) =>
-        prev ? { ...prev, nome, imagemRepublica: imagem } : null,
+        prev ? { ...prev, nome, imagemRepublica: imagem } : null
       );
     },
-    [republic, updateRepublic],
+    [republic, updateRepublic]
   );
 
   const currentResident = useMemo(() => {
     if (!user?.email) return null;
     const normalizedEmail = user.email.toLowerCase();
     return residents.find(
-      (resident) => resident.email.toLowerCase() === normalizedEmail,
+      (resident) => resident.email.toLowerCase() === normalizedEmail
     );
   }, [residents, user?.email]);
 
@@ -154,7 +153,7 @@ export function useRepublicScreen(republicId: string) {
       email: user?.email,
       roleLabel,
     }),
-    [roleLabel, user?.nome, user?.fotoPerfil, user?.email],
+    [roleLabel, user?.nome, user?.fotoPerfil, user?.email]
   );
 
   return {

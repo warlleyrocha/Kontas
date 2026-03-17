@@ -1,11 +1,11 @@
-import { api } from "@/src/services/api";
 import {
   Conta,
   CriarContaRequest,
   ListarContasRepublic,
-  RemoverContaParams,
   MarcarContaPaga,
+  RemoverContaParams,
 } from "@/src/features/accounts/types/account.types";
+import { api } from "@/src/services/api";
 
 import { toUserFriendlyError } from "@/src/services/httpError";
 

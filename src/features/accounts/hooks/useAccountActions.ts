@@ -1,7 +1,7 @@
-import { getErrorMessage } from "@/src/services/httpError";
-import { showToast } from "@/src/shared/utils/showToast";
 import { createElement, useCallback, useEffect, useRef, useState } from "react";
+import { getErrorMessage } from "@/src/services/httpError";
 import { toast } from "@/src/shared/components/ui/sonner";
+import { showToast } from "@/src/shared/utils/showToast";
 import { AccountRecoveryToast } from "../components";
 import { accountService } from "../services/account.service";
 import { accountResidentsService } from "../services/account-residents.service";
@@ -27,7 +27,7 @@ interface UseAccountActionsReturn {
   handleDelete: (accountId: string) => Promise<void>;
   handlePatch: (
     accountId: string,
-    metodoPagamento: MetodoPagamento,
+    metodoPagamento: MetodoPagamento
   ) => Promise<void>;
   handleRecovery: (accountId: string) => Promise<void>;
   fetchContasPorMorador: (moradorId: string) => Promise<ListarContasResponse>;
@@ -44,7 +44,7 @@ export function useAccountActions({
     Map<string, ReturnType<typeof setTimeout>>
   >(new Map());
   const pendingDeleteToastIdsRef = useRef<Map<string, string | number>>(
-    new Map(),
+    new Map()
   );
 
   useEffect(() => {
@@ -86,13 +86,13 @@ export function useAccountActions({
         await onRefresh?.();
       } catch (error) {
         showToast.error(
-          getErrorMessage(error, "Não foi possível criar a conta."),
+          getErrorMessage(error, "Não foi possível criar a conta.")
         );
       } finally {
         setIsSubmitting(false);
       }
     },
-    [onRefresh],
+    [onRefresh]
   );
 
   const handleRecovery = useCallback(
@@ -120,13 +120,13 @@ export function useAccountActions({
         await onRefresh?.();
       } catch (error) {
         showToast.error(
-          getErrorMessage(error, "Não foi possível recuperar a conta."),
+          getErrorMessage(error, "Não foi possível recuperar a conta.")
         );
       } finally {
         setIsDeleting(false);
       }
     },
-    [onRefresh],
+    [onRefresh]
   );
 
   const handleDelete = useCallback(
@@ -151,7 +151,7 @@ export function useAccountActions({
             await onRefresh?.();
           } catch (error) {
             showToast.error(
-              getErrorMessage(error, "Não foi possível remover a conta."),
+              getErrorMessage(error, "Não foi possível remover a conta.")
             );
           } finally {
             setIsDeleting(false);
@@ -169,11 +169,11 @@ export function useAccountActions({
           },
           durationMs: RECOVERY_TOAST_DURATION_MS,
         }),
-        { duration: RECOVERY_TOAST_DURATION_MS },
+        { duration: RECOVERY_TOAST_DURATION_MS }
       );
       pendingDeleteToastIdsRef.current.set(accountId, toastId);
     },
-    [handleRecovery, onRefresh],
+    [handleRecovery, onRefresh]
   );
 
   const handlePatch = useCallback(
@@ -186,20 +186,20 @@ export function useAccountActions({
         showToast.success("Conta marcada como paga com sucesso!");
       } catch (error) {
         showToast.error(
-          error instanceof Error ? error.message : "Erro inesperado",
+          error instanceof Error ? error.message : "Erro inesperado"
         );
       } finally {
         setIsUpdating(false);
       }
     },
-    [],
+    []
   );
 
   const fetchContasPorMorador = useCallback(
     async (moradorId: string): Promise<ListarContasResponse> => {
       return accountResidentsService.listarContasPorMorador(moradorId);
     },
-    [],
+    []
   );
 
   return {

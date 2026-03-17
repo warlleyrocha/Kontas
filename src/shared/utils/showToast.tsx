@@ -37,7 +37,7 @@ export const showToast = {
         }}
         onCancel={() => toast.dismiss(id)}
       />,
-      { duration: CONFIRM_DURATION },
+      { duration: CONFIRM_DURATION }
     );
   },
 };

@@ -7,7 +7,7 @@ export default function CheckEmail() {
   const baseId = React.useId();
 
   const [code, setCode] = React.useState(() =>
-    Array.from({ length: 6 }, (_, i) => ({ id: `${baseId}-${i}`, value: "" })),
+    Array.from({ length: 6 }, (_, i) => ({ id: `${baseId}-${i}`, value: "" }))
   );
 
   const inputRefs = useRef<(TextInput | null)[]>([]);

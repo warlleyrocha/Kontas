@@ -1,8 +1,8 @@
-import { api } from "@/src/services/api";
 import {
   RepublicPost,
   RepublicResponse,
 } from "@/src/features/republic/types/republic.types";
+import { api } from "@/src/services/api";
 import { toUserFriendlyError } from "@/src/services/httpError";
 
 export const republicService = {

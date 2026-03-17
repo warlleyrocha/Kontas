@@ -1,8 +1,8 @@
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 
 import {
-  StatusPagamento,
   type ContaMorador,
+  StatusPagamento,
 } from "@/src/features/accounts/types/accountResidents.types";
 import {
   getMoradorStatusBadge,

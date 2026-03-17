@@ -3,8 +3,8 @@ import React, {
   useCallback,
   useContext,
   useEffect,
-  useState,
   useMemo,
+  useState,
 } from "react";
 
 import { useAuth } from "@/src/features/auth/contexts";
@@ -21,7 +21,7 @@ interface RepublicListContextData {
 }
 
 const RepublicListContext = createContext<RepublicListContextData>(
-  {} as RepublicListContextData,
+  {} as RepublicListContextData
 );
 
 export function RepublicListProvider({
@@ -45,7 +45,7 @@ export function RepublicListProvider({
     } catch (error) {
       console.error("Erro ao buscar repúblicas:", error);
       showToast.error(
-        getErrorMessage(error, "Não foi possível carregar as repúblicas."),
+        getErrorMessage(error, "Não foi possível carregar as repúblicas.")
       );
       setRepublics([]);
     } finally {
@@ -59,7 +59,7 @@ export function RepublicListProvider({
     } catch (error) {
       console.error("Erro ao buscar república por ID:", error);
       showToast.error(
-        getErrorMessage(error, "Não foi possível carregar a república."),
+        getErrorMessage(error, "Não foi possível carregar a república.")
       );
       return null;
     }
@@ -67,7 +67,7 @@ export function RepublicListProvider({
 
   const contextValue = useMemo(
     () => ({ republics, setRepublics, fetchRepublics, fetchRepublicById }),
-    [republics, fetchRepublics, fetchRepublicById],
+    [republics, fetchRepublics, fetchRepublicById]
   );
 
   return (
@@ -81,7 +81,7 @@ export function useRepublicListContext() {
   const context = useContext(RepublicListContext);
   if (!context) {
     throw new Error(
-      "useRepublicListContext deve ser usado dentro de RepublicListProvider",
+      "useRepublicListContext deve ser usado dentro de RepublicListProvider"
     );
   }
   return context;

@@ -1,12 +1,12 @@
-import { api } from "@/src/services/api";
 import { isAxiosError } from "axios";
 import {
+  GetInvitesByUser,
   Invite,
   InviteRequest,
   PatchInviteStatusResponse,
   StatusInvite,
-  GetInvitesByUser,
 } from "@/src/features/invites/types/invite.types";
+import { api } from "@/src/services/api";
 import { toUserFriendlyError } from "@/src/services/httpError";
 
 export const inviteService = {
@@ -30,12 +30,12 @@ export const inviteService = {
   // Método para listar convites de uma república
   getInvitesByRepublicId: async (
     republicaId: string,
-    signal?: AbortSignal,
+    signal?: AbortSignal
   ): Promise<Invite[]> => {
     try {
       const response = await api.get<Invite[]>(
         `/convites/republica/${republicaId}`,
-        { signal },
+        { signal }
       );
       return response.data;
     } catch (error) {
@@ -54,7 +54,9 @@ export const inviteService = {
   },
 
   // Método para listar convites por usuario
-  getInvitesByUser: async (signal?: AbortSignal): Promise<GetInvitesByUser[]> => {
+  getInvitesByUser: async (
+    signal?: AbortSignal
+  ): Promise<GetInvitesByUser[]> => {
     console.log("🌐 Chamando GET /convites/me...");
     try {
       const response = await api.get<GetInvitesByUser[]>("/convites/me", {

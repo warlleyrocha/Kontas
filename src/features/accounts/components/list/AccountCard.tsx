@@ -1,18 +1,17 @@
-import { View, TouchableOpacity, Text } from "react-native";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Feather from "@expo/vector-icons/Feather";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useState } from "react";
-
-import { AccountResidentsContent } from "./AccountResidentsContent";
-import { AccountStatusIcon } from "../shared/AccountStatusIcon";
-import { Conta, MetodoPagamento, StatusConta } from "../../types/account.types";
+import { Text, TouchableOpacity, View } from "react-native";
 import { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
+import { Conta, MetodoPagamento, StatusConta } from "../../types/account.types";
 import {
   getContaStatusIcon,
   getContaStatusVisual,
   parseContaVencimento,
 } from "../../utils/accountStatus.utils";
+import { AccountStatusIcon } from "../shared/AccountStatusIcon";
+import { AccountResidentsContent } from "./AccountResidentsContent";
 
 interface AccountCardProps {
   conta: Conta;
@@ -25,12 +24,12 @@ interface AccountCardProps {
   currentResidentId: string | null;
   onConfirmResidentPayment?: (
     accountId: string,
-    accountResidentId: string,
+    accountResidentId: string
   ) => Promise<void> | void;
   onDelete?: (accountId: string) => Promise<void> | void;
   onPatch?: (
     accountId: string,
-    metodoPagamento: MetodoPagamento,
+    metodoPagamento: MetodoPagamento
   ) => Promise<void> | void;
 }
 

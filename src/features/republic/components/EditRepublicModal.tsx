@@ -1,4 +1,3 @@
-import useEditRepublicModal from "@/src/features/republic/hooks/useEditRepublicModal";
 import Feather from "@expo/vector-icons/Feather";
 import type { FC } from "react";
 import {
@@ -11,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import useEditRepublicModal from "@/src/features/republic/hooks/useEditRepublicModal";
 
 interface EditRepublicModalProps {
   visible: boolean;

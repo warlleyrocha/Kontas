@@ -71,10 +71,10 @@ function useRepublicContextMenuAnimation(translateYOutput: number) {
           if (finished && callback) {
             scheduleOnRN(callback);
           }
-        },
+        }
       );
     },
-    [opacity, scale],
+    [opacity, scale]
   );
 
   const menuAnimatedStyle = useAnimatedStyle(() => ({
@@ -82,11 +82,7 @@ function useRepublicContextMenuAnimation(translateYOutput: number) {
     transform: [
       { scale: scale.value },
       {
-        translateY: interpolate(
-          scale.value,
-          [0.85, 1],
-          [translateYOutput, 0],
-        ),
+        translateY: interpolate(scale.value, [0.85, 1], [translateYOutput, 0]),
       },
     ],
   }));
@@ -115,8 +111,7 @@ export function RepublicContextMenu({
   const menuTotalHeight = isAdmin ? MENU_ITEM_HEIGHT * 3 + 2 : MENU_ITEM_HEIGHT;
 
   // Posição horizontal: centralizado no card, mantendo dentro da tela
-  let menuX =
-    resolvedPosition.x + resolvedPosition.width / 2 - MENU_WIDTH / 2;
+  let menuX = resolvedPosition.x + resolvedPosition.width / 2 - MENU_WIDTH / 2;
   menuX = Math.max(12, Math.min(menuX, screenWidth - MENU_WIDTH - 12));
 
   // Posição vertical: abaixo do card se tiver espaço, senão acima

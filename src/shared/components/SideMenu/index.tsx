@@ -42,10 +42,7 @@ interface MenuSubItemComponentProps {
   readonly onClose: () => void;
 }
 
-function MenuSubItemComponent({
-  item,
-  onClose,
-}: MenuSubItemComponentProps) {
+function MenuSubItemComponent({ item, onClose }: MenuSubItemComponentProps) {
   const [imageError, setImageError] = useState(false);
 
   const handlePress = useCallback(() => {
@@ -55,7 +52,7 @@ function MenuSubItemComponent({
 
   const itemInitial = useMemo(
     () => item.label.charAt(0).toUpperCase(),
-    [item.label],
+    [item.label]
   );
 
   return (
@@ -185,16 +182,14 @@ export function SideMenu({
 
   const userInitial = useMemo(
     () => user.name.charAt(0).toUpperCase(),
-    [user.name],
+    [user.name]
   );
 
   const [photoError, setPhotoError] = useState(false);
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null);
 
   const handleToggleExpand = useCallback((itemId: string) => {
-    setExpandedItemId((currentId) =>
-      currentId === itemId ? null : itemId,
-    );
+    setExpandedItemId((currentId) => (currentId === itemId ? null : itemId));
   }, []);
 
   return (

@@ -1,6 +1,6 @@
 import {
-  StatusConta,
   Conta,
+  StatusConta,
 } from "@/src/features/accounts/types/account.types";
 
 import {
