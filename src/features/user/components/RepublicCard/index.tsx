@@ -14,7 +14,10 @@ interface RepublicaCardProps {
   readonly republic: RepublicResponse;
   readonly residentsCount?: number;
   readonly onSelect: () => void;
-  readonly onLongPress?: (republic: RepublicResponse, position: CardPosition) => void;
+  readonly onLongPress?: (
+    republic: RepublicResponse,
+    position: CardPosition,
+  ) => void;
 }
 
 export default function RepublicCard({
@@ -26,7 +29,7 @@ export default function RepublicCard({
   const residentsLabel = residentsCount === 1 ? "Morador" : "Moradores";
   const [imageError, setImageError] = useState(false);
   const cardRef = useRef<View>(null);
-  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const [scaleAnim] = useState(new Animated.Value(1));
   const pressAnimation = useRef<Animated.CompositeAnimation | null>(null);
 
   const handlePressIn = useCallback(() => {

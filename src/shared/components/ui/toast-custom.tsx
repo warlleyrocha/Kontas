@@ -2,7 +2,7 @@
 import Feather from "@expo/vector-icons/Feather";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import React, { ReactNode, useEffect, useRef, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { Animated, Text, TouchableOpacity, View } from "react-native";
 
 export type ToastVariant = "success" | "error" | "info";
@@ -56,7 +56,7 @@ export function ToastConfirm({
   onConfirm,
   onCancel,
 }: ToastConfirmProps) {
-  const progressAnim = useRef(new Animated.Value(1)).current;
+  const [progressAnim] = useState(new Animated.Value(1));
   const [barWidth, setBarWidth] = useState(0);
 
   useEffect(() => {

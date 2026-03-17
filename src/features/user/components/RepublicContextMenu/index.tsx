@@ -1,5 +1,5 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Animated,
   Modal,
@@ -40,8 +40,8 @@ export function RepublicContextMenu({
   isAdmin = false,
 }: RepublicContextMenuProps) {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
-  const scaleAnim = useRef(new Animated.Value(0.85)).current;
-  const opacityAnim = useRef(new Animated.Value(0)).current;
+  const [scaleAnim] = useState(new Animated.Value(0.85));
+  const [opacityAnim] = useState(new Animated.Value(0));
 
   useEffect(() => {
     if (visible) {
