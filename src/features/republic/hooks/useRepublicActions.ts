@@ -13,7 +13,7 @@ export function useRepublicActions() {
   async function createRepublic(data: RepublicPost) {
     const republic = await republicService.createRepublic(data);
     showToast.success("República criada com sucesso");
-    router.push(`/(republics)/${republic.id}`);
+    router.replace(`/(republics)/${republic.id}`);
     return republic;
   }
 
