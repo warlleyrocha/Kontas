@@ -24,16 +24,20 @@ interface AccountCardProps {
   currentResidentId: string | null;
   onConfirmResidentPayment?: (
     accountId: string,
-    accountResidentId: string
+    accountResidentId: string,
   ) => Promise<void> | void;
   onDelete?: (accountId: string) => Promise<void> | void;
   onPatch?: (
     accountId: string,
-    metodoPagamento: MetodoPagamento
+    metodoPagamento: MetodoPagamento,
   ) => Promise<void> | void;
 }
 
-const normalizeMetodoPagamento = (metodoPagamento: string): MetodoPagamento => {
+const normalizeMetodoPagamento = (
+  metodoPagamento: string | null,
+): MetodoPagamento => {
+  if (!metodoPagamento) return MetodoPagamento.PIX; // fallback
+
   const normalized = metodoPagamento
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -92,10 +96,7 @@ export const AccountCard = ({
   };
 
   return (
-    <TouchableOpacity
-      onPress={() => {}}
-      activeOpacity={0.7}
-    >
+    <TouchableOpacity onPress={() => {}} activeOpacity={0.7}>
       <View
         className={`mb-3 rounded-lg bg-white shadow-sm ${
           vencida ? "border border-orange-300 bg-orange-50" : ""
