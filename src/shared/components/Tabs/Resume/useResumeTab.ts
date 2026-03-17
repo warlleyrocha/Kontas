@@ -1,13 +1,13 @@
+import { useCallback, useEffect, useState } from "react";
 import { useAccountActions } from "@/src/features/accounts/hooks/useAccountActions";
 import { useAccountData } from "@/src/features/accounts/hooks/useAccountList/useAccountData";
-import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import type {
   Conta,
   ListarContasResponse,
 } from "@/src/features/accounts/types/account.types";
-import type { ResidentResponse } from "@/src/shared/types/resident.types";
+import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
-import { useCallback, useEffect, useState } from "react";
+import type { ResidentResponse } from "@/src/shared/types/resident.types";
 
 const STATUS_PENDENTE = [
   StatusPagamento.PENDENTE,

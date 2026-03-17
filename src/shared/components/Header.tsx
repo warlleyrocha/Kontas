@@ -1,7 +1,6 @@
-import ArrowLeftIcon from "@/assets/images/Vector.svg";
 import { goBack } from "expo-router/build/global-state/routing";
-import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import ArrowLeftIcon from "@/assets/images/Vector.svg";
 
 interface HeaderProps {
   readonly title?: string;

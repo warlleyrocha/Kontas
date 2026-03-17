@@ -1,9 +1,8 @@
-import React from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 
 import {
-  StatusPagamento,
   type ContaMorador,
+  StatusPagamento,
 } from "@/src/features/accounts/types/accountResidents.types";
 import {
   getMoradorStatusBadge,
@@ -112,7 +111,9 @@ export function PendingPaymentResidentCard({
         <TouchableOpacity
           activeOpacity={0.85}
           disabled={isConfirming}
-          onPress={() => void onConfirmResidentPayment(accountId, resident.id)}
+          onPress={async () => {
+            await onConfirmResidentPayment(accountId, resident.id);
+          }}
           className={`mt-4 min-h-11 flex-row items-center justify-center rounded-full px-4 ${
             isConfirming ? "bg-[#D1D5DB]" : "bg-[#111827]"
           }`}

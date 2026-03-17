@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 import { View } from "react-native";
 import Animated, {
   Extrapolation,
@@ -65,7 +65,7 @@ function RenderDotItem({
   );
 }
 
-const RenderDots: React.FC<RenderDotsProps> = ({
+const RenderDots: FC<RenderDotsProps> = ({
   slides,
   scrollX,
   currentIndex,

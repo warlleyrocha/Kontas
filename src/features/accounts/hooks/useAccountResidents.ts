@@ -1,8 +1,8 @@
 import { useCallback, useState } from "react";
-
-import { getErrorMessage } from "@/src/services/httpError";
 import type { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
-import { showToast } from "@/src/utils/showToast";
+import { getErrorMessage } from "@/src/services/httpError";
+import { useRefresh } from "@/src/shared/contexts/RefreshContext";
+import { showToast } from "@/src/shared/utils/showToast";
 import { accountResidentsService } from "../services/account-residents.service";
 import type { Conta } from "../types/account.types";
 
@@ -25,6 +25,7 @@ interface UseAccountResidentsReturn {
 export function useAccountResidents({
   fetchAccountResidents,
 }: UseAccountResidentsProps): UseAccountResidentsReturn {
+  const { refreshAll } = useRefresh();
   const [accountResidentsById, setAccountResidentsById] = useState<
     Record<string, ContaMorador[]>
   >({});
@@ -108,6 +109,7 @@ export function useAccountResidents({
           [accountId]: updatedResidents,
         }));
 
+        await refreshAll();
         showToast.success("Pagamento do morador enviado para confirmação.");
       } catch (error) {
         showToast.error(
@@ -124,7 +126,7 @@ export function useAccountResidents({
         });
       }
     },
-    [fetchAccountResidents, updatingResidentById]
+    [fetchAccountResidents, refreshAll, updatingResidentById]
   );
 
   return {

@@ -1,11 +1,3 @@
-import OnboardingButtons from "@/src/features/auth/components/onboarding/OnboardingButtons";
-import RenderDots from "@/src/features/auth/components/onboarding/RenderDots";
-import RenderSlide from "@/src/features/auth/components/onboarding/RenderSlide";
-import {
-  slides,
-  type OnboardingSlide,
-} from "@/src/features/auth/constants/slides";
-import { useOnboardingAnimation } from "@/src/features/auth/hooks/useOnboardingAnimation";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
@@ -15,8 +7,18 @@ import {
   View,
 } from "react-native";
 import Animated from "react-native-reanimated";
+import OnboardingButtons from "@/src/features/auth/components/onboarding/OnboardingButtons";
+import RenderDots from "@/src/features/auth/components/onboarding/RenderDots";
+import RenderSlide from "@/src/features/auth/components/onboarding/RenderSlide";
+import {
+  type OnboardingSlide,
+  slides,
+} from "@/src/features/auth/constants/slides";
+import { useOnboardingAnimation } from "@/src/features/auth/hooks/useOnboardingAnimation";
+import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 
 export default function Onboarding() {
+  useComponentLogger("OnboardingScreen");
   const { width, height } = useWindowDimensions();
   const [currentIndex, setCurrentIndex] = useState(0);
   const flatListRef = useRef<FlatList<OnboardingSlide>>(null);

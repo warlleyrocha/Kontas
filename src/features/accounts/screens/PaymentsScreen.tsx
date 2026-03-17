@@ -1,3 +1,5 @@
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useRouter } from "expo-router";
 import React, {
   useCallback,
   useEffect,
@@ -7,8 +9,6 @@ import React, {
 } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-import Header from "@/src/components/Header";
 import {
   PaymentsEmptyState,
   PaymentsErrorState,
@@ -16,15 +16,17 @@ import {
   PendingPaymentsList,
 } from "@/src/features/accounts/components/payments";
 import { useAccountData } from "@/src/features/accounts/hooks/useAccountList/useAccountData";
+import { accountResidentsService } from "@/src/features/accounts/services/account-residents.service";
 import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import type {
   PaymentAccount,
   PaymentStatusFilter,
 } from "@/src/features/accounts/types/payments.types";
-import { accountResidentsService } from "@/src/features/accounts/services/account-residents.service";
 import { getMoradorStatusVisual } from "@/src/features/accounts/utils/accountStatus.utils";
 import { getErrorMessage } from "@/src/services/httpError";
-import { showToast } from "@/src/utils/showToast";
+import { useRefresh } from "@/src/shared/contexts/RefreshContext";
+import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
+import { showToast } from "@/src/shared/utils/showToast";
 
 type PaymentsState = {
   accounts: PaymentAccount[];
@@ -41,7 +43,7 @@ type PaymentsAction =
 
 function paymentsReducer(
   state: PaymentsState,
-  action: PaymentsAction,
+  action: PaymentsAction
 ): PaymentsState {
   switch (action.type) {
     case "LOAD_START":
@@ -67,7 +69,7 @@ function paymentsReducer(
                       pagoEm: new Date().toISOString(),
                       status: StatusPagamento.PAGO,
                     }
-                  : resident,
+                  : resident
               ),
             };
           })
@@ -81,6 +83,9 @@ interface PaymentsScreenProps {
 }
 
 export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
+  useComponentLogger("PaymentsScreen");
+  const router = useRouter();
+  const { refreshAll } = useRefresh();
   const { error, fetchAccounts, fetchAccountResidents } = useAccountData({
     republicId,
   });
@@ -94,7 +99,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
     Record<string, boolean>
   >({});
   const [selectedStatus, setSelectedStatus] = useState<PaymentStatusFilter>(
-    StatusPagamento.AGUARDANDO_CONFIRMACAO,
+    StatusPagamento.AGUARDANDO_CONFIRMACAO
   );
 
   const loadPayments = useCallback(
@@ -111,7 +116,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
               (resident) =>
                 getMoradorStatusVisual(resident) ===
                   StatusPagamento.AGUARDANDO_CONFIRMACAO ||
-                getMoradorStatusVisual(resident) === StatusPagamento.PAGO,
+                getMoradorStatusVisual(resident) === StatusPagamento.PAGO
             );
 
             if (relevantResidents.length === 0) {
@@ -122,7 +127,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
               ...account,
               residents: relevantResidents,
             };
-          }),
+          })
         );
 
         const filteredAccounts = accountsWithPayments
@@ -130,7 +135,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
           .sort(
             (firstAccount, secondAccount) =>
               new Date(firstAccount.vencimento).getTime() -
-              new Date(secondAccount.vencimento).getTime(),
+              new Date(secondAccount.vencimento).getTime()
           );
 
         dispatch({ type: "LOAD_SUCCESS", accounts: filteredAccounts });
@@ -138,7 +143,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
         dispatch({ type: "LOAD_DONE" });
       }
     },
-    [fetchAccounts, fetchAccountResidents],
+    [fetchAccounts, fetchAccountResidents]
   );
 
   useEffect(() => {
@@ -163,10 +168,11 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
 
         dispatch({ type: "CONFIRM_RESIDENT", accountId, residentId });
 
+        await refreshAll();
         showToast.success("Pagamento marcado como PAGO.");
       } catch (error) {
         showToast.error(
-          getErrorMessage(error, "Não foi possível atualizar o pagamento."),
+          getErrorMessage(error, "Não foi possível atualizar o pagamento.")
         );
       } finally {
         setConfirmingResidentById((previousState) => {
@@ -176,7 +182,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
         });
       }
     },
-    [confirmingResidentById],
+    [confirmingResidentById, refreshAll]
   );
 
   const filteredPaymentAccounts = useMemo(
@@ -188,7 +194,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
           }
 
           const filteredResidents = account.residents.filter(
-            (resident) => getMoradorStatusVisual(resident) === selectedStatus,
+            (resident) => getMoradorStatusVisual(resident) === selectedStatus
           );
 
           if (filteredResidents.length === 0) {
@@ -201,16 +207,16 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
           };
         })
         .filter((account): account is PaymentAccount => account !== null),
-    [paymentAccounts, selectedStatus],
+    [paymentAccounts, selectedStatus]
   );
 
   const filteredResidentsCount = useMemo(
     () =>
       filteredPaymentAccounts.reduce(
         (total, account) => total + account.residents.length,
-        0,
+        0
       ),
-    [filteredPaymentAccounts],
+    [filteredPaymentAccounts]
   );
 
   const subtitle = useMemo(() => {
@@ -290,6 +296,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
   } else if (filteredPaymentAccounts.length === 0) {
     content = (
       <PaymentsEmptyState
+        isRefreshing={isRefreshing}
         onRefresh={() => void loadPayments(true)}
         selectedStatus={selectedStatus}
       />
@@ -298,9 +305,18 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
 
   return (
     <SafeAreaView key={republicId} className="flex-1 bg-[#FAFAFA]">
-      <Header title="Pagamentos" />
+      <View className="flex-row items-center gap-3 border-b border-b-black/10 bg-[#FAFAFA] px-[16px] pb-4">
+        <TouchableOpacity onPress={() => router.back()} className="p-1">
+          <Ionicons name="arrow-back" size={24} color="#374151" />
+        </TouchableOpacity>
 
-      <View className="flex-1 px-4 pb-4">
+        <View className="flex-1">
+          <Text className="text-lg font-semibold">Pagamentos</Text>
+          <Text className="text-sm text-gray-500">{subtitle}</Text>
+        </View>
+      </View>
+
+      <View className="flex-1 px-4 py-4">
         <View className="mb-4">
           <Text className="mb-2 text-sm font-semibold text-gray-700">
             Filtrar por status:
@@ -335,7 +351,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
             })}
           </ScrollView>
         </View>
-        <Text className="mb-4 text-sm text-gray-500">{subtitle}</Text>
+
         {content}
       </View>
     </SafeAreaView>

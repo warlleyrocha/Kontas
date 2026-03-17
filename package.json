@@ -4,11 +4,12 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "dev": "expo start --dev-client",
+    "dev": "expo start --clear --dev-client",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
+    "biome": "biome check .",
     "lint": "expo lint",
     "test": "jest"
   },
@@ -23,6 +24,7 @@
     "@react-navigation/elements": "^2.6.3",
     "@react-navigation/native": "^7.1.8",
     "@sentry/react-native": "~7.2.0",
+    "@tanstack/react-query": "^5.90.21",
     "axios": "^1.13.2",
     "expo": "~54.0.33",
     "expo-clipboard": "^8.0.7",

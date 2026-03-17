@@ -1,9 +1,8 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Text, TouchableOpacity, View } from "react-native";
-
-import { AccountCard } from "./AccountCard";
 import type { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
 import type { Conta, MetodoPagamento } from "../../types/account.types";
+import { AccountCard } from "./AccountCard";
 
 interface AccountSectionProps {
   readonly label: string;
@@ -24,7 +23,7 @@ interface AccountSectionProps {
     accountId: string,
     accountResidentId: string
   ) => Promise<void> | void;
-  readonly onDelete: (accountId: string) => void;
+  readonly onDelete: (accountId: string) => Promise<void> | void;
   readonly onPatch: (
     accountId: string,
     metodoPagamento: MetodoPagamento

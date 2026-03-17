@@ -1,8 +1,8 @@
+import { useCallback, useState } from "react";
 import { residentService } from "@/src/features/residents/services/resident.service";
 import { getErrorMessage } from "@/src/services/httpError";
-import { showToast } from "@/src/utils/showToast";
 import { ResidentResponse } from "@/src/shared/types/resident.types";
-import { useCallback, useState } from "react";
+import { showToast } from "@/src/shared/utils/showToast";
 
 type UseResidentState = {
   residents: ResidentResponse[];

@@ -1,4 +1,5 @@
-import { Feather } from "@expo/vector-icons";
+import Feather from "@expo/vector-icons/Feather";
+import { useEffect, useMemo } from "react";
 import {
   RefreshControl,
   ScrollView,
@@ -13,18 +14,24 @@ import {
   AddAccountModal,
 } from "@/src/features/accounts/components";
 import { useAccountsTab } from "@/src/features/accounts/hooks/useAccountsTab";
+import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
+import { getMoradorStatusVisual } from "@/src/features/accounts/utils/accountStatus.utils";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
-import { formatMounthYear } from "@/src/utils/formats";
+import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
+import { formatMounthYear } from "@/src/shared/utils/formats";
 
 interface AccountsTabProps {
   readonly republicId: string;
   readonly currentResidentId: string | null;
+  readonly onPendingPaymentsCountChange?: (count: number) => void;
 }
 
 export function AccountsTab({
   republicId,
   currentResidentId,
+  onPendingPaymentsCountChange,
 }: AccountsTabProps) {
+  useComponentLogger("AccountsTab");
   const {
     accountResidentsById,
     closeAccountModal,
@@ -53,6 +60,24 @@ export function AccountsTab({
   } = useAccountsTab({ republicId });
 
   const { refreshing, onRefresh } = useRefresh();
+  const pendingPaymentsCount = useMemo(
+    () =>
+      Object.values(accountResidentsById).reduce(
+        (total, residents) =>
+          total +
+          residents.filter(
+            (resident) =>
+              getMoradorStatusVisual(resident) ===
+              StatusPagamento.AGUARDANDO_CONFIRMACAO
+          ).length,
+        0
+      ),
+    [accountResidentsById]
+  );
+
+  useEffect(() => {
+    onPendingPaymentsCountChange?.(pendingPaymentsCount);
+  }, [onPendingPaymentsCountChange, pendingPaymentsCount]);
 
   if (loading) {
     return (
@@ -99,12 +124,14 @@ export function AccountsTab({
           </Text>
         </TouchableOpacity>
 
-        <AddAccountModal
-          visible={showAccountModal}
-          onSubmit={handleSubmit}
-          onClose={closeAccountModal}
-          republicId={republicId}
-        />
+        {showAccountModal && (
+          <AddAccountModal
+            visible={showAccountModal}
+            onSubmit={handleSubmit}
+            onClose={closeAccountModal}
+            republicId={republicId}
+          />
+        )}
       </View>
     );
   }
@@ -219,12 +246,14 @@ export function AccountsTab({
 
       <AddAccountButton onPress={openAccountModal} />
 
-      <AddAccountModal
-        visible={showAccountModal}
-        onSubmit={handleSubmit}
-        onClose={closeAccountModal}
-        republicId={republicId}
-      />
+      {showAccountModal && (
+        <AddAccountModal
+          visible={showAccountModal}
+          onSubmit={handleSubmit}
+          onClose={closeAccountModal}
+          republicId={republicId}
+        />
+      )}
     </View>
   );
 }

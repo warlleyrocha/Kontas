@@ -1,12 +1,14 @@
-import { api } from "@/src/services/api";
+import { isAxiosError } from "axios";
 import {
+  GetInvitesByUser,
   Invite,
   InviteRequest,
   PatchInviteStatusResponse,
   StatusInvite,
-  GetInvitesByUser,
 } from "@/src/features/invites/types/invite.types";
+import { api } from "@/src/services/api";
 import { toUserFriendlyError } from "@/src/services/httpError";
+import { logger } from "@/src/shared/utils/logger";
 
 export const inviteService = {
   // Método para enviar um convite
@@ -27,13 +29,20 @@ export const inviteService = {
   },
 
   // Método para listar convites de uma república
-  getInvitesByRepublicId: async (republicaId: string): Promise<Invite[]> => {
+  getInvitesByRepublicId: async (
+    republicaId: string,
+    signal?: AbortSignal
+  ): Promise<Invite[]> => {
     try {
       const response = await api.get<Invite[]>(
-        `/convites/republica/${republicaId}`
+        `/convites/republica/${republicaId}`,
+        { signal }
       );
       return response.data;
     } catch (error) {
+      if (isAxiosError(error) && error.code === "ERR_CANCELED") {
+        throw error;
+      }
       throw toUserFriendlyError(error, {
         defaultMessage: "Erro ao obter convites.",
         statusMessages: {
@@ -46,13 +55,20 @@ export const inviteService = {
   },
 
   // Método para listar convites por usuario
-  getInvitesByUser: async (): Promise<GetInvitesByUser[]> => {
-    console.log("🌐 Chamando GET /convites/me...");
+  getInvitesByUser: async (
+    signal?: AbortSignal
+  ): Promise<GetInvitesByUser[]> => {
+    logger.info("Invites", "Buscando convites do usuário");
     try {
-      const response = await api.get<GetInvitesByUser[]>("/convites/me");
+      const response = await api.get<GetInvitesByUser[]>("/convites/me", {
+        signal,
+      });
       return response.data;
     } catch (error) {
-      console.error("Erro no getInvitesByUser", error);
+      if (isAxiosError(error) && error.code === "ERR_CANCELED") {
+        throw error;
+      }
+      logger.error("Invites", "Erro ao buscar convites do usuário", error instanceof Error ? error : undefined);
       throw toUserFriendlyError(error, {
         defaultMessage: "Erro ao obter convites.",
         statusMessages: {

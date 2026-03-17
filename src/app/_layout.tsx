@@ -1,8 +1,3 @@
-import LoadingScreen from "@/src/components/ui/loading-screen";
-import { Toaster } from "@/src/components/ui/sonner";
-import { AuthProvider, useAuth } from "@/src/features/auth/contexts";
-import { RefreshProvider } from "@/src/shared/contexts/RefreshContext";
-import { GlobalErrorBoundary } from "@/src/components/error-boundary/GlobalErrorBoundary";
 import {
   Inter_300Light,
   Inter_400Regular,
@@ -20,16 +15,29 @@ import {
   Mulish_900Black,
 } from "@expo-google-fonts/mulish";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
-import React, { useEffect } from "react";
+import { hideAsync, preventAutoHideAsync } from "expo-splash-screen";
+import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { AuthProvider, useAuth } from "@/src/features/auth/contexts";
+import { RepublicListProvider } from "@/src/features/republic/contexts/RepublicListContext";
+import { queryClient } from "@/src/services/queryClient";
+import { GlobalErrorBoundary } from "@/src/shared/components/error-boundary/GlobalErrorBoundary";
+import LoadingScreen from "@/src/shared/components/ui/loading-screen";
+import { Toaster } from "@/src/shared/components/ui/sonner";
+import { RefreshProvider } from "@/src/shared/contexts/RefreshContext";
 import "../../global.css";
 
-import * as Sentry from "@sentry/react-native";
+import {
+  feedbackIntegration,
+  init,
+  mobileReplayIntegration,
+  wrap,
+} from "@sentry/react-native";
 
-Sentry.init({
+init({
   dsn: "https://da32d972451786e6c1a0aea2f4024516@o4510817801928704.ingest.us.sentry.io/4510818996322304",
 
   // Adds more context data to events (IP address, cookies, user, etc.)
@@ -42,16 +50,13 @@ Sentry.init({
   // Configure Session Replay
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1,
-  integrations: [
-    Sentry.mobileReplayIntegration(),
-    Sentry.feedbackIntegration(),
-  ],
+  integrations: [mobileReplayIntegration(), feedbackIntegration()],
 
   // uncomment the line below to enable Spotlight (https://spotlightjs.com)
   // spotlight: __DEV__,
 });
 
-SplashScreen.preventAutoHideAsync();
+preventAutoHideAsync();
 
 GoogleSignin.configure({
   iosClientId:
@@ -92,7 +97,7 @@ function RootLayout() {
 
   useEffect(() => {
     if (loaded) {
-      SplashScreen.hideAsync();
+      hideAsync();
     }
   }, [loaded]);
 
@@ -101,15 +106,19 @@ function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <GlobalErrorBoundary>
-        <AuthProvider>
-          <RefreshProvider>
-            <RootStack />
-            <Toaster position="bottom-center" />
-          </RefreshProvider>
-        </AuthProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <RepublicListProvider>
+              <RefreshProvider>
+                <RootStack />
+                <Toaster position="bottom-center" />
+              </RefreshProvider>
+            </RepublicListProvider>
+          </AuthProvider>
+        </QueryClientProvider>
       </GlobalErrorBoundary>
     </GestureHandlerRootView>
   );
 }
 
-export default Sentry.wrap(RootLayout);
+export default wrap(RootLayout);

@@ -1,6 +1,5 @@
-import useEditRepublicModal from "@/src/features/republic/hooks/useEditRepublicModal";
-import { Feather } from "@expo/vector-icons";
-import React from "react";
+import Feather from "@expo/vector-icons/Feather";
+import type { FC } from "react";
 import {
   Image,
   KeyboardAvoidingView,
@@ -11,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import useEditRepublicModal from "@/src/features/republic/hooks/useEditRepublicModal";
 
 interface EditRepublicModalProps {
   visible: boolean;
@@ -20,7 +20,7 @@ interface EditRepublicModalProps {
   onSave: (name: string, image?: string) => void;
 }
 
-export const EditRepublicModal: React.FC<EditRepublicModalProps> = ({
+export const EditRepublicModal: FC<EditRepublicModalProps> = ({
   visible,
   onClose,
   currentName,

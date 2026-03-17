@@ -1,5 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
-import React from "react";
+import type { FC } from "react";
 import { Image, Text, View } from "react-native";
 import Animated, {
   Extrapolation,
@@ -18,7 +18,7 @@ interface RenderSlideProps {
   scrollX: SharedValue<number>;
 }
 
-const RenderSlide: React.FC<RenderSlideProps> = ({
+const RenderSlide: FC<RenderSlideProps> = ({
   item,
   index,
   width,

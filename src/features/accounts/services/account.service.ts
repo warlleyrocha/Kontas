@@ -1,20 +1,21 @@
-import { api } from "@/src/services/api";
 import {
   Conta,
   CriarContaRequest,
   ListarContasRepublic,
-  RemoverContaParams,
   MarcarContaPaga,
+  RemoverContaParams,
 } from "@/src/features/accounts/types/account.types";
-
+import { api } from "@/src/services/api";
 import { toUserFriendlyError } from "@/src/services/httpError";
+import { logger } from "@/src/shared/utils/logger";
 
 export const accountService = {
   // Método para criar uma nova conta
   criarConta: async (data: CriarContaRequest): Promise<Conta> => {
     try {
+      logger.debug("Accounts", "Payload de criação de conta", data);
       const response = await api.post<Conta>("/contas", data);
-      console.log("Conta criada com sucesso:", response.data);
+      logger.info("Accounts", "Conta criada com sucesso", response.data);
       return response.data;
     } catch (error) {
       throw toUserFriendlyError(error, {
@@ -36,10 +37,7 @@ export const accountService = {
       const response = await api.get<ListarContasRepublic>(
         `/contas/republica/${republicaId}`
       );
-      console.log(
-        `Contas listadas para república ${republicaId}:`,
-        response.data
-      );
+      logger.table("Accounts", `Contas da república ${republicaId}`, response.data as object);
       return response.data;
     } catch (error) {
       throw toUserFriendlyError(error, {
@@ -57,7 +55,7 @@ export const accountService = {
   removerConta: async ({ id }: RemoverContaParams): Promise<void> => {
     try {
       await api.delete(`/contas/${id}`);
-      console.log(`Conta ${id} removida com sucesso.`);
+      logger.info("Accounts", `Conta ${id} removida com sucesso`);
     } catch (error) {
       throw toUserFriendlyError(error, {
         defaultMessage: "Erro ao remover conta.",
@@ -74,7 +72,7 @@ export const accountService = {
   restaurarConta: async (id: string): Promise<void> => {
     try {
       await api.patch(`/contas/${id}/restaurar`);
-      console.log(`Conta ${id} recuperada com sucesso.`);
+      logger.info("Accounts", `Conta ${id} restaurada com sucesso`);
     } catch (error) {
       throw toUserFriendlyError(error, {
         defaultMessage: "Erro ao recuperar conta.",
@@ -95,7 +93,7 @@ export const accountService = {
   }: MarcarContaPaga): Promise<void> => {
     try {
       await api.patch(`/contas/${id}`, { status: "PAGA", metodoPagamento });
-      console.log(`Conta ${id} paga com sucesso`);
+      logger.info("Accounts", `Conta ${id} marcada como paga`);
     } catch (error) {
       throw toUserFriendlyError(error, {
         defaultMessage: "Erro ao marcar conta como paga",

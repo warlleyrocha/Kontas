@@ -1,24 +1,25 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "expo-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useAuth } from "@/src/features/auth/contexts";
-import { useResidents } from "@/src/features/residents/hooks/useResidents";
-import { useRepublicList } from "./useRepublicList";
-import { useRepublicActions } from "./useRepublicActions";
-import { useRefresh } from "@/src/shared/contexts/RefreshContext";
-
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
-import type { TabKey } from "@/src/shared/types/tabs";
-
-import { showToast } from "@/src/utils/showToast";
-import { toastErrors } from "@/src/utils/toastMessages";
+import { useResidents } from "@/src/features/residents/hooks/useResidents";
 import { getErrorMessage } from "@/src/services/httpError";
+import { useRefresh } from "@/src/shared/contexts/RefreshContext";
+import { ResidentRole } from "@/src/shared/types/resident.types";
+import type { TabKey } from "@/src/shared/types/tabs";
+import { logger } from "@/src/shared/utils/logger";
+
+import { showToast } from "@/src/shared/utils/showToast";
+import { toastErrors } from "@/src/shared/utils/toastMessages";
+import { useRepublicActions } from "./useRepublicActions";
+import { useRepublicList } from "./useRepublicList";
 
 export function useRepublicScreen(republicId: string) {
   const router = useRouter();
   const { user, logout } = useAuth();
 
-  const { fetchRepublicById } = useRepublicList();
+  const { republics, fetchRepublics, fetchRepublicById } = useRepublicList();
   const { updateRepublic, showEditModal, setShowEditModal } =
     useRepublicActions();
 
@@ -107,6 +108,28 @@ export function useRepublicScreen(republicId: string) {
     }
   }, [logout, router]);
 
+  const handleOpenMenu = useCallback(async () => {
+    if (
+      user?.perfilCompleto &&
+      !republics.some((item) => item.id === republicId)
+    ) {
+      try {
+        await fetchRepublics();
+      } catch (error) {
+        logger.warn(
+          "Republic",
+          "Falha ao atualizar lista de repúblicas no menu",
+          {
+            republicId,
+            error: getErrorMessage(error, "Erro ao carregar repúblicas"),
+          }
+        );
+      }
+    }
+
+    setIsMenuOpen(true);
+  }, [fetchRepublics, republicId, republics, user?.perfilCompleto]);
+
   const handleSaveRepublic = useCallback(
     async (nome: string, imagem?: string) => {
       if (!republic) return;
@@ -123,15 +146,6 @@ export function useRepublicScreen(republicId: string) {
     [republic, updateRepublic]
   );
 
-  const userMenu = useMemo(
-    () => ({
-      name: user?.nome ?? "Usuário",
-      photo: user?.fotoPerfil,
-      email: user?.email,
-    }),
-    [user?.nome, user?.fotoPerfil, user?.email]
-  );
-
   const currentResident = useMemo(() => {
     if (!user?.email) return null;
     const normalizedEmail = user.email.toLowerCase();
@@ -142,6 +156,23 @@ export function useRepublicScreen(republicId: string) {
 
   const currentUserRole = currentResident?.role ?? null;
   const currentResidentId = currentResident?.id ?? null;
+  let roleLabel: string | null = null;
+
+  if (currentUserRole === ResidentRole.ADMIN) {
+    roleLabel = "Admin";
+  } else if (currentUserRole === ResidentRole.USER) {
+    roleLabel = "Morador";
+  }
+
+  const userMenu = useMemo(
+    () => ({
+      name: user?.nome ?? "Usuário",
+      photo: user?.fotoPerfil,
+      email: user?.email,
+      roleLabel,
+    }),
+    [roleLabel, user?.nome, user?.fotoPerfil, user?.email]
+  );
 
   return {
     republic,
@@ -158,8 +189,10 @@ export function useRepublicScreen(republicId: string) {
     setShowEditModal,
     handleSaveRepublic,
     handleSignOut,
+    handleOpenMenu,
     userMenu,
     currentUserRole,
     currentResidentId,
+    republics,
   };
 }

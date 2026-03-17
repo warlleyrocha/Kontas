@@ -2,11 +2,11 @@
 import { useCallback, useRef, useState } from "react";
 
 import { accountService } from "@/src/features/accounts/services/account.service";
-import { accountResidentsService } from "../../services/account-residents.service";
-import { getErrorMessage } from "@/src/services/httpError";
-import { showToast } from "@/src/utils/showToast";
 import type { Conta } from "@/src/features/accounts/types/account.types";
 import type { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
+import { getErrorMessage } from "@/src/services/httpError";
+import { showToast } from "@/src/shared/utils/showToast";
+import { accountResidentsService } from "../../services/account-residents.service";
 
 interface UseAccountDataProps {
   readonly republicId: string;
@@ -24,7 +24,7 @@ export function useAccountData({
   republicId,
 }: UseAccountDataProps): UseAccountDataReturn {
   const [contas, setContas] = useState<Conta[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const hasLoadedRef = useRef(false);
 

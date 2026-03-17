@@ -1,6 +1,6 @@
-import LoadingScreen from "@/src/components/ui/loading-screen";
-import { useAuth } from "@/src/features/auth/contexts";
 import { Redirect } from "expo-router";
+import { useAuth } from "@/src/features/auth/contexts";
+import LoadingScreen from "@/src/shared/components/ui/loading-screen";
 
 export default function Index() {
   const { user, loading, republicData } = useAuth();

@@ -1,12 +1,11 @@
 import { useCallback, useMemo, useState } from "react";
-import { useRouter } from "expo-router";
 
 import { useAuth } from "@/src/features/auth/contexts";
-import { useSideMenu } from "@/src/components/SideMenu/useSideMenu";
-import { toastErrors } from "@/src/utils/toastMessages";
+import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
+import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
+import { toastErrors } from "@/src/shared/utils/toastMessages";
 
 export function useInvitesScreen() {
-  const router = useRouter();
   const { user, logout } = useAuth();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,14 +13,24 @@ export function useInvitesScreen() {
   const handleSignOut = useCallback(async () => {
     try {
       await logout();
-      router.replace("/");
     } catch (error) {
       console.error("Erro ao fazer logout da conta:", error);
       toastErrors.logoutFailed(error);
     }
-  }, [logout, router]);
+  }, [logout]);
 
-  const { menuItems, footerItems } = useSideMenu("invite", handleSignOut);
+  const {
+    invitesByUser,
+    pendingCount,
+    error,
+    fetchInvitesByUser,
+    handleAcceptInvite,
+    handleRejectInvite,
+  } = useInvitesContext();
+
+  const { menuItems, footerItems } = useSideMenu("invite", handleSignOut, {
+    pendingInvitesCount: pendingCount,
+  });
 
   const sideMenuUser = useMemo(() => {
     return { name: user?.nome ?? "Usuário", photo: user?.fotoPerfil };
@@ -30,6 +39,12 @@ export function useInvitesScreen() {
   return {
     isMenuOpen,
     setIsMenuOpen,
+
+    invitesByUser,
+    fetchInvitesByUser,
+    handleAcceptInvite,
+    handleRejectInvite,
+    error,
 
     menuItems,
     footerItems,

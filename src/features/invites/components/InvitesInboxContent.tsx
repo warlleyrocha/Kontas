@@ -1,6 +1,6 @@
 import type { GetInvitesByUser } from "../types/invite.types";
-import { InviteListContentBase } from "./InviteListContentBase";
 import InviteCardMe from "./InviteCardMe";
+import { InviteListContentBase } from "./InviteListContentBase";
 
 interface InvitesInboxContentProps {
   readonly error: string | null;

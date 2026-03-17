@@ -1,11 +1,10 @@
-import { RouteErrorFallback } from "@/src/components/error-boundary/RouteErrorFallback";
-import { InvitesSentScreen } from "@/src/features/invites";
 import {
+  type ErrorBoundaryProps,
   Redirect,
   useLocalSearchParams,
-  type ErrorBoundaryProps,
 } from "expo-router";
-import React from "react";
+import { InvitesSentScreen } from "@/src/features/invites";
+import { RouteErrorFallback } from "@/src/shared/components/error-boundary/RouteErrorFallback";
 
 export default function InvitesSent() {
   const { id: republicId } = useLocalSearchParams<{ id?: string }>();

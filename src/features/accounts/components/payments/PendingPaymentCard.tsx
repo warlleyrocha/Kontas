@@ -1,13 +1,12 @@
+import Feather from "@expo/vector-icons/Feather";
 import React, { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import { Feather } from "@expo/vector-icons";
-
+import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import type {
   PaymentAccount,
   PaymentStatusFilter,
 } from "@/src/features/accounts/types/payments.types";
-import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
-import { formatDate } from "@/src/utils/formats";
+import { formatDate } from "@/src/shared/utils/formats";
 
 import { PendingPaymentResidentCard } from "./PendingPaymentResidentCard";
 

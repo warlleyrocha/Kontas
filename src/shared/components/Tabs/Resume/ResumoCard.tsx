@@ -1,10 +1,10 @@
-import React from "react";
+import type { ReactNode } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 
 interface ResumoCardProps {
   label: string;
   value: number;
-  icon: React.ReactNode;
+  icon: ReactNode;
   description: string;
   color: string;
   isLoading: boolean;

@@ -1,13 +1,17 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import React from "react";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useCallback, useMemo, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
-import { SideMenu } from "@/src/components/SideMenu";
-import { useSideMenu } from "@/src/components/SideMenu/useSideMenu";
-import Tabs from "@/src/components/Tabs";
-import { ResumeTab } from "@/src/components/Tabs/Resume";
 import { AccountsTab } from "@/src/features/accounts";
+import { useInvitesByRepublicQuery } from "@/src/features/invites/contexts/InvitesContext";
+import { StatusInvite } from "@/src/features/invites/types/invite.types";
 import { EditRepublicModal } from "@/src/features/republic/components/EditRepublicModal";
 import { ResidentsTab } from "@/src/features/residents";
+import { SideMenu } from "@/src/shared/components/SideMenu";
+import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
+import Tabs from "@/src/shared/components/Tabs";
+import { ResumeTab } from "@/src/shared/components/Tabs/Resume";
+import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
+import { ResidentRole } from "@/src/shared/types/resident.types";
 import { RepublicHeader } from "../components/RepublicHeader";
 import { useRepublicScreen } from "../hooks/useRepublicScreen";
 
@@ -16,6 +20,7 @@ interface Props {
 }
 
 export function RepublicScreen({ republicId }: Props) {
+  useComponentLogger("RepublicScreen");
   const {
     republic,
     residents,
@@ -31,17 +36,52 @@ export function RepublicScreen({ republicId }: Props) {
     setShowEditModal,
     handleSaveRepublic,
     handleSignOut,
+    handleOpenMenu,
     userMenu,
     currentUserRole,
     currentResidentId,
+    republics,
   } = useRepublicScreen(republicId);
+  const [pendingPaymentsByRepublic, setPendingPaymentsByRepublic] = useState<
+    Record<string, number>
+  >({});
 
-  const { menuItems, footerItems } = useSideMenu(
-    "home",
-    handleSignOut,
-    republic?.id,
-    currentUserRole
+  const invitesSentQuery = useInvitesByRepublicQuery(republicId);
+
+  // Convites enviados pela república ainda sem resposta do convidado.
+  // Derivado do cache do React Query por republicId.
+  const pendingInvitesSentCount = useMemo(
+    () =>
+      (invitesSentQuery.data ?? []).filter(
+        (i) => i.status === StatusInvite.PENDENTE
+      ).length,
+    [invitesSentQuery.data]
   );
+
+  const pendingPaymentsCount = pendingPaymentsByRepublic[republicId] ?? 0;
+  const handlePendingPaymentsCountChange = useCallback(
+    (count: number) => {
+      setPendingPaymentsByRepublic((current) => {
+        if (current[republicId] === count) {
+          return current;
+        }
+
+        return {
+          ...current,
+          [republicId]: count,
+        };
+      });
+    },
+    [republicId]
+  );
+
+  const { menuItems, footerItems } = useSideMenu("home", handleSignOut, {
+    republicId: republic?.id,
+    republics,
+    currentUserRole,
+    pendingInvitesSentCount,
+    pendingPaymentsCount,
+  });
 
   if (isLoading) {
     return (
@@ -69,7 +109,8 @@ export function RepublicScreen({ republicId }: Props) {
         isFavorited={isFavorited}
         onEdit={() => setShowEditModal(true)}
         onToggleFavorite={toggleFavorite}
-        onMenuOpen={() => setIsMenuOpen(true)}
+        onMenuOpen={() => void handleOpenMenu()}
+        hasNotification={menuItems.some((item) => (item.badge ?? 0) > 0)}
       />
 
       <View className="flex-1 p-4">
@@ -79,9 +120,16 @@ export function RepublicScreen({ republicId }: Props) {
           <AccountsTab
             republicId={republicId}
             currentResidentId={currentResidentId}
+            onPendingPaymentsCountChange={handlePendingPaymentsCountChange}
           />
         )}
-        {tab === "moradores" && <ResidentsTab residents={residents} />}
+        {tab === "moradores" && (
+          <ResidentsTab
+            residents={residents}
+            republicId={republicId}
+            isAdmin={currentUserRole === ResidentRole.ADMIN}
+          />
+        )}
         {tab === "resumo" && (
           <ResumeTab residents={residents} republicId={republicId} />
         )}

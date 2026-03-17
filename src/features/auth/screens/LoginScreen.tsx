@@ -1,19 +1,20 @@
-import IconGoogle from "@/assets/images/google-icon.svg";
-import { useAuth } from "@/src/features/auth/contexts/AuthContext";
-import { legalLinks, openLegalLink } from "@/src/shared/constants/legal";
-import { getErrorMessage } from "@/src/services/httpError";
-import { showToast } from "@/src/utils/showToast";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
-  useWindowDimensions,
   Image,
   Text,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from "react-native";
+import IconGoogle from "@/assets/images/google-icon.svg";
+import { useAuth } from "@/src/features/auth/contexts/AuthContext";
+import { getErrorMessage } from "@/src/services/httpError";
+import { legalLinks, openLegalLink } from "@/src/shared/constants/legal";
+import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
+import { showToast } from "@/src/shared/utils/showToast";
 
 type GoogleSignInResult = Awaited<ReturnType<typeof GoogleSignin.signIn>>;
 
@@ -22,6 +23,7 @@ function getGoogleToken(userInfo: GoogleSignInResult): string | null {
 }
 
 export default function LoginScreen() {
+  useComponentLogger("LoginScreen");
   const router = useRouter();
   const [isSigningIn, setIsSigningIn] = useState(false);
   const { loginWithGoogle, error } = useAuth();
@@ -94,7 +96,7 @@ export default function LoginScreen() {
         </View>
 
         <TouchableOpacity
-          className={`mt-44 h-[50px] w-[345px] flex-row items-center justify-center gap-3 rounded-lg ${
+          className={`mt-20 h-[50px] w-[345px] flex-row items-center justify-center gap-3 rounded-lg ${
             isSigningIn ? "bg-gray-300" : "bg-[#ececec]"
           }`}
           onPress={handleGoogleLogin}

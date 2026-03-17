@@ -1,11 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios, {
   AxiosError,
-  isAxiosError,
-  type AxiosRequestConfig,
   type InternalAxiosRequestConfig,
+  isAxiosError,
 } from "axios";
-import * as ExpoCrypto from "expo-crypto";
+import { logger } from "@/src/shared/utils/logger";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -25,26 +24,9 @@ export const api = axios.create({
 
 type CircuitState = "CLOSED" | "OPEN" | "HALF_OPEN";
 
-type RetryConfig = {
-  retries: number;
-  baseDelayMs: number;
-  maxDelayMs: number;
-  retryOnStatuses: number[];
-};
-
 type RequestConfig = InternalAxiosRequestConfig & {
-  _retryCount?: number;
   _cbHalfOpen?: boolean;
 };
-
-const RETRY_CONFIG: RetryConfig = {
-  retries: 3,
-  baseDelayMs: 300,
-  maxDelayMs: 3000,
-  retryOnStatuses: [408, 429, 500, 502, 503, 504],
-};
-
-const SAFE_RETRY_METHODS = new Set(["get", "head", "options"]);
 const CIRCUIT_OPEN_CODE = "CIRCUIT_OPEN";
 
 const circuitBreaker = {
@@ -56,9 +38,6 @@ const circuitBreaker = {
   halfOpenInFlight: false,
 };
 
-const SHOULD_LOG_HTTP = process.env.NODE_ENV !== "production";
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const canProceed = (): { allowed: boolean; halfOpen: boolean } => {
   if (circuitBreaker.state === "OPEN") {
@@ -113,40 +92,6 @@ const onFailure = (wasHalfOpen: boolean) => {
   }
 };
 
-const getRetryDelay = async (retryCount: number) => {
-  const baseDelay = RETRY_CONFIG.baseDelayMs * 2 ** (retryCount - 1);
-  const randomBytes = await ExpoCrypto.getRandomBytesAsync(1);
-  const jitter = randomBytes[0] % 100; // 0–99
-  return Math.min(baseDelay + jitter, RETRY_CONFIG.maxDelayMs);
-};
-const isIdempotencyKeyPresent = (headers: AxiosRequestConfig["headers"]) => {
-  if (!headers) return false;
-  const normalized = headers as Record<string, unknown>;
-  return Object.keys(normalized).some(
-    (key) => key.toLowerCase() === "idempotency-key"
-  );
-};
-
-const canRetryMethod = (config?: RequestConfig) => {
-  const method = config?.method?.toLowerCase();
-  if (!method) return true;
-  if (SAFE_RETRY_METHODS.has(method)) return true;
-  return isIdempotencyKeyPresent(config?.headers);
-};
-
-const shouldRetry = (error: AxiosError, config?: RequestConfig) => {
-  if (!config) return false;
-  if (config._cbHalfOpen) return false;
-  if (error.code === "ERR_CANCELED") return false;
-  if (!canRetryMethod(config)) return false;
-
-  const retryCount = config._retryCount ?? 0;
-  if (retryCount >= RETRY_CONFIG.retries) return false;
-
-  if (!error.response) return true;
-  return RETRY_CONFIG.retryOnStatuses.includes(error.response.status);
-};
-
 const shouldCountAsCircuitFailure = (error: AxiosError) => {
   if (error.code === "ERR_CANCELED") return false;
   if (!error.response) return true;
@@ -156,19 +101,15 @@ const shouldCountAsCircuitFailure = (error: AxiosError) => {
 };
 
 const logResponse = (status: number, url?: string, data?: unknown) => {
-  if (!SHOULD_LOG_HTTP) return;
-  console.log(`\n✅ ${status} ${url}`);
-  if (data !== undefined) {
-    console.log(JSON.stringify(data, null, 2));
+  if (Array.isArray(data)) {
+    logger.table("API", `✅ ${status} ${url}`, data);
+  } else {
+    logger.info("API", `✅ ${status} ${url}`, data);
   }
 };
 
 const logError = (status: number | string, url?: string, data?: unknown) => {
-  if (!SHOULD_LOG_HTTP) return;
-  console.log(`\n❌ ${status} ${url}`);
-  if (data !== undefined) {
-    console.log(JSON.stringify(data, null, 2));
-  }
+  logger.warn("API", `❌ ${status} ${url}`, data);
 };
 
 const createCircuitOpenError = () => {
@@ -197,6 +138,13 @@ api.interceptors.request.use(
         config.headers["Authorization"] = `Bearer ${token}`;
       }
     }
+
+    logger.debug(
+      "API",
+      `➡️ ${String(config.method).toUpperCase()} ${config.url}`,
+      config.data ?? config.params
+    );
+
     return config;
   },
 
@@ -218,9 +166,7 @@ api.interceptors.response.use(
   async (error) => {
     const knownError = error as Error & { code?: string };
     if (knownError.code === CIRCUIT_OPEN_CODE) {
-      if (SHOULD_LOG_HTTP) {
-        console.log("\n⛔ Circuit breaker aberto: requisição bloqueada.");
-      }
+      logger.warn("API", "⛔ Circuit breaker aberto: requisição bloqueada.");
       return Promise.reject(knownError);
     }
 
@@ -239,15 +185,6 @@ api.interceptors.response.use(
       config?.url,
       axiosError.response?.data
     );
-
-    const retryable = shouldRetry(axiosError, config);
-    if (retryable && config) {
-      const nextRetry = (config._retryCount ?? 0) + 1;
-      config._retryCount = nextRetry;
-      config._cbHalfOpen = false;
-      await sleep(await getRetryDelay(nextRetry));
-      return api.request(config);
-    }
 
     const shouldOpenByFailure = shouldCountAsCircuitFailure(axiosError);
     if (shouldOpenByFailure) {

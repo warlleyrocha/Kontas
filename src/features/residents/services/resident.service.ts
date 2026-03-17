@@ -1,9 +1,9 @@
 import { api } from "@/src/services/api";
+import { toUserFriendlyError } from "@/src/services/httpError";
 import {
   CreateResidentRequest,
   ResidentResponse,
 } from "@/src/shared/types/resident.types";
-import { toUserFriendlyError } from "@/src/services/httpError";
 
 export const residentService = {
   // Método para criar um novo morador

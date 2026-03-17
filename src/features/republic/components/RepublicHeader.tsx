@@ -1,9 +1,10 @@
+import Feather from "@expo/vector-icons/Feather";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import React, { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
-import { MenuButton } from "@/src/components/SideMenu";
+import { MenuButton } from "@/src/shared/components/SideMenu";
 
 interface RepublicHeaderProps {
   readonly republic: RepublicResponse;
@@ -12,6 +13,7 @@ interface RepublicHeaderProps {
   readonly onEdit: () => void;
   readonly onToggleFavorite: () => void;
   readonly onMenuOpen: () => void;
+  readonly hasNotification?: boolean;
 }
 
 export function RepublicHeader({
@@ -21,6 +23,7 @@ export function RepublicHeader({
   onEdit,
   onToggleFavorite,
   onMenuOpen,
+  hasNotification,
 }: RepublicHeaderProps) {
   const residentsLabel = numberResidents === 1 ? "Morador" : "Moradores";
   const [imageError, setImageError] = useState(false);
@@ -72,7 +75,7 @@ export function RepublicHeader({
       </TouchableOpacity>
 
       {/* Menu lateral */}
-      <MenuButton onPress={onMenuOpen} />
+      <MenuButton onPress={onMenuOpen} hasNotification={hasNotification} />
     </View>
   );
 }

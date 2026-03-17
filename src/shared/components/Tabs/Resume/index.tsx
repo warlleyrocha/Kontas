@@ -1,5 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   ActivityIndicator,
   RefreshControl,
@@ -7,11 +6,11 @@ import {
   Text,
   View,
 } from "react-native";
+import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import type { ResidentResponse } from "@/src/shared/types/resident.types";
 import { MoradorRow } from "./MoradorRow";
 import { ResumoCard } from "./ResumoCard";
 import { useResumeTab } from "./useResumeTab";
-import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 
 interface Props {
   residents: ResidentResponse[];

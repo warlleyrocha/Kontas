@@ -4,12 +4,12 @@ import {
   ContaMorador,
   StatusPagamento,
 } from "@/src/features/accounts/types/accountResidents.types";
-import { AccountStatusIcon } from "../shared/AccountStatusIcon";
 import {
   getMoradorStatusBadge,
   getMoradorStatusIcon,
   getMoradorStatusVisual,
 } from "../../utils/accountStatus.utils";
+import { AccountStatusIcon } from "../shared/AccountStatusIcon";
 
 interface AccountResidentRowProps {
   readonly accountId: string;
@@ -50,7 +50,7 @@ export function AccountResidentRow({
       }`}
     >
       <TouchableOpacity
-        onPress={(e) => {
+        onPress={async (e) => {
           e.stopPropagation();
 
           if (
@@ -63,7 +63,7 @@ export function AccountResidentRow({
             return;
           }
 
-          void onConfirmResidentPayment(accountId, morador.id);
+          await onConfirmResidentPayment(accountId, morador.id);
         }}
         disabled={
           moradorPago ||

@@ -1,32 +1,23 @@
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import React, { useEffect } from "react";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { Text, TouchableOpacity, View } from "react-native";
 
-import { MenuButton, SideMenu } from "@/src/components/SideMenu";
-
 import { InvitesSentContent } from "../components/InvitesSentContent";
-import { useInvitesScreen } from "../hooks/useInvitesScreen";
-import { useInvites } from "../hooks/useInvite";
+import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
+import { useInvitesSentScreen } from "../hooks/useInvitesSentScreen";
 
 interface InvitesSentScreenProps {
   readonly republicId: string;
 }
 
 export function InvitesSentScreen({ republicId }: InvitesSentScreenProps) {
-  const router = useRouter();
-  const { invites, fetchInvites, error } = useInvites();
-  const { isMenuOpen, setIsMenuOpen, menuItems, footerItems, sideMenuUser } =
-    useInvitesScreen();
-
-  useEffect(() => {
-    fetchInvites(republicId);
-  }, [fetchInvites, republicId]);
+  useComponentLogger("InvitesSentScreen");
+  const { invites, error, handleRetry, handleEmptyStatePress } =
+    useInvitesSentScreen(republicId);
 
   return (
     <View className="flex-1 bg-[#FAFAFA]">
       <View className="mt-[32px] flex-row items-center gap-3 border-b border-b-black/10 bg-[#FAFAFA] px-[16px] py-4">
-        <TouchableOpacity onPress={() => router.back()} className="p-1">
+        <TouchableOpacity onPress={handleEmptyStatePress} className="p-1">
           <Ionicons name="arrow-back" size={24} color="#374151" />
         </TouchableOpacity>
 
@@ -36,25 +27,14 @@ export function InvitesSentScreen({ republicId }: InvitesSentScreenProps) {
             {invites.length} {invites.length === 1 ? "convite" : "convites"}
           </Text>
         </View>
-
-        <MenuButton onPress={() => setIsMenuOpen(true)} />
       </View>
 
       <InvitesSentContent
         error={error}
         invites={invites}
-        onRetry={() => fetchInvites(republicId)}
-        onEmptyStatePress={() => router.back()}
+        onRetry={handleRetry}
+        onEmptyStatePress={handleEmptyStatePress}
       />
-
-      {isMenuOpen && sideMenuUser && (
-        <SideMenu
-          onRequestClose={() => setIsMenuOpen(false)}
-          user={sideMenuUser}
-          menuItems={menuItems}
-          footerItems={footerItems}
-        />
-      )}
     </View>
   );
 }

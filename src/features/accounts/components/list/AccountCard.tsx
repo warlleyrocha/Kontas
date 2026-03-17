@@ -1,16 +1,17 @@
-import { View, TouchableOpacity, Text } from "react-native";
-import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import Feather from "@expo/vector-icons/Feather";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useState } from "react";
-
-import { AccountResidentsContent } from "./AccountResidentsContent";
-import { AccountStatusIcon } from "../shared/AccountStatusIcon";
-import { Conta, MetodoPagamento, StatusConta } from "../../types/account.types";
+import { Text, TouchableOpacity, View } from "react-native";
 import { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
+import { Conta, MetodoPagamento, StatusConta } from "../../types/account.types";
 import {
   getContaStatusIcon,
   getContaStatusVisual,
   parseContaVencimento,
 } from "../../utils/accountStatus.utils";
+import { AccountStatusIcon } from "../shared/AccountStatusIcon";
+import { AccountResidentsContent } from "./AccountResidentsContent";
 
 interface AccountCardProps {
   conta: Conta;
@@ -92,7 +93,7 @@ export const AccountCard = ({
 
   return (
     <TouchableOpacity
-      onPress={() => console.log("Editar conta", conta.id)}
+      onPress={() => {}}
       activeOpacity={0.7}
     >
       <View
@@ -105,9 +106,9 @@ export const AccountCard = ({
           <TouchableOpacity
             className="flex-1 flex-row items-center gap-2"
             disabled={paga || isPatching}
-            onPress={(e) => {
+            onPress={async (e) => {
               e.stopPropagation();
-              void handlePatchAccount();
+              await handlePatchAccount();
             }}
           >
             <AccountStatusIcon
@@ -192,7 +193,7 @@ export const AccountCard = ({
           {/* Copiar PIX */}
           {!paga && (
             <TouchableOpacity
-              onPress={() => console.log("Copiar PIX")}
+              onPress={() => {}}
               className="flex-1 flex-row items-center justify-center rounded-md border border-indigo-600 py-2"
             >
               <Feather name="copy" size={16} color="#4b5563" />
@@ -202,9 +203,9 @@ export const AccountCard = ({
 
           {/* Deletar */}
           <TouchableOpacity
-            onPress={(e) => {
+            onPress={async (e) => {
               e.stopPropagation();
-              void onDelete?.(conta.id);
+              await onDelete?.(conta.id);
             }}
             className="flex-row items-center justify-center rounded-md bg-red-50 px-4 py-2"
           >

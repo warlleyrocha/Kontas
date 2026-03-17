@@ -1,9 +1,8 @@
 import { useCallback } from "react";
-
+import type { MetodoPagamento } from "../types/account.types";
 import { useAccountActions } from "./useAccountActions";
 import { useAccountExpansion } from "./useAccountExpansion";
 import { useAccountList } from "./useAccountList";
-import type { MetodoPagamento } from "../types/account.types";
 
 interface UseAccountsTabParams {
   readonly republicId: string;

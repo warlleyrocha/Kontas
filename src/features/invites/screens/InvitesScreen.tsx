@@ -1,14 +1,14 @@
-import React, { useEffect } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
+import { Text, TouchableOpacity, View } from "react-native";
 
-import { MenuButton, SideMenu } from "@/src/components/SideMenu";
 import { InvitesInboxContent } from "@/src/features/invites/components/InvitesInboxContent";
+
+import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 import { useInvitesScreen } from "../hooks/useInvitesScreen";
-import { useInvites } from "../hooks/useInvite";
 
 export function InvitesScreen() {
+  useComponentLogger("InvitesScreen");
   const router = useRouter();
 
   const {
@@ -17,13 +17,7 @@ export function InvitesScreen() {
     handleAcceptInvite,
     handleRejectInvite,
     error,
-  } = useInvites();
-  const { isMenuOpen, setIsMenuOpen, menuItems, footerItems, sideMenuUser } =
-    useInvitesScreen();
-
-  useEffect(() => {
-    fetchInvitesByUser();
-  }, [fetchInvitesByUser]);
+  } = useInvitesScreen();
 
   return (
     <View className="flex-1 bg-[#FAFAFA]">
@@ -33,14 +27,12 @@ export function InvitesScreen() {
         </TouchableOpacity>
 
         <View className="flex-1">
-          <Text className="text-lg font-semibold">Convites</Text>
+          <Text className="text-lg font-semibold">Meus Convites</Text>
           <Text className="text-sm text-gray-500">
             {invitesByUser.length}{" "}
             {invitesByUser.length === 1 ? "pendente" : "pendentes"}
           </Text>
         </View>
-
-        <MenuButton onPress={() => setIsMenuOpen(true)} />
       </View>
 
       <InvitesInboxContent
@@ -51,15 +43,6 @@ export function InvitesScreen() {
         onAcceptInvite={handleAcceptInvite}
         onRejectInvite={handleRejectInvite}
       />
-
-      {isMenuOpen && sideMenuUser && (
-        <SideMenu
-          onRequestClose={() => setIsMenuOpen(false)}
-          user={sideMenuUser}
-          menuItems={menuItems}
-          footerItems={footerItems}
-        />
-      )}
     </View>
   );
 }

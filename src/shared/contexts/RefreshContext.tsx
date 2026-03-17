@@ -10,12 +10,14 @@ import React, {
 interface RefreshContextValue {
   refreshing: boolean;
   onRefresh: () => Promise<void>;
+  refreshAll: () => Promise<void>;
   registerRefresh: (key: string, fn: () => Promise<void>) => () => void;
 }
 
 const RefreshContext = createContext<RefreshContextValue>({
   refreshing: false,
   onRefresh: async () => {},
+  refreshAll: async () => {},
   registerRefresh: () => () => {},
 });
 
@@ -24,6 +26,10 @@ export function RefreshProvider({
 }: Readonly<{ children: React.ReactNode }>) {
   const [refreshing, setRefreshing] = useState(false);
   const callbacks = useRef<Map<string, () => Promise<void>>>(new Map());
+
+  const refreshAll = useCallback(async () => {
+    await Promise.allSettled([...callbacks.current.values()].map((fn) => fn()));
+  }, []);
 
   const registerRefresh = useCallback(
     (key: string, fn: () => Promise<void>) => {
@@ -37,13 +43,16 @@ export function RefreshProvider({
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    await Promise.all([...callbacks.current.values()].map((fn) => fn()));
-    setRefreshing(false);
-  }, []);
+    try {
+      await refreshAll();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refreshAll]);
 
   const value = useMemo(
-    () => ({ refreshing, onRefresh, registerRefresh }),
-    [refreshing, onRefresh, registerRefresh]
+    () => ({ refreshing, onRefresh, refreshAll, registerRefresh }),
+    [refreshing, onRefresh, refreshAll, registerRefresh]
   );
 
   return (

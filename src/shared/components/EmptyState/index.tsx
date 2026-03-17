@@ -1,6 +1,5 @@
-import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { Text, TouchableOpacity, View } from "react-native";
 
 interface EmptyStateProps {
   icon: keyof typeof Ionicons.glyphMap;
@@ -8,8 +7,8 @@ interface EmptyStateProps {
   bgColor: string;
   title: string;
   description: string;
-  buttonText: string;
-  onPress: () => void;
+  buttonText?: string;
+  onPress?: () => void;
   buttonClassName?: string;
   containerClassName?: string;
 }
@@ -43,13 +42,15 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         {description}
       </Text>
 
-      <TouchableOpacity
-        onPress={onPress}
-        className={`flex-row items-center rounded-xl px-6 py-3 ${buttonClassName}`}
-        activeOpacity={0.8}
-      >
-        <Text className="font-semibold text-white">{buttonText}</Text>
-      </TouchableOpacity>
+      {buttonText && onPress && (
+        <TouchableOpacity
+          onPress={onPress}
+          className={`flex-row items-center rounded-xl px-6 py-3 ${buttonClassName}`}
+          activeOpacity={0.8}
+        >
+          <Text className="font-semibold text-white">{buttonText}</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

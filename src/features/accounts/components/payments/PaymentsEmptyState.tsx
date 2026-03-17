@@ -1,10 +1,11 @@
-import React from "react";
+import { RefreshControl, ScrollView } from "react-native";
 
-import { EmptyState } from "@/src/components/EmptyState";
 import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import type { PaymentStatusFilter } from "@/src/features/accounts/types/payments.types";
+import { EmptyState } from "@/src/shared/components/EmptyState";
 
 interface PaymentsEmptyStateProps {
+  readonly isRefreshing: boolean;
   readonly onRefresh: () => void;
   readonly selectedStatus: PaymentStatusFilter;
 }
@@ -39,6 +40,7 @@ function getEmptyStateContent(selectedStatus: PaymentStatusFilter) {
 }
 
 export function PaymentsEmptyState({
+  isRefreshing,
   onRefresh,
   selectedStatus,
 }: PaymentsEmptyStateProps) {
@@ -46,15 +48,21 @@ export function PaymentsEmptyState({
     getEmptyStateContent(selectedStatus);
 
   return (
-    <EmptyState
-      icon="wallet-outline"
-      iconColor={iconColor}
-      bgColor={bgColor}
-      title={title}
-      description={description}
-      buttonText="Atualizar"
-      onPress={onRefresh}
-      containerClassName="px-0"
-    />
+    <ScrollView
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ flexGrow: 1 }}
+      refreshControl={
+        <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
+      }
+    >
+      <EmptyState
+        icon="wallet-outline"
+        iconColor={iconColor}
+        bgColor={bgColor}
+        title={title}
+        description={description}
+        containerClassName="px-0"
+      />
+    </ScrollView>
   );
 }

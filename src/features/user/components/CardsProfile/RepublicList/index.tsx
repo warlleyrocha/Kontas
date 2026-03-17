@@ -1,7 +1,4 @@
-import { useRepublicResidents } from "@/src/shared/hooks/useRepublicResidents";
-import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
-import RepublicCard from "@/src/features/user/components/RepublicCard";
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import {
   RefreshControl,
   ScrollView,
@@ -9,26 +6,38 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
+import RepublicCard from "@/src/features/user/components/RepublicCard";
+
+interface CardPosition {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 
 interface RepublicListProps {
   readonly republics: RepublicResponse[];
-  //readonly onEditRepublic: (id: string) => void;
   readonly onSelectRepublic: (id: string) => void;
   readonly onCreateRepublic: () => void;
+  readonly onLongPressRepublic?: (
+    republic: RepublicResponse,
+    position: CardPosition
+  ) => void;
   readonly refreshing?: boolean;
   readonly onRefresh?: () => void | Promise<void>;
+  readonly getResidentsCount: (republicId: string) => number;
 }
 
 export default function RepublicList({
   republics,
-  //onEditRepublic,
   onSelectRepublic,
   onCreateRepublic,
+  onLongPressRepublic,
   refreshing = false,
   onRefresh,
+  getResidentsCount,
 }: RepublicListProps) {
-  const { getResidentsCount } = useRepublicResidents(republics);
-
   return (
     <ScrollView
       className="flex-1 px-6 pt-6"
@@ -53,8 +62,8 @@ export default function RepublicList({
             key={republic.id}
             republic={republic}
             residentsCount={getResidentsCount(republic.id)}
-            //onEdit={() => onEditRepublic(republic.id)}
             onSelect={() => onSelectRepublic(republic.id)}
+            onLongPress={onLongPressRepublic}
           />
         ))}
       </View>

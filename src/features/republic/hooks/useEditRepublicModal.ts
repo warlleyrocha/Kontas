@@ -1,9 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as ImagePicker from "expo-image-picker";
+import {
+  launchImageLibraryAsync,
+  requestMediaLibraryPermissionsAsync,
+} from "expo-image-picker";
 import { useEffect, useState } from "react";
 import { Alert } from "react-native";
 import { getErrorMessage } from "@/src/services/httpError";
-import { showToast } from "@/src/utils/showToast";
+import { showToast } from "@/src/shared/utils/showToast";
 
 interface UseEditRepublicModalParams {
   visible: boolean;
@@ -55,8 +58,7 @@ export default function useEditRepublicModal({
   const selecionarImagem = async () => {
     try {
       // Solicitar permissão
-      const { status } =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const { status } = await requestMediaLibraryPermissionsAsync();
 
       if (status !== "granted") {
         Alert.alert(
@@ -67,7 +69,7 @@ export default function useEditRepublicModal({
       }
 
       // Abrir seletor de imagens
-      const result = await ImagePicker.launchImageLibraryAsync({
+      const result = await launchImageLibraryAsync({
         mediaTypes: ["images"],
         allowsEditing: true,
         aspect: [1, 1],

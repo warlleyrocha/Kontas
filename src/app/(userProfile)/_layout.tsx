@@ -1,5 +1,5 @@
-import { RouteErrorFallback } from "@/src/components/error-boundary/RouteErrorFallback";
-import { Stack, type ErrorBoundaryProps } from "expo-router";
+import { type ErrorBoundaryProps, Stack } from "expo-router";
+import { RouteErrorFallback } from "@/src/shared/components/error-boundary/RouteErrorFallback";
 
 export default function UserProfileLayout() {
   return <Stack screenOptions={{ headerShown: false }} />;

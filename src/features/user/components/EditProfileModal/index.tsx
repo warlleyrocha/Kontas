@@ -1,5 +1,5 @@
-import { Feather } from "@expo/vector-icons";
-import React from "react";
+import Feather from "@expo/vector-icons/Feather";
+import type { FC } from "react";
 import {
   Image,
   KeyboardAvoidingView,
@@ -10,18 +10,18 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { maskPhoneWrite } from "@/src/shared/utils/inputMasks";
 import {
   EditProfileFormValues,
   useEditProfile,
 } from "../../hooks/useEditProfile";
-import { maskPhoneWrite } from "@/src/utils/inputMasks";
 
 export interface EditProfileModalProps extends EditProfileFormValues {
   visible: boolean;
   currentPhone?: string;
 }
 
-export const EditProfileModal: React.FC<EditProfileModalProps> = ({
+export const EditProfileModal: FC<EditProfileModalProps> = ({
   visible,
   onClose,
   currentName,
