@@ -13,7 +13,6 @@ import IconGoogle from "@/assets/images/google-icon.svg";
 import ImageLogin from "@/assets/images/image-login.webp";
 import { useAuth } from "@/src/features/auth/contexts/AuthContext";
 import { getErrorMessage } from "@/src/services/httpError";
-import { legalLinks, openLegalLink } from "@/src/shared/constants/legal";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 import { showToast } from "@/src/shared/utils/showToast";
 
@@ -119,18 +118,14 @@ export default function LoginScreen() {
           Ao continuar, você concorda com nossos{" "}
           <Text
             className="font-semibold text-teal"
-            onPress={() =>
-              openLegalLink(legalLinks.termsOfUse, "Termos de Uso")
-            }
+            onPress={() => router.push("/terms-of-use")}
           >
             Termos de Uso
           </Text>{" "}
           e{" "}
           <Text
             className="font-semibold text-teal"
-            onPress={() =>
-              openLegalLink(legalLinks.privacyPolicy, "Política de Privacidade")
-            }
+            onPress={() => router.push("/privacy-policy")}
           >
             Política de Privacidade
           </Text>

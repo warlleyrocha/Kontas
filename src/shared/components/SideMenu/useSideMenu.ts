@@ -1,7 +1,6 @@
 import { useRouter } from "expo-router";
 import { useCallback, useMemo } from "react";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
-import { legalLinks, openLegalLink } from "@/src/shared/constants/legal";
 import { ResidentRole } from "@/src/shared/types/resident.types";
 import { MenuItem, UserMenuContext } from "@/src/shared/types/sideMenu";
 
@@ -155,18 +154,13 @@ export function useSideMenu(
         id: "termsOfUse",
         label: "Termos de Uso",
         icon: "document-text-outline" as const,
-        onPress: () =>
-          void openLegalLink(legalLinks.termsOfUse, "Termos de Uso"),
+        onPress: () => router.push("/terms-of-use"),
       },
       {
         id: "privacyPolicy",
         label: "Política de Privacidade",
         icon: "shield-checkmark-outline" as const,
-        onPress: () =>
-          void openLegalLink(
-            legalLinks.privacyPolicy,
-            "Política de Privacidade"
-          ),
+        onPress: () => router.push("/privacy-policy"),
       },
       {
         id: "logout",
@@ -176,7 +170,7 @@ export function useSideMenu(
         danger: true,
       },
     ],
-    [handleSignOut]
+    [handleSignOut, router]
   );
 
   return { menuItems, footerItems };
