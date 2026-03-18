@@ -82,7 +82,7 @@ export const ResidentCard: FC<ResidentCardProps> = ({ morador, onCopyPix }) => {
                 Email
               </Text>
               <Text className="mt-1 text-sm text-[#111827]" numberOfLines={1}>
-                {morador.email || "Não informado"}
+                {morador.email ?? "Não informado"}
               </Text>
             </View>
 
@@ -91,7 +91,7 @@ export const ResidentCard: FC<ResidentCardProps> = ({ morador, onCopyPix }) => {
                 Telefone
               </Text>
               <Text className="mt-1 text-sm text-[#111827]" numberOfLines={1}>
-                {morador.telefone || "Não informado"}
+                {morador.telefone ?? "Não informado"}
               </Text>
             </View>
           </View>
@@ -102,7 +102,7 @@ export const ResidentCard: FC<ResidentCardProps> = ({ morador, onCopyPix }) => {
 
           <View className=" flex-row items-center gap-3">
             <Text className="flex-1 text-sm text-[#111827]" numberOfLines={2}>
-              {morador.chavePix || "Não informado"}
+              {morador.chavePix ?? "Não informado"}
             </Text>
 
             {morador.chavePix ? (
