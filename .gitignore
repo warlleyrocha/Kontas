@@ -50,3 +50,6 @@ yarn-error.*
 /android
 
 .env.local
+coverage/
+
+.sonarlint
