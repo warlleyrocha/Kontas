@@ -66,6 +66,8 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
             {/* Foto do Perfil */}
             <TouchableOpacity
               onPress={selectPhoto}
+              accessibilityRole="button"
+              accessibilityLabel="Alterar foto de perfil"
               className="mb-6 items-center"
             >
               <View className="h-28 w-28 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-teal/40 bg-teal/10">
@@ -130,6 +132,8 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
             <View className="flex-row gap-3">
               <TouchableOpacity
                 onPress={handleSave}
+                accessibilityRole="button"
+                accessibilityLabel="Salvar perfil"
                 className="flex-1 items-center rounded-lg bg-teal py-3"
               >
                 <Text className="font-semibold text-white">Salvar</Text>
@@ -137,6 +141,8 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
 
               <TouchableOpacity
                 onPress={handleClose}
+                accessibilityRole="button"
+                accessibilityLabel="Cancelar edição de perfil"
                 className="flex-1 items-center rounded-lg border border-gray-300 bg-white py-3"
               >
                 <Text className="font-semibold text-gray-700">Cancelar</Text>

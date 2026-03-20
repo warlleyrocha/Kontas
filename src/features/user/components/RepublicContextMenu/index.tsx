@@ -1,10 +1,7 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import {
-  CardPosition,
-  ContextMenu,
-} from "@/src/shared/components/ContextMenu";
+import { CardPosition, ContextMenu } from "@/src/shared/components/ContextMenu";
 
 const MENU_ITEM_HEIGHT = 52;
 
@@ -44,6 +41,8 @@ export function RepublicContextMenu({
           <TouchableOpacity
             onPress={() => handleClose(onEdit)}
             activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="Editar república"
             className="h-[52px] justify-center"
           >
             <View className="flex-row items-center justify-between px-4">
@@ -65,6 +64,8 @@ export function RepublicContextMenu({
               <TouchableOpacity
                 onPress={() => handleClose(onInvite)}
                 activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel="Convidar novo morador"
                 className="h-[52px] justify-center"
               >
                 <View className="flex-row items-center justify-between px-4">
@@ -83,6 +84,8 @@ export function RepublicContextMenu({
               <TouchableOpacity
                 onPress={() => handleClose(onDelete)}
                 activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel="Deletar república"
                 className="h-[52px] justify-center"
               >
                 <View className="flex-row items-center justify-between px-4">

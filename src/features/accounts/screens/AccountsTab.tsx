@@ -146,6 +146,8 @@ export function AccountsTab({
         <TouchableOpacity
           className="mt-6 items-center rounded-lg bg-white p-6 shadow-lg"
           onPress={openAccountModal}
+          accessibilityRole="button"
+          accessibilityLabel="Adicionar nova conta"
         >
           <Feather name="dollar-sign" size={48} color="#337176" />
           <Text className="mt-4 text-center text-gray-500">
@@ -185,6 +187,9 @@ export function AccountsTab({
           >
             <TouchableOpacity
               onPress={() => setMesSelecionado("todos")}
+              accessibilityRole="button"
+              accessibilityLabel="Mostrar contas de todos os meses"
+              accessibilityState={{ selected: mesSelecionado === "todos" }}
               className={`rounded-full px-4 py-2 ${
                 mesSelecionado === "todos"
                   ? "bg-teal"
@@ -204,6 +209,9 @@ export function AccountsTab({
               <TouchableOpacity
                 key={mesAno}
                 onPress={() => setMesSelecionado(mesAno)}
+                accessibilityRole="button"
+                accessibilityLabel={`Mostrar contas de ${formatMounthYear(mesAno)}`}
+                accessibilityState={{ selected: mesSelecionado === mesAno }}
                 className={`rounded-full px-4 py-2 ${
                   mesSelecionado === mesAno
                     ? "bg-teal"

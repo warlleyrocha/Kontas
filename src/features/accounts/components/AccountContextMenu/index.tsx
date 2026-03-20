@@ -1,10 +1,7 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import {
-  CardPosition,
-  ContextMenu,
-} from "@/src/shared/components/ContextMenu";
+import { CardPosition, ContextMenu } from "@/src/shared/components/ContextMenu";
 
 export type { CardPosition };
 
@@ -42,6 +39,8 @@ export function AccountContextMenu({
           <TouchableOpacity
             onPress={() => handleClose(onEdit)}
             activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel="Editar conta"
             className="h-[52px] justify-center"
           >
             <View className="flex-row items-center justify-between px-4">
@@ -63,6 +62,8 @@ export function AccountContextMenu({
               <TouchableOpacity
                 onPress={() => handleClose(onDelete)}
                 activeOpacity={0.7}
+                accessibilityRole="button"
+                accessibilityLabel="Deletar conta"
                 className="h-[52px] justify-center"
               >
                 <View className="flex-row items-center justify-between px-4">

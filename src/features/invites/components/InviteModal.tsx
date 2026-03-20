@@ -58,7 +58,11 @@ export const InviteModal: React.FC<InviteModalProps> = ({
             {/* Header */}
             <View className="mb-6 flex-row items-center justify-between">
               <Text className="text-xl font-semibold">Enviar convite</Text>
-              <TouchableOpacity onPress={onClose}>
+              <TouchableOpacity
+                onPress={onClose}
+                accessibilityRole="button"
+                accessibilityLabel="Fechar modal de convite"
+              >
                 <Feather name="x" size={24} color="#337176" />
               </TouchableOpacity>
             </View>
@@ -86,6 +90,8 @@ export const InviteModal: React.FC<InviteModalProps> = ({
               <TouchableOpacity
                 onPress={handleSubmit}
                 disabled={loading}
+                accessibilityRole="button"
+                accessibilityLabel="Enviar convite"
                 className="flex-1 items-center rounded-lg bg-teal py-3"
               >
                 {loading ? (
@@ -99,6 +105,8 @@ export const InviteModal: React.FC<InviteModalProps> = ({
 
               <TouchableOpacity
                 onPress={onClose}
+                accessibilityRole="button"
+                accessibilityLabel="Cancelar envio de convite"
                 className="flex-1 items-center rounded-lg border border-gray-300 bg-white py-3"
               >
                 <Text className="font-semibold text-gray-700">Cancelar</Text>

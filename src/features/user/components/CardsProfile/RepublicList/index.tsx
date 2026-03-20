@@ -70,6 +70,8 @@ export default function RepublicList({
 
       <TouchableOpacity
         onPress={onCreateRepublic}
+        accessibilityRole="button"
+        accessibilityLabel="Adicionar nova república"
         className="mb-6 mt-2 flex-row items-center justify-center rounded-xl border-2 border-dashed border-teal/40 bg-teal/5 px-6 py-4"
         activeOpacity={0.8}
       >

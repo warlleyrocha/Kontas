@@ -320,6 +320,9 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
                 <TouchableOpacity
                   key={option.value}
                   onPress={() => setSelectedStatus(option.value)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Filtrar pagamentos por ${option.label}`}
+                  accessibilityState={{ selected }}
                   className={`rounded-full px-4 py-2 ${
                     selected ? "bg-teal" : "border border-teal/20 bg-white"
                   }`}

@@ -11,10 +11,18 @@ export const DeleteButton: React.FC<DeleteButtonProps> = ({
   onPress,
   size = 20,
   color = "#dc2626",
+  accessibilityLabel = "Excluir item",
+  accessibilityRole: _accessibilityRole,
   ...props
 }) => {
   return (
-    <TouchableOpacity onPress={onPress} className="rounded-md p-2" {...props}>
+    <TouchableOpacity
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      className="rounded-md p-2"
+      {...props}
+    >
       <Feather name="trash-2" size={size} color={color} />
     </TouchableOpacity>
   );

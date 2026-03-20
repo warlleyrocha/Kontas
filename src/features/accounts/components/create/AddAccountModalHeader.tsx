@@ -15,7 +15,12 @@ export function AddAccountModalHeader({ onClose }: AddAccountModalHeaderProps) {
         </Text>
       </View>
 
-      <TouchableOpacity onPress={onClose} className="p-2">
+      <TouchableOpacity
+        onPress={onClose}
+        accessibilityRole="button"
+        accessibilityLabel="Fechar modal de nova conta"
+        className="p-2"
+      >
         <Feather name="x" size={24} color="#337176" />
       </TouchableOpacity>
     </View>

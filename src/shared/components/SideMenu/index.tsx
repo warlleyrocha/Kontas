@@ -61,6 +61,8 @@ function MenuSubItemComponent({ item, onClose }: MenuSubItemComponentProps) {
         item.active ? "bg-teal/10" : ""
       }`}
       onPress={handlePress}
+      accessibilityRole="button"
+      accessibilityLabel={item.label}
     >
       <View className="h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-teal/15">
         {item.image && !imageError ? (
@@ -110,12 +112,18 @@ function MenuItemComponent({
 
   const iconColor = item.danger ? "#ef4444" : "#337176";
   const textClassName = `text-base ${item.danger ? "text-red-500" : "text-gray-700"}`;
+  const accessibilityLabel = isExpandable
+    ? `${isExpanded ? "Recolher" : "Expandir"} ${item.label}`
+    : item.label;
 
   return (
     <View>
       <TouchableOpacity
         className="flex-row items-center px-4 py-3"
         onPress={handlePress}
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel}
+        accessibilityState={isExpandable ? { expanded: isExpanded } : undefined}
       >
         <Ionicons
           name={item.icon}
@@ -193,7 +201,11 @@ export function SideMenu({
   return (
     <Modal transparent animationType="none" onRequestClose={closeMenu}>
       <View className="flex-1 flex-row">
-        <TouchableWithoutFeedback onPress={closeMenu}>
+        <TouchableWithoutFeedback
+          onPress={closeMenu}
+          accessibilityRole="button"
+          accessibilityLabel="Fechar menu lateral"
+        >
           <Animated.View
             className="flex-1 bg-black/50"
             style={backdropAnimatedStyle}
@@ -310,7 +322,15 @@ interface MenuButtonProps {
 
 export function MenuButton({ onPress, hasNotification }: MenuButtonProps) {
   return (
-    <TouchableOpacity onPress={onPress} className="p-2" activeOpacity={0.7}>
+    <TouchableOpacity
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={
+        hasNotification ? "Abrir menu com notificações" : "Abrir menu"
+      }
+      className="p-2"
+      activeOpacity={0.7}
+    >
       <Ionicons name="menu" size={28} color="#337176" />
       {hasNotification && (
         <View className="absolute right-1 top-1 h-3 w-3 rounded-full bg-yellow-400" />

@@ -120,9 +120,13 @@ export function ContextMenu({
       onRequestClose={handleOverlayPress}
       onShow={handleOpen}
     >
-      <TouchableWithoutFeedback onPress={handleOverlayPress}>
+      <TouchableWithoutFeedback
+        onPress={handleOverlayPress}
+        accessibilityRole="button"
+        accessibilityLabel="Fechar menu de contexto"
+      >
         <View className="flex-1 bg-black/35">
-          <TouchableWithoutFeedback>
+          <TouchableWithoutFeedback accessible={false}>
             <Animated.View
               className="absolute overflow-hidden rounded-[14px] bg-white"
               style={[

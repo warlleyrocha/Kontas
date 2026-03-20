@@ -26,6 +26,8 @@ export default function IncompleteProfile({
 
           <TouchableOpacity
             onPress={onContinue}
+            accessibilityRole="button"
+            accessibilityLabel="Continuar configuração do perfil"
             className="w-full overflow-hidden rounded-2xl bg-teal px-6 py-4 shadow-lg hover:shadow-teal/30 active:scale-95"
             activeOpacity={0.9}
           >
