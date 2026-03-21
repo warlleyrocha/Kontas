@@ -132,7 +132,7 @@ export function useAccountActions({
     [onRefresh]
   );
 
-  const handleDelete = useCallback(
+  /*const handleDelete = useCallback(
     async (accountId: string) => {
       if (pendingDeleteTimeoutsRef.current.has(accountId)) {
         return;
@@ -177,6 +177,24 @@ export function useAccountActions({
       pendingDeleteToastIdsRef.current.set(accountId, toastId);
     },
     [handleRecovery, onRefresh]
+  );*/
+
+  const handleDelete = useCallback(
+    async (accountId: string) => {
+      setIsDeleting(true);
+      try{
+        await accountService.removerConta({ id: accountId});
+        showToast.success("Conta removida com sucesso.");
+        await onRefresh?.();
+      }catch(error) {
+        showToast.error(
+          getErrorMessage(error, "Não foi possível remover a conta.")
+        );
+      }finally{
+        setIsDeleting(false);
+      }
+    },
+    [onRefresh]
   );
 
   const handlePatch = useCallback(
