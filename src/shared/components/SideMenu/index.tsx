@@ -52,7 +52,7 @@ function MenuSubItemComponent({ item, onClose }: MenuSubItemComponentProps) {
 
   const itemInitial = useMemo(
     () => item.label.charAt(0).toUpperCase(),
-    [item.label]
+    [item.label],
   );
 
   return (
@@ -97,6 +97,7 @@ function MenuItemComponent({
   onToggleExpand,
 }: MenuItemComponentProps) {
   const isExpandable = !!item.children;
+  const expandActionLabel = isExpanded ? "Recolher" : "Expandir";
 
   const handlePress = useCallback(() => {
     if (isExpandable) {
@@ -113,7 +114,7 @@ function MenuItemComponent({
   const iconColor = item.danger ? "#ef4444" : "#337176";
   const textClassName = `text-base ${item.danger ? "text-red-500" : "text-gray-700"}`;
   const accessibilityLabel = isExpandable
-    ? `${isExpanded ? "Recolher" : "Expandir"} ${item.label}`
+    ? `${expandActionLabel} ${item.label}`
     : item.label;
 
   return (
@@ -188,7 +189,7 @@ export function SideMenu({
 
   const userInitial = useMemo(
     () => user.name.charAt(0).toUpperCase(),
-    [user.name]
+    [user.name],
   );
 
   const [photoError, setPhotoError] = useState(false);
