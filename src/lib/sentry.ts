@@ -6,7 +6,7 @@ import {
 
 export function initSentry() {
   init({
-    dsn: "...",
+    dsn: "https://da32d972451786e6c1a0aea2f4024516@o4510817801928704.ingest.us.sentry.io/4510818996322304",
     sendDefaultPii: true,
     enableLogs: true,
     replaysSessionSampleRate: 0.1,
