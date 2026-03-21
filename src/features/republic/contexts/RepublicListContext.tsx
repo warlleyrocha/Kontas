@@ -27,9 +27,7 @@ const RepublicListContext = createContext<RepublicListContextData>(
 
 export function RepublicListProvider({
   children,
-}: {
-  readonly children: React.ReactNode;
-}) {
+}: Readonly<{ children: React.ReactNode }>) {
   const { isAuthenticated } = useAuth();
   const [republics, setRepublics] = useState<RepublicResponse[]>([]);
 
