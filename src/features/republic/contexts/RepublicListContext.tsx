@@ -27,9 +27,7 @@ const RepublicListContext = createContext<RepublicListContextData>(
 
 export function RepublicListProvider({
   children,
-}: {
-  readonly children: React.ReactNode;
-}) {
+}: Readonly<{ children: React.ReactNode }>) {
   const { isAuthenticated } = useAuth();
   const [republics, setRepublics] = useState<RepublicResponse[]>([]);
 
@@ -44,7 +42,11 @@ export function RepublicListProvider({
       const data = await republicService.getRepublics();
       setRepublics(data);
     } catch (error) {
-      logger.error("Republic", "Erro ao buscar repúblicas", error instanceof Error ? error : undefined);
+      logger.error(
+        "Republic",
+        "Erro ao buscar repúblicas",
+        error instanceof Error ? error : undefined
+      );
       showToast.error(
         getErrorMessage(error, "Não foi possível carregar as repúblicas.")
       );
@@ -58,7 +60,11 @@ export function RepublicListProvider({
     try {
       return await republicService.getRepublicById(id);
     } catch (error) {
-      logger.error("Republic", "Erro ao buscar república por ID", error instanceof Error ? error : undefined);
+      logger.error(
+        "Republic",
+        "Erro ao buscar república por ID",
+        error instanceof Error ? error : undefined
+      );
       showToast.error(
         getErrorMessage(error, "Não foi possível carregar a república.")
       );

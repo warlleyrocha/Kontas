@@ -36,7 +36,7 @@ interface ProfileContentProps {
   readonly onSelectRepublic: (republicId: string) => void;
   readonly onLongPressRepublic: (
     republic: RepublicResponse,
-    position: CardPosition,
+    position: CardPosition
   ) => void;
   readonly onRefresh: () => void;
 }
@@ -148,6 +148,8 @@ export function ProfileScreen() {
         <TouchableOpacity
           className="flex-1"
           onPress={() => setShowEditProfileModal(true)}
+          accessibilityRole="button"
+          accessibilityLabel={`Configurar perfil de ${user.nome ?? "usuário"}`}
         >
           <Text className="text-base font-semibold">
             {user.nome ?? "Sem nome"}

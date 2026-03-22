@@ -45,6 +45,8 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       {buttonText && onPress && (
         <TouchableOpacity
           onPress={onPress}
+          accessibilityRole="button"
+          accessibilityLabel={buttonText}
           className={`flex-row items-center rounded-xl px-6 py-3 ${buttonClassName}`}
           activeOpacity={0.8}
         >

@@ -74,6 +74,8 @@ export function AddAccountModalFormSection({
           <TouchableOpacity
             className="flex-row items-center justify-between rounded border border-gray-200 bg-gray-50 px-3 py-2"
             onPress={onOpenDatepicker}
+            accessibilityRole="button"
+            accessibilityLabel={`Selecionar vencimento ${vencimento.toLocaleDateString("pt-BR")}`}
           >
             <Text>{vencimento.toLocaleDateString("pt-BR")}</Text>
             <Feather name="calendar" size={18} color="#6b7280" />
@@ -84,7 +86,11 @@ export function AddAccountModalFormSection({
               <View className="flex-1 justify-end bg-black/40">
                 <View className="bg-white pb-8 pt-4">
                   <View className="mb-2 flex-row justify-end px-4">
-                    <TouchableOpacity onPress={onConfirmDate}>
+                    <TouchableOpacity
+                      onPress={onConfirmDate}
+                      accessibilityRole="button"
+                      accessibilityLabel="Confirmar vencimento"
+                    >
                       <Text className="text-base font-semibold text-indigo-600">
                         Confirmar
                       </Text>
@@ -121,6 +127,8 @@ export function AddAccountModalFormSection({
         <TouchableOpacity
           className="flex-row items-center justify-between rounded border border-gray-200 bg-gray-50 px-3 py-2"
           onPress={onCycleMetodoPagamento}
+          accessibilityRole="button"
+          accessibilityLabel={`Selecionar método de pagamento ${paymentMethodLabels[metodoPagamento]}`}
         >
           <Text>{paymentMethodLabels[metodoPagamento]}</Text>
         </TouchableOpacity>

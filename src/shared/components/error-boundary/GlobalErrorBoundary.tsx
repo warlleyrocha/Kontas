@@ -72,6 +72,8 @@ export class GlobalErrorBoundary extends React.Component<
         )}
         <TouchableOpacity
           onPress={this.handleRetry}
+          accessibilityRole="button"
+          accessibilityLabel="Tentar novamente"
           className="mt-8 rounded-xl bg-indigo-600 px-5 py-3"
         >
           <Text className="font-inter-semibold text-white">

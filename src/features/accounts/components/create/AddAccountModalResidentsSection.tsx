@@ -29,6 +29,8 @@ function DivisionOption({
   return (
     <TouchableOpacity
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`${selected ? "Opção selecionada" : "Selecionar opção"} ${label}`}
       className={`flex-row items-center ${className ?? ""}`}
     >
       <View
@@ -84,6 +86,8 @@ export function AddAccountModalResidentsSection({
               <View className="flex-row items-center">
                 <TouchableOpacity
                   onPress={() => onToggleMorador(morador.moradorId)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${morador.checked ? "Desmarcar" : "Selecionar"} morador ${morador.nome}`}
                   className={`mr-3 h-6 w-6 items-center justify-center rounded-sm border ${
                     morador.checked
                       ? "border-teal bg-teal"

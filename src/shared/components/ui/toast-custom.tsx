@@ -132,6 +132,8 @@ export function ToastConfirm({
         <TouchableOpacity
           onPress={onCancel}
           activeOpacity={0.6}
+          accessibilityRole="button"
+          accessibilityLabel="Cancelar exclusão"
           className="flex-1 items-center py-3.5"
         >
           <Text className="font-mulish-medium text-sm text-gray-400">
@@ -145,6 +147,8 @@ export function ToastConfirm({
         <TouchableOpacity
           onPress={onConfirm}
           activeOpacity={0.7}
+          accessibilityRole="button"
+          accessibilityLabel="Confirmar exclusão"
           className="flex-1 items-center py-3.5"
         >
           <Text className="font-mulish-semibold text-sm text-red-500">

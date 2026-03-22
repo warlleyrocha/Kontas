@@ -66,6 +66,8 @@ export default function InviteCardMe({
           <View className="mt-4 flex-row gap-3">
             <TouchableOpacity
               onPress={onReject}
+              accessibilityRole="button"
+              accessibilityLabel={`Recusar convite de ${invite.republicaId}`}
               className="flex-1 flex-row items-center justify-center rounded-xl border border-gray-200 bg-gray-50 py-3"
               activeOpacity={0.8}
             >
@@ -75,6 +77,8 @@ export default function InviteCardMe({
 
             <TouchableOpacity
               onPress={onAccept}
+              accessibilityRole="button"
+              accessibilityLabel={`Aceitar convite de ${invite.republicaId}`}
               className="flex-1 flex-row items-center justify-center rounded-xl bg-teal py-3"
               activeOpacity={0.8}
             >

@@ -32,6 +32,8 @@ export default function EmptyRepublic({
           {/* Botão principal */}
           <TouchableOpacity
             onPress={onCreateRepublic}
+            accessibilityRole="button"
+            accessibilityLabel="Criar república"
             className="mb-3 w-full overflow-hidden rounded-2xl bg-teal px-6 py-4 shadow-lg shadow-teal/30"
             activeOpacity={0.9}
           >
@@ -41,7 +43,12 @@ export default function EmptyRepublic({
           </TouchableOpacity>
 
           {/* Link secundário */}
-          <TouchableOpacity onPress={onViewInvites} activeOpacity={0.7}>
+          <TouchableOpacity
+            onPress={onViewInvites}
+            accessibilityRole="button"
+            accessibilityLabel="Ver meus convites"
+            activeOpacity={0.7}
+          >
             <Text className="text-center text-sm font-medium text-teal">
               Ver meus convites
             </Text>

@@ -54,7 +54,12 @@ export function AccountRecoveryToast({
         </View>
 
         {/* Direita: botão como ícone estático */}
-        <TouchableOpacity onPress={onRecover} activeOpacity={0.6}>
+        <TouchableOpacity
+          onPress={onRecover}
+          activeOpacity={0.6}
+          accessibilityRole="button"
+          accessibilityLabel="Recuperar conta"
+        >
           <Ionicons name="sync" size={20} color="#16a34a" />
         </TouchableOpacity>
       </View>

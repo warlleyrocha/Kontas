@@ -47,8 +47,6 @@ export function InviteListContentBase({
   }
 
   return (
-    <ScrollView className="flex-1 bg-teal/5 px-4 pt-4">
-      {children}
-    </ScrollView>
+    <ScrollView className="flex-1 bg-teal/5 px-4 pt-4">{children}</ScrollView>
   );
 }

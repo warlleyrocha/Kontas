@@ -2,9 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 import { useAccountActions } from "@/src/features/accounts/hooks/useAccountActions";
 import { useAccountData } from "@/src/features/accounts/hooks/useAccountList/useAccountData";
 import {
-  StatusConta,
   type Conta,
   type ListarContasResponse,
+  StatusConta,
 } from "@/src/features/accounts/types/account.types";
 import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";

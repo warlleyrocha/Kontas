@@ -91,6 +91,8 @@ export default function RepublicCard({
         onLongPress={handleLongPress}
         delayLongPress={400}
         activeOpacity={1}
+        accessibilityRole="button"
+        accessibilityLabel={`Abrir república ${republic.nome}`}
         className="mb-4 w-44 overflow-hidden rounded-3xl bg-white shadow-sm"
       >
         {/* Imagem */}

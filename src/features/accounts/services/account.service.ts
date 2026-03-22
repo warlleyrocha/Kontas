@@ -33,16 +33,16 @@ export const accountService = {
 
   // Método para listar contas de uma república
   listarContasPorRepublica: async (
-    republicaId: string,
+    republicaId: string
   ): Promise<ListarContasRepublic> => {
     try {
       const response = await api.get<ListarContasRepublic>(
-        `/contas/republica/${republicaId}`,
+        `/contas/republica/${republicaId}`
       );
       logger.table(
         "Accounts",
         `Contas da república ${republicaId}`,
-        response.data as object,
+        response.data as object
       );
       return response.data;
     } catch (error) {

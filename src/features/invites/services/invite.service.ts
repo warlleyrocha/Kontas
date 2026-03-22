@@ -68,7 +68,11 @@ export const inviteService = {
       if (isAxiosError(error) && error.code === "ERR_CANCELED") {
         throw error;
       }
-      logger.error("Invites", "Erro ao buscar convites do usuário", error instanceof Error ? error : undefined);
+      logger.error(
+        "Invites",
+        "Erro ao buscar convites do usuário",
+        error instanceof Error ? error : undefined
+      );
       throw toUserFriendlyError(error, {
         defaultMessage: "Erro ao obter convites.",
         statusMessages: {

@@ -22,7 +22,12 @@ export function ScreenLayout({
   return (
     <SafeAreaView className="flex-1 bg-[#FAFAFA]">
       <View className="flex-row items-center gap-3 border-b border-b-black/10 bg-[#FAFAFA] px-[16px] py-4">
-        <TouchableOpacity onPress={onBack ?? (() => router.back())} className="p-1">
+        <TouchableOpacity
+          onPress={onBack ?? (() => router.back())}
+          accessibilityRole="button"
+          accessibilityLabel="Voltar para a tela anterior"
+          className="p-1"
+        >
           <Ionicons name="arrow-back" size={24} color="#337176" />
         </TouchableOpacity>
 

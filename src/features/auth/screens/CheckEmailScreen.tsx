@@ -1,9 +1,9 @@
 import Feather from "@expo/vector-icons/Feather";
 import React, { useEffect, useRef } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 import { logger } from "@/src/shared/utils/logger";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CheckEmail() {
   useComponentLogger("CheckEmailScreen");
@@ -62,7 +62,9 @@ export default function CheckEmail() {
   const handleContinue = () => {
     const fullCode = code.map((s) => s.value).join("");
     if (fullCode.length === 6) {
-      logger.info("Auth", "Código de verificação submetido", { code: fullCode });
+      logger.info("Auth", "Código de verificação submetido", {
+        code: fullCode,
+      });
     } else {
       alert("Por favor, digite o código completo");
     }
