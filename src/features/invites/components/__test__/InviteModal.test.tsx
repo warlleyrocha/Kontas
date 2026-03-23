@@ -1,4 +1,4 @@
-import { ActivityIndicator } from "react-native";
+import { ActivityIndicator, KeyboardAvoidingView, Platform } from "react-native";
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { InviteModal } from "../InviteModal";
 
@@ -75,6 +75,25 @@ describe("InviteModal — renderização", () => {
   it("não exibe ActivityIndicator quando loading=false", () => {
     render(<InviteModal {...defaultProps} loading={false} />);
     expect(screen.UNSAFE_queryByType(ActivityIndicator)).toBeNull();
+  });
+
+  it("usa behavior='height' no KeyboardAvoidingView quando Platform.OS é android", () => {
+    const originalOS = Platform.OS;
+    Object.defineProperty(Platform, "OS", {
+      value: "android",
+      configurable: true,
+    });
+
+    render(<InviteModal {...defaultProps} />);
+
+    expect(screen.UNSAFE_getByType(KeyboardAvoidingView).props.behavior).toBe(
+      "height"
+    );
+
+    Object.defineProperty(Platform, "OS", {
+      value: originalOS,
+      configurable: true,
+    });
   });
 });
 

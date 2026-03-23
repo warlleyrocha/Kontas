@@ -220,6 +220,15 @@ describe("useSendInviteMutation", () => {
     const updater = mockSetQueryData.mock.calls[0][1] as (prev: Invite[] | undefined) => Invite[];
     expect(updater([mockInvite])).toEqual([updated]);
   });
+
+  it("updater: mantém convites com id diferente ao substituir um convite existente", () => {
+    renderHook(() => useSendInviteMutation());
+    const otherInvite: Invite = { ...mockInvite, id: "inv-other" };
+    const updated: Invite = { ...mockInvite, status: StatusInvite.ACEITO };
+    capturedOptions.onSuccess(updated, { email: "a@b.com", republicaId: "rep-1" });
+    const updater = mockSetQueryData.mock.calls[0][1] as (prev: Invite[] | undefined) => Invite[];
+    expect(updater([otherInvite, mockInvite])).toEqual([otherInvite, updated]);
+  });
 });
 
 // ─── useUpdateInviteStatusMutation ───────────────────────────────────────────
@@ -307,14 +316,19 @@ const mockMutateAsyncSend = jest.fn();
 const mockMutateAsyncUpdate = jest.fn();
 
 function setupContextMocks({
-  data = [] as GetInvitesByUser[],
+  data,
   queryError = null as unknown,
   updateError = null as unknown,
   sendError = null as unknown,
   sendPending = false,
 } = {}) {
+  const resolvedData =
+    Object.prototype.hasOwnProperty.call(arguments[0] ?? {}, "data")
+      ? data
+      : ([] as GetInvitesByUser[]);
+
   jest.mocked(useQuery).mockReturnValue({
-    data,
+    data: resolvedData,
     error: queryError,
     refetch: mockRefetch,
   } as any);
@@ -342,6 +356,12 @@ describe("useInvitesContext — estado inicial", () => {
   beforeEach(() => setupContextMocks());
 
   it("retorna invitesByUser vazio por padrão", () => {
+    const { result } = renderHook(() => useInvitesContext());
+    expect(result.current.invitesByUser).toEqual([]);
+  });
+
+  it("retorna invitesByUser vazio quando a query retorna data undefined", () => {
+    setupContextMocks({ data: undefined });
     const { result } = renderHook(() => useInvitesContext());
     expect(result.current.invitesByUser).toEqual([]);
   });
