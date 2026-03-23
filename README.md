@@ -297,7 +297,7 @@ npm run ios
 | `npm run format`        | Formata o código com Biome                          |
 | `npm test`              | Roda o Jest em modo watch                           |
 | `npm run test:coverage` | Gera cobertura de testes                            |
-| `npm run sonar`         | Executa cobertura + scanner SonarQube               |
+| `npm run sonar:scan`    | Executa cobertura + scanner SonarQube               |
 | `npm run reset-project` | Reseta o template Expo base (script destrutivo)     |
 
 ---
@@ -368,7 +368,7 @@ Repositório da API: `https://github.com/Ameglebm/kontas-back-end`
 docker compose up --build
 
 # Roda o scanner
-npm run sonar
+npm run sonar:scan
 ```
 
 ---
