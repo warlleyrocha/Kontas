@@ -11,7 +11,7 @@ import { showToast } from "@/src/shared/utils/showToast";
 import { toastErrors } from "@/src/shared/utils/toastMessages";
 import { useRepublicActions } from "../useRepublicActions";
 import { useRepublicList } from "../useRepublicList";
-import { useRepublicScreen } from "../useRepublicScreen";
+import { mergeSavedRepublic, useRepublicScreen } from "../useRepublicScreen";
 
 jest.mock("expo-router", () => ({ useRouter: jest.fn() }));
 jest.mock("@/src/features/auth/contexts", () => ({ useAuth: jest.fn() }));
@@ -307,6 +307,18 @@ describe("useRepublicScreen — handleOpenMenu", () => {
 // ─── handleSaveRepublic ───────────────────────────────────────────────────────
 
 describe("useRepublicScreen — handleSaveRepublic", () => {
+  it("mergeSavedRepublic retorna null quando o estado anterior é null", () => {
+    expect(mergeSavedRepublic(null, "Novo Nome", "img.jpg")).toBeNull();
+  });
+
+  it("mergeSavedRepublic atualiza nome e imagem quando há república anterior", () => {
+    expect(mergeSavedRepublic(mockRepublic, "Novo Nome", "img.jpg")).toEqual({
+      ...mockRepublic,
+      nome: "Novo Nome",
+      imagemRepublica: "img.jpg",
+    });
+  });
+
   it("retorna imediatamente quando republic é null", async () => {
     mockFetchRepublicById.mockResolvedValue(null);
     const { result } = renderHook(() => useRepublicScreen("rep-1"));
@@ -381,6 +393,20 @@ describe("useRepublicScreen — currentResident e roleLabel", () => {
 
     expect(result.current.userMenu.roleLabel).toBeNull();
   });
+
+  it("retorna currentResident nulo quando user.email é null", async () => {
+    setupMocks({ email: null });
+    jest.mocked(useResidents).mockReturnValue({
+      residents: [mockResident],
+      fetchResidents: mockFetchResidents,
+    } as any);
+
+    const { result } = renderHook(() => useRepublicScreen("rep-1"));
+    await act(async () => {});
+
+    expect(result.current.currentUserRole).toBeNull();
+    expect(result.current.currentResidentId).toBeNull();
+  });
 });
 
 // ─── userMenu ─────────────────────────────────────────────────────────────────
@@ -394,5 +420,13 @@ describe("useRepublicScreen — userMenu", () => {
       name: "Ana",
       email: "ana@email.com",
     });
+  });
+
+  it("usa 'Usuário' como fallback quando user.nome é null", async () => {
+    setupMocks({ nome: null });
+    const { result } = renderHook(() => useRepublicScreen("rep-1"));
+    await act(async () => {});
+
+    expect(result.current.userMenu.name).toBe("Usuário");
   });
 });

@@ -64,10 +64,10 @@ beforeEach(() => {
 // ─── useRepublicListContext ───────────────────────────────────────────────────
 
 describe("useRepublicListContext", () => {
-  it("retorna o default context quando usado fora do RepublicListProvider", () => {
-    // createContext default é {} (truthy), então não lança — mas as propriedades não estão definidas
-    const { result } = renderHook(() => useRepublicListContext());
-    expect(result.current).toBeDefined();
+  it("lança erro quando usado fora do RepublicListProvider", () => {
+    expect(() => renderHook(() => useRepublicListContext())).toThrow(
+      "useRepublicListContext deve ser usado dentro de RepublicListProvider"
+    );
   });
 
   it("retorna o contexto quando usado dentro do RepublicListProvider", async () => {

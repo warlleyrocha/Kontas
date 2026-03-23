@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react-native";
-import { TouchableOpacity } from "react-native";
+import { Image, KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
 import { EditRepublicModal } from "../components/EditRepublicModal";
 import useEditRepublicModal, {
   type UseEditRepublicModalReturn,
@@ -61,6 +61,25 @@ describe("EditRepublicModal", () => {
     expect(screen.getByText("Cancelar")).toBeTruthy();
   });
 
+  it("usa behavior='height' no KeyboardAvoidingView quando Platform.OS é android", () => {
+    const originalOS = Platform.OS;
+    Object.defineProperty(Platform, "OS", {
+      value: "android",
+      configurable: true,
+    });
+
+    render(<EditRepublicModal {...createProps()} />);
+
+    expect(screen.UNSAFE_getByType(KeyboardAvoidingView).props.behavior).toBe(
+      "height"
+    );
+
+    Object.defineProperty(Platform, "OS", {
+      value: originalOS,
+      configurable: true,
+    });
+  });
+
   it("chama setNome ao editar o nome da república", () => {
     render(<EditRepublicModal {...createProps()} />);
 
@@ -79,6 +98,19 @@ describe("EditRepublicModal", () => {
     fireEvent.press(imageButton);
 
     expect(mockSelecionarImagem).toHaveBeenCalledTimes(1);
+  });
+
+  it("renderiza a imagem da república quando imagemUri está preenchida", () => {
+    mockUseEditRepublicModal.mockReturnValue({
+      ...createHookReturn(),
+      imagemUri: "https://example.com/republica.jpg",
+    });
+
+    render(<EditRepublicModal {...createProps()} />);
+
+    expect(screen.UNSAFE_getByType(Image).props.source).toEqual({
+      uri: "https://example.com/republica.jpg",
+    });
   });
 
   it("chama salvar ao pressionar o botão Salvar", () => {

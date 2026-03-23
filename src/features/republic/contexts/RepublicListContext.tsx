@@ -21,8 +21,8 @@ interface RepublicListContextData {
   fetchRepublicById: (id: string) => Promise<RepublicResponse | null>;
 }
 
-const RepublicListContext = createContext<RepublicListContextData>(
-  {} as RepublicListContextData
+const RepublicListContext = createContext<RepublicListContextData | undefined>(
+  undefined
 );
 
 export function RepublicListProvider({
