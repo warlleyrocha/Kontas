@@ -1,3 +1,5 @@
+import { APP_FONTS } from "@/src/lib/fonts";
+
 jest.mock("@expo-google-fonts/inter", () => ({
   __esModule: true,
   Inter_300Light: "Inter_300Light",
@@ -17,8 +19,6 @@ jest.mock("@expo-google-fonts/mulish", () => ({
   Mulish_700Bold: "Mulish_700Bold",
   Mulish_900Black: "Mulish_900Black",
 }));
-
-import { APP_FONTS } from "@/src/lib/fonts";
 
 describe("APP_FONTS", () => {
   it("exporta o mapa completo de fontes do app", () => {
