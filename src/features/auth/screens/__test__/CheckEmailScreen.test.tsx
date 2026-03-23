@@ -121,6 +121,18 @@ describe("CheckEmailScreen — paste de múltiplos dígitos", () => {
     const updated = screen.UNSAFE_getAllByType(TextInput);
     expect(updated[5].props.value).toBe("6"); // apenas os 6 primeiros
   });
+
+  it("ignora dígitos colados que ultrapassam o último campo a partir de índice alto", () => {
+    render(<CheckEmail />);
+    const inputs = screen.UNSAFE_getAllByType(TextInput);
+
+    fireEvent.changeText(inputs[4], "3456");
+
+    const updated = screen.UNSAFE_getAllByType(TextInput);
+    expect(updated[3].props.value).toBe("");
+    expect(updated[4].props.value).toBe("3");
+    expect(updated[5].props.value).toBe("4");
+  });
 });
 
 describe("CheckEmailScreen — reenviar código", () => {
@@ -144,6 +156,41 @@ describe("CheckEmailScreen — reenviar código", () => {
       "Auth",
       "Código de verificação reenviado"
     );
+  });
+});
+
+describe("CheckEmailScreen — handleKeyPress (L50–52, L104)", () => {
+  it("Backspace em campo vazio com índice > 0 tenta focar o campo anterior", () => {
+    render(<CheckEmail />);
+    const inputs = screen.UNSAFE_getAllByType(TextInput);
+    // Campo 1 está vazio por padrão — condição completa: Backspace + vazio + índice > 0
+    fireEvent(inputs[1], "keyPress", { nativeEvent: { key: "Backspace" } });
+    expect(screen.UNSAFE_getAllByType(TextInput)[1].props.value).toBe("");
+  });
+
+  it("Backspace em campo preenchido não move o foco (valor não vazio)", () => {
+    render(<CheckEmail />);
+    fireEvent.changeText(screen.UNSAFE_getAllByType(TextInput)[1], "5");
+    fireEvent(screen.UNSAFE_getAllByType(TextInput)[1], "keyPress", {
+      nativeEvent: { key: "Backspace" },
+    });
+    expect(screen.UNSAFE_getAllByType(TextInput)[1].props.value).toBe("5");
+  });
+
+  it("Backspace no índice 0 não move o foco (index > 0 falso)", () => {
+    render(<CheckEmail />);
+    fireEvent(screen.UNSAFE_getAllByType(TextInput)[0], "keyPress", {
+      nativeEvent: { key: "Backspace" },
+    });
+    expect(screen.UNSAFE_getAllByType(TextInput)[0].props.value).toBe("");
+  });
+
+  it("tecla não-Backspace não dispara nenhuma ação", () => {
+    render(<CheckEmail />);
+    fireEvent(screen.UNSAFE_getAllByType(TextInput)[1], "keyPress", {
+      nativeEvent: { key: "1" },
+    });
+    expect(screen.UNSAFE_getAllByType(TextInput)[1].props.value).toBe("");
   });
 });
 

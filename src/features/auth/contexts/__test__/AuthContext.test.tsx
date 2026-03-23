@@ -92,6 +92,15 @@ function mockStorageWithToken(
   });
 }
 
+function mockStorageWithTokenButNoUser(republicData: string | null = null) {
+  jest.mocked(AsyncStorage.getItem).mockImplementation((key: string) => {
+    if (key === "@app:token") return Promise.resolve("jwt-abc");
+    if (key === "@app:user") return Promise.resolve(null);
+    if (key === "republic-data") return Promise.resolve(republicData);
+    return Promise.resolve(null);
+  });
+}
+
 function renderWithProvider() {
   return renderHook(() => useAuth(), {
     wrapper: ({ children }: { children: React.ReactNode }) => (
@@ -125,11 +134,10 @@ beforeEach(() => {
 // ─── useAuth ──────────────────────────────────────────────────────────────────
 
 describe("useAuth", () => {
-  it("retorna o default context quando usado fora do AuthProvider", () => {
-    // createContext default é {} as AuthContextData (truthy), então não lança —
-    // mas as propriedades não estão definidas
-    const { result } = renderHook(() => useAuth());
-    expect(result.current).toBeDefined();
+  it("lança erro quando usado fora do AuthProvider", () => {
+    expect(() => renderHook(() => useAuth())).toThrow(
+      "❌ useAuth deve ser usado dentro de um AuthProvider"
+    );
   });
 
   it("retorna o contexto quando usado dentro do AuthProvider", async () => {
@@ -167,6 +175,18 @@ describe("checkAuth — sem token", () => {
 describe("checkAuth — com token válido", () => {
   it("pré-carrega o usuário do cache e valida com o backend", async () => {
     mockStorageWithToken();
+    jest.mocked(userService.fetchUser).mockResolvedValue(mockUser);
+
+    const { result } = renderWithProvider();
+    await flush();
+
+    expect(jest.mocked(userService.fetchUser)).toHaveBeenCalledTimes(1);
+    expect(result.current.user).toEqual(mockUser);
+    expect(result.current.loading).toBe(false);
+  });
+
+  it("valida o token mesmo sem usuário em cache", async () => {
+    mockStorageWithTokenButNoUser();
     jest.mocked(userService.fetchUser).mockResolvedValue(mockUser);
 
     const { result } = renderWithProvider();
@@ -240,6 +260,23 @@ describe("checkAuth — erro externo (AsyncStorage lança)", () => {
       "Auth",
       "Erro na verificação de auth",
       expect.any(Error)
+    );
+    expect(result.current.loading).toBe(false);
+  });
+
+  it("loga undefined quando a falha externa não é uma instância de Error", async () => {
+    jest.mocked(AsyncStorage.getItem).mockImplementation((key: string) => {
+      if (key === "@app:token") return Promise.reject("disk error");
+      return Promise.resolve(null);
+    });
+
+    const { result } = renderWithProvider();
+    await flush();
+
+    expect(jest.mocked(logger.error)).toHaveBeenCalledWith(
+      "Auth",
+      "Erro na verificação de auth",
+      undefined
     );
     expect(result.current.loading).toBe(false);
   });
@@ -336,6 +373,24 @@ describe("logout", () => {
       "Auth",
       "Erro ao fazer logout",
       error
+    );
+  });
+
+  it("loga undefined quando o logout falha com valor que não é Error", async () => {
+    mockStorageNoToken();
+    mockQueryClient.cancelQueries.mockRejectedValueOnce("logout error");
+
+    const { result } = renderWithProvider();
+    await flush();
+
+    await act(async () => {
+      await result.current.logout();
+    });
+
+    expect(jest.mocked(logger.error)).toHaveBeenCalledWith(
+      "Auth",
+      "Erro ao fazer logout",
+      undefined
     );
   });
 });
@@ -441,6 +496,26 @@ describe("updateUser", () => {
       "Auth",
       "Erro ao atualizar usuário",
       error
+    );
+  });
+
+  it("loga undefined e relança quando a falha não é uma instância de Error", async () => {
+    mockStorageNoToken();
+    jest.mocked(userService.updateUser).mockRejectedValue("update failed");
+
+    const { result } = renderWithProvider();
+    await flush();
+
+    await expect(
+      act(async () => {
+        await result.current.updateUser({ nome: "X" });
+      })
+    ).rejects.toBeDefined();
+
+    expect(jest.mocked(logger.error)).toHaveBeenCalledWith(
+      "Auth",
+      "Erro ao atualizar usuário",
+      undefined
     );
   });
 });

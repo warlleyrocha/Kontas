@@ -89,6 +89,24 @@ describe("OnboardingScreen", () => {
     expect(mockReplace).toHaveBeenCalledWith("/(userProfile)/profile");
   });
 
+  it("avança para o próximo slide ao pressionar handleNext antes do último slide", async () => {
+    const scrollToIndexMock = jest
+      .spyOn(FlatList.prototype, "scrollToIndex")
+      .mockImplementation(() => {});
+
+    render(<Onboarding />);
+
+    await act(async () => {
+      fireEvent.press(screen.getByRole("button", { name: "next" }));
+    });
+
+    expect(scrollToIndexMock).toHaveBeenCalledWith({ index: 1 });
+    expect(screen.getByText("Começar Agora")).toBeTruthy();
+    expect(mockReplace).not.toHaveBeenCalled();
+
+    scrollToIndexMock.mockRestore();
+  });
+
   it("atualiza currentIndex via onMomentumScrollEnd", async () => {
     const { UNSAFE_getAllByType } = render(<Onboarding />);
 

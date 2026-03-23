@@ -36,7 +36,7 @@ interface AuthContextData {
 }
 
 // Criar o Context
-const AuthContext = createContext<AuthContextData>({} as AuthContextData);
+const AuthContext = createContext<AuthContextData | undefined>(undefined);
 
 // Provider para envolver o app
 export const AuthProvider = ({ children }: { children: ReactNode }) => {

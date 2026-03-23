@@ -1,10 +1,9 @@
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { useRouter } from "expo-router";
-import { ActivityIndicator } from "react-native";
+import { ActivityIndicator, TouchableOpacity } from "react-native";
 import { useAuth } from "@/src/features/auth/contexts/AuthContext";
 import { getErrorMessage } from "@/src/services/httpError";
-import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 import { showToast } from "@/src/shared/utils/showToast";
 import LoginScreen from "../LoginScreen";
 
@@ -98,12 +97,45 @@ describe("LoginScreen — renderização", () => {
 });
 
 describe("LoginScreen — estado de carregamento", () => {
+  it("ignora cliques adicionais enquanto o login está em andamento (L33)", async () => {
+    let resolveHasPlay!: (v: any) => void;
+    jest.mocked(GoogleSignin.hasPlayServices).mockReturnValue(
+      new Promise((resolve) => {
+        resolveHasPlay = resolve;
+      }),
+    );
+
+    render(<LoginScreen />);
+
+    // Primeiro clique: isSigningIn = false → guard pulado, login inicia
+    await act(async () => {
+      fireEvent.press(screen.getByText("Entrar com Google"));
+    });
+
+    // Segundo clique: fireEvent ignora `disabled`, chamando handleGoogleLogin
+    // com isSigningIn=true → L33 `if (isSigningIn) return` é executado
+    const googleButton = screen
+      .UNSAFE_getAllByType(TouchableOpacity)
+      .find((b) => b.props.disabled === true);
+    expect(googleButton).toBeDefined();
+    await act(async () => {
+      fireEvent.press(googleButton);
+    });
+
+    // hasPlayServices chamado apenas 1 vez — segundo clique foi bloqueado
+    expect(GoogleSignin.hasPlayServices).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      resolveHasPlay(undefined);
+    });
+  });
+
   it("exibe ActivityIndicator enquanto o login está em andamento", async () => {
     let resolveHasPlay!: (v: any) => void;
     jest.mocked(GoogleSignin.hasPlayServices).mockReturnValue(
       new Promise((resolve) => {
         resolveHasPlay = resolve;
-      })
+      }),
     );
 
     render(<LoginScreen />);
@@ -157,7 +189,7 @@ describe("LoginScreen — fluxo de login com Google", () => {
       fireEvent.press(screen.getByText("Entrar com Google"));
     });
     expect(showToast.error).toHaveBeenCalledWith(
-      "Não foi possível obter o token do Google"
+      "Não foi possível obter o token do Google",
     );
     expect(mockRouterReplace).not.toHaveBeenCalled();
   });
@@ -173,16 +205,16 @@ describe("LoginScreen — fluxo de login com Google", () => {
   it("chama showToast.error e console.error em caso de exceção", async () => {
     const err = new Error("Falha no Google");
     jest.mocked(GoogleSignin.hasPlayServices).mockRejectedValue(err);
-    jest.mocked(getErrorMessage).mockReturnValue(
-      "Erro ao fazer login com Google. Tente novamente."
-    );
+    jest
+      .mocked(getErrorMessage)
+      .mockReturnValue("Erro ao fazer login com Google. Tente novamente.");
     render(<LoginScreen />);
     await act(async () => {
       fireEvent.press(screen.getByText("Entrar com Google"));
     });
     expect(consoleErrorSpy).toHaveBeenCalledWith("Erro no login:", err);
     expect(showToast.error).toHaveBeenCalledWith(
-      "Erro ao fazer login com Google. Tente novamente."
+      "Erro ao fazer login com Google. Tente novamente.",
     );
     consoleErrorSpy.mockClear();
   });

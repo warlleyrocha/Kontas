@@ -1,5 +1,7 @@
 import { renderHook } from "@testing-library/react-native";
 
+import { useOnboardingAnimation } from "../hooks/useOnboardingAnimation";
+
 jest.mock("react-native-reanimated", () => {
   const actual = require("react-native-reanimated/mock");
   return {
@@ -14,8 +16,6 @@ jest.mock("react-native-reanimated", () => {
     },
   };
 });
-
-import { useOnboardingAnimation } from "../hooks/useOnboardingAnimation";
 
 describe("useOnboardingAnimation", () => {
   it("retorna scrollX e handleScroll", () => {
