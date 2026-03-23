@@ -7,6 +7,6 @@ export default function PrivacyPolicyRoute() {
   return <LegalScreen doc={privacyPolicy} />;
 }
 
-export function ErrorBoundary(props: ErrorBoundaryProps) {
+export function ErrorBoundary(props: Readonly<ErrorBoundaryProps>) {
   return <RouteErrorFallback domain="PrivacyPolicy" {...props} />;
 }

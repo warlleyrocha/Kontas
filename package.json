@@ -15,28 +15,19 @@
     "lint": "expo lint",
     "test": "jest --watchAll",
     "test:coverage": "jest --coverage",
-    "sonar": "jest --coverage --ci && docker compose --env-file .env run --rm node-sonar"
+    "sonar:scan": "jest --coverage --ci && docker compose --env-file .env run --rm node-sonar"
   },
   "jest": {
     "preset": "jest-expo",
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/$1"
     },
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/android/",
-      "/dist/"
-    ],
+    "testPathIgnorePatterns": ["/node_modules/", "/android/", "/dist/"],
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg)"
     ],
-    "setupFiles": [
-      "react-native-reanimated/mock"
-    ],
-    "coverageReporters": [
-      "lcov",
-      "text"
-    ],
+    "setupFiles": ["react-native-reanimated/mock"],
+    "coverageReporters": ["lcov", "text"],
     "coverageDirectory": "coverage",
     "collectCoverageFrom": [
       "**/*.{ts,tsx}",

@@ -1,6 +1,6 @@
 # Termos de Uso — Kontas
 
-**Última atualização:** março de 2025
+**Última atualização:** março de 2026
 
 ---
 
@@ -75,7 +75,7 @@ O Kontas é um aplicativo mobile de gestão financeira colaborativa voltado para
 
 ## 7. Propriedade Intelectual
 
-Todo o código, design e conteúdo do Kontas são de propriedade de Warlley Rocha. É proibida a reprodução, modificação ou distribuição sem autorização prévia por escrito.
+Todo o código, design, documentação associada e conteúdo do Kontas são de propriedade exclusiva da Éden. É proibida a reprodução, distribuição, modificação, sublicenciamento ou uso sem autorização prévia e expressa por escrito.
 
 ---
 

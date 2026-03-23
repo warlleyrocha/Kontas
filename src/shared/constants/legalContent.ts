@@ -18,14 +18,14 @@ export type LegalDoc = {
 
 export const privacyPolicy: LegalDoc = {
   title: "Política de Privacidade",
-  lastUpdated: "dezembro de 2025",
+  lastUpdated: "março de 2026",
   sections: [
     {
       title: "1. Introdução",
       blocks: [
         {
           kind: "p",
-          text: "Esta Política de Privacidade descreve como o aplicativo Kontas, desenvolvido por Warlley Rocha, coleta, utiliza, armazena e compartilha suas informações pessoais. Ao utilizar o App, você concorda com as práticas descritas neste documento, em conformidade com a Lei Geral de Proteção de Dados (LGPD — Lei nº 13.709/2018).",
+          text: "Esta Política de Privacidade descreve como o aplicativo Kontas, de propriedade da Éden, coleta, utiliza, armazena e compartilha suas informações pessoais. Ao utilizar o App, você concorda com as práticas descritas neste documento, em conformidade com a Lei Geral de Proteção de Dados (LGPD — Lei nº 13.709/2018).",
         },
       ],
     },
@@ -202,7 +202,7 @@ export const privacyPolicy: LegalDoc = {
 
 export const termsOfUse: LegalDoc = {
   title: "Termos de Uso",
-  lastUpdated: "dezembro de 2025",
+  lastUpdated: "março de 2026",
   sections: [
     {
       title: "1. Aceitação dos Termos",
@@ -306,7 +306,7 @@ export const termsOfUse: LegalDoc = {
       blocks: [
         {
           kind: "p",
-          text: "Todo o código, design e conteúdo do Kontas são de propriedade de Warlley Rocha. É proibida a reprodução, modificação ou distribuição sem autorização prévia por escrito.",
+          text: "Todo o código, design, documentação associada e conteúdo do Kontas são de propriedade exclusiva da Éden. É proibida a reprodução, distribuição, modificação, sublicenciamento ou uso sem autorização prévia e expressa por escrito.",
         },
       ],
     },

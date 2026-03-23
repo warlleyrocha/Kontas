@@ -139,9 +139,7 @@ export function useRepublicScreen(republicId: string) {
         imagemRepublica: imagem,
       });
 
-      setRepublic((prev) =>
-        prev ? { ...prev, nome, imagemRepublica: imagem } : null
-      );
+      setRepublic((prev) => mergeSavedRepublic(prev, nome, imagem));
     },
     [republic, updateRepublic]
   );
@@ -195,4 +193,12 @@ export function useRepublicScreen(republicId: string) {
     currentResidentId,
     republics,
   };
+}
+
+export function mergeSavedRepublic(
+  prev: RepublicResponse | null,
+  nome: string,
+  imagem?: string
+): RepublicResponse | null {
+  return prev ? { ...prev, nome, imagemRepublica: imagem } : null;
 }

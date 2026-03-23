@@ -7,6 +7,6 @@ export default function TermsOfUseRoute() {
   return <LegalScreen doc={termsOfUse} />;
 }
 
-export function ErrorBoundary(props: ErrorBoundaryProps) {
+export function ErrorBoundary(props: Readonly<ErrorBoundaryProps>) {
   return <RouteErrorFallback domain="TermsOfUse" {...props} />;
 }

@@ -52,7 +52,7 @@ function MenuSubItemComponent({ item, onClose }: MenuSubItemComponentProps) {
 
   const itemInitial = useMemo(
     () => item.label.charAt(0).toUpperCase(),
-    [item.label],
+    [item.label]
   );
 
   return (
@@ -189,7 +189,7 @@ export function SideMenu({
 
   const userInitial = useMemo(
     () => user.name.charAt(0).toUpperCase(),
-    [user.name],
+    [user.name]
   );
 
   const [photoError, setPhotoError] = useState(false);
