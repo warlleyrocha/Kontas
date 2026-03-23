@@ -1,7 +1,9 @@
 import { render, screen } from "@testing-library/react-native";
 import { ActivityIndicator } from "react-native";
+import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import type { ResidentResponse } from "@/src/shared/types/resident.types";
 import { ResumeTab } from "../index";
+import { useResumeTab } from "../useResumeTab";
 
 jest.mock("@expo/vector-icons/Ionicons", () => ({
   __esModule: true,
@@ -18,7 +20,7 @@ jest.mock("../useResumeTab", () => ({
 
 jest.mock("../ResumoCard", () => ({
   ResumoCard: ({ label, isLoading }: { label: string; isLoading: boolean }) => {
-    const { Text } = require("react-native");
+    const { Text } = jest.requireActual("react-native");
     return (
       <Text
         testID={`resumo-card-${label}`}
@@ -38,7 +40,7 @@ jest.mock("../MoradorRow", () => ({
     morador: { id: string; nome: string };
     valor: number;
   }) => {
-    const { Text } = require("react-native");
+    const { Text } = jest.requireActual("react-native");
     return (
       <Text testID={`morador-row-${morador.id}`}>
         {morador.nome}:{valor}
@@ -46,9 +48,6 @@ jest.mock("../MoradorRow", () => ({
     );
   },
 }));
-
-const { useRefresh } = require("@/src/shared/contexts/RefreshContext");
-const { useResumeTab } = require("../useResumeTab");
 
 const mockResidents: ResidentResponse[] = [
   {

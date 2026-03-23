@@ -5,7 +5,7 @@ import RepublicList from "../index";
 jest.mock("@expo/vector-icons/Ionicons", () => "Ionicons");
 
 jest.mock("@/src/features/user/components/RepublicCard", () => {
-  const { TouchableOpacity, Text } = require("react-native");
+  const { TouchableOpacity, Text } = jest.requireActual("react-native");
   return function MockRepublicCard({
     republic,
     residentsCount,

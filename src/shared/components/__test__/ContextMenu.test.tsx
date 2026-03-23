@@ -6,7 +6,7 @@ import { scheduleOnRN } from "react-native-worklets";
 import { ContextMenu, resolveMenuPlacement } from "../ContextMenu";
 
 jest.mock("react-native-reanimated", () => {
-  const reanimated = require("react-native-reanimated/mock");
+  const reanimated = jest.requireActual("react-native-reanimated/mock");
   return {
     ...reanimated,
     withSpring: jest.fn(reanimated.withSpring),

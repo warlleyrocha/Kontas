@@ -182,13 +182,11 @@ describe("ProfileScreen — Header", () => {
   });
 
   it("exibe a inicial após erro de carregamento da foto de perfil", () => {
-    jest
-      .mocked(useProfileScreen)
-      .mockReturnValue(
-        makeHookReturn({
-          user: { ...baseUser, fotoPerfil: "https://foto.jpg" },
-        }) as any
-      );
+    jest.mocked(useProfileScreen).mockReturnValue(
+      makeHookReturn({
+        user: { ...baseUser, fotoPerfil: "https://foto.jpg" },
+      }) as any
+    );
     const { UNSAFE_getByType } = render(<ProfileScreen />);
     act(() => {
       UNSAFE_getByType(Image).props.onError();
@@ -197,13 +195,11 @@ describe("ProfileScreen — Header", () => {
   });
 
   it("exibe '?' quando nome é null e não há foto", () => {
-    jest
-      .mocked(useProfileScreen)
-      .mockReturnValue(
-        makeHookReturn({
-          user: { ...baseUser, nome: null, fotoPerfil: null },
-        }) as any
-      );
+    jest.mocked(useProfileScreen).mockReturnValue(
+      makeHookReturn({
+        user: { ...baseUser, nome: null, fotoPerfil: null },
+      }) as any
+    );
     render(<ProfileScreen />);
     expect(screen.getByText("?")).toBeTruthy();
   });

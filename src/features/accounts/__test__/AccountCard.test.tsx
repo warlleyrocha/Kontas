@@ -25,7 +25,7 @@ jest.mock("../components/shared/AccountStatusIcon", () => ({
 
 jest.mock("../components/list/AccountResidentsContent", () => ({
   AccountResidentsContent: () => {
-    const { View } = require("react-native");
+    const { View } = jest.requireActual("react-native");
     return <View testID="residents-content" />;
   },
 }));

@@ -15,7 +15,7 @@ jest.mock("@/src/shared/components/ContextMenu", () => ({
     children: (handleClose: (cb?: () => void) => void) => React.ReactNode;
     menuTotalHeight: number;
   }) => {
-    const { View } = require("react-native");
+    const { View } = jest.requireActual("react-native");
     const mockHandleClose = (cb?: () => void) => {
       if (cb) cb();
     };

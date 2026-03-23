@@ -2,7 +2,6 @@ import { render } from "@testing-library/react-native";
 import { InvitesSentContent } from "@/src/features/invites/components/InvitesSentContent";
 import { useInvitesSentScreen } from "@/src/features/invites/hooks/useInvitesSentScreen";
 import { ScreenLayout } from "@/src/shared/components/ScreenLayout";
-import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 import { InvitesSentScreen } from "../InvitesSentScreen";
 
 jest.mock("@/src/features/invites/components/InvitesSentContent", () => ({

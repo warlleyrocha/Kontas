@@ -5,7 +5,7 @@ import { AccountStatusIcon } from "../components/shared/AccountStatusIcon";
 jest.mock("@expo/vector-icons/MaterialIcons", () => ({
   __esModule: true,
   default: ({ name }: { name: string }) => {
-    const { View } = require("react-native");
+    const { View } = jest.requireActual("react-native");
     return <View testID={`material-${name}`} />;
   },
 }));
@@ -13,7 +13,7 @@ jest.mock("@expo/vector-icons/MaterialIcons", () => ({
 jest.mock("@expo/vector-icons/MaterialCommunityIcons", () => ({
   __esModule: true,
   default: ({ name }: { name: string }) => {
-    const { View } = require("react-native");
+    const { View } = jest.requireActual("react-native");
     return <View testID={`material-community-${name}`} />;
   },
 }));

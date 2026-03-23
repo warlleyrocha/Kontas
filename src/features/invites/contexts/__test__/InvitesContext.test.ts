@@ -334,13 +334,11 @@ describe("usePendingInvitesCount", () => {
   });
 
   it("retorna 0 quando data é undefined", () => {
-    jest
-      .mocked(useQuery)
-      .mockReturnValue({
-        data: undefined,
-        error: null,
-        refetch: mockRefetch,
-      } as any);
+    jest.mocked(useQuery).mockReturnValue({
+      data: undefined,
+      error: null,
+      refetch: mockRefetch,
+    } as any);
     const { result } = renderHook(() => usePendingInvitesCount());
     expect(result.current).toBe(0);
   });
@@ -352,13 +350,11 @@ describe("usePendingInvitesCount", () => {
       { ...mockInvite, id: "3", status: StatusInvite.ACEITO },
       { ...mockInvite, id: "4", status: StatusInvite.RECUSADO },
     ];
-    jest
-      .mocked(useQuery)
-      .mockReturnValue({
-        data: invites,
-        error: null,
-        refetch: mockRefetch,
-      } as any);
+    jest.mocked(useQuery).mockReturnValue({
+      data: invites,
+      error: null,
+      refetch: mockRefetch,
+    } as any);
     const { result } = renderHook(() => usePendingInvitesCount());
     expect(result.current).toBe(2);
   });

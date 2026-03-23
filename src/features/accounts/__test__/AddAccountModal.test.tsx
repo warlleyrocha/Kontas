@@ -12,7 +12,7 @@ jest.mock("../hooks/useAccountForm", () => ({
 
 jest.mock("../components/create/AddAccountModalHeader", () => ({
   AddAccountModalHeader: ({ onClose }: { onClose: () => void }) => {
-    const { TouchableOpacity } = require("react-native");
+    const { TouchableOpacity } = jest.requireActual("react-native");
     return (
       <TouchableOpacity
         onPress={onClose}
@@ -31,7 +31,7 @@ jest.mock("../components/create/AddAccountModalFormSection", () => ({
     onDescricaoChange: (v: string) => void;
     onCycleMetodoPagamento: () => void;
   }) => {
-    const { TouchableOpacity, View } = require("react-native");
+    const { TouchableOpacity, View } = jest.requireActual("react-native");
     return (
       <View>
         <TouchableOpacity
@@ -55,7 +55,7 @@ jest.mock("../components/create/AddAccountModalResidentsSection", () => ({
   }: {
     onValorInputFocusChange: (focused: boolean) => void;
   }) => {
-    const { TouchableOpacity } = require("react-native");
+    const { TouchableOpacity } = jest.requireActual("react-native");
     return (
       <TouchableOpacity
         onPress={() => onValorInputFocusChange(true)}
@@ -74,7 +74,7 @@ jest.mock("../components/create/AddAccountModalActions", () => ({
     onSubmit: () => void;
     onCancel: () => void;
   }) => {
-    const { TouchableOpacity, View } = require("react-native");
+    const { TouchableOpacity, View } = jest.requireActual("react-native");
     return (
       <View>
         <TouchableOpacity

@@ -5,7 +5,7 @@ import * as RN from "react-native";
 import { SideMenu, MenuButton } from "../index";
 
 jest.mock("react-native-reanimated", () =>
-  require("react-native-reanimated/mock")
+  jest.requireActual("react-native-reanimated/mock")
 );
 jest.mock("react-native-worklets", () => ({
   scheduleOnRN: jest.fn((fn: () => void) => fn()),

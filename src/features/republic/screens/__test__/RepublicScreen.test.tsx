@@ -299,14 +299,12 @@ describe("RepublicScreen — ResidentsTab", () => {
   });
 
   it("isAdmin=true quando currentUserRole é ADMIN", () => {
-    jest
-      .mocked(useRepublicScreen)
-      .mockReturnValue(
-        makeScreenReturn({
-          tab: "moradores",
-          currentUserRole: ResidentRole.ADMIN,
-        }) as any
-      );
+    jest.mocked(useRepublicScreen).mockReturnValue(
+      makeScreenReturn({
+        tab: "moradores",
+        currentUserRole: ResidentRole.ADMIN,
+      }) as any
+    );
     render(<RepublicScreen republicId="rep-1" />);
     const props = jest.mocked(ResidentsTab).mock.calls[0][0] as any;
     expect(props.isAdmin).toBe(true);

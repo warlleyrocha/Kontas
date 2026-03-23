@@ -290,14 +290,12 @@ describe("AccountsTab — AccountSection", () => {
   });
 
   it("passa visivel, onToggle e expandedAccountId corretos à primeira AccountSection", () => {
-    jest
-      .mocked(useAccountsTab)
-      .mockReturnValue(
-        makeTabReturn({
-          mostrarContasAbertas: false,
-          expandedAccountId: "a-1",
-        }) as any
-      );
+    jest.mocked(useAccountsTab).mockReturnValue(
+      makeTabReturn({
+        mostrarContasAbertas: false,
+        expandedAccountId: "a-1",
+      }) as any
+    );
     render(<AccountsTab republicId="rep-1" currentResidentId="r-1" />);
     const props = jest.mocked(AccountSection).mock.calls[0][0] as any;
     expect(props.visivel).toBe(false);

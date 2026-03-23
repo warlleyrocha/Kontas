@@ -3,7 +3,7 @@ import { renderHook } from "@testing-library/react-native";
 import { useOnboardingAnimation } from "../hooks/useOnboardingAnimation";
 
 jest.mock("react-native-reanimated", () => {
-  const actual = require("react-native-reanimated/mock");
+  const actual = jest.requireActual("react-native-reanimated/mock");
   return {
     ...actual,
     useSharedValue: (initial: number) => ({ value: initial }),

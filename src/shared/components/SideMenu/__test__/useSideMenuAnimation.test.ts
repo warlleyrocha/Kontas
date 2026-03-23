@@ -3,7 +3,7 @@ import * as reanimated from "react-native-reanimated";
 import { useSideMenuAnimation } from "../useSideMenuAnimation";
 
 jest.mock("react-native-reanimated", () =>
-  require("react-native-reanimated/mock")
+  jest.requireActual("react-native-reanimated/mock")
 );
 jest.mock("react-native-worklets", () => ({
   // factory sem variável externa — evita problema de hoisting

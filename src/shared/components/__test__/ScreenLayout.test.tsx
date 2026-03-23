@@ -14,7 +14,7 @@ jest.mock("@expo/vector-icons/Ionicons", () => ({
 
 jest.mock("react-native-safe-area-context", () => ({
   SafeAreaView: ({ children }: { children: React.ReactNode }) => {
-    const { View } = require("react-native");
+    const { View } = jest.requireActual("react-native");
     return <View>{children}</View>;
   },
 }));

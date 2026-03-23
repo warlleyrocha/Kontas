@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
+import { router } from "expo-router";
 import { FlatList } from "react-native";
 import Onboarding from "../screens/OnboardingScreen";
 
@@ -30,7 +31,8 @@ jest.mock(
   () => ({
     __esModule: true,
     default: ({ handleNext, handleSkip, isLastSlide }: any) => {
-      const { TouchableOpacity, Text, View } = require("react-native");
+      const { TouchableOpacity, Text, View } =
+        jest.requireActual("react-native");
       return (
         <View>
           <TouchableOpacity
@@ -68,7 +70,7 @@ jest.mock("@/src/shared/hooks/useComponentLogger", () => ({
 const mockReplace = jest.fn();
 beforeEach(() => {
   jest.clearAllMocks();
-  require("expo-router").router.replace = mockReplace;
+  jest.mocked(router.replace).mockImplementation(mockReplace);
 });
 
 describe("OnboardingScreen", () => {

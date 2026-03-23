@@ -5,7 +5,7 @@ import { StatusPagamento } from "../types/accountResidents.types";
 
 jest.mock("../components/list/AccountResidentRow", () => ({
   AccountResidentRow: ({ morador }: { morador: ContaMorador }) => {
-    const { Text } = require("react-native");
+    const { Text } = jest.requireActual("react-native");
     return <Text>{morador.moradorNome}</Text>;
   },
 }));

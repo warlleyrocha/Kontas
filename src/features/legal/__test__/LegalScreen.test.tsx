@@ -5,7 +5,7 @@ import { LegalScreen } from "../screens/LegalScreen";
 jest.mock("@/src/shared/components/Header", () => ({
   __esModule: true,
   default: ({ title }: { title: string }) => {
-    const { Text } = require("react-native");
+    const { Text } = jest.requireActual("react-native");
     return <Text>{title}</Text>;
   },
 }));

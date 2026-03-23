@@ -207,14 +207,12 @@ describe("useProfileScreen — handleSignOut", () => {
 
 describe("useProfileScreen — handleSaveProfile", () => {
   it("retorna imediatamente quando user é null", async () => {
-    jest
-      .mocked(useAuth)
-      .mockReturnValue({
-        user: null,
-        logout: mockLogout,
-        completeProfile: mockCompleteProfile,
-        updateUser: mockUpdateUser,
-      } as any);
+    jest.mocked(useAuth).mockReturnValue({
+      user: null,
+      logout: mockLogout,
+      completeProfile: mockCompleteProfile,
+      updateUser: mockUpdateUser,
+    } as any);
     const { result } = renderHook(() => useProfileScreen());
 
     await act(async () => {

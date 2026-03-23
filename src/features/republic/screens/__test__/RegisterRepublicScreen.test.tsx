@@ -149,14 +149,12 @@ describe("RegisterRepublicScreen — botão Cadastrar República", () => {
 
   it("pressionar o botão chama createRepublic com nome e imagem", async () => {
     mockCreateRepublic.mockResolvedValue(undefined);
-    jest
-      .mocked(useRepublicForm)
-      .mockReturnValue(
-        makeFormReturn({
-          republicName: "Alpha",
-          republicImage: "file://img.jpg",
-        }) as any
-      );
+    jest.mocked(useRepublicForm).mockReturnValue(
+      makeFormReturn({
+        republicName: "Alpha",
+        republicImage: "file://img.jpg",
+      }) as any
+    );
     render(<RegisterRepublicScreen />);
     await act(async () => {
       fireEvent.press(screen.getByText("Cadastrar República"));

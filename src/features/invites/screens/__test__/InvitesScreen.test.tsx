@@ -3,7 +3,6 @@ import { useRouter } from "expo-router";
 import { InvitesInboxContent } from "@/src/features/invites/components/InvitesInboxContent";
 import { useInvitesScreen } from "@/src/features/invites/hooks/useInvitesScreen";
 import { ScreenLayout } from "@/src/shared/components/ScreenLayout";
-import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 import { InvitesScreen } from "../InvitesScreen";
 
 jest.mock("expo-router", () => ({ useRouter: jest.fn() }));

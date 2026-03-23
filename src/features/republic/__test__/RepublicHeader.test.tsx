@@ -16,7 +16,7 @@ jest.mock("@/src/shared/components/SideMenu", () => ({
     onPress: () => void;
     hasNotification?: boolean;
   }) => {
-    const { TouchableOpacity } = require("react-native");
+    const { TouchableOpacity } = jest.requireActual("react-native");
     return (
       <TouchableOpacity
         onPress={onPress}

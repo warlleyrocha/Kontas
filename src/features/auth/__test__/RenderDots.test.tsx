@@ -1,4 +1,5 @@
 import { render } from "@testing-library/react-native";
+import { View } from "react-native";
 import type { SharedValue } from "react-native-reanimated";
 import RenderDots from "../components/onboarding/RenderDots";
 import type { OnboardingSlide } from "../constants/slides";
@@ -44,12 +45,10 @@ describe("RenderDots", () => {
 
   it("renderiza um dot por slide", () => {
     const { UNSAFE_getAllByType } = render(<RenderDots {...createProps()} />);
-    const { Animated } = require("react-native");
+
     // Animated.View é usado para cada dot
     // verifica que montou sem erros com o número correto de slides
-    expect(
-      UNSAFE_getAllByType(require("react-native").View).length
-    ).toBeGreaterThan(0);
+    expect(UNSAFE_getAllByType(View).length).toBeGreaterThan(0);
   });
 
   it("renderiza com currentIndex no meio", () => {

@@ -43,10 +43,7 @@ describe("Toast", () => {
   });
 
   it("usa ícone customizado quando fornecido", () => {
-    const CustomIcon = () => {
-      const { View } = require("react-native");
-      return <View testID="custom-icon" />;
-    };
+    const CustomIcon = () => <View testID="custom-icon" />;
     render(<Toast message="Com ícone" icon={<CustomIcon />} />);
     expect(screen.getByTestId("custom-icon")).toBeTruthy();
   });

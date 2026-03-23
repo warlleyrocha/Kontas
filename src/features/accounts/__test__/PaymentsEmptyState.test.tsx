@@ -11,7 +11,7 @@ jest.mock("@/src/shared/components/EmptyState", () => ({
     title: string;
     description: string;
   }) => {
-    const { Text, View } = require("react-native");
+    const { Text, View } = jest.requireActual("react-native");
     return (
       <View>
         <Text>{title}</Text>

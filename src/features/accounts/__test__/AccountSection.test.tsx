@@ -24,7 +24,7 @@ jest.mock("../components/list/AccountCard", () => ({
       height: number;
     }) => void;
   }) => {
-    const { TouchableOpacity, View, Text } = require("react-native");
+    const { TouchableOpacity, View, Text } = jest.requireActual("react-native");
     return (
       <View>
         <Text testID={`card-${conta.id}`}>{conta.descricao}</Text>

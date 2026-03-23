@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react-native";
+import { goBack } from "expo-router/build/global-state/routing";
 import Header from "../Header";
 
 jest.mock("expo-router/build/global-state/routing", () => ({
@@ -21,7 +22,6 @@ describe("Header", () => {
   });
 
   it("chama goBack ao pressionar o botão de voltar", () => {
-    const { goBack } = require("expo-router/build/global-state/routing");
     render(<Header title="Tela" />);
 
     fireEvent.press(
