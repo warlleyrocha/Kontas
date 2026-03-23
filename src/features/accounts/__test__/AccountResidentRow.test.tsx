@@ -158,6 +158,11 @@ describe("AccountResidentRow", () => {
     expect(props.onConfirmResidentPayment).not.toHaveBeenCalled();
   });
 
+  it("não aplica borda quando isLastItem=true (L49)", () => {
+    render(<AccountResidentRow {...createProps({ isLastItem: true })} />);
+    expect(screen.getByText("Ana")).toBeTruthy();
+  });
+
   it("não chama onConfirmResidentPayment quando não é fornecido", async () => {
     const props = createProps({ onConfirmResidentPayment: undefined });
     const { UNSAFE_getByType } = render(<AccountResidentRow {...props} />);

@@ -130,6 +130,18 @@ describe("AccountCard", () => {
     expect(props.onToggleExpand).toHaveBeenCalledTimes(1);
   });
 
+  it("executa o onPress vazio do card sem disparar outras ações", () => {
+    const props = createProps();
+    const { UNSAFE_getAllByType } = render(<AccountCard {...props} />);
+
+    const buttons = UNSAFE_getAllByType(TouchableOpacity);
+    fireEvent.press(buttons[0]);
+
+    expect(props.onToggleExpand).not.toHaveBeenCalled();
+    expect(props.onPatch).not.toHaveBeenCalled();
+    expect(props.onLongPress).not.toHaveBeenCalled();
+  });
+
   it("exibe AccountResidentsContent quando expanded é true", () => {
     render(<AccountCard {...createProps({ expanded: true })} />);
     expect(screen.getByTestId("residents-content")).toBeTruthy();
@@ -143,6 +155,17 @@ describe("AccountCard", () => {
   it('exibe "Copiar PIX" quando a conta não está paga', () => {
     render(<AccountCard {...createProps()} />);
     expect(screen.getByText("Copiar PIX")).toBeTruthy();
+  });
+
+  it('executa o onPress de "Copiar PIX" sem disparar outras ações', () => {
+    const props = createProps();
+    const { UNSAFE_getAllByType } = render(<AccountCard {...props} />);
+
+    const buttons = UNSAFE_getAllByType(TouchableOpacity);
+    fireEvent.press(buttons[3]);
+
+    expect(props.onPatch).not.toHaveBeenCalled();
+    expect(props.onToggleExpand).not.toHaveBeenCalled();
   });
 
   it('não exibe "Copiar PIX" quando a conta está paga', () => {

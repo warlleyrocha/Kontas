@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
-import { Platform, View } from "react-native";
+import { KeyboardAvoidingView, Platform, View } from "react-native";
 import AddAccountModal from "../components/create/AddAccountModal";
 import { useAccountForm } from "../hooks/useAccountForm";
 import { MetodoPagamento, StatusConta } from "../types/account.types";
@@ -237,14 +237,16 @@ describe("AddAccountModal", () => {
     expect(styledView).toBeTruthy();
   });
 
-  it("usa behavior 'padding' no iOS (branch Platform.OS)", () => {
-    Object.defineProperty(Platform, "OS", { value: "ios", writable: true });
+  it("usa behavior 'padding' no iOS", () => {
+    Platform.OS = "ios";
+    const { UNSAFE_getByType } = render(<AddAccountModal {...defaultProps} />);
+    expect(UNSAFE_getByType(KeyboardAvoidingView).props.behavior).toBe("padding");
+    Platform.OS = "android";
+  });
 
-    render(<AddAccountModal {...defaultProps} />);
-
-    Object.defineProperty(Platform, "OS", {
-      value: "android",
-      writable: true,
-    });
+  it("usa behavior 'height' no Android", () => {
+    Platform.OS = "android";
+    const { UNSAFE_getByType } = render(<AddAccountModal {...defaultProps} />);
+    expect(UNSAFE_getByType(KeyboardAvoidingView).props.behavior).toBe("height");
   });
 });
