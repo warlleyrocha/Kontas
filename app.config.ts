@@ -4,12 +4,12 @@ import path from "path";
 import { version } from "./package.json";
 
 /**
- * Carrega `.env.local` manualmente quando necessário (sem depender de dotenv)
+ * Carrega `.env` manualmente quando necessário (sem depender de dotenv)
  * Só carrega se `process.env.APP_ENV` não estiver definido e o arquivo existir.
  */
-(function loadLocalEnv() {
+(function loadEnv() {
   try {
-    const envPath = path.resolve(process.cwd(), ".env.local");
+    const envPath = path.resolve(process.cwd(), ".env");
 
     // ✅ Só carrega em DEV SERVER (expo start / metro)
     const isDevServer =
@@ -49,10 +49,10 @@ import { version } from "./package.json";
         }
       }
 
-      console.log("🔒 .env.local carregado (apenas dev server)");
+      console.log("🔒 .env carregado (apenas dev server)");
     }
   } catch (err) {
-    console.warn("⚠️ Falha ao carregar .env.local:", err);
+    console.warn("⚠️ Falha ao carregar .env:", err);
   }
 })();
 
@@ -159,7 +159,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
 // Configuração dinâmica baseada no ambiente
 export const getDynamicAppConfig = (
-  environment: "development" | "preview" | "production"
+  environment: "development" | "preview" | "production",
 ) => {
   if (environment === "production") {
     return {
