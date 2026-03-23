@@ -5,8 +5,10 @@ import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContex
 import { ResidentCard } from "@/src/features/residents/components/ResidentCard";
 import { useTabResidents } from "@/src/features/residents/hooks/useTabResidents";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
-import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
-import { ResidentRole, type ResidentResponse } from "@/src/shared/types/resident.types";
+import {
+  ResidentRole,
+  type ResidentResponse,
+} from "@/src/shared/types/resident.types";
 import { ResidentsTab } from "../ResidentsTab";
 
 jest.mock("@expo/vector-icons/Feather", () => "Feather");
@@ -61,8 +63,12 @@ beforeEach(() => {
     sendLoading: false,
     sendError: null,
   } as any);
-  jest.mocked(useTabResidents).mockReturnValue({ copiarChavePix: mockCopiarChavePix });
-  jest.mocked(useRefresh).mockReturnValue({ refreshing: false, onRefresh: mockOnRefresh } as any);
+  jest
+    .mocked(useTabResidents)
+    .mockReturnValue({ copiarChavePix: mockCopiarChavePix });
+  jest
+    .mocked(useRefresh)
+    .mockReturnValue({ refreshing: false, onRefresh: mockOnRefresh } as any);
   consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 });
 
@@ -93,7 +99,9 @@ describe("ResidentsTab — lista de moradores", () => {
   });
 
   it("passa copiarChavePix do hook para ResidentCard", () => {
-    render(<ResidentsTab residents={[makeResident("r-1")]} republicId="rep-1" />);
+    render(
+      <ResidentsTab residents={[makeResident("r-1")]} republicId="rep-1" />,
+    );
     const props = jest.mocked(ResidentCard).mock.calls[0][0] as any;
     expect(props.onCopyPix).toBe(mockCopiarChavePix);
   });
@@ -126,7 +134,9 @@ describe("ResidentsTab — modal de convite", () => {
   it("abre o modal ao pressionar AddAccountButton", () => {
     render(<ResidentsTab residents={[]} republicId="rep-1" isAdmin={true} />);
     const { onPress } = jest.mocked(AddAccountButton).mock.calls[0][0] as any;
-    act(() => { onPress(); });
+    act(() => {
+      onPress();
+    });
     const lastProps = jest.mocked(InviteModal).mock.calls.at(-1)?.[0] as any;
     expect(lastProps.open).toBe(true);
   });
@@ -134,9 +144,13 @@ describe("ResidentsTab — modal de convite", () => {
   it("fecha o modal ao chamar onClose do InviteModal", () => {
     render(<ResidentsTab residents={[]} republicId="rep-1" isAdmin={true} />);
     const { onPress } = jest.mocked(AddAccountButton).mock.calls[0][0] as any;
-    act(() => { onPress(); });
+    act(() => {
+      onPress();
+    });
     const { onClose } = jest.mocked(InviteModal).mock.calls.at(-1)?.[0] as any;
-    act(() => { onClose(); });
+    act(() => {
+      onClose();
+    });
     const lastProps = jest.mocked(InviteModal).mock.calls.at(-1)?.[0] as any;
     expect(lastProps.open).toBe(false);
   });

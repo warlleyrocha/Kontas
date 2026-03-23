@@ -137,6 +137,63 @@ describe("ResidentCard", () => {
     expect(mockToggleExpanded).toHaveBeenCalledTimes(1);
   });
 
+  it("usa accessibilityLabel 'Recolher detalhes' quando expanded=true", () => {
+    jest.mocked(useResidentCard).mockReturnValue(
+      createHookReturn({ expanded: true })
+    );
+
+    render(<ResidentCard morador={mockMorador} onCopyPix={jest.fn()} />);
+
+    expect(screen.getByLabelText("Recolher detalhes")).toBeTruthy();
+  });
+
+  it("exibe fallback 'Não informado' para email, telefone e chave PIX ausentes", () => {
+    const moradorSemContato: ResidentResponse = {
+      ...mockMorador,
+      email: null as any,
+      telefone: null,
+      chavePix: null,
+    };
+
+    render(<ResidentCard morador={moradorSemContato} onCopyPix={jest.fn()} />);
+
+    expect(screen.getAllByText("Não informado")).toHaveLength(3);
+    expect(screen.queryByLabelText("Copiar chave PIX")).toBeNull();
+  });
+
+  it("renderiza detalhes de contato e botão para copiar chave PIX quando disponíveis", () => {
+    const moradorCompleto: ResidentResponse = {
+      ...mockMorador,
+      telefone: "11999999999",
+      chavePix: "ana@pix",
+    };
+
+    render(<ResidentCard morador={moradorCompleto} onCopyPix={jest.fn()} />);
+
+    expect(screen.getByText("ana@email.com")).toBeTruthy();
+    expect(screen.getByText("11999999999")).toBeTruthy();
+    expect(screen.getByText("ana@pix")).toBeTruthy();
+
+    fireEvent.press(screen.getByLabelText("Copiar chave PIX"));
+
+    expect(mockHandleCopyPix).toHaveBeenCalledTimes(1);
+  });
+
+  it("usa accessibilityLabel 'Chave PIX copiada' quando copiado=true", () => {
+    jest.mocked(useResidentCard).mockReturnValue(
+      createHookReturn({ copiado: true })
+    );
+
+    const moradorComPix: ResidentResponse = {
+      ...mockMorador,
+      chavePix: "ana@pix",
+    };
+
+    render(<ResidentCard morador={moradorComPix} onCopyPix={jest.fn()} />);
+
+    expect(screen.getByLabelText("Chave PIX copiada")).toBeTruthy();
+  });
+
   it("passa morador e onCopyPix corretos para o hook", () => {
     const onCopyPix = jest.fn();
     render(<ResidentCard morador={mockMorador} onCopyPix={onCopyPix} />);
