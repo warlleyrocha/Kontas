@@ -1,12 +1,12 @@
 # Política de Privacidade — Kontas
 
-**Última atualização:** março de 2025
+**Última atualização:** março de 2026
 
 ---
 
 ## 1. Introdução
 
-Esta Política de Privacidade descreve como o aplicativo Kontas ("App"), desenvolvido por Warlley Rocha, coleta, utiliza, armazena e compartilha suas informações pessoais. Ao utilizar o App, você concorda com as práticas descritas neste documento, em conformidade com a Lei Geral de Proteção de Dados (LGPD — Lei nº 13.709/2018).
+Esta Política de Privacidade descreve como o aplicativo Kontas ("App"), de propriedade da Éden, coleta, utiliza, armazena e compartilha suas informações pessoais. Ao utilizar o App, você concorda com as práticas descritas neste documento, em conformidade com a Lei Geral de Proteção de Dados (LGPD — Lei nº 13.709/2018).
 
 ---
 
