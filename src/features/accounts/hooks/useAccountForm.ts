@@ -1,21 +1,20 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Platform } from "react-native";
 import { useResidents } from "@/src/features/residents/hooks/useResidents";
 import { MetodoPagamento } from "../types/account.types";
+import type {
+  MoradorDivisao,
+  TipoDivisao,
+} from "../types/accountForm.types";
+import {
+  applySplitByType,
+  parseCurrencyValue,
+} from "../utils/accountForm.utils";
 
 interface UseAccountFormParams {
   readonly republicId: string;
   readonly visible: boolean;
   readonly onClose: () => void;
-}
-
-export type TipoDivisao = "equal" | "custom";
-
-export interface MoradorDivisao {
-  moradorId: string;
-  nome: string;
-  checked: boolean;
-  valor: string;
 }
 
 interface AccountFormData {
@@ -25,30 +24,6 @@ interface AccountFormData {
   metodoPagamento: MetodoPagamento;
   tipoDivisao: TipoDivisao;
   moradoresDivisao: MoradorDivisao[];
-}
-
-function parseCurrencyValue(value: string): number {
-  const normalized = value.replace(/\./g, "").replace(",", ".").trim();
-  const parsed = Number(normalized);
-  return Number.isFinite(parsed) ? parsed : 0;
-}
-
-function formatCurrencyValue(value: number): string {
-  return value.toFixed(2).replace(".", ",");
-}
-
-function splitEvenly(total: number, parts: number): number[] {
-  if (!parts) return [];
-
-  const cents = Math.round(total * 100);
-  const base = Math.floor(cents / parts);
-  let remainder = cents - base * parts;
-
-  return Array.from({ length: parts }, () => {
-    const current = base + (remainder > 0 ? 1 : 0);
-    remainder = Math.max(0, remainder - 1);
-    return current / 100;
-  });
 }
 
 function createInitialFormData(): AccountFormData {
@@ -84,43 +59,6 @@ export function useAccountForm({
     void loadResidents();
   }, [fetchResidents, republicId, visible]);
 
-  const applySplitByType = useCallback(
-    (list: MoradorDivisao[], type: TipoDivisao, totalValue: string) => {
-      const selected = list.filter((morador) => morador.checked);
-      if (!selected.length)
-        return list.map((morador) => ({ ...morador, valor: "" }));
-
-      if (type === "custom") {
-        const getValor = (morador: MoradorDivisao) => {
-          if (!morador.checked) return "";
-          return morador.valor || "0,00";
-        };
-
-        return list.map((morador) => ({
-          ...morador,
-          valor: getValor(morador),
-        }));
-      }
-
-      const total = parseCurrencyValue(totalValue);
-      const values = splitEvenly(total, selected.length);
-      let cursor = 0;
-
-      return list.map((morador) => {
-        if (!morador.checked) return { ...morador, valor: "" };
-
-        const nextValue = values[cursor] ?? 0;
-        cursor += 1;
-
-        return {
-          ...morador,
-          valor: formatCurrencyValue(nextValue),
-        };
-      });
-    },
-    []
-  );
-
   // Atualizar moradoresDivisao quando residents mudar
   useEffect(() => {
     const moradores = residents.map((resident) => ({
@@ -138,7 +76,7 @@ export function useAccountForm({
         prev.valorTotal
       ),
     }));
-  }, [residents, applySplitByType]);
+  }, [residents]);
 
   const handleDateChange = (_: any, selectedDate?: Date) => {
     if (!selectedDate) return;

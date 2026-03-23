@@ -1,7 +1,10 @@
 import Feather from "@expo/vector-icons/Feather";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 
-import type { MoradorDivisao, TipoDivisao } from "../../hooks/useAccountForm";
+import type {
+  MoradorDivisao,
+  TipoDivisao,
+} from "../../types/accountForm.types";
 
 interface AddAccountModalResidentsSectionProps {
   readonly tipoDivisao: TipoDivisao;
