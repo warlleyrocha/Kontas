@@ -115,6 +115,14 @@ describe("httpError", () => {
     expect(result.code).toBe("ECONNABORTED");
   });
 
+  it("usa mensagem padrão de timeout quando timeoutMessage não é fornecido (L65)", () => {
+    const error = createAxiosError({ code: "ECONNABORTED" });
+
+    const result = toUserFriendlyError(error, { defaultMessage: "fallback" });
+
+    expect(result.message).toBe("Tempo de resposta excedido. Tente novamente.");
+  });
+
   it("usa networkMessage quando não há response", () => {
     const error = createAxiosError({ code: "ERR_NETWORK" });
 
@@ -125,6 +133,14 @@ describe("httpError", () => {
 
     expect(result.message).toBe("sem conexão");
     expect(result.code).toBe("ERR_NETWORK");
+  });
+
+  it("usa mensagem padrão de rede quando networkMessage não é fornecido (L73)", () => {
+    const error = createAxiosError({ code: "ERR_NETWORK" });
+
+    const result = toUserFriendlyError(error, { defaultMessage: "fallback" });
+
+    expect(result.message).toBe("Falha de conexão. Verifique sua internet.");
   });
 
   it("usa defaultMessage para erro axios com response sem mapeamento", () => {

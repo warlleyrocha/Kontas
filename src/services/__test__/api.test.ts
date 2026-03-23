@@ -2,6 +2,8 @@ import { AxiosError, type AxiosInstance, type InternalAxiosRequestConfig } from 
 
 type ApiModule = typeof import("../api");
 
+type RequestConfig = InternalAxiosRequestConfig & { _cbHalfOpen?: boolean };
+
 type MockedLogger = {
   debug: jest.Mock;
   info: jest.Mock;
@@ -60,19 +62,19 @@ function createAxiosError({
 function getHandlers(api: AxiosInstance) {
   const requestHandlers = (
     api.interceptors.request as unknown as {
-      handlers: Array<InterceptorHandler<InternalAxiosRequestConfig>>;
+      handlers: InterceptorHandler<InternalAxiosRequestConfig>[];
     }
   ).handlers;
 
   const responseHandlers = (
     api.interceptors.response as unknown as {
-      handlers: Array<InterceptorHandler<unknown, unknown>>;
+      handlers: InterceptorHandler<unknown, unknown>[];
     }
   ).handlers;
 
   return {
-    request: requestHandlers[0]!,
-    response: responseHandlers[0]!,
+    request: requestHandlers[0],
+    response: responseHandlers[0],
   };
 }
 
@@ -109,7 +111,7 @@ function importApiModule(apiUrl = "https://api.example.com") {
   let importedModule: ApiModule | undefined;
 
   jest.isolateModules(() => {
-    importedModule = jest.requireActual("../api");
+    importedModule = jest.requireActual("../api") as ApiModule;
   });
 
   const api = importedModule?.api as AxiosInstance;
@@ -165,7 +167,7 @@ describe("api service", () => {
 
     expect(asyncStorage.getItem).toHaveBeenCalledWith("@app:token");
     expect(result.headers.Authorization).toBe("Bearer token-123");
-    expect(result._cbHalfOpen).toBe(false);
+    expect((result as RequestConfig)._cbHalfOpen).toBe(false);
     expect(logger.debug).toHaveBeenCalledWith(
       "API",
       "➡️ POST /payments",
@@ -300,7 +302,7 @@ describe("api service", () => {
     );
 
     const normalConfig = await request.fulfilled(createConfig({ url: "/next" }));
-    expect(normalConfig._cbHalfOpen).toBe(false);
+    expect((normalConfig as RequestConfig)._cbHalfOpen).toBe(false);
   });
 
   it("reabre o circuito quando a tentativa half-open falha com erro contabilizável", async () => {
@@ -368,7 +370,7 @@ describe("api service", () => {
       createConfig({ url: "/allowed-again" }),
     );
 
-    expect(nextConfig._cbHalfOpen).toBe(false);
+    expect((nextConfig as RequestConfig)._cbHalfOpen).toBe(false);
   });
 
   it("trata erro axios sem response como network error", async () => {
@@ -392,5 +394,114 @@ describe("api service", () => {
     await expect(response.rejected("falha desconhecida")).rejects.toMatchObject({
       message: "falha desconhecida",
     });
+  });
+
+  it("repassa instância de Error no rejected do interceptor de request (L151)", async () => {
+    const { request } = importApiModule();
+    const err = new Error("already an error");
+
+    await expect(request.rejected(err)).rejects.toBe(err);
+  });
+
+  it("repassa instância de Error não-axios no rejected do interceptor de resposta (L174)", async () => {
+    const { response } = importApiModule();
+    const err = new Error("plain non-axios error");
+
+    await expect(response.rejected(err)).rejects.toBe(err);
+  });
+
+  it("não define Authorization quando config.headers é nulo com token presente (L136)", async () => {
+    const { asyncStorage, request } = importApiModule();
+    asyncStorage.getItem.mockResolvedValue("token-abc");
+
+    const config = createConfig({ headers: null as any });
+    const result = await request.fulfilled(config);
+
+    expect(result.headers).toBeNull();
+  });
+
+  it("onFailure não modifica nada quando circuito já está OPEN (L86)", async () => {
+    const { response } = importApiModule();
+    const failure = createAxiosError({
+      status: 500,
+      config: createConfig({ url: "/unstable" }),
+    });
+
+    await expect(response.rejected(failure)).rejects.toBe(failure);
+    await expect(response.rejected(failure)).rejects.toBe(failure);
+    await expect(response.rejected(failure)).rejects.toBe(failure);
+
+    // 4ª falha: circuito já está OPEN — onFailure(false) chamado com state=OPEN → L86 false branch
+    await expect(response.rejected(failure)).rejects.toBe(failure);
+  });
+
+  it("onSuccess(false) não altera failureCount quando circuito está em HALF_OPEN (L69)", async () => {
+    const nowSpy = jest.spyOn(Date, "now");
+    nowSpy.mockReturnValue(1000);
+
+    const { asyncStorage, request, response } = importApiModule();
+    asyncStorage.getItem.mockResolvedValue(null);
+
+    const failure = createAxiosError({
+      status: 500,
+      config: createConfig({ url: "/probe" }),
+    });
+
+    await expect(response.rejected(failure)).rejects.toBe(failure);
+    await expect(response.rejected(failure)).rejects.toBe(failure);
+    await expect(response.rejected(failure)).rejects.toBe(failure);
+
+    nowSpy.mockReturnValue(11000);
+
+    // Abre a sonda half-open (state → HALF_OPEN, halfOpenInFlight=true)
+    await request.fulfilled(createConfig({ url: "/probe" }));
+
+    // Resposta bem-sucedida de uma request normal (sem _cbHalfOpen) enquanto estado é HALF_OPEN
+    // → onSuccess(false) chamado com state=HALF_OPEN → L69 false branch (não reseta failureCount)
+    const normalConfig = Object.assign(createConfig({ url: "/other" }), {
+      _cbHalfOpen: false,
+    });
+    const apiResponse = { status: 200, config: normalConfig, data: {} };
+    expect(response.fulfilled(apiResponse)).toBe(apiResponse);
+  });
+
+  it("normaliza objeto axios-like que não é instância de Error (L196)", async () => {
+    const { response } = importApiModule();
+
+    // isAxiosError() verifica apenas a flag `isAxiosError: true`, não o instanceof.
+    // Passando um objeto simples com essa flag chegamos ao final do handler (L195-196)
+    // com error instanceof Error === false → cria new Error(String(error)).
+    const fakeAxiosLike = {
+      isAxiosError: true,
+      code: undefined as string | undefined,
+      config: createConfig({ url: "/fake" }),
+      response: undefined,
+      message: "fake axios",
+      toString: () => "fake axios error",
+    };
+
+    await expect(response.rejected(fakeAxiosLike)).rejects.toMatchObject({
+      message: "fake axios error",
+    });
+  });
+
+  it("erro cancelado em request normal não modifica o circuito (L191–196)", async () => {
+    const { asyncStorage, request, response } = importApiModule();
+    asyncStorage.getItem.mockResolvedValue(null);
+
+    const normalConfig = await request.fulfilled(
+      createConfig({ url: "/cancel-test" }),
+    );
+    const canceledError = createAxiosError({
+      code: "ERR_CANCELED",
+      config: normalConfig,
+    });
+
+    // shouldOpenByFailure=false, wasHalfOpen=false → nem if nem else-if é tomado → L195 direto
+    await expect(response.rejected(canceledError)).rejects.toBe(canceledError);
+
+    // Circuito permanece CLOSED
+    const nextConfig = await request.fulfilled(createConfig({ url: "/next" }));
+    expect((nextConfig as RequestConfig)._cbHalfOpen).toBe(false);
   });
 });
