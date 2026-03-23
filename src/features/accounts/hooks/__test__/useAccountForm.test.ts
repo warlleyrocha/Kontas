@@ -2,7 +2,14 @@ import { act, renderHook } from "@testing-library/react-native";
 import { Platform } from "react-native";
 import { useResidents } from "@/src/features/residents/hooks/useResidents";
 import { MetodoPagamento } from "../../types/account.types";
-import { useAccountForm } from "../useAccountForm";
+import {
+  applyEqualSplitValues,
+  applySplitByType,
+  splitEvenly,
+} from "../../utils/accountForm.utils";
+import {
+  useAccountForm,
+} from "../useAccountForm";
 
 jest.mock("@/src/features/residents/hooks/useResidents", () => ({
   useResidents: jest.fn(),
@@ -49,6 +56,23 @@ function renderForm(
   );
 }
 
+function createMoradorDivisao(
+  overrides: Partial<{
+    moradorId: string;
+    nome: string;
+    checked: boolean;
+    valor: string;
+  }> = {}
+) {
+  return {
+    moradorId: "r-1",
+    nome: "Ana",
+    checked: true,
+    valor: "",
+    ...overrides,
+  };
+}
+
 // ─── Setup ────────────────────────────────────────────────────────────────────
 
 let consoleErrorSpy: jest.SpyInstance;
@@ -65,6 +89,67 @@ afterEach(() => {
 });
 
 // ─── useAccountForm ───────────────────────────────────────────────────────────
+
+describe("useAccountForm helpers de divisão", () => {
+  it("splitEvenly retorna array vazio quando não há partes", () => {
+    expect(splitEvenly(10, 0)).toEqual([]);
+  });
+
+  it("applySplitByType no modo custom preserva valor preenchido de morador marcado", () => {
+    const result = applySplitByType(
+      [
+        createMoradorDivisao({ valor: "7,50" }),
+        createMoradorDivisao({
+          moradorId: "r-2",
+          nome: "Bruno",
+          checked: false,
+          valor: "4,00",
+        }),
+      ],
+      "custom",
+      "20,00"
+    );
+
+    expect(result).toEqual([
+      createMoradorDivisao({ valor: "7,50" }),
+      createMoradorDivisao({
+        moradorId: "r-2",
+        nome: "Bruno",
+        checked: false,
+        valor: "",
+      }),
+    ]);
+  });
+
+  it("applySplitByType no modo custom usa '0,00' quando o morador marcado não tem valor", () => {
+    const result = applySplitByType(
+      [createMoradorDivisao()],
+      "custom",
+      "20,00"
+    );
+
+    expect(result).toEqual([createMoradorDivisao({ valor: "0,00" })]);
+  });
+
+  it("applyEqualSplitValues usa 0,00 quando faltar valor calculado para um morador marcado", () => {
+    const result = applyEqualSplitValues(
+      [
+        createMoradorDivisao(),
+        createMoradorDivisao({ moradorId: "r-2", nome: "Bruno" }),
+      ],
+      [5]
+    );
+
+    expect(result).toEqual([
+      createMoradorDivisao({ valor: "5,00" }),
+      createMoradorDivisao({
+        moradorId: "r-2",
+        nome: "Bruno",
+        valor: "0,00",
+      }),
+    ]);
+  });
+});
 
 describe("useAccountForm — estado inicial", () => {
   it("formData começa com valores padrão", () => {
@@ -343,6 +428,90 @@ describe("useAccountForm — handleValorTotalChange", () => {
       (m) => m.moradorId === "r-1"
     );
     expect(morador?.valor).toBe("3,00");
+  });
+});
+
+describe("useAccountForm — handleValorTotalChange (parseCurrencyValue não-finito)", () => {
+  it("valorTotal não numérico é tratado como zero no modo equal", () => {
+    setupResidentsMock([mockResident]);
+    const { result } = renderForm();
+    act(() => {
+      result.current.handleValorTotalChange("xyz");
+    });
+    const morador = result.current.formData.moradoresDivisao[0];
+    expect(morador.valor).toBe("0,00");
+  });
+});
+
+describe("useAccountForm — applySplitByType: modo custom com moradores", () => {
+  beforeEach(() => {
+    setupResidentsMock([mockResident, mockResident2]);
+  });
+
+  it("morador marcado com valor vazio recebe '0,00'", () => {
+    const { result } = renderForm();
+    act(() => {
+      result.current.handleSetTipoDivisao("custom");
+    });
+    const morador = result.current.formData.moradoresDivisao.find(
+      (m) => m.moradorId === "r-1"
+    );
+    expect(morador?.valor).toBe("0,00");
+  });
+
+  it("morador desmarcado recebe valor '' no modo custom", () => {
+    const { result } = renderForm();
+    act(() => {
+      result.current.handleSetTipoDivisao("custom");
+    });
+    act(() => {
+      result.current.handleToggleMorador("r-1");
+    });
+    const morador = result.current.formData.moradoresDivisao.find(
+      (m) => m.moradorId === "r-1"
+    );
+    expect(morador?.valor).toBe("");
+  });
+
+  it("morador marcado com valor definido mantém o valor ao redistribuir no modo custom", () => {
+    const { result } = renderForm();
+    act(() => {
+      result.current.handleSetTipoDivisao("custom");
+    });
+    act(() => {
+      result.current.handleMoradorValorChange("r-1", "7,50");
+    });
+    act(() => {
+      result.current.handleToggleMorador("r-2");
+    });
+    const r1 = result.current.formData.moradoresDivisao.find(
+      (m) => m.moradorId === "r-1"
+    );
+    expect(r1?.valor).toBe("7,50");
+  });
+});
+
+describe("useAccountForm — handleToggleMorador no modo equal com lista mista", () => {
+  beforeEach(() => {
+    setupResidentsMock([mockResident, mockResident2]);
+  });
+
+  it("morador desmarcado recebe '' e o marcado absorve o total inteiro", () => {
+    const { result } = renderForm();
+    act(() => {
+      result.current.handleValorTotalChange("10,00");
+    });
+    act(() => {
+      result.current.handleToggleMorador("r-1");
+    });
+    const r1 = result.current.formData.moradoresDivisao.find(
+      (m) => m.moradorId === "r-1"
+    );
+    const r2 = result.current.formData.moradoresDivisao.find(
+      (m) => m.moradorId === "r-2"
+    );
+    expect(r1?.valor).toBe("");
+    expect(r2?.valor).toBe("10,00");
   });
 });
 

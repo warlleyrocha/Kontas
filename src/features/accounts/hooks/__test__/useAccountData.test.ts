@@ -211,6 +211,22 @@ describe("useAccountData — fetchAccounts (falha)", () => {
     consoleErrorSpy.mockClear();
   });
 
+  it("envolve em new Error quando o lançado não é instância de Error (L49)", async () => {
+    jest
+      .mocked(accountService.listarContasPorRepublica)
+      .mockRejectedValue("falha como string");
+    jest.mocked(getErrorMessage).mockReturnValue("mensagem tratada");
+
+    const { result } = renderHook(() => useAccountData({ republicId: "rep-1" }));
+    await act(async () => {
+      await result.current.fetchAccounts();
+    });
+
+    expect(result.current.error).toBeInstanceOf(Error);
+    expect(result.current.error?.message).toBe("mensagem tratada");
+    consoleErrorSpy.mockClear();
+  });
+
   it("esvazia contas ao falhar", async () => {
     jest
       .mocked(accountService.listarContasPorRepublica)

@@ -367,6 +367,51 @@ describe("useAccountActions", () => {
     expect(result.current.isUpdating).toBe(false);
   });
 
+  it("exibe error.message quando handlePatch rejeita com instância de Error (L192)", async () => {
+    mockAccountService.pagarConta.mockRejectedValue(new Error("falha no pagamento"));
+
+    const { result } = renderHook(() => useAccountActions());
+
+    await act(async () => {
+      await result.current.handlePatch("account-10", MetodoPagamento.PIX);
+    });
+
+    expect(mockShowToast.error).toHaveBeenCalledWith("falha no pagamento");
+  });
+
+  it("não chama toast.dismiss quando toastId é undefined em handleRecovery (L109)", async () => {
+    mockToast.custom.mockReturnValue(undefined as any);
+
+    const { result } = renderHook(() => useAccountActions());
+
+    await act(async () => {
+      await result.current.handleDelete("account-11");
+    });
+
+    await act(async () => {
+      await result.current.handleRecovery("account-11");
+    });
+
+    expect(mockToast.dismiss).not.toHaveBeenCalled();
+    expect(mockShowToast.success).toHaveBeenCalledWith("Remoção cancelada com sucesso.");
+  });
+
+  it("não chama toast.dismiss quando toastId é undefined no callback do setTimeout (L144)", async () => {
+    mockToast.custom.mockReturnValue(undefined as any);
+    mockAccountService.removerConta.mockResolvedValue(undefined);
+
+    const { result } = renderHook(() => useAccountActions());
+
+    await act(async () => {
+      await result.current.handleDelete("account-12");
+    });
+
+    await advanceRecoveryWindow();
+
+    expect(mockToast.dismiss).not.toHaveBeenCalled();
+    expect(mockAccountService.removerConta).toHaveBeenCalledWith({ id: "account-12" });
+  });
+
   it("busca contas por morador", async () => {
     const contas = [
       {
