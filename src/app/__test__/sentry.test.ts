@@ -16,15 +16,22 @@ const mockFeedbackIntegration = jest.mocked(feedbackIntegration);
 const mockInit = jest.mocked(init);
 const mockMobileReplayIntegration = jest.mocked(mobileReplayIntegration);
 
+const MOCK_DSN = "https://test-key@sentry.io/test-project";
+
 describe("initSentry", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    process.env.EXPO_PUBLIC_SENTRY_DSN = MOCK_DSN;
     mockMobileReplayIntegration.mockReturnValue({
       name: "mobile-replay",
     } as never);
     mockFeedbackIntegration.mockReturnValue({
       name: "feedback",
     } as never);
+  });
+
+  afterEach(() => {
+    delete process.env.EXPO_PUBLIC_SENTRY_DSN;
   });
 
   it("inicializa o Sentry com as integrações e configurações do app", () => {
@@ -34,12 +41,20 @@ describe("initSentry", () => {
     expect(mockFeedbackIntegration).toHaveBeenCalledTimes(1);
     expect(mockInit).toHaveBeenCalledTimes(1);
     expect(mockInit).toHaveBeenCalledWith({
-      dsn: "https://da32d972451786e6c1a0aea2f4024516@o4510817801928704.ingest.us.sentry.io/4510818996322304",
+      dsn: MOCK_DSN,
       sendDefaultPii: true,
       enableLogs: true,
       replaysSessionSampleRate: 0.1,
       replaysOnErrorSampleRate: 1,
       integrations: [{ name: "mobile-replay" }, { name: "feedback" }],
     });
+  });
+
+  it("passa dsn=undefined quando a variável de ambiente não está definida", () => {
+    delete process.env.EXPO_PUBLIC_SENTRY_DSN;
+    initSentry();
+    expect(mockInit).toHaveBeenCalledWith(
+      expect.objectContaining({ dsn: undefined })
+    );
   });
 });
