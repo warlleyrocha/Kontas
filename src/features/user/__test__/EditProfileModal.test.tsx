@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react-native";
+import { Platform } from "react-native";
 import { EditProfileModal } from "../components/EditProfileModal";
 import { useEditProfile } from "../hooks/useEditProfile";
 
@@ -113,5 +114,26 @@ describe("EditProfileModal", () => {
     fireEvent.press(screen.getByLabelText("Cancelar edição de perfil"));
 
     expect(mockHandleClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("usa behavior 'padding' no iOS", () => {
+    Platform.OS = "ios";
+
+    render(<EditProfileModal {...createProps()} />);
+
+    expect(screen.getByText("Editar Perfil")).toBeTruthy();
+
+    Platform.OS = "android";
+  });
+
+  it("exibe a imagem quando photoUri está definido", () => {
+    mockUseEditProfile.mockReturnValue({
+      ...createHookReturn(),
+      photoUri: "https://example.com/photo.jpg",
+    });
+
+    render(<EditProfileModal {...createProps()} />);
+
+    expect(screen.queryByText("Toque para alterar a foto")).toBeTruthy();
   });
 });
