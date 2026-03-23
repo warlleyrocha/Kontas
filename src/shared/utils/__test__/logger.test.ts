@@ -7,13 +7,13 @@ const mockWithScope = jest.fn(
     callback: (scope: {
       setTag: typeof mockSetTag;
       setExtra: typeof mockSetExtra;
-    }) => void,
+    }) => void
   ) => {
     callback({
       setTag: mockSetTag,
       setExtra: mockSetExtra,
     });
-  },
+  }
 );
 
 jest.mock("@sentry/react-native", () => ({
@@ -74,17 +74,17 @@ describe("logger", () => {
     expect(infoSpy).toHaveBeenCalledWith(
       "[INFO][Auth]",
       "mensagem info",
-      JSON.stringify({ ok: true }, null, 2),
+      JSON.stringify({ ok: true }, null, 2)
     );
     expect(debugSpy).toHaveBeenCalledWith(
       "[DEBUG][Auth]",
       "mensagem debug",
-      JSON.stringify({ payload: 1 }, null, 2),
+      JSON.stringify({ payload: 1 }, null, 2)
     );
     expect(warnSpy).toHaveBeenCalledWith(
       "[WARN][Auth]",
       "mensagem warn",
-      JSON.stringify({ step: "x" }, null, 2),
+      JSON.stringify({ step: "x" }, null, 2)
     );
     expect(mockAddBreadcrumb).toHaveBeenCalledWith({
       category: "Auth",
@@ -95,13 +95,13 @@ describe("logger", () => {
     expect(errorSpy).toHaveBeenCalledWith(
       "[ERROR][Auth]",
       "mensagem error",
-      JSON.stringify(error, Object.getOwnPropertyNames(error), 2),
+      JSON.stringify(error, Object.getOwnPropertyNames(error), 2)
     );
     expect(traceSpy).toHaveBeenNthCalledWith(1, "[TRACE][Auth]");
     expect(traceSpy).toHaveBeenNthCalledWith(
       2,
       "[TRACE][Auth]",
-      "mensagem trace",
+      "mensagem trace"
     );
     expect(mockSetTag).toHaveBeenCalledWith("module", "Auth");
     expect(mockSetExtra).toHaveBeenCalledWith("context", { requestId: "1" });
@@ -110,7 +110,7 @@ describe("logger", () => {
       2,
       "[TABLE][Auth]",
       "mensagem table",
-      JSON.stringify({ rows: 2 }, null, 2),
+      JSON.stringify({ rows: 2 }, null, 2)
     );
   });
 
@@ -168,17 +168,17 @@ describe("logger", () => {
     expect(infoSpy).toHaveBeenCalledWith(
       "[INFO][Billing]",
       "info sem data",
-      "",
+      ""
     );
     expect(debugSpy).toHaveBeenCalledWith(
       "[DEBUG][Billing]",
       "debug sem data",
-      "",
+      ""
     );
     expect(warnSpy).toHaveBeenCalledWith(
       "[WARN][Billing]",
       "warn sem data",
-      "",
+      ""
     );
     expect(mockAddBreadcrumb).toHaveBeenCalledWith({
       category: "Billing",
@@ -190,7 +190,7 @@ describe("logger", () => {
       1,
       "[ERROR][Billing]",
       "erro sem payload",
-      "",
+      ""
     );
     expect(errorSpy).toHaveBeenNthCalledWith(
       2,
@@ -199,8 +199,8 @@ describe("logger", () => {
       JSON.stringify(
         "falha em texto",
         Object.getOwnPropertyNames("falha em texto"),
-        2,
-      ),
+        2
+      )
     );
     expect(traceSpy).toHaveBeenNthCalledWith(1, "[TRACE][Billing]");
     expect(traceSpy).toHaveBeenNthCalledWith(2, "[TRACE][Billing]");

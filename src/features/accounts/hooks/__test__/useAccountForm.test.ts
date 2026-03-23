@@ -7,9 +7,7 @@ import {
   applySplitByType,
   splitEvenly,
 } from "../../utils/accountForm.utils";
-import {
-  useAccountForm,
-} from "../useAccountForm";
+import { useAccountForm } from "../useAccountForm";
 
 jest.mock("@/src/features/residents/hooks/useResidents", () => ({
   useResidents: jest.fn(),
@@ -31,7 +29,7 @@ const mockResident = {
 
 const mockResident2 = { ...mockResident, id: "r-2", nome: "Bruno" };
 
-function setupResidentsMock(residents: typeof mockResident[] = []) {
+function setupResidentsMock(residents: (typeof mockResident)[] = []) {
   jest.mocked(useResidents).mockReturnValue({
     residents,
     fetchResidents: mockFetchResidents,
@@ -398,7 +396,9 @@ describe("useAccountForm — handleValorTotalChange", () => {
     act(() => {
       result.current.handleValorTotalChange("10,00");
     });
-    const valores = result.current.formData.moradoresDivisao.map((m) => m.valor);
+    const valores = result.current.formData.moradoresDivisao.map(
+      (m) => m.valor
+    );
     expect(valores).toEqual(["5,00", "5,00"]);
   });
 
@@ -408,7 +408,9 @@ describe("useAccountForm — handleValorTotalChange", () => {
     act(() => {
       result.current.handleValorTotalChange("10,01");
     });
-    const valores = result.current.formData.moradoresDivisao.map((m) => m.valor);
+    const valores = result.current.formData.moradoresDivisao.map(
+      (m) => m.valor
+    );
     expect(valores).toEqual(["5,01", "5,00"]);
   });
 

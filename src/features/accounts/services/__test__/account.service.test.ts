@@ -107,7 +107,9 @@ describe("accountService.criarConta", () => {
     mockApi.post.mockRejectedValue(new Error("original"));
     mockToUserFriendlyError.mockReturnValue(friendly);
 
-    await expect(accountService.criarConta(criarPayload)).rejects.toBe(friendly);
+    await expect(accountService.criarConta(criarPayload)).rejects.toBe(
+      friendly
+    );
   });
 });
 
@@ -151,9 +153,9 @@ describe("accountService.listarContasPorRepublica", () => {
     mockApi.get.mockRejectedValue(new Error("original"));
     mockToUserFriendlyError.mockReturnValue(friendly);
 
-    await expect(
-      accountService.listarContasPorRepublica("rep-1")
-    ).rejects.toBe(friendly);
+    await expect(accountService.listarContasPorRepublica("rep-1")).rejects.toBe(
+      friendly
+    );
   });
 });
 
@@ -251,7 +253,10 @@ describe("accountService.pagarConta", () => {
     mockApi.patch.mockResolvedValue({});
 
     await expect(
-      accountService.pagarConta({ id: "c-1", metodoPagamento: MetodoPagamento.PIX })
+      accountService.pagarConta({
+        id: "c-1",
+        metodoPagamento: MetodoPagamento.PIX,
+      })
     ).resolves.toBeUndefined();
 
     expect(mockApi.patch).toHaveBeenCalledWith("/contas/c-1", {
@@ -269,7 +274,10 @@ describe("accountService.pagarConta", () => {
     mockApi.patch.mockRejectedValue(error);
 
     await expect(
-      accountService.pagarConta({ id: "c-1", metodoPagamento: MetodoPagamento.DINHEIRO })
+      accountService.pagarConta({
+        id: "c-1",
+        metodoPagamento: MetodoPagamento.DINHEIRO,
+      })
     ).rejects.toBeDefined();
 
     expect(mockToUserFriendlyError).toHaveBeenCalledWith(error, {
@@ -290,7 +298,10 @@ describe("accountService.pagarConta", () => {
     mockToUserFriendlyError.mockReturnValue(friendly);
 
     await expect(
-      accountService.pagarConta({ id: "c-1", metodoPagamento: MetodoPagamento.CARTAO })
+      accountService.pagarConta({
+        id: "c-1",
+        metodoPagamento: MetodoPagamento.CARTAO,
+      })
     ).rejects.toBe(friendly);
   });
 });

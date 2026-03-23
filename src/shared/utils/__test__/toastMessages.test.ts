@@ -30,7 +30,7 @@ describe("toastMessages", () => {
 
     expect(mockGetErrorMessage).toHaveBeenCalledWith(
       error,
-      "Não foi possível fazer logout. Tente novamente.",
+      "Não foi possível fazer logout. Tente novamente."
     );
     expect(mockShowToast.error).toHaveBeenCalledWith("mensagem tratada");
   });
@@ -42,7 +42,7 @@ describe("toastMessages", () => {
 
     expect(mockGetErrorMessage).toHaveBeenCalledWith(
       error,
-      "Erro ao atualizar o perfil.",
+      "Erro ao atualizar o perfil."
     );
     expect(mockShowToast.error).toHaveBeenCalledWith("mensagem tratada");
   });
@@ -54,7 +54,7 @@ describe("toastMessages", () => {
 
     expect(mockGetErrorMessage).toHaveBeenCalledWith(
       error,
-      "Erro de conexão. Verifique sua internet.",
+      "Erro de conexão. Verifique sua internet."
     );
     expect(mockShowToast.error).toHaveBeenCalledWith("mensagem tratada");
   });

@@ -3,9 +3,7 @@ import InputField from "../input-field";
 
 describe("InputField", () => {
   it("monta sem erros", () => {
-    render(
-      <InputField label="Nome" value="" onChangeText={jest.fn()} />,
-    );
+    render(<InputField label="Nome" value="" onChangeText={jest.fn()} />);
   });
 
   it("exibe o label", () => {
@@ -25,14 +23,14 @@ describe("InputField", () => {
         placeholder="Digite seu email"
         value=""
         onChangeText={jest.fn()}
-      />,
+      />
     );
     expect(screen.getByPlaceholderText("Digite seu email")).toBeTruthy();
   });
 
   it("exibe o valor atual no input", () => {
     render(
-      <InputField label="Nome" value="Warlley" onChangeText={jest.fn()} />,
+      <InputField label="Nome" value="Warlley" onChangeText={jest.fn()} />
     );
     expect(screen.getByDisplayValue("Warlley")).toBeTruthy();
   });

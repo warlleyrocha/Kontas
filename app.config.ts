@@ -159,7 +159,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
 // Configuração dinâmica baseada no ambiente
 export const getDynamicAppConfig = (
-  environment: "development" | "preview" | "production",
+  environment: "development" | "preview" | "production"
 ) => {
   if (environment === "production") {
     return {

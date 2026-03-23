@@ -94,7 +94,9 @@ describe("InvitesCard — status diferentes", () => {
       ...mockStatusStyle,
       label: "Aceito",
     });
-    render(<InvitesCard invite={{ ...mockInvite, status: StatusInvite.ACEITO }} />);
+    render(
+      <InvitesCard invite={{ ...mockInvite, status: StatusInvite.ACEITO }} />
+    );
     expect(screen.getByText("Aceito")).toBeTruthy();
   });
 
@@ -103,7 +105,9 @@ describe("InvitesCard — status diferentes", () => {
       ...mockStatusStyle,
       label: "Recusado",
     });
-    render(<InvitesCard invite={{ ...mockInvite, status: StatusInvite.RECUSADO }} />);
+    render(
+      <InvitesCard invite={{ ...mockInvite, status: StatusInvite.RECUSADO }} />
+    );
     expect(screen.getByText("Recusado")).toBeTruthy();
   });
 });

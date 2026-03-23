@@ -37,13 +37,11 @@ describe("PaymentsEmptyState", () => {
     render(
       <PaymentsEmptyState
         {...createProps({ selectedStatus: StatusPagamento.PAGO })}
-      />,
+      />
     );
     expect(screen.getByText("Nenhum pagamento pago")).toBeTruthy();
     expect(
-      screen.getByText(
-        "Nenhum pagamento foi confirmado como PAGO no momento.",
-      ),
+      screen.getByText("Nenhum pagamento foi confirmado como PAGO no momento.")
     ).toBeTruthy();
   });
 
@@ -53,13 +51,13 @@ describe("PaymentsEmptyState", () => {
         {...createProps({
           selectedStatus: StatusPagamento.AGUARDANDO_CONFIRMACAO,
         })}
-      />,
+      />
     );
     expect(screen.getByText("Nada para confirmar")).toBeTruthy();
     expect(
       screen.getByText(
-        "Nenhum pagamento enviado por moradores está aguardando confirmação no momento.",
-      ),
+        "Nenhum pagamento enviado por moradores está aguardando confirmação no momento."
+      )
     ).toBeTruthy();
   });
 
@@ -68,8 +66,8 @@ describe("PaymentsEmptyState", () => {
     expect(screen.getByText("Nenhum pagamento encontrado")).toBeTruthy();
     expect(
       screen.getByText(
-        "Não há pagamentos com status PAGO ou aguardando confirmação no momento.",
-      ),
+        "Não há pagamentos com status PAGO ou aguardando confirmação no momento."
+      )
     ).toBeTruthy();
   });
 
@@ -84,7 +82,7 @@ describe("PaymentsEmptyState", () => {
 
   it("passa isRefreshing para o RefreshControl", () => {
     const { UNSAFE_getByType } = render(
-      <PaymentsEmptyState {...createProps({ isRefreshing: true })} />,
+      <PaymentsEmptyState {...createProps({ isRefreshing: true })} />
     );
     expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(true);
   });

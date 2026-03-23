@@ -58,7 +58,7 @@ describe("ScreenLayout", () => {
     render(<ScreenLayout {...createProps({ onBack })} />);
 
     fireEvent.press(
-      screen.getByRole("button", { name: "Voltar para a tela anterior" }),
+      screen.getByRole("button", { name: "Voltar para a tela anterior" })
     );
 
     expect(onBack).toHaveBeenCalledTimes(1);
@@ -69,7 +69,7 @@ describe("ScreenLayout", () => {
     render(<ScreenLayout {...createProps()} />);
 
     fireEvent.press(
-      screen.getByRole("button", { name: "Voltar para a tela anterior" }),
+      screen.getByRole("button", { name: "Voltar para a tela anterior" })
     );
 
     expect(mockBack).toHaveBeenCalledTimes(1);

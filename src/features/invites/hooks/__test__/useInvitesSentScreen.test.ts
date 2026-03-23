@@ -33,7 +33,9 @@ function setupQuery(overrides = {}) {
 beforeEach(() => {
   jest.clearAllMocks();
   jest.mocked(useRouter).mockReturnValue(mockRouter as any);
-  jest.mocked(getErrorMessage).mockImplementation((_err, fallback) => fallback ?? "erro");
+  jest
+    .mocked(getErrorMessage)
+    .mockImplementation((_err, fallback) => fallback ?? "erro");
   setupQuery();
 });
 
@@ -64,12 +66,19 @@ describe("useInvitesSentScreen — estado inicial", () => {
   it("retorna a mensagem de erro quando invitesQuery.error está definido", () => {
     const error = new Error("fail");
     setupQuery({ error });
-    jest.mocked(getErrorMessage).mockReturnValue("Não foi possível carregar os convites enviados.");
+    jest
+      .mocked(getErrorMessage)
+      .mockReturnValue("Não foi possível carregar os convites enviados.");
 
     const { result } = renderHook(() => useInvitesSentScreen("rep-1"));
 
-    expect(getErrorMessage).toHaveBeenCalledWith(error, "Não foi possível carregar os convites enviados.");
-    expect(result.current.error).toBe("Não foi possível carregar os convites enviados.");
+    expect(getErrorMessage).toHaveBeenCalledWith(
+      error,
+      "Não foi possível carregar os convites enviados."
+    );
+    expect(result.current.error).toBe(
+      "Não foi possível carregar os convites enviados."
+    );
   });
 
   it("loading=true quando isLoading é true", () => {
@@ -94,7 +103,9 @@ describe("useInvitesSentScreen — handleRetry", () => {
   it("chama invitesQuery.refetch", () => {
     const { result } = renderHook(() => useInvitesSentScreen("rep-1"));
 
-    act(() => { result.current.handleRetry(); });
+    act(() => {
+      result.current.handleRetry();
+    });
 
     expect(mockRefetch).toHaveBeenCalledTimes(1);
   });
@@ -104,7 +115,9 @@ describe("useInvitesSentScreen — handleEmptyStatePress", () => {
   it("chama router.back", () => {
     const { result } = renderHook(() => useInvitesSentScreen("rep-1"));
 
-    act(() => { result.current.handleEmptyStatePress(); });
+    act(() => {
+      result.current.handleEmptyStatePress();
+    });
 
     expect(mockRouter.back).toHaveBeenCalledTimes(1);
   });

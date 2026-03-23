@@ -13,18 +13,14 @@ describe("DeleteButton", () => {
 
   it("exibe o label padrão de acessibilidade", () => {
     render(<DeleteButton onPress={jest.fn()} />);
-    expect(
-      screen.getByRole("button", { name: "Excluir item" }),
-    ).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Excluir item" })).toBeTruthy();
   });
 
   it("exibe label de acessibilidade customizado", () => {
     render(
-      <DeleteButton onPress={jest.fn()} accessibilityLabel="Remover conta" />,
+      <DeleteButton onPress={jest.fn()} accessibilityLabel="Remover conta" />
     );
-    expect(
-      screen.getByRole("button", { name: "Remover conta" }),
-    ).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Remover conta" })).toBeTruthy();
   });
 
   it("chama onPress ao pressionar o botão", () => {

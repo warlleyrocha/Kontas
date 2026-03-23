@@ -54,9 +54,7 @@ describe("RepublicHeader", () => {
 
   it('exibe "República" quando o nome é nulo', () => {
     render(
-      <RepublicHeader
-        {...createProps({ republic: { id: "1", nome: null } })}
-      />,
+      <RepublicHeader {...createProps({ republic: { id: "1", nome: null } })} />
     );
     expect(screen.getByText("República")).toBeTruthy();
   });
@@ -93,9 +91,13 @@ describe("RepublicHeader", () => {
     render(
       <RepublicHeader
         {...createProps({
-          republic: { id: "1", nome: "República Solar", imagemRepublica: "https://example.com/foto.jpg" },
+          republic: {
+            id: "1",
+            nome: "República Solar",
+            imagemRepublica: "https://example.com/foto.jpg",
+          },
         })}
-      />,
+      />
     );
 
     const image = screen.UNSAFE_getByType(Image);
@@ -106,11 +108,11 @@ describe("RepublicHeader", () => {
     expect(screen.UNSAFE_queryByType(Image)).toBeNull();
   });
 
-  it('exibe label de notificação no menu quando hasNotification é true', () => {
+  it("exibe label de notificação no menu quando hasNotification é true", () => {
     render(<RepublicHeader {...createProps({ hasNotification: true })} />);
 
     expect(
-      screen.getByRole("button", { name: "Abrir menu com notificações" }),
+      screen.getByRole("button", { name: "Abrir menu com notificações" })
     ).toBeTruthy();
   });
 });

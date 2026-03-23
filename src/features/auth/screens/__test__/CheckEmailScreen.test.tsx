@@ -200,7 +200,9 @@ describe("CheckEmailScreen — submissão", () => {
     const buttons = screen.UNSAFE_getAllByType(TouchableOpacity);
     const submitButton = buttons.find((b) => b.props.disabled !== undefined);
     submitButton?.props.onPress?.();
-    expect(alertMock).toHaveBeenCalledWith("Por favor, digite o código completo");
+    expect(alertMock).toHaveBeenCalledWith(
+      "Por favor, digite o código completo"
+    );
   });
 
   it("não chama logger.info quando código incompleto", () => {

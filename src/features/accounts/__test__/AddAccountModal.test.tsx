@@ -175,15 +175,15 @@ describe("AddAccountModal", () => {
     const updater = mockSetFormData.mock.calls[0][0] as (prev: any) => any;
 
     expect(
-      updater({ metodoPagamento: MetodoPagamento.PIX }).metodoPagamento,
+      updater({ metodoPagamento: MetodoPagamento.PIX }).metodoPagamento
     ).toBe(MetodoPagamento.CARTAO);
 
     expect(
-      updater({ metodoPagamento: MetodoPagamento.CARTAO }).metodoPagamento,
+      updater({ metodoPagamento: MetodoPagamento.CARTAO }).metodoPagamento
     ).toBe(MetodoPagamento.DINHEIRO);
 
     expect(
-      updater({ metodoPagamento: MetodoPagamento.DINHEIRO }).metodoPagamento,
+      updater({ metodoPagamento: MetodoPagamento.DINHEIRO }).metodoPagamento
     ).toBe(MetodoPagamento.PIX);
   });
 
@@ -218,12 +218,14 @@ describe("AddAccountModal", () => {
       fireEvent.press(screen.getByRole("button", { name: "adicionar conta" }));
     });
 
-    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ valor: 0 }));
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({ valor: 0 })
+    );
   });
 
   it("aplica translateY -135 quando isValorInputFocused é true", () => {
     const { UNSAFE_getAllByType } = render(
-      <AddAccountModal {...defaultProps} />,
+      <AddAccountModal {...defaultProps} />
     );
 
     act(() => {
@@ -232,7 +234,7 @@ describe("AddAccountModal", () => {
 
     const views = UNSAFE_getAllByType(View);
     const styledView = views.find(
-      (v) => v.props.style?.transform?.[0]?.translateY === -135,
+      (v) => v.props.style?.transform?.[0]?.translateY === -135
     );
     expect(styledView).toBeTruthy();
   });
@@ -240,13 +242,17 @@ describe("AddAccountModal", () => {
   it("usa behavior 'padding' no iOS", () => {
     Platform.OS = "ios";
     const { UNSAFE_getByType } = render(<AddAccountModal {...defaultProps} />);
-    expect(UNSAFE_getByType(KeyboardAvoidingView).props.behavior).toBe("padding");
+    expect(UNSAFE_getByType(KeyboardAvoidingView).props.behavior).toBe(
+      "padding"
+    );
     Platform.OS = "android";
   });
 
   it("usa behavior 'height' no Android", () => {
     Platform.OS = "android";
     const { UNSAFE_getByType } = render(<AddAccountModal {...defaultProps} />);
-    expect(UNSAFE_getByType(KeyboardAvoidingView).props.behavior).toBe("height");
+    expect(UNSAFE_getByType(KeyboardAvoidingView).props.behavior).toBe(
+      "height"
+    );
   });
 });

@@ -13,8 +13,13 @@ import { ResidentRole } from "@/src/shared/types/resident.types";
 import { RepublicHeader } from "../../components/RepublicHeader";
 import { RepublicScreen } from "../RepublicScreen";
 
-jest.mock("@expo/vector-icons/MaterialCommunityIcons", () => "MaterialCommunityIcons");
-jest.mock("@/src/features/accounts", () => ({ AccountsTab: jest.fn(() => null) }));
+jest.mock(
+  "@expo/vector-icons/MaterialCommunityIcons",
+  () => "MaterialCommunityIcons"
+);
+jest.mock("@/src/features/accounts", () => ({
+  AccountsTab: jest.fn(() => null),
+}));
 jest.mock("@/src/features/invites/contexts/InvitesContext", () => ({
   useInvitesByRepublicQuery: jest.fn(),
 }));
@@ -24,7 +29,9 @@ jest.mock("@/src/features/republic/components/EditRepublicModal", () => ({
 jest.mock("@/src/features/republic/hooks/useRepublicScreen", () => ({
   useRepublicScreen: jest.fn(),
 }));
-jest.mock("@/src/features/residents", () => ({ ResidentsTab: jest.fn(() => null) }));
+jest.mock("@/src/features/residents", () => ({
+  ResidentsTab: jest.fn(() => null),
+}));
 jest.mock("@/src/shared/components/SideMenu", () => ({
   SideMenu: jest.fn(() => null),
 }));
@@ -85,7 +92,9 @@ beforeEach(() => {
   jest.clearAllMocks();
   jest.mocked(useRepublicScreen).mockReturnValue(makeScreenReturn() as any);
   jest.mocked(useInvitesByRepublicQuery).mockReturnValue({ data: [] } as any);
-  jest.mocked(useSideMenu).mockReturnValue({ menuItems: [], footerItems: [] } as any);
+  jest
+    .mocked(useSideMenu)
+    .mockReturnValue({ menuItems: [], footerItems: [] } as any);
   consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 });
 
@@ -98,17 +107,17 @@ afterEach(() => {
 
 describe("RepublicScreen — loading", () => {
   it("exibe spinner e texto de carregamento quando isLoading é true", () => {
-    jest.mocked(useRepublicScreen).mockReturnValue(
-      makeScreenReturn({ isLoading: true }) as any
-    );
+    jest
+      .mocked(useRepublicScreen)
+      .mockReturnValue(makeScreenReturn({ isLoading: true }) as any);
     render(<RepublicScreen republicId="rep-1" />);
     expect(screen.getByText("Carregando república...")).toBeTruthy();
   });
 
   it("não renderiza RepublicHeader enquanto carrega", () => {
-    jest.mocked(useRepublicScreen).mockReturnValue(
-      makeScreenReturn({ isLoading: true }) as any
-    );
+    jest
+      .mocked(useRepublicScreen)
+      .mockReturnValue(makeScreenReturn({ isLoading: true }) as any);
     render(<RepublicScreen republicId="rep-1" />);
     expect(jest.mocked(RepublicHeader)).not.toHaveBeenCalled();
   });
@@ -118,17 +127,17 @@ describe("RepublicScreen — loading", () => {
 
 describe("RepublicScreen — república não encontrada", () => {
   it("exibe mensagem de não encontrada quando republic é null", () => {
-    jest.mocked(useRepublicScreen).mockReturnValue(
-      makeScreenReturn({ republic: null }) as any
-    );
+    jest
+      .mocked(useRepublicScreen)
+      .mockReturnValue(makeScreenReturn({ republic: null }) as any);
     render(<RepublicScreen republicId="rep-1" />);
     expect(screen.getByText("República não encontrada")).toBeTruthy();
   });
 
   it("não renderiza RepublicHeader quando republic é null", () => {
-    jest.mocked(useRepublicScreen).mockReturnValue(
-      makeScreenReturn({ republic: null }) as any
-    );
+    jest
+      .mocked(useRepublicScreen)
+      .mockReturnValue(makeScreenReturn({ republic: null }) as any);
     render(<RepublicScreen republicId="rep-1" />);
     expect(jest.mocked(RepublicHeader)).not.toHaveBeenCalled();
   });
@@ -147,7 +156,9 @@ describe("RepublicScreen — RepublicHeader", () => {
   it("onEdit abre o modal de edição", () => {
     render(<RepublicScreen republicId="rep-1" />);
     const { onEdit } = jest.mocked(RepublicHeader).mock.calls[0][0] as any;
-    act(() => { onEdit(); });
+    act(() => {
+      onEdit();
+    });
     expect(mockSetShowEditModal).toHaveBeenCalledWith(true);
   });
 
@@ -155,7 +166,9 @@ describe("RepublicScreen — RepublicHeader", () => {
     mockHandleOpenMenu.mockResolvedValue(undefined);
     render(<RepublicScreen republicId="rep-1" />);
     const { onMenuOpen } = jest.mocked(RepublicHeader).mock.calls[0][0] as any;
-    act(() => { onMenuOpen(); });
+    act(() => {
+      onMenuOpen();
+    });
     expect(mockHandleOpenMenu).toHaveBeenCalled();
   });
 
@@ -165,7 +178,8 @@ describe("RepublicScreen — RepublicHeader", () => {
       footerItems: [],
     } as any);
     render(<RepublicScreen republicId="rep-1" />);
-    const { hasNotification } = jest.mocked(RepublicHeader).mock.calls[0][0] as any;
+    const { hasNotification } = jest.mocked(RepublicHeader).mock
+      .calls[0][0] as any;
     expect(hasNotification).toBe(false);
   });
 
@@ -175,7 +189,8 @@ describe("RepublicScreen — RepublicHeader", () => {
       footerItems: [],
     } as any);
     render(<RepublicScreen republicId="rep-1" />);
-    const { hasNotification } = jest.mocked(RepublicHeader).mock.calls[0][0] as any;
+    const { hasNotification } = jest.mocked(RepublicHeader).mock
+      .calls[0][0] as any;
     expect(hasNotification).toBe(true);
   });
 });
@@ -198,9 +213,9 @@ describe("RepublicScreen — Tabs", () => {
   });
 
   it("renderiza ResidentsTab quando tab='moradores'", () => {
-    jest.mocked(useRepublicScreen).mockReturnValue(
-      makeScreenReturn({ tab: "moradores" }) as any
-    );
+    jest
+      .mocked(useRepublicScreen)
+      .mockReturnValue(makeScreenReturn({ tab: "moradores" }) as any);
     render(<RepublicScreen republicId="rep-1" />);
     expect(jest.mocked(ResidentsTab)).toHaveBeenCalled();
     expect(jest.mocked(AccountsTab)).not.toHaveBeenCalled();
@@ -208,9 +223,9 @@ describe("RepublicScreen — Tabs", () => {
   });
 
   it("renderiza ResumeTab quando tab='resumo'", () => {
-    jest.mocked(useRepublicScreen).mockReturnValue(
-      makeScreenReturn({ tab: "resumo" }) as any
-    );
+    jest
+      .mocked(useRepublicScreen)
+      .mockReturnValue(makeScreenReturn({ tab: "resumo" }) as any);
     render(<RepublicScreen republicId="rep-1" />);
     expect(jest.mocked(ResumeTab)).toHaveBeenCalled();
     expect(jest.mocked(AccountsTab)).not.toHaveBeenCalled();
@@ -229,9 +244,11 @@ describe("RepublicScreen — AccountsTab", () => {
   });
 
   it("isAdmin=true quando currentUserRole é ADMIN", () => {
-    jest.mocked(useRepublicScreen).mockReturnValue(
-      makeScreenReturn({ currentUserRole: ResidentRole.ADMIN }) as any
-    );
+    jest
+      .mocked(useRepublicScreen)
+      .mockReturnValue(
+        makeScreenReturn({ currentUserRole: ResidentRole.ADMIN }) as any
+      );
     render(<RepublicScreen republicId="rep-1" />);
     const props = jest.mocked(AccountsTab).mock.calls[0][0] as any;
     expect(props.isAdmin).toBe(true);
@@ -245,17 +262,23 @@ describe("RepublicScreen — AccountsTab", () => {
 
   it("onPendingPaymentsCountChange atualiza pendingPaymentsCount", () => {
     render(<RepublicScreen republicId="rep-1" />);
-    const { onPendingPaymentsCountChange } =
-      jest.mocked(AccountsTab).mock.calls[0][0] as any;
+    const { onPendingPaymentsCountChange } = jest.mocked(AccountsTab).mock
+      .calls[0][0] as any;
 
     // primeira chamada — deve atualizar
-    act(() => { onPendingPaymentsCountChange(5); });
+    act(() => {
+      onPendingPaymentsCountChange(5);
+    });
 
     // segunda chamada com o mesmo valor — não deve recriar o objeto
-    act(() => { onPendingPaymentsCountChange(5); });
+    act(() => {
+      onPendingPaymentsCountChange(5);
+    });
 
     // chamada com valor diferente — deve atualizar
-    act(() => { onPendingPaymentsCountChange(3); });
+    act(() => {
+      onPendingPaymentsCountChange(3);
+    });
   });
 });
 
@@ -263,9 +286,9 @@ describe("RepublicScreen — AccountsTab", () => {
 
 describe("RepublicScreen — ResidentsTab", () => {
   beforeEach(() => {
-    jest.mocked(useRepublicScreen).mockReturnValue(
-      makeScreenReturn({ tab: "moradores" }) as any
-    );
+    jest
+      .mocked(useRepublicScreen)
+      .mockReturnValue(makeScreenReturn({ tab: "moradores" }) as any);
   });
 
   it("passa residents e republicId ao ResidentsTab", () => {
@@ -276,9 +299,14 @@ describe("RepublicScreen — ResidentsTab", () => {
   });
 
   it("isAdmin=true quando currentUserRole é ADMIN", () => {
-    jest.mocked(useRepublicScreen).mockReturnValue(
-      makeScreenReturn({ tab: "moradores", currentUserRole: ResidentRole.ADMIN }) as any
-    );
+    jest
+      .mocked(useRepublicScreen)
+      .mockReturnValue(
+        makeScreenReturn({
+          tab: "moradores",
+          currentUserRole: ResidentRole.ADMIN,
+        }) as any
+      );
     render(<RepublicScreen republicId="rep-1" />);
     const props = jest.mocked(ResidentsTab).mock.calls[0][0] as any;
     expect(props.isAdmin).toBe(true);
@@ -289,9 +317,9 @@ describe("RepublicScreen — ResidentsTab", () => {
 
 describe("RepublicScreen — ResumeTab", () => {
   it("passa residents e republicId ao ResumeTab", () => {
-    jest.mocked(useRepublicScreen).mockReturnValue(
-      makeScreenReturn({ tab: "resumo" }) as any
-    );
+    jest
+      .mocked(useRepublicScreen)
+      .mockReturnValue(makeScreenReturn({ tab: "resumo" }) as any);
     render(<RepublicScreen republicId="rep-1" />);
     const props = jest.mocked(ResumeTab).mock.calls[0][0] as any;
     expect(props.residents).toBe(mockResidents);
@@ -309,9 +337,9 @@ describe("RepublicScreen — EditRepublicModal", () => {
   });
 
   it("passa visible=true quando showEditModal é true", () => {
-    jest.mocked(useRepublicScreen).mockReturnValue(
-      makeScreenReturn({ showEditModal: true }) as any
-    );
+    jest
+      .mocked(useRepublicScreen)
+      .mockReturnValue(makeScreenReturn({ showEditModal: true }) as any);
     render(<RepublicScreen republicId="rep-1" />);
     const props = jest.mocked(EditRepublicModal).mock.calls[0][0] as any;
     expect(props.visible).toBe(true);
@@ -320,7 +348,9 @@ describe("RepublicScreen — EditRepublicModal", () => {
   it("onClose chama setShowEditModal(false)", () => {
     render(<RepublicScreen republicId="rep-1" />);
     const { onClose } = jest.mocked(EditRepublicModal).mock.calls[0][0] as any;
-    act(() => { onClose(); });
+    act(() => {
+      onClose();
+    });
     expect(mockSetShowEditModal).toHaveBeenCalledWith(false);
   });
 
@@ -347,20 +377,22 @@ describe("RepublicScreen — SideMenu", () => {
   });
 
   it("renderiza SideMenu quando isMenuOpen é true", () => {
-    jest.mocked(useRepublicScreen).mockReturnValue(
-      makeScreenReturn({ isMenuOpen: true }) as any
-    );
+    jest
+      .mocked(useRepublicScreen)
+      .mockReturnValue(makeScreenReturn({ isMenuOpen: true }) as any);
     render(<RepublicScreen republicId="rep-1" />);
     expect(jest.mocked(SideMenu)).toHaveBeenCalled();
   });
 
   it("onRequestClose chama setIsMenuOpen(false)", () => {
-    jest.mocked(useRepublicScreen).mockReturnValue(
-      makeScreenReturn({ isMenuOpen: true }) as any
-    );
+    jest
+      .mocked(useRepublicScreen)
+      .mockReturnValue(makeScreenReturn({ isMenuOpen: true }) as any);
     render(<RepublicScreen republicId="rep-1" />);
     const { onRequestClose } = jest.mocked(SideMenu).mock.calls[0][0] as any;
-    act(() => { onRequestClose(); });
+    act(() => {
+      onRequestClose();
+    });
     expect(mockSetIsMenuOpen).toHaveBeenCalledWith(false);
   });
 
@@ -368,9 +400,9 @@ describe("RepublicScreen — SideMenu", () => {
     const menuItems = [{ label: "Item" }];
     const footerItems = [{ label: "Footer" }];
     jest.mocked(useSideMenu).mockReturnValue({ menuItems, footerItems } as any);
-    jest.mocked(useRepublicScreen).mockReturnValue(
-      makeScreenReturn({ isMenuOpen: true }) as any
-    );
+    jest
+      .mocked(useRepublicScreen)
+      .mockReturnValue(makeScreenReturn({ isMenuOpen: true }) as any);
     render(<RepublicScreen republicId="rep-1" />);
     const props = jest.mocked(SideMenu).mock.calls[0][0] as any;
     expect(props.menuItems).toBe(menuItems);
@@ -398,7 +430,9 @@ describe("RepublicScreen — pendingInvitesSentCount", () => {
   });
 
   it("retorna 0 quando data é undefined", () => {
-    jest.mocked(useInvitesByRepublicQuery).mockReturnValue({ data: undefined } as any);
+    jest
+      .mocked(useInvitesByRepublicQuery)
+      .mockReturnValue({ data: undefined } as any);
     render(<RepublicScreen republicId="rep-1" />);
     const options = jest.mocked(useSideMenu).mock.calls[0][2] as any;
     expect(options.pendingInvitesSentCount).toBe(0);

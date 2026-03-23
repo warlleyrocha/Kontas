@@ -64,27 +64,27 @@ describe("InvitesScreen — ScreenLayout", () => {
   });
 
   it("subtitle mostra '0 pendentes' quando não há convites", () => {
-    jest.mocked(useInvitesScreen).mockReturnValue(
-      makeHookReturn({ invitesByUser: [] }) as any
-    );
+    jest
+      .mocked(useInvitesScreen)
+      .mockReturnValue(makeHookReturn({ invitesByUser: [] }) as any);
     render(<InvitesScreen />);
     const props = jest.mocked(ScreenLayout).mock.calls[0][0] as any;
     expect(props.subtitle).toBe("0 pendentes");
   });
 
   it("subtitle mostra '1 pendente' com um convite", () => {
-    jest.mocked(useInvitesScreen).mockReturnValue(
-      makeHookReturn({ invitesByUser: [{}] }) as any
-    );
+    jest
+      .mocked(useInvitesScreen)
+      .mockReturnValue(makeHookReturn({ invitesByUser: [{}] }) as any);
     render(<InvitesScreen />);
     const props = jest.mocked(ScreenLayout).mock.calls[0][0] as any;
     expect(props.subtitle).toBe("1 pendente");
   });
 
   it("subtitle mostra '2 pendentes' com múltiplos convites", () => {
-    jest.mocked(useInvitesScreen).mockReturnValue(
-      makeHookReturn({ invitesByUser: [{}, {}] }) as any
-    );
+    jest
+      .mocked(useInvitesScreen)
+      .mockReturnValue(makeHookReturn({ invitesByUser: [{}, {}] }) as any);
     render(<InvitesScreen />);
     const props = jest.mocked(ScreenLayout).mock.calls[0][0] as any;
     expect(props.subtitle).toBe("2 pendentes");
@@ -93,9 +93,9 @@ describe("InvitesScreen — ScreenLayout", () => {
 
 describe("InvitesScreen — InvitesInboxContent", () => {
   it("passa error do hook ao InvitesInboxContent", () => {
-    jest.mocked(useInvitesScreen).mockReturnValue(
-      makeHookReturn({ error: "Falha de rede" }) as any
-    );
+    jest
+      .mocked(useInvitesScreen)
+      .mockReturnValue(makeHookReturn({ error: "Falha de rede" }) as any);
     render(<InvitesScreen />);
     const props = jest.mocked(InvitesInboxContent).mock.calls[0][0] as any;
     expect(props.error).toBe("Falha de rede");
@@ -103,9 +103,9 @@ describe("InvitesScreen — InvitesInboxContent", () => {
 
   it("passa invitesByUser como invites ao InvitesInboxContent", () => {
     const invites = [{}, {}] as any;
-    jest.mocked(useInvitesScreen).mockReturnValue(
-      makeHookReturn({ invitesByUser: invites }) as any
-    );
+    jest
+      .mocked(useInvitesScreen)
+      .mockReturnValue(makeHookReturn({ invitesByUser: invites }) as any);
     render(<InvitesScreen />);
     const props = jest.mocked(InvitesInboxContent).mock.calls[0][0] as any;
     expect(props.invites).toBe(invites);

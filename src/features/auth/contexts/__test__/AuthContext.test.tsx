@@ -11,10 +11,7 @@ import type {
   User,
 } from "@/src/features/auth/types/auth.types";
 import { userService } from "@/src/features/user/services/user.service";
-import {
-  getErrorMessage,
-  isUnauthorizedError,
-} from "@/src/services/httpError";
+import { getErrorMessage, isUnauthorizedError } from "@/src/services/httpError";
 import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
 import { AuthProvider, useAuth } from "../AuthContext";
@@ -125,9 +122,9 @@ beforeEach(() => {
   jest.mocked(AsyncStorage.multiRemove).mockResolvedValue(undefined);
   jest.mocked(GoogleSignin.signOut).mockResolvedValue(undefined as any);
   jest.mocked(isUnauthorizedError).mockReturnValue(false);
-  jest.mocked(getErrorMessage).mockImplementation(
-    (_err, fallback) => fallback ?? "erro"
-  );
+  jest
+    .mocked(getErrorMessage)
+    .mockImplementation((_err, fallback) => fallback ?? "erro");
   mockStorageNoToken();
 });
 

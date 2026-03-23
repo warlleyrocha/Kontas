@@ -102,7 +102,7 @@ describe("LoginScreen — estado de carregamento", () => {
     jest.mocked(GoogleSignin.hasPlayServices).mockReturnValue(
       new Promise((resolve) => {
         resolveHasPlay = resolve;
-      }),
+      })
     );
 
     render(<LoginScreen />);
@@ -135,7 +135,7 @@ describe("LoginScreen — estado de carregamento", () => {
     jest.mocked(GoogleSignin.hasPlayServices).mockReturnValue(
       new Promise((resolve) => {
         resolveHasPlay = resolve;
-      }),
+      })
     );
 
     render(<LoginScreen />);
@@ -189,7 +189,7 @@ describe("LoginScreen — fluxo de login com Google", () => {
       fireEvent.press(screen.getByText("Entrar com Google"));
     });
     expect(showToast.error).toHaveBeenCalledWith(
-      "Não foi possível obter o token do Google",
+      "Não foi possível obter o token do Google"
     );
     expect(mockRouterReplace).not.toHaveBeenCalled();
   });
@@ -214,7 +214,7 @@ describe("LoginScreen — fluxo de login com Google", () => {
     });
     expect(consoleErrorSpy).toHaveBeenCalledWith("Erro no login:", err);
     expect(showToast.error).toHaveBeenCalledWith(
-      "Erro ao fazer login com Google. Tente novamente.",
+      "Erro ao fazer login com Google. Tente novamente."
     );
     consoleErrorSpy.mockClear();
   });

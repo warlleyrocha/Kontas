@@ -22,21 +22,12 @@
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/$1"
     },
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/android/",
-      "/dist/"
-    ],
+    "testPathIgnorePatterns": ["/node_modules/", "/android/", "/dist/"],
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg)"
     ],
-    "setupFiles": [
-      "react-native-reanimated/mock"
-    ],
-    "coverageReporters": [
-      "lcov",
-      "text"
-    ],
+    "setupFiles": ["react-native-reanimated/mock"],
+    "coverageReporters": ["lcov", "text"],
     "coverageDirectory": "coverage",
     "collectCoverageFrom": [
       "**/*.{ts,tsx}",

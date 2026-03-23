@@ -1,5 +1,10 @@
 import { fireEvent, render, screen } from "@testing-library/react-native";
-import { Image, KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
+import {
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableOpacity,
+} from "react-native";
 import { EditRepublicModal } from "../components/EditRepublicModal";
 import useEditRepublicModal, {
   type UseEditRepublicModalReturn,

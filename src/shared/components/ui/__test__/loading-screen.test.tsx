@@ -24,7 +24,7 @@ describe("LoadingScreen", () => {
 
   it("passa color e size para o ActivityIndicator", () => {
     const { UNSAFE_getByType } = render(
-      <LoadingScreen color="#FF0000" size="small" />,
+      <LoadingScreen color="#FF0000" size="small" />
     );
     const indicator = UNSAFE_getByType(ActivityIndicator);
     expect(indicator.props.color).toBe("#FF0000");

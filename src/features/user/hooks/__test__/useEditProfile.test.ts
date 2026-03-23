@@ -39,7 +39,9 @@ let alertSpy: jest.SpyInstance;
 
 beforeEach(() => {
   jest.clearAllMocks();
-  jest.mocked(getErrorMessage).mockImplementation((_err, fallback) => fallback ?? "erro");
+  jest
+    .mocked(getErrorMessage)
+    .mockImplementation((_err, fallback) => fallback ?? "erro");
   consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
   alertSpy = jest.spyOn(Alert, "alert").mockImplementation(() => {});
 });
@@ -64,7 +66,11 @@ describe("useEditProfile — estado inicial", () => {
 
   it("usa string vazia quando currentPixKey e currentPhone são undefined", () => {
     const { result } = renderHook(() =>
-      useEditProfile({ ...defaultProps, currentPixKey: undefined, currentPhone: undefined })
+      useEditProfile({
+        ...defaultProps,
+        currentPixKey: undefined,
+        currentPhone: undefined,
+      })
     );
 
     expect(result.current.pixKey).toBe("");
@@ -81,8 +87,12 @@ describe("useEditProfile — handleClose", () => {
       useEditProfile({ ...defaultProps, onClose })
     );
 
-    act(() => { result.current.setName("Novo Nome"); });
-    act(() => { result.current.handleClose(); });
+    act(() => {
+      result.current.setName("Novo Nome");
+    });
+    act(() => {
+      result.current.handleClose();
+    });
 
     expect(result.current.name).toBe("Ana");
     expect(result.current.pixKey).toBe("ana@pix");
@@ -125,29 +135,48 @@ describe("useEditProfile — handleClose", () => {
 describe("useEditProfile — handleSave", () => {
   it("chama onSave com name, pixKey, photoUri e phone", async () => {
     const onSave = jest.fn();
-    const { result } = renderHook(() => useEditProfile({ ...defaultProps, onSave }));
+    const { result } = renderHook(() =>
+      useEditProfile({ ...defaultProps, onSave })
+    );
 
-    await act(async () => { await result.current.handleSave(); });
+    await act(async () => {
+      await result.current.handleSave();
+    });
 
-    expect(onSave).toHaveBeenCalledWith("Ana", "ana@pix", undefined, "(11) 99999-9999");
+    expect(onSave).toHaveBeenCalledWith(
+      "Ana",
+      "ana@pix",
+      undefined,
+      "(11) 99999-9999"
+    );
   });
 
   it("define isUploading=false no finally após sucesso", async () => {
     const { result } = renderHook(() => useEditProfile(defaultProps));
 
-    await act(async () => { await result.current.handleSave(); });
+    await act(async () => {
+      await result.current.handleSave();
+    });
 
     expect(result.current.isUploading).toBe(false);
   });
 
   it("loga erro, exibe toast e redefine isUploading=false ao falhar", async () => {
     const error = new Error("save error");
-    const onSave = jest.fn().mockImplementation(() => { throw error; });
-    jest.mocked(getErrorMessage).mockReturnValue("Não foi possível salvar as alterações.");
+    const onSave = jest.fn().mockImplementation(() => {
+      throw error;
+    });
+    jest
+      .mocked(getErrorMessage)
+      .mockReturnValue("Não foi possível salvar as alterações.");
 
-    const { result } = renderHook(() => useEditProfile({ ...defaultProps, onSave }));
+    const { result } = renderHook(() =>
+      useEditProfile({ ...defaultProps, onSave })
+    );
 
-    await act(async () => { await result.current.handleSave(); });
+    await act(async () => {
+      await result.current.handleSave();
+    });
 
     expect(consoleErrorSpy).toHaveBeenCalledWith("Erro ao salvar:", error);
     expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
@@ -168,7 +197,9 @@ describe("useEditProfile — selectPhoto", () => {
 
     const { result } = renderHook(() => useEditProfile(defaultProps));
 
-    await act(async () => { await result.current.selectPhoto(); });
+    await act(async () => {
+      await result.current.selectPhoto();
+    });
 
     expect(alertSpy).toHaveBeenCalledWith(
       "Permissão necessária",
@@ -188,7 +219,9 @@ describe("useEditProfile — selectPhoto", () => {
 
     const { result } = renderHook(() => useEditProfile(defaultProps));
 
-    await act(async () => { await result.current.selectPhoto(); });
+    await act(async () => {
+      await result.current.selectPhoto();
+    });
 
     expect(result.current.photoUri).toBeUndefined();
   });
@@ -204,7 +237,9 @@ describe("useEditProfile — selectPhoto", () => {
 
     const { result } = renderHook(() => useEditProfile(defaultProps));
 
-    await act(async () => { await result.current.selectPhoto(); });
+    await act(async () => {
+      await result.current.selectPhoto();
+    });
 
     expect(result.current.photoUri).toBe("file://photo.jpg");
   });
@@ -212,13 +247,20 @@ describe("useEditProfile — selectPhoto", () => {
   it("loga erro e exibe toast quando selectPhoto lança exceção", async () => {
     const error = new Error("picker error");
     jest.mocked(requestMediaLibraryPermissionsAsync).mockRejectedValue(error);
-    jest.mocked(getErrorMessage).mockReturnValue("Não foi possível selecionar a imagem.");
+    jest
+      .mocked(getErrorMessage)
+      .mockReturnValue("Não foi possível selecionar a imagem.");
 
     const { result } = renderHook(() => useEditProfile(defaultProps));
 
-    await act(async () => { await result.current.selectPhoto(); });
+    await act(async () => {
+      await result.current.selectPhoto();
+    });
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith("Erro ao selecionar imagem:", error);
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Erro ao selecionar imagem:",
+      error
+    );
     expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
       "Não foi possível selecionar a imagem."
     );

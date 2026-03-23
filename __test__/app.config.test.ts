@@ -143,7 +143,7 @@ describe("app.config.ts", () => {
       envFileExists: true,
       envContent: [
         "# comment",
-        "EXPO_PUBLIC_API_URL=\"http://localhost:3333\"",
+        'EXPO_PUBLIC_API_URL="http://localhost:3333"',
         "APP_ENV=preview",
         "INVALID_LINE",
         "QUOTED_SINGLE='abc'",
@@ -158,7 +158,7 @@ describe("app.config.ts", () => {
     expect(process.env.QUOTED_SINGLE).toBe("abc");
     expect(process.env.EXISTING_KEY).toBe("keep-this");
     expect(consoleLogSpy).toHaveBeenCalledWith(
-      expect.stringContaining(".env carregado"),
+      expect.stringContaining(".env carregado")
     );
     expect(consoleWarnSpy).not.toHaveBeenCalled();
   });
@@ -178,7 +178,7 @@ describe("app.config.ts", () => {
     expect(fsMock.readFileSync).toHaveBeenCalledTimes(1);
     expect(consoleWarnSpy).toHaveBeenCalledWith(
       expect.stringContaining("Falha ao carregar .env"),
-      error,
+      error
     );
   });
 
@@ -236,7 +236,7 @@ describe("app.config.ts", () => {
           url: "https://u.expo.dev/04e033a1-b0fb-4572-9158-cfefac3041cf",
         },
         owner: "warlleyrocha",
-      }),
+      })
     );
 
     expect(result.ios).toEqual({

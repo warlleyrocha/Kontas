@@ -40,7 +40,9 @@ describe("AccountResidentsContent", () => {
   });
 
   it("exibe ActivityIndicator e texto quando isLoadingMoradores é true", () => {
-    render(<AccountResidentsContent {...createProps({ isLoadingMoradores: true })} />);
+    render(
+      <AccountResidentsContent {...createProps({ isLoadingMoradores: true })} />
+    );
     expect(screen.getByText("Carregando moradores...")).toBeTruthy();
   });
 

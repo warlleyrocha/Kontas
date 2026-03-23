@@ -13,7 +13,9 @@ function mesRef(dateStr: string): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
 
-function makeConta(overrides: Partial<Conta> & { id: string; vencimento: string }): Conta {
+function makeConta(
+  overrides: Partial<Conta> & { id: string; vencimento: string }
+): Conta {
   return {
     descricao: "Conta teste",
     valor: 100,

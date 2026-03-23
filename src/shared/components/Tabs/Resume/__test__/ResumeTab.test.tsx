@@ -20,7 +20,10 @@ jest.mock("../ResumoCard", () => ({
   ResumoCard: ({ label, isLoading }: { label: string; isLoading: boolean }) => {
     const { Text } = require("react-native");
     return (
-      <Text testID={`resumo-card-${label}`} accessibilityState={{ busy: isLoading }}>
+      <Text
+        testID={`resumo-card-${label}`}
+        accessibilityState={{ busy: isLoading }}
+      >
         {label}
       </Text>
     );
@@ -81,17 +84,15 @@ const defaultResumeTab = {
 };
 
 beforeEach(() => {
-  jest.mocked(useRefresh).mockReturnValue({ refreshing: false, onRefresh: jest.fn() });
+  jest
+    .mocked(useRefresh)
+    .mockReturnValue({ refreshing: false, onRefresh: jest.fn() });
   jest.mocked(useResumeTab).mockReturnValue(defaultResumeTab);
 });
 
 const renderComponent = (overrides = {}) =>
   render(
-    <ResumeTab
-      residents={mockResidents}
-      republicId="rep-1"
-      {...overrides}
-    />
+    <ResumeTab residents={mockResidents} republicId="rep-1" {...overrides} />
   );
 
 describe("ResumeTab", () => {
@@ -119,13 +120,17 @@ describe("ResumeTab", () => {
   });
 
   it("exibe ActivityIndicator quando isLoadingDividas é true", () => {
-    jest.mocked(useResumeTab).mockReturnValue({ ...defaultResumeTab, isLoadingDividas: true });
+    jest
+      .mocked(useResumeTab)
+      .mockReturnValue({ ...defaultResumeTab, isLoadingDividas: true });
     const { UNSAFE_getByType } = renderComponent();
     expect(UNSAFE_getByType(ActivityIndicator)).toBeTruthy();
   });
 
   it("não renderiza MoradorRow quando isLoadingDividas é true", () => {
-    jest.mocked(useResumeTab).mockReturnValue({ ...defaultResumeTab, isLoadingDividas: true });
+    jest
+      .mocked(useResumeTab)
+      .mockReturnValue({ ...defaultResumeTab, isLoadingDividas: true });
     renderComponent();
     expect(screen.queryByTestId("morador-row-r-1")).toBeNull();
   });
@@ -147,7 +152,9 @@ describe("ResumeTab", () => {
   });
 
   it("passa isLoadingContas para os ResumoCards", () => {
-    jest.mocked(useResumeTab).mockReturnValue({ ...defaultResumeTab, isLoadingContas: true });
+    jest
+      .mocked(useResumeTab)
+      .mockReturnValue({ ...defaultResumeTab, isLoadingContas: true });
     renderComponent();
     const card = screen.getByTestId("resumo-card-Total de Contas");
     expect(card.props.accessibilityState.busy).toBe(true);

@@ -16,7 +16,10 @@ jest.mock("@/src/features/user/components/RepublicCard", () => {
     onSelect: () => void;
   }) {
     return (
-      <TouchableOpacity onPress={onSelect} accessibilityLabel={`card-${republic.id}`}>
+      <TouchableOpacity
+        onPress={onSelect}
+        accessibilityLabel={`card-${republic.id}`}
+      >
         <Text>{republic.nome}</Text>
         <Text>{residentsCount}</Text>
       </TouchableOpacity>

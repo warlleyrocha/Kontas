@@ -44,7 +44,9 @@ let alertSpy: jest.SpyInstance;
 
 beforeEach(() => {
   jest.clearAllMocks();
-  jest.mocked(getErrorMessage).mockImplementation((_err, fallback) => fallback ?? "erro");
+  jest
+    .mocked(getErrorMessage)
+    .mockImplementation((_err, fallback) => fallback ?? "erro");
   jest.mocked(AsyncStorage.setItem).mockResolvedValue(undefined);
   jest.mocked(AsyncStorage.removeItem).mockResolvedValue(undefined);
   consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
@@ -77,7 +79,9 @@ describe("useEditRepublicModal — efeito visible", () => {
       { initialProps: { ...defaultProps, visible: false } }
     );
 
-    act(() => { result.current.setNome("Outro Nome"); });
+    act(() => {
+      result.current.setNome("Outro Nome");
+    });
 
     rerender({ ...defaultProps, visible: true, currentName: "Alpha" });
 
@@ -90,7 +94,9 @@ describe("useEditRepublicModal — efeito visible", () => {
       { initialProps: { ...defaultProps, visible: false } }
     );
 
-    act(() => { result.current.setNome("Editado"); });
+    act(() => {
+      result.current.setNome("Editado");
+    });
 
     rerender({ ...defaultProps, visible: false });
 
@@ -106,9 +112,15 @@ describe("useEditRepublicModal — limpar", () => {
       useEditRepublicModal({ ...defaultProps, currentImage: "img.jpg" })
     );
 
-    act(() => { result.current.setNome("Alterado"); });
-    act(() => { result.current.setImagemUri(undefined); });
-    act(() => { result.current.limpar(); });
+    act(() => {
+      result.current.setNome("Alterado");
+    });
+    act(() => {
+      result.current.setImagemUri(undefined);
+    });
+    act(() => {
+      result.current.limpar();
+    });
 
     expect(result.current.nome).toBe("Alpha");
     expect(result.current.imagemUri).toBe("img.jpg");
@@ -123,7 +135,9 @@ describe("useEditRepublicModal — removerImagem", () => {
       useEditRepublicModal({ ...defaultProps, currentImage: "img.jpg" })
     );
 
-    act(() => { result.current.removerImagem(); });
+    act(() => {
+      result.current.removerImagem();
+    });
 
     expect(result.current.imagemUri).toBeUndefined();
   });
@@ -133,34 +147,51 @@ describe("useEditRepublicModal — removerImagem", () => {
 
 describe("useEditRepublicModal — selecionarImagem", () => {
   it("exibe Alert e não altera imagemUri quando permissão negada", async () => {
-    jest.mocked(requestMediaLibraryPermissionsAsync).mockResolvedValue({ status: "denied" } as any);
+    jest
+      .mocked(requestMediaLibraryPermissionsAsync)
+      .mockResolvedValue({ status: "denied" } as any);
     const { result } = renderHook(() => useEditRepublicModal(defaultProps));
 
-    await act(async () => { await result.current.selecionarImagem(); });
+    await act(async () => {
+      await result.current.selecionarImagem();
+    });
 
-    expect(alertSpy).toHaveBeenCalledWith("Permissão necessária", expect.any(String));
+    expect(alertSpy).toHaveBeenCalledWith(
+      "Permissão necessária",
+      expect.any(String)
+    );
     expect(result.current.imagemUri).toBeUndefined();
   });
 
   it("não altera imagemUri quando usuário cancela a seleção", async () => {
-    jest.mocked(requestMediaLibraryPermissionsAsync).mockResolvedValue({ status: "granted" } as any);
-    jest.mocked(launchImageLibraryAsync).mockResolvedValue({ canceled: true, assets: [] } as any);
+    jest
+      .mocked(requestMediaLibraryPermissionsAsync)
+      .mockResolvedValue({ status: "granted" } as any);
+    jest
+      .mocked(launchImageLibraryAsync)
+      .mockResolvedValue({ canceled: true, assets: [] } as any);
     const { result } = renderHook(() => useEditRepublicModal(defaultProps));
 
-    await act(async () => { await result.current.selecionarImagem(); });
+    await act(async () => {
+      await result.current.selecionarImagem();
+    });
 
     expect(result.current.imagemUri).toBeUndefined();
   });
 
   it("atualiza imagemUri com o URI selecionado", async () => {
-    jest.mocked(requestMediaLibraryPermissionsAsync).mockResolvedValue({ status: "granted" } as any);
+    jest
+      .mocked(requestMediaLibraryPermissionsAsync)
+      .mockResolvedValue({ status: "granted" } as any);
     jest.mocked(launchImageLibraryAsync).mockResolvedValue({
       canceled: false,
       assets: [{ uri: "file://rep.jpg" }],
     } as any);
     const { result } = renderHook(() => useEditRepublicModal(defaultProps));
 
-    await act(async () => { await result.current.selecionarImagem(); });
+    await act(async () => {
+      await result.current.selecionarImagem();
+    });
 
     expect(result.current.imagemUri).toBe("file://rep.jpg");
   });
@@ -168,13 +199,22 @@ describe("useEditRepublicModal — selecionarImagem", () => {
   it("loga erro e exibe toast ao falhar", async () => {
     const error = new Error("picker error");
     jest.mocked(requestMediaLibraryPermissionsAsync).mockRejectedValue(error);
-    jest.mocked(getErrorMessage).mockReturnValue("Não foi possível selecionar a imagem.");
+    jest
+      .mocked(getErrorMessage)
+      .mockReturnValue("Não foi possível selecionar a imagem.");
     const { result } = renderHook(() => useEditRepublicModal(defaultProps));
 
-    await act(async () => { await result.current.selecionarImagem(); });
+    await act(async () => {
+      await result.current.selecionarImagem();
+    });
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith("Erro ao selecionar imagem:", error);
-    expect(jest.mocked(showToast.error)).toHaveBeenCalledWith("Não foi possível selecionar a imagem.");
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Erro ao selecionar imagem:",
+      error
+    );
+    expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
+      "Não foi possível selecionar a imagem."
+    );
     consoleErrorSpy.mockClear();
   });
 });
@@ -187,7 +227,9 @@ describe("useEditRepublicModal — salvar", () => {
       useEditRepublicModal({ ...defaultProps, currentName: "" })
     );
 
-    await act(async () => { await result.current.salvar(); });
+    await act(async () => {
+      await result.current.salvar();
+    });
 
     expect(alertSpy).toHaveBeenCalledWith("Atenção", expect.any(String));
     expect(defaultProps.onSave).not.toHaveBeenCalled();
@@ -198,17 +240,26 @@ describe("useEditRepublicModal — salvar", () => {
       useEditRepublicModal({ ...defaultProps, currentImage: "img.jpg" })
     );
 
-    await act(async () => { await result.current.salvar(); });
+    await act(async () => {
+      await result.current.salvar();
+    });
 
-    expect(jest.mocked(AsyncStorage.setItem)).toHaveBeenCalledWith("@republica_imagem", "img.jpg");
+    expect(jest.mocked(AsyncStorage.setItem)).toHaveBeenCalledWith(
+      "@republica_imagem",
+      "img.jpg"
+    );
   });
 
   it("chama AsyncStorage.removeItem quando imagemUri é undefined", async () => {
     const { result } = renderHook(() => useEditRepublicModal(defaultProps));
 
-    await act(async () => { await result.current.salvar(); });
+    await act(async () => {
+      await result.current.salvar();
+    });
 
-    expect(jest.mocked(AsyncStorage.removeItem)).toHaveBeenCalledWith("@republica_imagem");
+    expect(jest.mocked(AsyncStorage.removeItem)).toHaveBeenCalledWith(
+      "@republica_imagem"
+    );
   });
 
   it("chama onSave com o nome e imagemUri corretos", async () => {
@@ -217,7 +268,9 @@ describe("useEditRepublicModal — salvar", () => {
       useEditRepublicModal({ ...defaultProps, onSave, currentImage: "img.jpg" })
     );
 
-    await act(async () => { await result.current.salvar(); });
+    await act(async () => {
+      await result.current.salvar();
+    });
 
     expect(onSave).toHaveBeenCalledWith("Alpha", "img.jpg");
   });
@@ -228,7 +281,9 @@ describe("useEditRepublicModal — salvar", () => {
       useEditRepublicModal({ ...defaultProps, onClose })
     );
 
-    await act(async () => { await result.current.salvar(); });
+    await act(async () => {
+      await result.current.salvar();
+    });
 
     expect(onClose).toHaveBeenCalledTimes(1);
   });
@@ -238,16 +293,24 @@ describe("useEditRepublicModal — salvar", () => {
       useEditRepublicModal({ ...defaultProps, onClose: undefined })
     );
 
-    await expect(act(async () => { await result.current.salvar(); })).resolves.not.toThrow();
+    await expect(
+      act(async () => {
+        await result.current.salvar();
+      })
+    ).resolves.not.toThrow();
   });
 
   it("define isUploading=false no finally mesmo ao falhar", async () => {
-    jest.mocked(AsyncStorage.setItem).mockRejectedValue(new Error("disk error"));
+    jest
+      .mocked(AsyncStorage.setItem)
+      .mockRejectedValue(new Error("disk error"));
     const { result } = renderHook(() =>
       useEditRepublicModal({ ...defaultProps, currentImage: "img.jpg" })
     );
 
-    await act(async () => { await result.current.salvar(); });
+    await act(async () => {
+      await result.current.salvar();
+    });
 
     expect(result.current.isUploading).toBe(false);
     consoleErrorSpy.mockClear();
@@ -256,13 +319,22 @@ describe("useEditRepublicModal — salvar", () => {
   it("loga erro e exibe toast ao falhar", async () => {
     const error = new Error("save error");
     jest.mocked(AsyncStorage.removeItem).mockRejectedValue(error);
-    jest.mocked(getErrorMessage).mockReturnValue("Não foi possível salvar as alterações.");
+    jest
+      .mocked(getErrorMessage)
+      .mockReturnValue("Não foi possível salvar as alterações.");
     const { result } = renderHook(() => useEditRepublicModal(defaultProps));
 
-    await act(async () => { await result.current.salvar(); });
+    await act(async () => {
+      await result.current.salvar();
+    });
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith("Erro ao salvar dados da república:", error);
-    expect(jest.mocked(showToast.error)).toHaveBeenCalledWith("Não foi possível salvar as alterações.");
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Erro ao salvar dados da república:",
+      error
+    );
+    expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
+      "Não foi possível salvar as alterações."
+    );
     consoleErrorSpy.mockClear();
   });
 });

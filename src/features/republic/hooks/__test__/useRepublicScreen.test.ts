@@ -5,7 +5,10 @@ import type { RepublicResponse } from "@/src/features/republic/types/republic.ty
 import { useResidents } from "@/src/features/residents/hooks/useResidents";
 import { getErrorMessage } from "@/src/services/httpError";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
-import { ResidentRole, type ResidentResponse } from "@/src/shared/types/resident.types";
+import {
+  ResidentRole,
+  type ResidentResponse,
+} from "@/src/shared/types/resident.types";
 import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
 import { toastErrors } from "@/src/shared/utils/toastMessages";
@@ -17,9 +20,13 @@ jest.mock("expo-router", () => ({ useRouter: jest.fn() }));
 jest.mock("@/src/features/auth/contexts", () => ({ useAuth: jest.fn() }));
 jest.mock("../useRepublicList", () => ({ useRepublicList: jest.fn() }));
 jest.mock("../useRepublicActions", () => ({ useRepublicActions: jest.fn() }));
-jest.mock("@/src/features/residents/hooks/useResidents", () => ({ useResidents: jest.fn() }));
+jest.mock("@/src/features/residents/hooks/useResidents", () => ({
+  useResidents: jest.fn(),
+}));
 jest.mock("@/src/services/httpError", () => ({ getErrorMessage: jest.fn() }));
-jest.mock("@/src/shared/contexts/RefreshContext", () => ({ useRefresh: jest.fn() }));
+jest.mock("@/src/shared/contexts/RefreshContext", () => ({
+  useRefresh: jest.fn(),
+}));
 jest.mock("@/src/shared/utils/logger", () => ({
   logger: { warn: jest.fn(), error: jest.fn() },
 }));
@@ -83,7 +90,9 @@ function setupMocks(userOverrides = {}) {
   jest.mocked(useRefresh).mockReturnValue({
     registerRefresh: mockRegisterRefresh,
   } as any);
-  jest.mocked(getErrorMessage).mockImplementation((_err, fallback) => fallback ?? "erro");
+  jest
+    .mocked(getErrorMessage)
+    .mockImplementation((_err, fallback) => fallback ?? "erro");
 }
 
 // ─── Setup ────────────────────────────────────────────────────────────────────
@@ -120,7 +129,9 @@ describe("useRepublicScreen — loadRepublic", () => {
     renderHook(() => useRepublicScreen(""));
     await act(async () => {});
 
-    expect(jest.mocked(showToast.error)).toHaveBeenCalledWith("ID da república não encontrado");
+    expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
+      "ID da república não encontrado"
+    );
     expect(mockRouter.back).toHaveBeenCalled();
   });
 
@@ -129,7 +140,9 @@ describe("useRepublicScreen — loadRepublic", () => {
     renderHook(() => useRepublicScreen("rep-1"));
     await act(async () => {});
 
-    expect(jest.mocked(showToast.error)).toHaveBeenCalledWith("República não encontrada");
+    expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
+      "República não encontrada"
+    );
     expect(mockRouter.back).toHaveBeenCalled();
   });
 
@@ -141,8 +154,13 @@ describe("useRepublicScreen — loadRepublic", () => {
     renderHook(() => useRepublicScreen("rep-1"));
     await act(async () => {});
 
-    expect(consoleWarnSpy).toHaveBeenCalledWith("Não foi possível carregar república:", error);
-    expect(jest.mocked(showToast.error)).toHaveBeenCalledWith("Erro ao carregar república");
+    expect(consoleWarnSpy).toHaveBeenCalledWith(
+      "Não foi possível carregar república:",
+      error
+    );
+    expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
+      "Erro ao carregar república"
+    );
     expect(mockRouter.back).toHaveBeenCalled();
     consoleWarnSpy.mockClear();
   });
@@ -177,8 +195,11 @@ describe("useRepublicScreen — registerRefresh", () => {
     renderHook(() => useRepublicScreen("rep-1"));
     await act(async () => {});
 
-    const fetchData = mockRegisterRefresh.mock.calls[0][1] as () => Promise<void>;
-    await act(async () => { await fetchData(); });
+    const fetchData = mockRegisterRefresh.mock
+      .calls[0][1] as () => Promise<void>;
+    await act(async () => {
+      await fetchData();
+    });
 
     expect(mockFetchResidents).toHaveBeenCalledWith("rep-1");
   });
@@ -186,14 +207,17 @@ describe("useRepublicScreen — registerRefresh", () => {
   it("fetchData não atualiza quando retorna null", async () => {
     mockFetchRepublicById
       .mockResolvedValueOnce(mockRepublic) // loadRepublic inicial
-      .mockResolvedValueOnce(null);         // fetchData call
+      .mockResolvedValueOnce(null); // fetchData call
 
     renderHook(() => useRepublicScreen("rep-1"));
     await act(async () => {});
 
     mockFetchResidents.mockClear();
-    const fetchData = mockRegisterRefresh.mock.calls[0][1] as () => Promise<void>;
-    await act(async () => { await fetchData(); });
+    const fetchData = mockRegisterRefresh.mock
+      .calls[0][1] as () => Promise<void>;
+    await act(async () => {
+      await fetchData();
+    });
 
     expect(mockFetchResidents).not.toHaveBeenCalled();
   });
@@ -206,7 +230,9 @@ describe("useRepublicScreen — toggleFavorite", () => {
     const { result } = renderHook(() => useRepublicScreen("rep-1"));
     await act(async () => {});
 
-    act(() => { result.current.toggleFavorite(); });
+    act(() => {
+      result.current.toggleFavorite();
+    });
 
     expect(result.current.isFavorited).toBe(true);
     expect(jest.mocked(showToast.success)).toHaveBeenCalledWith(
@@ -218,8 +244,12 @@ describe("useRepublicScreen — toggleFavorite", () => {
     const { result } = renderHook(() => useRepublicScreen("rep-1"));
     await act(async () => {});
 
-    act(() => { result.current.toggleFavorite(); });
-    act(() => { result.current.toggleFavorite(); });
+    act(() => {
+      result.current.toggleFavorite();
+    });
+    act(() => {
+      result.current.toggleFavorite();
+    });
 
     expect(result.current.isFavorited).toBe(false);
     expect(jest.mocked(showToast.success)).toHaveBeenLastCalledWith(
@@ -236,7 +266,9 @@ describe("useRepublicScreen — handleSignOut", () => {
     const { result } = renderHook(() => useRepublicScreen("rep-1"));
     await act(async () => {});
 
-    await act(async () => { await result.current.handleSignOut(); });
+    await act(async () => {
+      await result.current.handleSignOut();
+    });
 
     expect(mockLogout).toHaveBeenCalled();
     expect(mockRouter.replace).toHaveBeenCalledWith("/");
@@ -248,9 +280,14 @@ describe("useRepublicScreen — handleSignOut", () => {
     const { result } = renderHook(() => useRepublicScreen("rep-1"));
     await act(async () => {});
 
-    await act(async () => { await result.current.handleSignOut(); });
+    await act(async () => {
+      await result.current.handleSignOut();
+    });
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith("Erro ao fazer logout:", error);
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Erro ao fazer logout:",
+      error
+    );
     expect(jest.mocked(toastErrors.logoutFailed)).toHaveBeenCalledWith(error);
     consoleErrorSpy.mockClear();
   });
@@ -263,7 +300,9 @@ describe("useRepublicScreen — handleOpenMenu", () => {
     const { result } = renderHook(() => useRepublicScreen("rep-1"));
     await act(async () => {});
 
-    await act(async () => { await result.current.handleOpenMenu(); });
+    await act(async () => {
+      await result.current.handleOpenMenu();
+    });
 
     expect(mockFetchRepublics).not.toHaveBeenCalled();
     expect(result.current.isMenuOpen).toBe(true);
@@ -280,7 +319,9 @@ describe("useRepublicScreen — handleOpenMenu", () => {
     const { result } = renderHook(() => useRepublicScreen("rep-1"));
     await act(async () => {});
 
-    await act(async () => { await result.current.handleOpenMenu(); });
+    await act(async () => {
+      await result.current.handleOpenMenu();
+    });
 
     expect(mockFetchRepublics).toHaveBeenCalled();
     expect(result.current.isMenuOpen).toBe(true);
@@ -297,7 +338,9 @@ describe("useRepublicScreen — handleOpenMenu", () => {
     const { result } = renderHook(() => useRepublicScreen("rep-1"));
     await act(async () => {});
 
-    await act(async () => { await result.current.handleOpenMenu(); });
+    await act(async () => {
+      await result.current.handleOpenMenu();
+    });
 
     expect(jest.mocked(logger.warn)).toHaveBeenCalled();
     expect(result.current.isMenuOpen).toBe(true);
@@ -324,7 +367,9 @@ describe("useRepublicScreen — handleSaveRepublic", () => {
     const { result } = renderHook(() => useRepublicScreen("rep-1"));
     await act(async () => {});
 
-    await act(async () => { await result.current.handleSaveRepublic("Novo Nome"); });
+    await act(async () => {
+      await result.current.handleSaveRepublic("Novo Nome");
+    });
 
     expect(mockUpdateRepublic).not.toHaveBeenCalled();
   });
@@ -363,7 +408,10 @@ describe("useRepublicScreen — currentResident e roleLabel", () => {
   });
 
   it("define roleLabel='Admin' quando role é ADMIN", async () => {
-    const adminResident: ResidentResponse = { ...mockResident, role: ResidentRole.ADMIN };
+    const adminResident: ResidentResponse = {
+      ...mockResident,
+      role: ResidentRole.ADMIN,
+    };
     jest.mocked(useResidents).mockReturnValue({
       residents: [adminResident],
       fetchResidents: mockFetchResidents,

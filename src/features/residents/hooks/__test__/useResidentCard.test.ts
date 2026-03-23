@@ -36,7 +36,9 @@ afterEach(() => {
 
 describe("useResidentCard — estado inicial", () => {
   it("inicia com expanded=false, copiado=false, imageError=false", () => {
-    const { result } = renderHook(() => useResidentCard(mockMorador, onCopyPix));
+    const { result } = renderHook(() =>
+      useResidentCard(mockMorador, onCopyPix)
+    );
 
     expect(result.current.expanded).toBe(false);
     expect(result.current.copiado).toBe(false);
@@ -44,7 +46,9 @@ describe("useResidentCard — estado inicial", () => {
   });
 
   it("expõe animatedStyle, toggleExpanded, handleCopyPix e setImageError", () => {
-    const { result } = renderHook(() => useResidentCard(mockMorador, onCopyPix));
+    const { result } = renderHook(() =>
+      useResidentCard(mockMorador, onCopyPix)
+    );
 
     expect(result.current.animatedStyle).toBeDefined();
     expect(typeof result.current.toggleExpanded).toBe("function");
@@ -55,7 +59,9 @@ describe("useResidentCard — estado inicial", () => {
 
 describe("useResidentCard — toggleExpanded", () => {
   it("alterna expanded de false para true", () => {
-    const { result } = renderHook(() => useResidentCard(mockMorador, onCopyPix));
+    const { result } = renderHook(() =>
+      useResidentCard(mockMorador, onCopyPix)
+    );
 
     act(() => {
       result.current.toggleExpanded();
@@ -65,7 +71,9 @@ describe("useResidentCard — toggleExpanded", () => {
   });
 
   it("alterna expanded de true para false na segunda chamada", () => {
-    const { result } = renderHook(() => useResidentCard(mockMorador, onCopyPix));
+    const { result } = renderHook(() =>
+      useResidentCard(mockMorador, onCopyPix)
+    );
 
     act(() => {
       result.current.toggleExpanded();
@@ -80,7 +88,9 @@ describe("useResidentCard — toggleExpanded", () => {
 
 describe("useResidentCard — handleCopyPix", () => {
   it("chama onCopyPix com o morador e define copiado=true", () => {
-    const { result } = renderHook(() => useResidentCard(mockMorador, onCopyPix));
+    const { result } = renderHook(() =>
+      useResidentCard(mockMorador, onCopyPix)
+    );
 
     act(() => {
       result.current.handleCopyPix();
@@ -91,7 +101,9 @@ describe("useResidentCard — handleCopyPix", () => {
   });
 
   it("redefine copiado=false após 2000ms", () => {
-    const { result } = renderHook(() => useResidentCard(mockMorador, onCopyPix));
+    const { result } = renderHook(() =>
+      useResidentCard(mockMorador, onCopyPix)
+    );
 
     act(() => {
       result.current.handleCopyPix();
@@ -109,7 +121,9 @@ describe("useResidentCard — handleCopyPix", () => {
 
 describe("useResidentCard — setImageError", () => {
   it("atualiza imageError para true", () => {
-    const { result } = renderHook(() => useResidentCard(mockMorador, onCopyPix));
+    const { result } = renderHook(() =>
+      useResidentCard(mockMorador, onCopyPix)
+    );
 
     act(() => {
       result.current.setImageError(true);

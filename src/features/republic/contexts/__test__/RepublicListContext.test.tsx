@@ -56,9 +56,9 @@ function renderWithProvider(isAuthenticated = false) {
 beforeEach(() => {
   jest.clearAllMocks();
   jest.mocked(useAuth).mockReturnValue({ isAuthenticated: false } as any);
-  jest.mocked(getErrorMessage).mockImplementation(
-    (_err, fallback) => fallback ?? "erro"
-  );
+  jest
+    .mocked(getErrorMessage)
+    .mockImplementation((_err, fallback) => fallback ?? "erro");
 });
 
 // ─── useRepublicListContext ───────────────────────────────────────────────────
@@ -173,8 +173,12 @@ describe("fetchRepublics", () => {
   });
 
   it("exibe toast com a mensagem de erro e define republics como []", async () => {
-    jest.mocked(republicService.getRepublics).mockRejectedValue(new Error("fail"));
-    jest.mocked(getErrorMessage).mockReturnValue("Não foi possível carregar as repúblicas.");
+    jest
+      .mocked(republicService.getRepublics)
+      .mockRejectedValue(new Error("fail"));
+    jest
+      .mocked(getErrorMessage)
+      .mockReturnValue("Não foi possível carregar as repúblicas.");
 
     const { result } = renderWithProvider();
 
@@ -189,7 +193,9 @@ describe("fetchRepublics", () => {
   });
 
   it("loga info no finally mesmo quando falha", async () => {
-    jest.mocked(republicService.getRepublics).mockRejectedValue(new Error("fail"));
+    jest
+      .mocked(republicService.getRepublics)
+      .mockRejectedValue(new Error("fail"));
 
     const { result } = renderWithProvider();
 
@@ -208,7 +214,9 @@ describe("fetchRepublics", () => {
 
 describe("fetchRepublicById", () => {
   it("chama getRepublicById e retorna a república", async () => {
-    jest.mocked(republicService.getRepublicById).mockResolvedValue(mockRepublic);
+    jest
+      .mocked(republicService.getRepublicById)
+      .mockResolvedValue(mockRepublic);
 
     const { result } = renderWithProvider();
 
@@ -217,7 +225,9 @@ describe("fetchRepublicById", () => {
       republic = await result.current.fetchRepublicById("rep-1");
     });
 
-    expect(jest.mocked(republicService.getRepublicById)).toHaveBeenCalledWith("rep-1");
+    expect(jest.mocked(republicService.getRepublicById)).toHaveBeenCalledWith(
+      "rep-1"
+    );
     expect(republic).toEqual(mockRepublic);
   });
 
@@ -241,7 +251,9 @@ describe("fetchRepublicById", () => {
   });
 
   it("loga undefined quando o erro não é instância de Error e retorna null", async () => {
-    jest.mocked(republicService.getRepublicById).mockRejectedValue("string error");
+    jest
+      .mocked(republicService.getRepublicById)
+      .mockRejectedValue("string error");
 
     const { result } = renderWithProvider();
 
@@ -259,8 +271,12 @@ describe("fetchRepublicById", () => {
   });
 
   it("exibe toast com a mensagem de erro ao falhar", async () => {
-    jest.mocked(republicService.getRepublicById).mockRejectedValue(new Error("fail"));
-    jest.mocked(getErrorMessage).mockReturnValue("Não foi possível carregar a república.");
+    jest
+      .mocked(republicService.getRepublicById)
+      .mockRejectedValue(new Error("fail"));
+    jest
+      .mocked(getErrorMessage)
+      .mockReturnValue("Não foi possível carregar a república.");
 
     const { result } = renderWithProvider();
 

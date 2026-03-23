@@ -1,4 +1,8 @@
-import { ActivityIndicator, KeyboardAvoidingView, Platform } from "react-native";
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { InviteModal } from "../InviteModal";
 
@@ -34,7 +38,9 @@ afterEach(() => {
 describe("InviteModal — renderização", () => {
   it("renderiza o título 'Enviar convite'", () => {
     render(<InviteModal {...defaultProps} />);
-    expect(screen.getAllByText("Enviar convite").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Enviar convite").length).toBeGreaterThanOrEqual(
+      1
+    );
   });
 
   it("renderiza o campo de email com placeholder correto", () => {
@@ -117,7 +123,13 @@ describe("InviteModal — envio do convite", () => {
   it("chama sendInvite com email trimado e republicaId ao enviar", async () => {
     const sendInvite = jest.fn().mockResolvedValue(undefined);
     const onClose = jest.fn();
-    render(<InviteModal {...defaultProps} sendInvite={sendInvite} onClose={onClose} />);
+    render(
+      <InviteModal
+        {...defaultProps}
+        sendInvite={sendInvite}
+        onClose={onClose}
+      />
+    );
 
     fireEvent.changeText(
       screen.getByPlaceholderText("Email do convidado"),
@@ -136,7 +148,13 @@ describe("InviteModal — envio do convite", () => {
   it("chama onClose após envio bem-sucedido", async () => {
     const sendInvite = jest.fn().mockResolvedValue(undefined);
     const onClose = jest.fn();
-    render(<InviteModal {...defaultProps} sendInvite={sendInvite} onClose={onClose} />);
+    render(
+      <InviteModal
+        {...defaultProps}
+        sendInvite={sendInvite}
+        onClose={onClose}
+      />
+    );
 
     fireEvent.changeText(
       screen.getByPlaceholderText("Email do convidado"),
@@ -194,7 +212,10 @@ describe("InviteModal — envio do convite", () => {
     const sendInvite = jest.fn();
     render(<InviteModal {...defaultProps} sendInvite={sendInvite} />);
 
-    fireEvent.changeText(screen.getByPlaceholderText("Email do convidado"), "   ");
+    fireEvent.changeText(
+      screen.getByPlaceholderText("Email do convidado"),
+      "   "
+    );
     await act(async () => {
       fireEvent.press(screen.getByLabelText("Enviar convite"));
     });

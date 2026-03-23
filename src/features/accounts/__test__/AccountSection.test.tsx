@@ -17,7 +17,12 @@ jest.mock("../components/list/AccountCard", () => ({
   }: {
     conta: Conta;
     onToggleExpand: () => void;
-    onLongPress?: (position: { x: number; y: number; width: number; height: number }) => void;
+    onLongPress?: (position: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    }) => void;
   }) => {
     const { TouchableOpacity, View, Text } = require("react-native");
     return (
@@ -29,7 +34,9 @@ jest.mock("../components/list/AccountCard", () => ({
           accessibilityLabel={`toggle ${conta.id}`}
         />
         <TouchableOpacity
-          onPress={() => onLongPress?.({ x: 10, y: 20, width: 100, height: 50 })}
+          onPress={() =>
+            onLongPress?.({ x: 10, y: 20, width: 100, height: 50 })
+          }
           accessibilityRole="button"
           accessibilityLabel={`longpress ${conta.id}`}
         />

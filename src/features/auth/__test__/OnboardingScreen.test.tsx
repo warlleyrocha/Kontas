@@ -48,7 +48,7 @@ jest.mock(
         </View>
       );
     },
-  }),
+  })
 );
 
 jest.mock("@/src/features/auth/components/onboarding/RenderDots", () => ({

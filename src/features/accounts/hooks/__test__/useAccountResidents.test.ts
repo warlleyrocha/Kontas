@@ -16,14 +16,11 @@ jest.mock("@/src/shared/utils/showToast", () => ({
 jest.mock("@/src/services/httpError", () => ({
   getErrorMessage: jest.fn(),
 }));
-jest.mock(
-  "@/src/features/accounts/services/account-residents.service",
-  () => ({
-    accountResidentsService: {
-      confirmarPagamentoMorador: jest.fn(),
-    },
-  })
-);
+jest.mock("@/src/features/accounts/services/account-residents.service", () => ({
+  accountResidentsService: {
+    confirmarPagamentoMorador: jest.fn(),
+  },
+}));
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -71,7 +68,9 @@ beforeEach(() => {
     onRefresh: jest.fn(),
     registerRefresh: jest.fn(),
   } as any);
-  jest.mocked(getErrorMessage).mockImplementation((_err, fallback) => fallback ?? "erro");
+  jest
+    .mocked(getErrorMessage)
+    .mockImplementation((_err, fallback) => fallback ?? "erro");
 
   consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 });

@@ -82,7 +82,10 @@ describe("useRepublicForm", () => {
 
     it("abre o seletor de imagem com as opções corretas quando a permissão é concedida", async () => {
       mockRequestPermission.mockResolvedValue({ status: "granted" } as any);
-      mockLaunchLibrary.mockResolvedValue({ canceled: true, assets: [] } as any);
+      mockLaunchLibrary.mockResolvedValue({
+        canceled: true,
+        assets: [],
+      } as any);
 
       const { result } = renderHook(() => useRepublicForm());
 
@@ -100,7 +103,10 @@ describe("useRepublicForm", () => {
 
     it("não atualiza a imagem quando o usuário cancela a seleção", async () => {
       mockRequestPermission.mockResolvedValue({ status: "granted" } as any);
-      mockLaunchLibrary.mockResolvedValue({ canceled: true, assets: [] } as any);
+      mockLaunchLibrary.mockResolvedValue({
+        canceled: true,
+        assets: [],
+      } as any);
 
       const { result } = renderHook(() => useRepublicForm());
 

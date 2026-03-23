@@ -31,27 +31,24 @@ describe("showToast", () => {
     ["success", "success", "mensagem de sucesso"],
     ["error", "error", "mensagem de erro"],
     ["info", "info", "mensagem informativa"],
-  ] as const)(
-    "renderiza Toast no caso %s com duração padrão",
-    (method, variant, message) => {
-      showToast[method](message, "icone");
+  ] as const)("renderiza Toast no caso %s com duração padrão", (method, variant, message) => {
+    showToast[method](message, "icone");
 
-      expect(mockToast.custom).toHaveBeenCalledTimes(1);
-      const element = mockToast.custom.mock.calls[0]?.[0] as ReactElement<{
-        variant: string;
-        message: string;
-        icon?: unknown;
-      }>;
+    expect(mockToast.custom).toHaveBeenCalledTimes(1);
+    const element = mockToast.custom.mock.calls[0]?.[0] as ReactElement<{
+      variant: string;
+      message: string;
+      icon?: unknown;
+    }>;
 
-      expect(element.type).toBe(mockToastComponent);
-      expect(element.props).toMatchObject({
-        variant,
-        message,
-        icon: "icone",
-      });
-      expect(mockToast.custom.mock.calls[0]?.[1]).toEqual({ duration: 2000 });
-    },
-  );
+    expect(element.type).toBe(mockToastComponent);
+    expect(element.props).toMatchObject({
+      variant,
+      message,
+      icon: "icone",
+    });
+    expect(mockToast.custom.mock.calls[0]?.[1]).toEqual({ duration: 2000 });
+  });
 
   it("renderiza ToastConfirm e conecta confirmar e cancelar ao dismiss", () => {
     const onConfirm = jest.fn();

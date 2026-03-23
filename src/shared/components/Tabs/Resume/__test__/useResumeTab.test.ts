@@ -68,9 +68,7 @@ function makeConta(overrides: Partial<Conta> = {}): Conta {
   };
 }
 
-function makeContaMorador(
-  overrides: Partial<ContaMorador> = {}
-): ContaMorador {
+function makeContaMorador(overrides: Partial<ContaMorador> = {}): ContaMorador {
   return {
     id: "cm-1",
     contaId: "c-1",
@@ -179,7 +177,9 @@ describe("useResumeTab", () => {
     it("define isLoadingContas como true durante o fetch e false após", async () => {
       let resolveContas!: (v: Conta[]) => void;
       mockFetchAccounts.mockReturnValue(
-        new Promise<Conta[]>((r) => { resolveContas = r; })
+        new Promise<Conta[]>((r) => {
+          resolveContas = r;
+        })
       );
 
       const { result } = renderResumeTab();
@@ -208,7 +208,9 @@ describe("useResumeTab", () => {
     it("define isLoadingDividas como true durante o fetch e false após", async () => {
       let resolveDividas!: (v: ContaMorador[]) => void;
       mockFetchContasPorMorador.mockReturnValue(
-        new Promise<ContaMorador[]>((r) => { resolveDividas = r; })
+        new Promise<ContaMorador[]>((r) => {
+          resolveDividas = r;
+        })
       );
 
       const { result } = renderResumeTab();
@@ -247,7 +249,7 @@ describe("useResumeTab", () => {
       await act(async () => {});
 
       expect(result.current.dividas["r-1"]).toBe(100); // 80 + 20
-      expect(result.current.dividas["r-2"]).toBe(0);   // só PAGO, não conta
+      expect(result.current.dividas["r-2"]).toBe(0); // só PAGO, não conta
     });
 
     it("atribui 0 quando morador não possui contas pendentes", async () => {

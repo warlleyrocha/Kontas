@@ -10,7 +10,7 @@ export const logger = {
       console.info(
         `[INFO][${tag}]`,
         msg,
-        data !== undefined ? JSON.stringify(data, null, 2) : "",
+        data !== undefined ? JSON.stringify(data, null, 2) : ""
       );
   },
 
@@ -20,7 +20,7 @@ export const logger = {
       console.debug(
         `[DEBUG][${tag}]`,
         msg,
-        data !== undefined ? JSON.stringify(data, null, 2) : "",
+        data !== undefined ? JSON.stringify(data, null, 2) : ""
       );
   },
 
@@ -30,7 +30,7 @@ export const logger = {
       console.warn(
         `[WARN][${tag}]`,
         msg,
-        data !== undefined ? JSON.stringify(data, null, 2) : "",
+        data !== undefined ? JSON.stringify(data, null, 2) : ""
       );
     Sentry.addBreadcrumb({
       category: tag,
@@ -45,7 +45,7 @@ export const logger = {
     tag: string,
     msg: string,
     error?: unknown,
-    extra?: Record<string, unknown>,
+    extra?: Record<string, unknown>
   ) {
     if (IS_DEV) {
       console.error(
@@ -53,7 +53,7 @@ export const logger = {
         msg,
         error !== undefined
           ? JSON.stringify(error, Object.getOwnPropertyNames(error), 2)
-          : "",
+          : ""
       );
       console.trace(`[TRACE][${tag}]`);
     }

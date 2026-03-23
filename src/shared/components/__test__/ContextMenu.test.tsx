@@ -104,12 +104,14 @@ describe("ContextMenu", () => {
   });
 
   it("não agenda callback no RN quando handleClose é chamado sem callback", () => {
-    jest.mocked(Reanimated.withTiming).mockImplementation(
-      ((toValue: number, _config?: unknown, callback?: (finished?: boolean) => void) => {
-        if (callback) callback(true);
-        return toValue;
-      }) as any
-    );
+    jest.mocked(Reanimated.withTiming).mockImplementation(((
+      toValue: number,
+      _config?: unknown,
+      callback?: (finished?: boolean) => void
+    ) => {
+      if (callback) callback(true);
+      return toValue;
+    }) as any);
 
     const children = jest.fn((handleClose) => {
       handleClose();

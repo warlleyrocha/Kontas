@@ -9,7 +9,10 @@ jest.mock("@sentry/react-native", () => ({
 }));
 
 const mockCaptureException = jest.mocked(captureException);
-const originalDevDescriptor = Object.getOwnPropertyDescriptor(global, "__DEV__");
+const originalDevDescriptor = Object.getOwnPropertyDescriptor(
+  global,
+  "__DEV__"
+);
 
 function setDev(value: boolean) {
   Object.defineProperty(global, "__DEV__", {
@@ -43,7 +46,7 @@ describe("GlobalErrorBoundary", () => {
     render(
       <GlobalErrorBoundary>
         <Text>conteudo seguro</Text>
-      </GlobalErrorBoundary>,
+      </GlobalErrorBoundary>
     );
 
     expect(screen.getByText("conteudo seguro")).toBeTruthy();
@@ -64,12 +67,12 @@ describe("GlobalErrorBoundary", () => {
     render(
       <GlobalErrorBoundary>
         <BrokenChild />
-      </GlobalErrorBoundary>,
+      </GlobalErrorBoundary>
     );
 
     expect(screen.getByText("Ocorreu um erro inesperado")).toBeTruthy();
     expect(
-      screen.getByText("Tente novamente. Se persistir, reinicie o aplicativo."),
+      screen.getByText("Tente novamente. Se persistir, reinicie o aplicativo.")
     ).toBeTruthy();
     expect(screen.getByText("falha global")).toBeTruthy();
 
@@ -87,7 +90,7 @@ describe("GlobalErrorBoundary", () => {
             componentStack: expect.any(String),
           },
         },
-      }),
+      })
     );
 
     shouldThrow = false;
@@ -107,7 +110,7 @@ describe("GlobalErrorBoundary", () => {
     render(
       <GlobalErrorBoundary>
         <BrokenChild />
-      </GlobalErrorBoundary>,
+      </GlobalErrorBoundary>
     );
 
     expect(screen.getByText("Ocorreu um erro inesperado")).toBeTruthy();

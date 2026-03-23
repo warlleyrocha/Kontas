@@ -33,27 +33,27 @@ const materialCommunityIcon = {
 describe("AccountStatusIcon", () => {
   it("monta sem erros", () => {
     render(
-      <AccountStatusIcon icon={materialIcon} size={24} isLoading={false} />,
+      <AccountStatusIcon icon={materialIcon} size={24} isLoading={false} />
     );
   });
 
   it("exibe ActivityIndicator quando isLoading é true", () => {
     const { UNSAFE_getByType } = render(
-      <AccountStatusIcon icon={materialIcon} size={24} isLoading={true} />,
+      <AccountStatusIcon icon={materialIcon} size={24} isLoading={true} />
     );
     expect(UNSAFE_getByType(ActivityIndicator)).toBeTruthy();
   });
 
   it("não exibe ActivityIndicator quando isLoading é false", () => {
     const { UNSAFE_queryByType } = render(
-      <AccountStatusIcon icon={materialIcon} size={24} isLoading={false} />,
+      <AccountStatusIcon icon={materialIcon} size={24} isLoading={false} />
     );
     expect(UNSAFE_queryByType(ActivityIndicator)).toBeNull();
   });
 
   it("renderiza MaterialIcons quando library é 'material'", () => {
     render(
-      <AccountStatusIcon icon={materialIcon} size={24} isLoading={false} />,
+      <AccountStatusIcon icon={materialIcon} size={24} isLoading={false} />
     );
     expect(screen.getByTestId("material-payment")).toBeTruthy();
   });
@@ -64,7 +64,7 @@ describe("AccountStatusIcon", () => {
         icon={materialCommunityIcon}
         size={20}
         isLoading={false}
-      />,
+      />
     );
     expect(screen.getByTestId("material-community-cash-clock")).toBeTruthy();
   });

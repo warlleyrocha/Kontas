@@ -30,7 +30,7 @@ function createAxiosError({
           config: { headers: {} },
           data,
         } as never)
-      : undefined,
+      : undefined
   );
 }
 
@@ -56,7 +56,7 @@ describe("httpError", () => {
     expect(
       toUserFriendlyError(error, {
         defaultMessage: "fallback",
-      }),
+      })
     ).toBe(error);
   });
 
@@ -156,12 +156,12 @@ describe("httpError", () => {
   });
 
   it("identifica erro 401 para AppError e AxiosError", () => {
-    expect(isUnauthorizedError(new AppError("sem acesso", { status: 401 }))).toBe(
-      true,
-    );
+    expect(
+      isUnauthorizedError(new AppError("sem acesso", { status: 401 }))
+    ).toBe(true);
     expect(isUnauthorizedError(createAxiosError({ status: 401 }))).toBe(true);
     expect(isUnauthorizedError(new AppError("outro", { status: 403 }))).toBe(
-      false,
+      false
     );
     expect(isUnauthorizedError(new Error("sem status"))).toBe(false);
   });
@@ -170,7 +170,7 @@ describe("httpError", () => {
     expect(getErrorMessage(new AppError("mensagem app"))).toBe("mensagem app");
     expect(getErrorMessage(new Error("mensagem comum"))).toBe("mensagem comum");
     expect(getErrorMessage(null, "fallback customizado")).toBe(
-      "fallback customizado",
+      "fallback customizado"
     );
   });
 });

@@ -2,10 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Platform } from "react-native";
 import { useResidents } from "@/src/features/residents/hooks/useResidents";
 import { MetodoPagamento } from "../types/account.types";
-import type {
-  MoradorDivisao,
-  TipoDivisao,
-} from "../types/accountForm.types";
+import type { MoradorDivisao, TipoDivisao } from "../types/accountForm.types";
 import {
   applySplitByType,
   parseCurrencyValue,

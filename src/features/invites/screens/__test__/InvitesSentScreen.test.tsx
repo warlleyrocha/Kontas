@@ -71,18 +71,18 @@ describe("InvitesSentScreen — ScreenLayout", () => {
   });
 
   it("subtitle mostra '1 convite' com um convite", () => {
-    jest.mocked(useInvitesSentScreen).mockReturnValue(
-      makeHookReturn({ invites: [{}] }) as any
-    );
+    jest
+      .mocked(useInvitesSentScreen)
+      .mockReturnValue(makeHookReturn({ invites: [{}] }) as any);
     render(<InvitesSentScreen republicId="rep-1" />);
     const props = jest.mocked(ScreenLayout).mock.calls[0][0] as any;
     expect(props.subtitle).toBe("1 convite");
   });
 
   it("subtitle mostra '2 convites' com múltiplos convites", () => {
-    jest.mocked(useInvitesSentScreen).mockReturnValue(
-      makeHookReturn({ invites: [{}, {}] }) as any
-    );
+    jest
+      .mocked(useInvitesSentScreen)
+      .mockReturnValue(makeHookReturn({ invites: [{}, {}] }) as any);
     render(<InvitesSentScreen republicId="rep-1" />);
     const props = jest.mocked(ScreenLayout).mock.calls[0][0] as any;
     expect(props.subtitle).toBe("2 convites");
@@ -97,9 +97,9 @@ describe("InvitesSentScreen — ScreenLayout", () => {
 
 describe("InvitesSentScreen — InvitesSentContent", () => {
   it("passa error do hook ao InvitesSentContent", () => {
-    jest.mocked(useInvitesSentScreen).mockReturnValue(
-      makeHookReturn({ error: "Falha de rede" }) as any
-    );
+    jest
+      .mocked(useInvitesSentScreen)
+      .mockReturnValue(makeHookReturn({ error: "Falha de rede" }) as any);
     render(<InvitesSentScreen republicId="rep-1" />);
     const props = jest.mocked(InvitesSentContent).mock.calls[0][0] as any;
     expect(props.error).toBe("Falha de rede");
@@ -107,9 +107,9 @@ describe("InvitesSentScreen — InvitesSentContent", () => {
 
   it("passa invites do hook ao InvitesSentContent", () => {
     const invites = [{}, {}] as any;
-    jest.mocked(useInvitesSentScreen).mockReturnValue(
-      makeHookReturn({ invites }) as any
-    );
+    jest
+      .mocked(useInvitesSentScreen)
+      .mockReturnValue(makeHookReturn({ invites }) as any);
     render(<InvitesSentScreen republicId="rep-1" />);
     const props = jest.mocked(InvitesSentContent).mock.calls[0][0] as any;
     expect(props.invites).toBe(invites);

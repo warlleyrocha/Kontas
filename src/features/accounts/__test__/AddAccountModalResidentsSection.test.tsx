@@ -58,7 +58,7 @@ describe("AddAccountModalResidentsSection", () => {
     fireEvent.press(
       screen.getByRole("button", {
         name: "Opção selecionada Dividir igualmente",
-      }),
+      })
     );
 
     expect(props.onSetTipoDivisao).toHaveBeenCalledWith("equal");
@@ -71,7 +71,7 @@ describe("AddAccountModalResidentsSection", () => {
     fireEvent.press(
       screen.getByRole("button", {
         name: "Selecionar opção Valores customizados",
-      }),
+      })
     );
 
     expect(props.onSetTipoDivisao).toHaveBeenCalledWith("custom");
@@ -81,18 +81,18 @@ describe("AddAccountModalResidentsSection", () => {
     render(
       <AddAccountModalResidentsSection
         {...createProps({ tipoDivisao: "custom" })}
-      />,
+      />
     );
 
     expect(
       screen.getByRole("button", {
         name: "Opção selecionada Valores customizados",
-      }),
+      })
     ).toBeTruthy();
     expect(
       screen.getByRole("button", {
         name: "Selecionar opção Dividir igualmente",
-      }),
+      })
     ).toBeTruthy();
   });
 
@@ -101,7 +101,7 @@ describe("AddAccountModalResidentsSection", () => {
     render(<AddAccountModalResidentsSection {...props} />);
 
     fireEvent.press(
-      screen.getByRole("button", { name: "Desmarcar morador Ana" }),
+      screen.getByRole("button", { name: "Desmarcar morador Ana" })
     );
 
     expect(props.onToggleMorador).toHaveBeenCalledWith("1");
@@ -111,7 +111,7 @@ describe("AddAccountModalResidentsSection", () => {
     render(<AddAccountModalResidentsSection {...createProps()} />);
 
     expect(
-      screen.getByRole("button", { name: "Selecionar morador Bruno" }),
+      screen.getByRole("button", { name: "Selecionar morador Bruno" })
     ).toBeTruthy();
   });
 
@@ -146,7 +146,7 @@ describe("AddAccountModalResidentsSection", () => {
     render(
       <AddAccountModalResidentsSection
         {...createProps({ tipoDivisao: "custom" })}
-      />,
+      />
     );
 
     const input = screen.getAllByDisplayValue("50,00")[0];

@@ -1,4 +1,8 @@
-import { AxiosError, type AxiosInstance, type InternalAxiosRequestConfig } from "axios";
+import {
+  AxiosError,
+  type AxiosInstance,
+  type InternalAxiosRequestConfig,
+} from "axios";
 
 type ApiModule = typeof import("../api");
 
@@ -19,7 +23,7 @@ type InterceptorHandler<TArg, TResult = TArg> = {
 const originalApiUrl = process.env.EXPO_PUBLIC_API_URL;
 
 function createConfig(
-  overrides: Partial<InternalAxiosRequestConfig> = {},
+  overrides: Partial<InternalAxiosRequestConfig> = {}
 ): InternalAxiosRequestConfig {
   return {
     method: "get",
@@ -55,7 +59,7 @@ function createAxiosError({
           config,
           data,
         } as never)
-      : undefined,
+      : undefined
   );
 }
 
@@ -141,7 +145,7 @@ describe("api service", () => {
 
   it("lança erro ao importar quando EXPO_PUBLIC_API_URL não existe", () => {
     expect(() => importApiModule("")).toThrow(
-      "EXPO_PUBLIC_API_URL não definida no runtime. Verifique o build preview/production.",
+      "EXPO_PUBLIC_API_URL não definida no runtime. Verifique o build preview/production."
     );
   });
 
@@ -168,11 +172,9 @@ describe("api service", () => {
     expect(asyncStorage.getItem).toHaveBeenCalledWith("@app:token");
     expect(result.headers.Authorization).toBe("Bearer token-123");
     expect((result as RequestConfig)._cbHalfOpen).toBe(false);
-    expect(logger.debug).toHaveBeenCalledWith(
-      "API",
-      "➡️ POST /payments",
-      { id: 1 },
-    );
+    expect(logger.debug).toHaveBeenCalledWith("API", "➡️ POST /payments", {
+      id: 1,
+    });
   });
 
   it("loga params quando não há data e não injeta Authorization sem token", async () => {
@@ -188,11 +190,9 @@ describe("api service", () => {
     const result = await request.fulfilled(config);
 
     expect(result.headers.Authorization).toBeUndefined();
-    expect(logger.debug).toHaveBeenCalledWith(
-      "API",
-      "➡️ GET /accounts",
-      { page: 2 },
-    );
+    expect(logger.debug).toHaveBeenCalledWith("API", "➡️ GET /accounts", {
+      page: 2,
+    });
   });
 
   it("normaliza o erro do interceptor de request", async () => {
@@ -213,11 +213,7 @@ describe("api service", () => {
     };
 
     expect(response.fulfilled(apiResponse)).toBe(apiResponse);
-    expect(logger.info).toHaveBeenCalledWith(
-      "API",
-      "✅ 200 /me",
-      { ok: true },
-    );
+    expect(logger.info).toHaveBeenCalledWith("API", "✅ 200 /me", { ok: true });
   });
 
   it("abre o circuit breaker após falhas consecutivas e bloqueia novas requisições", async () => {
@@ -233,7 +229,7 @@ describe("api service", () => {
     await expect(response.rejected(failure)).rejects.toBe(failure);
 
     await expect(
-      request.fulfilled(createConfig({ url: "/blocked" })),
+      request.fulfilled(createConfig({ url: "/blocked" }))
     ).rejects.toMatchObject({
       name: "CircuitBreakerError",
       code: "CIRCUIT_OPEN",
@@ -243,20 +239,18 @@ describe("api service", () => {
       response.rejected(
         Object.assign(new Error("circuit open"), {
           code: "CIRCUIT_OPEN",
-        }),
-      ),
+        })
+      )
     ).rejects.toMatchObject({
       code: "CIRCUIT_OPEN",
     });
 
+    expect(logger.warn).toHaveBeenCalledWith("API", "❌ 500 /unstable", {
+      message: "boom",
+    });
     expect(logger.warn).toHaveBeenCalledWith(
       "API",
-      "❌ 500 /unstable",
-      { message: "boom" },
-    );
-    expect(logger.warn).toHaveBeenCalledWith(
-      "API",
-      "⛔ Circuit breaker aberto: requisição bloqueada.",
+      "⛔ Circuit breaker aberto: requisição bloqueada."
     );
   });
 
@@ -279,11 +273,11 @@ describe("api service", () => {
     nowSpy.mockReturnValue(11000);
 
     const halfOpenConfig = await request.fulfilled(
-      createConfig({ url: "/retry-success" }),
+      createConfig({ url: "/retry-success" })
     );
 
     await expect(
-      request.fulfilled(createConfig({ url: "/retry-concurrent" })),
+      request.fulfilled(createConfig({ url: "/retry-concurrent" }))
     ).rejects.toMatchObject({
       code: "CIRCUIT_OPEN",
     });
@@ -295,13 +289,13 @@ describe("api service", () => {
     };
 
     expect(response.fulfilled(apiResponse)).toBe(apiResponse);
-    expect(logger.table).toHaveBeenCalledWith(
-      "API",
-      "✅ 200 /retry-success",
-      [{ id: 1 }],
-    );
+    expect(logger.table).toHaveBeenCalledWith("API", "✅ 200 /retry-success", [
+      { id: 1 },
+    ]);
 
-    const normalConfig = await request.fulfilled(createConfig({ url: "/next" }));
+    const normalConfig = await request.fulfilled(
+      createConfig({ url: "/next" })
+    );
     expect((normalConfig as RequestConfig)._cbHalfOpen).toBe(false);
   });
 
@@ -322,7 +316,7 @@ describe("api service", () => {
     nowSpy.mockReturnValue(11000);
 
     const halfOpenConfig = await request.fulfilled(
-      createConfig({ url: "/half-open-fail" }),
+      createConfig({ url: "/half-open-fail" })
     );
 
     const halfOpenFailure = createAxiosError({
@@ -331,10 +325,10 @@ describe("api service", () => {
     });
 
     await expect(response.rejected(halfOpenFailure)).rejects.toBe(
-      halfOpenFailure,
+      halfOpenFailure
     );
     await expect(
-      request.fulfilled(createConfig({ url: "/still-blocked" })),
+      request.fulfilled(createConfig({ url: "/still-blocked" }))
     ).rejects.toMatchObject({
       code: "CIRCUIT_OPEN",
     });
@@ -357,7 +351,7 @@ describe("api service", () => {
     nowSpy.mockReturnValue(11000);
 
     const halfOpenConfig = await request.fulfilled(
-      createConfig({ url: "/recoverable" }),
+      createConfig({ url: "/recoverable" })
     );
     const canceledError = createAxiosError({
       code: "ERR_CANCELED",
@@ -367,7 +361,7 @@ describe("api service", () => {
     await expect(response.rejected(canceledError)).rejects.toBe(canceledError);
 
     const nextConfig = await request.fulfilled(
-      createConfig({ url: "/allowed-again" }),
+      createConfig({ url: "/allowed-again" })
     );
 
     expect((nextConfig as RequestConfig)._cbHalfOpen).toBe(false);
@@ -384,16 +378,18 @@ describe("api service", () => {
     expect(logger.warn).toHaveBeenCalledWith(
       "API",
       "❌ Network Error /network-error",
-      undefined,
+      undefined
     );
   });
 
   it("normaliza erro não axios no interceptor de resposta", async () => {
     const { response } = importApiModule();
 
-    await expect(response.rejected("falha desconhecida")).rejects.toMatchObject({
-      message: "falha desconhecida",
-    });
+    await expect(response.rejected("falha desconhecida")).rejects.toMatchObject(
+      {
+        message: "falha desconhecida",
+      }
+    );
   });
 
   it("repassa instância de Error no rejected do interceptor de request (L151)", async () => {
@@ -490,7 +486,7 @@ describe("api service", () => {
     asyncStorage.getItem.mockResolvedValue(null);
 
     const normalConfig = await request.fulfilled(
-      createConfig({ url: "/cancel-test" }),
+      createConfig({ url: "/cancel-test" })
     );
     const canceledError = createAxiosError({
       code: "ERR_CANCELED",

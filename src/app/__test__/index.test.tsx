@@ -40,7 +40,7 @@ describe("index route", () => {
     expect(mockLoadingScreen).toHaveBeenCalledTimes(1);
     expect(mockLoadingScreen).toHaveBeenCalledWith(
       expect.objectContaining({ message: "Carregando..." }),
-      undefined,
+      undefined
     );
     expect(mockRedirect).not.toHaveBeenCalled();
   });
@@ -56,7 +56,7 @@ describe("index route", () => {
 
     expect(mockRedirect).toHaveBeenCalledWith(
       expect.objectContaining({ href: "/(auth)/login" }),
-      undefined,
+      undefined
     );
   });
 
@@ -71,7 +71,7 @@ describe("index route", () => {
 
     expect(mockRedirect).toHaveBeenCalledWith(
       expect.objectContaining({ href: "/(auth)/onboarding" }),
-      undefined,
+      undefined
     );
   });
 
@@ -86,7 +86,7 @@ describe("index route", () => {
 
     expect(mockRedirect).toHaveBeenCalledWith(
       expect.objectContaining({ href: "/(republics)/rep-1" }),
-      undefined,
+      undefined
     );
   });
 
@@ -101,7 +101,7 @@ describe("index route", () => {
 
     expect(mockRedirect).toHaveBeenCalledWith(
       expect.objectContaining({ href: "/(userProfile)/profile" }),
-      undefined,
+      undefined
     );
   });
 });

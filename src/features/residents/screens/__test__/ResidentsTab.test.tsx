@@ -100,7 +100,7 @@ describe("ResidentsTab — lista de moradores", () => {
 
   it("passa copiarChavePix do hook para ResidentCard", () => {
     render(
-      <ResidentsTab residents={[makeResident("r-1")]} republicId="rep-1" />,
+      <ResidentsTab residents={[makeResident("r-1")]} republicId="rep-1" />
     );
     const props = jest.mocked(ResidentCard).mock.calls[0][0] as any;
     expect(props.onCopyPix).toBe(mockCopiarChavePix);

@@ -22,7 +22,7 @@ describe("useComponentLogger", () => {
       ({ name }) => useComponentLogger(name),
       {
         initialProps: { name: "ProfileCard" },
-      },
+      }
     );
 
     expect(mockLogger.debug).toHaveBeenCalledWith("ProfileCard", "render #1");

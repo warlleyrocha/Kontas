@@ -68,7 +68,10 @@ beforeEach(() => {
 // ─── sendInvite ───────────────────────────────────────────────────────────────
 
 describe("inviteService.sendInvite", () => {
-  const payload: InviteRequest = { email: "ana@email.com", republicaId: "rep-1" };
+  const payload: InviteRequest = {
+    email: "ana@email.com",
+    republicaId: "rep-1",
+  };
 
   it("chama POST /convites e retorna response.data", async () => {
     mockApi.post.mockResolvedValue({ data: mockInvite });
@@ -133,9 +136,9 @@ describe("inviteService.getInvitesByRepublicId", () => {
     const cancelError = makeCancelledError();
     mockApi.get.mockRejectedValue(cancelError);
 
-    await expect(
-      inviteService.getInvitesByRepublicId("rep-1")
-    ).rejects.toBe(cancelError);
+    await expect(inviteService.getInvitesByRepublicId("rep-1")).rejects.toBe(
+      cancelError
+    );
 
     expect(mockToUserFriendlyError).not.toHaveBeenCalled();
   });
@@ -144,7 +147,9 @@ describe("inviteService.getInvitesByRepublicId", () => {
     const error = new Error("fail");
     mockApi.get.mockRejectedValue(error);
 
-    await expect(inviteService.getInvitesByRepublicId("rep-1")).rejects.toBeDefined();
+    await expect(
+      inviteService.getInvitesByRepublicId("rep-1")
+    ).rejects.toBeDefined();
 
     expect(mockToUserFriendlyError).toHaveBeenCalledWith(error, {
       defaultMessage: "Erro ao obter convites.",
@@ -161,7 +166,9 @@ describe("inviteService.getInvitesByRepublicId", () => {
     mockApi.get.mockRejectedValue(new Error("original"));
     mockToUserFriendlyError.mockReturnValue(friendly);
 
-    await expect(inviteService.getInvitesByRepublicId("rep-1")).rejects.toBe(friendly);
+    await expect(inviteService.getInvitesByRepublicId("rep-1")).rejects.toBe(
+      friendly
+    );
   });
 });
 

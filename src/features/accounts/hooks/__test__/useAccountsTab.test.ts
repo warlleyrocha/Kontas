@@ -86,7 +86,9 @@ afterEach(() => {
 
 describe("useAccountsTab — estado inicial", () => {
   it("expõe todas as propriedades esperadas", () => {
-    const { result } = renderHook(() => useAccountsTab({ republicId: "rep-1" }));
+    const { result } = renderHook(() =>
+      useAccountsTab({ republicId: "rep-1" })
+    );
     expect(result.current).toMatchObject({
       contasOrdenadas: { abertas: [], pagas: [] },
       expandedAccountId: null,
@@ -121,26 +123,34 @@ describe("useAccountsTab — estado inicial", () => {
 describe("useAccountsTab — hasNoAccounts", () => {
   it("é true quando abertas e pagas estão vazias", () => {
     setupMocks({ abertas: [], pagas: [] });
-    const { result } = renderHook(() => useAccountsTab({ republicId: "rep-1" }));
+    const { result } = renderHook(() =>
+      useAccountsTab({ republicId: "rep-1" })
+    );
     expect(result.current.hasNoAccounts).toBe(true);
   });
 
   it("é false quando há contas abertas", () => {
     setupMocks({ abertas: [{ id: "acc-1" }], pagas: [] });
-    const { result } = renderHook(() => useAccountsTab({ republicId: "rep-1" }));
+    const { result } = renderHook(() =>
+      useAccountsTab({ republicId: "rep-1" })
+    );
     expect(result.current.hasNoAccounts).toBe(false);
   });
 
   it("é false quando há contas pagas", () => {
     setupMocks({ abertas: [], pagas: [{ id: "acc-2" }] });
-    const { result } = renderHook(() => useAccountsTab({ republicId: "rep-1" }));
+    const { result } = renderHook(() =>
+      useAccountsTab({ republicId: "rep-1" })
+    );
     expect(result.current.hasNoAccounts).toBe(false);
   });
 });
 
 describe("useAccountsTab — openAccountModal / closeAccountModal", () => {
   it("openAccountModal chama setShowAccountModal(true)", () => {
-    const { result } = renderHook(() => useAccountsTab({ republicId: "rep-1" }));
+    const { result } = renderHook(() =>
+      useAccountsTab({ republicId: "rep-1" })
+    );
     act(() => {
       result.current.openAccountModal();
     });
@@ -148,7 +158,9 @@ describe("useAccountsTab — openAccountModal / closeAccountModal", () => {
   });
 
   it("closeAccountModal chama setShowAccountModal(false)", () => {
-    const { result } = renderHook(() => useAccountsTab({ republicId: "rep-1" }));
+    const { result } = renderHook(() =>
+      useAccountsTab({ republicId: "rep-1" })
+    );
     act(() => {
       result.current.closeAccountModal();
     });
@@ -159,7 +171,9 @@ describe("useAccountsTab — openAccountModal / closeAccountModal", () => {
 describe("useAccountsTab — toggleOpenAccounts / togglePaidAccounts", () => {
   it("toggleOpenAccounts inverte mostrarContasAbertas (true → false)", () => {
     setupMocks({ mostrarContasAbertas: true });
-    const { result } = renderHook(() => useAccountsTab({ republicId: "rep-1" }));
+    const { result } = renderHook(() =>
+      useAccountsTab({ republicId: "rep-1" })
+    );
     act(() => {
       result.current.toggleOpenAccounts();
     });
@@ -168,7 +182,9 @@ describe("useAccountsTab — toggleOpenAccounts / togglePaidAccounts", () => {
 
   it("toggleOpenAccounts inverte mostrarContasAbertas (false → true)", () => {
     setupMocks({ mostrarContasAbertas: false });
-    const { result } = renderHook(() => useAccountsTab({ republicId: "rep-1" }));
+    const { result } = renderHook(() =>
+      useAccountsTab({ republicId: "rep-1" })
+    );
     act(() => {
       result.current.toggleOpenAccounts();
     });
@@ -177,7 +193,9 @@ describe("useAccountsTab — toggleOpenAccounts / togglePaidAccounts", () => {
 
   it("togglePaidAccounts inverte mostrarContasPagas (true → false)", () => {
     setupMocks({ mostrarContasPagas: true });
-    const { result } = renderHook(() => useAccountsTab({ republicId: "rep-1" }));
+    const { result } = renderHook(() =>
+      useAccountsTab({ republicId: "rep-1" })
+    );
     act(() => {
       result.current.togglePaidAccounts();
     });
@@ -186,7 +204,9 @@ describe("useAccountsTab — toggleOpenAccounts / togglePaidAccounts", () => {
 
   it("togglePaidAccounts inverte mostrarContasPagas (false → true)", () => {
     setupMocks({ mostrarContasPagas: false });
-    const { result } = renderHook(() => useAccountsTab({ republicId: "rep-1" }));
+    const { result } = renderHook(() =>
+      useAccountsTab({ republicId: "rep-1" })
+    );
     act(() => {
       result.current.togglePaidAccounts();
     });
@@ -199,7 +219,9 @@ describe("useAccountsTab — handlePatchAndRefresh", () => {
     mockHandlePatch.mockResolvedValue(undefined);
     mockRefresh.mockResolvedValue(undefined);
 
-    const { result } = renderHook(() => useAccountsTab({ republicId: "rep-1" }));
+    const { result } = renderHook(() =>
+      useAccountsTab({ republicId: "rep-1" })
+    );
 
     await act(async () => {
       await result.current.handlePatchAndRefresh("acc-1", MetodoPagamento.PIX);
@@ -218,10 +240,15 @@ describe("useAccountsTab — handlePatchAndRefresh", () => {
       callOrder.push("refresh");
     });
 
-    const { result } = renderHook(() => useAccountsTab({ republicId: "rep-1" }));
+    const { result } = renderHook(() =>
+      useAccountsTab({ republicId: "rep-1" })
+    );
 
     await act(async () => {
-      await result.current.handlePatchAndRefresh("acc-1", MetodoPagamento.DINHEIRO);
+      await result.current.handlePatchAndRefresh(
+        "acc-1",
+        MetodoPagamento.DINHEIRO
+      );
     });
 
     expect(callOrder).toEqual(["patch", "refresh"]);

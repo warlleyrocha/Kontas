@@ -124,7 +124,9 @@ describe("useAccountList — estado retornado", () => {
       fetchAccountResidents: mockFetchAccountResidents,
     });
 
-    const { result } = renderHook(() => useAccountList({ republicId: "rep-1" }));
+    const { result } = renderHook(() =>
+      useAccountList({ republicId: "rep-1" })
+    );
 
     expect(result.current.loading).toBe(true);
     expect(result.current.error).toBeInstanceOf(Error);
@@ -140,7 +142,9 @@ describe("useAccountList — estado retornado", () => {
       setMostrarContasPagas: mockSetMostrarContasPagas,
     });
 
-    const { result } = renderHook(() => useAccountList({ republicId: "rep-1" }));
+    const { result } = renderHook(() =>
+      useAccountList({ republicId: "rep-1" })
+    );
 
     expect(result.current.mesSelecionado).toBe("2026-03");
     expect(result.current.mostrarContasAbertas).toBe(false);
@@ -156,7 +160,9 @@ describe("useAccountList — estado retornado", () => {
       contasOrdenadas,
     });
 
-    const { result } = renderHook(() => useAccountList({ republicId: "rep-1" }));
+    const { result } = renderHook(() =>
+      useAccountList({ republicId: "rep-1" })
+    );
 
     expect(result.current.mesesDisponiveis).toBe(mesesDisponiveis);
     expect(result.current.contasOrdenadas).toBe(contasOrdenadas);
@@ -173,10 +179,14 @@ describe("useAccountList — estado retornado", () => {
       confirmResidentPayment: mockConfirmResidentPayment,
     } as any);
 
-    const { result } = renderHook(() => useAccountList({ republicId: "rep-1" }));
+    const { result } = renderHook(() =>
+      useAccountList({ republicId: "rep-1" })
+    );
 
     expect(result.current.accountResidentsById).toBe(accountResidentsById);
-    expect(result.current.confirmResidentPayment).toBe(mockConfirmResidentPayment);
+    expect(result.current.confirmResidentPayment).toBe(
+      mockConfirmResidentPayment
+    );
   });
 });
 
@@ -225,7 +235,8 @@ describe("useAccountList — registro no RefreshContext", () => {
     await act(async () => {});
 
     // Captura e invoca a função registrada
-    const registeredRefresh = mockRegisterRefresh.mock.calls[0][1] as () => Promise<void>;
+    const registeredRefresh = mockRegisterRefresh.mock
+      .calls[0][1] as () => Promise<void>;
     mockFetchAccounts.mockClear();
     mockLoadResidents.mockClear();
 
@@ -244,7 +255,9 @@ describe("useAccountList — refresh público", () => {
     mockFetchAccounts.mockResolvedValue(contas);
     mockLoadResidents.mockResolvedValue(undefined);
 
-    const { result } = renderHook(() => useAccountList({ republicId: "rep-1" }));
+    const { result } = renderHook(() =>
+      useAccountList({ republicId: "rep-1" })
+    );
     await act(async () => {}); // flush mount effect
 
     mockFetchAccounts.mockClear();

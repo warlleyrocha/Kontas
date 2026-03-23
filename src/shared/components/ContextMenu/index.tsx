@@ -39,7 +39,8 @@ export function resolveMenuPlacement(
   screenHeight: number,
   menuTotalHeight: number
 ) {
-  const spaceBelow = screenHeight - (resolvedPosition.y + resolvedPosition.height);
+  const spaceBelow =
+    screenHeight - (resolvedPosition.y + resolvedPosition.height);
 
   return {
     menuY:

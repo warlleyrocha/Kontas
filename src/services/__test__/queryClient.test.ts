@@ -34,10 +34,10 @@ describe("queryClient", () => {
     const { retry } = getQueryOptions();
 
     expect(retry(0, new AppError("cancelado", { code: "ERR_CANCELED" }))).toBe(
-      false,
+      false
     );
     expect(retry(0, new AppError("circuito", { code: "CIRCUIT_OPEN" }))).toBe(
-      false,
+      false
     );
   });
 
@@ -61,10 +61,10 @@ describe("queryClient", () => {
     const { retry } = getQueryOptions();
 
     expect(
-      retry(0, Object.assign(new Error("cancelado"), { code: "ERR_CANCELED" })),
+      retry(0, Object.assign(new Error("cancelado"), { code: "ERR_CANCELED" }))
     ).toBe(false);
     expect(
-      retry(0, Object.assign(new Error("circuito"), { code: "CIRCUIT_OPEN" })),
+      retry(0, Object.assign(new Error("circuito"), { code: "CIRCUIT_OPEN" }))
     ).toBe(false);
   });
 

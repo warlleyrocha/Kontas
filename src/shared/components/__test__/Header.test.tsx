@@ -25,7 +25,7 @@ describe("Header", () => {
     render(<Header title="Tela" />);
 
     fireEvent.press(
-      screen.getByRole("button", { name: "Voltar para a tela anterior" }),
+      screen.getByRole("button", { name: "Voltar para a tela anterior" })
     );
 
     expect(goBack).toHaveBeenCalledTimes(1);

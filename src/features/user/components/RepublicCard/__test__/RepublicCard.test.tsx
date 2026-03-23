@@ -23,17 +23,13 @@ beforeEach(() => {
 
 describe("RepublicCard", () => {
   it("renderiza o nome da república", () => {
-    render(
-      <RepublicCard republic={mockRepublic} onSelect={onSelect} />
-    );
+    render(<RepublicCard republic={mockRepublic} onSelect={onSelect} />);
 
     expect(screen.getByText("Alpha")).toBeTruthy();
   });
 
   it("exibe '0 Moradores' por padrão", () => {
-    render(
-      <RepublicCard republic={mockRepublic} onSelect={onSelect} />
-    );
+    render(<RepublicCard republic={mockRepublic} onSelect={onSelect} />);
 
     expect(screen.getByText("0 Moradores")).toBeTruthy();
   });
@@ -63,13 +59,9 @@ describe("RepublicCard", () => {
   });
 
   it("chama onSelect ao pressionar o card", () => {
-    render(
-      <RepublicCard republic={mockRepublic} onSelect={onSelect} />
-    );
+    render(<RepublicCard republic={mockRepublic} onSelect={onSelect} />);
 
-    fireEvent.press(
-      screen.getByLabelText("Abrir república Alpha")
-    );
+    fireEvent.press(screen.getByLabelText("Abrir república Alpha"));
 
     expect(onSelect).toHaveBeenCalledTimes(1);
   });
@@ -90,9 +82,7 @@ describe("RepublicCard", () => {
   });
 
   it("não lança erro ao pressionar longamente sem onLongPress", () => {
-    render(
-      <RepublicCard republic={mockRepublic} onSelect={onSelect} />
-    );
+    render(<RepublicCard republic={mockRepublic} onSelect={onSelect} />);
 
     expect(() =>
       fireEvent(screen.getByLabelText("Abrir república Alpha"), "longPress")
@@ -100,17 +90,13 @@ describe("RepublicCard", () => {
   });
 
   it("renderiza ícone padrão quando imagemRepublica não está definida", () => {
-    render(
-      <RepublicCard republic={mockRepublic} onSelect={onSelect} />
-    );
+    render(<RepublicCard republic={mockRepublic} onSelect={onSelect} />);
 
     expect(screen.getByText("🏠")).toBeTruthy();
   });
 
   it("chama shrink (withTiming) ao disparar pressIn", () => {
-    render(
-      <RepublicCard republic={mockRepublic} onSelect={onSelect} />
-    );
+    render(<RepublicCard republic={mockRepublic} onSelect={onSelect} />);
 
     expect(() =>
       fireEvent(screen.getByLabelText("Abrir república Alpha"), "pressIn")
@@ -118,9 +104,7 @@ describe("RepublicCard", () => {
   });
 
   it("chama reset ao disparar pressOut", () => {
-    render(
-      <RepublicCard republic={mockRepublic} onSelect={onSelect} />
-    );
+    render(<RepublicCard republic={mockRepublic} onSelect={onSelect} />);
 
     expect(() =>
       fireEvent(screen.getByLabelText("Abrir república Alpha"), "pressOut")
@@ -128,9 +112,11 @@ describe("RepublicCard", () => {
   });
 
   it("chama onLongPress com a república e posição quando measure está disponível", () => {
-    jest.spyOn(View.prototype, "measure").mockImplementation(
-      (cb: (...args: number[]) => void) => cb(0, 0, 100, 50, 10, 20)
-    );
+    jest
+      .spyOn(View.prototype, "measure")
+      .mockImplementation((cb: (...args: number[]) => void) =>
+        cb(0, 0, 100, 50, 10, 20)
+      );
 
     render(
       <RepublicCard
@@ -156,9 +142,7 @@ describe("RepublicCard", () => {
       imagemRepublica: "https://example.com/photo.jpg",
     };
 
-    render(
-      <RepublicCard republic={republicWithImage} onSelect={onSelect} />
-    );
+    render(<RepublicCard republic={republicWithImage} onSelect={onSelect} />);
 
     // Antes do erro: Image é renderizada (ícone não está visível)
     expect(screen.queryByText("🏠")).toBeNull();

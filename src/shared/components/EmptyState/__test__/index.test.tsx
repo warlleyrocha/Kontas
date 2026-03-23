@@ -28,7 +28,7 @@ describe("EmptyState", () => {
   it("exibe a descrição", () => {
     render(<EmptyState {...createProps()} />);
     expect(
-      screen.getByText("Não há itens para exibir no momento."),
+      screen.getByText("Não há itens para exibir no momento.")
     ).toBeTruthy();
   });
 
@@ -46,19 +46,15 @@ describe("EmptyState", () => {
     render(
       <EmptyState
         {...createProps({ buttonText: "Adicionar item", onPress: jest.fn() })}
-      />,
+      />
     );
-    expect(
-      screen.getByRole("button", { name: "Adicionar item" }),
-    ).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Adicionar item" })).toBeTruthy();
   });
 
   it("chama onPress ao pressionar o botão", () => {
     const onPress = jest.fn();
     render(
-      <EmptyState
-        {...createProps({ buttonText: "Adicionar item", onPress })}
-      />,
+      <EmptyState {...createProps({ buttonText: "Adicionar item", onPress })} />
     );
 
     fireEvent.press(screen.getByRole("button", { name: "Adicionar item" }));

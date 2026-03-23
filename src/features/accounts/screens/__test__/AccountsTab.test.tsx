@@ -91,7 +91,9 @@ beforeEach(() => {
     refreshing: false,
     onRefresh: mockOnRefresh,
   } as any);
-  jest.mocked(getMoradorStatusVisual).mockReturnValue(StatusPagamento.PAGO as any);
+  jest
+    .mocked(getMoradorStatusVisual)
+    .mockReturnValue(StatusPagamento.PAGO as any);
   consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 });
 
@@ -104,17 +106,17 @@ afterEach(() => {
 
 describe("AccountsTab — loading", () => {
   it("exibe texto de carregamento quando loading é true", () => {
-    jest.mocked(useAccountsTab).mockReturnValue(
-      makeTabReturn({ loading: true }) as any
-    );
+    jest
+      .mocked(useAccountsTab)
+      .mockReturnValue(makeTabReturn({ loading: true }) as any);
     render(<AccountsTab republicId="rep-1" currentResidentId="r-1" />);
     expect(screen.getByText("Carregando contas...")).toBeTruthy();
   });
 
   it("não renderiza AccountSection enquanto carrega", () => {
-    jest.mocked(useAccountsTab).mockReturnValue(
-      makeTabReturn({ loading: true }) as any
-    );
+    jest
+      .mocked(useAccountsTab)
+      .mockReturnValue(makeTabReturn({ loading: true }) as any);
     render(<AccountsTab republicId="rep-1" currentResidentId="r-1" />);
     expect(jest.mocked(AccountSection)).not.toHaveBeenCalled();
   });
@@ -124,27 +126,29 @@ describe("AccountsTab — loading", () => {
 
 describe("AccountsTab — error", () => {
   it("exibe mensagem de erro quando error está definido", () => {
-    jest.mocked(useAccountsTab).mockReturnValue(
-      makeTabReturn({ error: { message: "Falha de rede" } }) as any
-    );
-    render(<AccountsTab republicId="rep-1" currentResidentId="r-1" />);
-    expect(screen.getByText(/Erro ao carregar contas: Falha de rede/)).toBeTruthy();
-  });
-
-  it("exibe aviso de nenhuma conta no estado de erro", () => {
-    jest.mocked(useAccountsTab).mockReturnValue(
-      makeTabReturn({ error: { message: "err" } }) as any
-    );
+    jest
+      .mocked(useAccountsTab)
+      .mockReturnValue(
+        makeTabReturn({ error: { message: "Falha de rede" } }) as any
+      );
     render(<AccountsTab republicId="rep-1" currentResidentId="r-1" />);
     expect(
-      screen.getByText(/Nenhuma conta cadastrada ainda/)
+      screen.getByText(/Erro ao carregar contas: Falha de rede/)
     ).toBeTruthy();
   });
 
+  it("exibe aviso de nenhuma conta no estado de erro", () => {
+    jest
+      .mocked(useAccountsTab)
+      .mockReturnValue(makeTabReturn({ error: { message: "err" } }) as any);
+    render(<AccountsTab republicId="rep-1" currentResidentId="r-1" />);
+    expect(screen.getByText(/Nenhuma conta cadastrada ainda/)).toBeTruthy();
+  });
+
   it("não renderiza AccountSection quando há erro", () => {
-    jest.mocked(useAccountsTab).mockReturnValue(
-      makeTabReturn({ error: { message: "err" } }) as any
-    );
+    jest
+      .mocked(useAccountsTab)
+      .mockReturnValue(makeTabReturn({ error: { message: "err" } }) as any);
     render(<AccountsTab republicId="rep-1" currentResidentId="r-1" />);
     expect(jest.mocked(AccountSection)).not.toHaveBeenCalled();
   });
@@ -154,9 +158,11 @@ describe("AccountsTab — error", () => {
 
 describe("AccountsTab — sem contas (mesSelecionado='todos')", () => {
   beforeEach(() => {
-    jest.mocked(useAccountsTab).mockReturnValue(
-      makeTabReturn({ hasNoAccounts: true, mesSelecionado: "todos" }) as any
-    );
+    jest
+      .mocked(useAccountsTab)
+      .mockReturnValue(
+        makeTabReturn({ hasNoAccounts: true, mesSelecionado: "todos" }) as any
+      );
   });
 
   it("exibe mensagem de nenhuma conta cadastrada", () => {
@@ -212,18 +218,20 @@ describe("AccountsTab — filtro de meses", () => {
   });
 
   it("renderiza um botão por mês disponível", () => {
-    jest.mocked(useAccountsTab).mockReturnValue(
-      makeTabReturn({ mesesDisponiveis: ["2024-01", "2024-02"] }) as any
-    );
+    jest
+      .mocked(useAccountsTab)
+      .mockReturnValue(
+        makeTabReturn({ mesesDisponiveis: ["2024-01", "2024-02"] }) as any
+      );
     render(<AccountsTab republicId="rep-1" currentResidentId="r-1" />);
     expect(screen.getByText("Mês:2024-01")).toBeTruthy();
     expect(screen.getByText("Mês:2024-02")).toBeTruthy();
   });
 
   it("pressionar um mês chama setMesSelecionado com o mesAno", () => {
-    jest.mocked(useAccountsTab).mockReturnValue(
-      makeTabReturn({ mesesDisponiveis: ["2024-01"] }) as any
-    );
+    jest
+      .mocked(useAccountsTab)
+      .mockReturnValue(makeTabReturn({ mesesDisponiveis: ["2024-01"] }) as any);
     render(<AccountsTab republicId="rep-1" currentResidentId="r-1" />);
     fireEvent.press(
       screen.getByRole("button", { name: "Mostrar contas de Mês:2024-01" })
@@ -257,9 +265,11 @@ describe("AccountsTab — AccountSection", () => {
 
   it("primeira AccountSection recebe label 'Em Aberto' e contas abertas", () => {
     const abertas = [{ id: "a-1" }];
-    jest.mocked(useAccountsTab).mockReturnValue(
-      makeTabReturn({ contasOrdenadas: { abertas, pagas: [] } }) as any
-    );
+    jest
+      .mocked(useAccountsTab)
+      .mockReturnValue(
+        makeTabReturn({ contasOrdenadas: { abertas, pagas: [] } }) as any
+      );
     render(<AccountsTab republicId="rep-1" currentResidentId="r-1" />);
     const props = jest.mocked(AccountSection).mock.calls[0][0] as any;
     expect(props.label).toBe("Em Aberto");
@@ -268,9 +278,11 @@ describe("AccountsTab — AccountSection", () => {
 
   it("segunda AccountSection recebe label 'Contas Pagas' e contas pagas", () => {
     const pagas = [{ id: "a-2" }];
-    jest.mocked(useAccountsTab).mockReturnValue(
-      makeTabReturn({ contasOrdenadas: { abertas: [], pagas } }) as any
-    );
+    jest
+      .mocked(useAccountsTab)
+      .mockReturnValue(
+        makeTabReturn({ contasOrdenadas: { abertas: [], pagas } }) as any
+      );
     render(<AccountsTab republicId="rep-1" currentResidentId="r-1" />);
     const props = jest.mocked(AccountSection).mock.calls[1][0] as any;
     expect(props.label).toBe("Contas Pagas");
@@ -278,9 +290,14 @@ describe("AccountsTab — AccountSection", () => {
   });
 
   it("passa visivel, onToggle e expandedAccountId corretos à primeira AccountSection", () => {
-    jest.mocked(useAccountsTab).mockReturnValue(
-      makeTabReturn({ mostrarContasAbertas: false, expandedAccountId: "a-1" }) as any
-    );
+    jest
+      .mocked(useAccountsTab)
+      .mockReturnValue(
+        makeTabReturn({
+          mostrarContasAbertas: false,
+          expandedAccountId: "a-1",
+        }) as any
+      );
     render(<AccountsTab republicId="rep-1" currentResidentId="r-1" />);
     const props = jest.mocked(AccountSection).mock.calls[0][0] as any;
     expect(props.visivel).toBe(false);
@@ -305,8 +322,12 @@ describe("AccountsTab — AccountSection", () => {
     render(<AccountsTab republicId="rep-1" currentResidentId="r-1" />);
     const { onLongPress } = jest.mocked(AccountSection).mock.calls[0][0] as any;
     const position = { x: 10, y: 20, width: 100, height: 50 };
-    act(() => { onLongPress("a-1", position); });
-    const ctxProps = jest.mocked(AccountContextMenu).mock.calls.at(-1)?.[0] as any;
+    act(() => {
+      onLongPress("a-1", position);
+    });
+    const ctxProps = jest
+      .mocked(AccountContextMenu)
+      .mock.calls.at(-1)?.[0] as any;
     expect(ctxProps.visible).toBe(true);
     expect(ctxProps.position).toEqual(position);
   });
@@ -323,14 +344,16 @@ describe("AccountsTab — AddAccountButton", () => {
   it("onPress do AddAccountButton chama openAccountModal", () => {
     render(<AccountsTab republicId="rep-1" currentResidentId="r-1" />);
     const { onPress } = jest.mocked(AddAccountButton).mock.calls[0][0] as any;
-    act(() => { onPress(); });
+    act(() => {
+      onPress();
+    });
     expect(mockOpenAccountModal).toHaveBeenCalled();
   });
 
   it("renderiza AddAccountModal quando showAccountModal é true na view principal", () => {
-    jest.mocked(useAccountsTab).mockReturnValue(
-      makeTabReturn({ showAccountModal: true }) as any
-    );
+    jest
+      .mocked(useAccountsTab)
+      .mockReturnValue(makeTabReturn({ showAccountModal: true }) as any);
     render(<AccountsTab republicId="rep-1" currentResidentId="r-1" />);
     expect(jest.mocked(AddAccountModal)).toHaveBeenCalled();
     const props = jest.mocked(AddAccountModal).mock.calls[0][0] as any;
@@ -365,11 +388,19 @@ describe("AccountsTab — AccountContextMenu", () => {
     render(<AccountsTab republicId="rep-1" currentResidentId="r-1" />);
     // abre via long press
     const { onLongPress } = jest.mocked(AccountSection).mock.calls[0][0] as any;
-    act(() => { onLongPress("a-1", { x: 0, y: 0, width: 0, height: 0 }); });
+    act(() => {
+      onLongPress("a-1", { x: 0, y: 0, width: 0, height: 0 });
+    });
     // fecha
-    const { onClose } = jest.mocked(AccountContextMenu).mock.calls.at(-1)?.[0] as any;
-    act(() => { onClose(); });
-    const lastProps = jest.mocked(AccountContextMenu).mock.calls.at(-1)?.[0] as any;
+    const { onClose } = jest
+      .mocked(AccountContextMenu)
+      .mock.calls.at(-1)?.[0] as any;
+    act(() => {
+      onClose();
+    });
+    const lastProps = jest
+      .mocked(AccountContextMenu)
+      .mock.calls.at(-1)?.[0] as any;
     expect(lastProps.visible).toBe(false);
   });
 
@@ -377,18 +408,29 @@ describe("AccountsTab — AccountContextMenu", () => {
     mockHandleDelete.mockResolvedValue(undefined);
     render(<AccountsTab republicId="rep-1" currentResidentId="r-1" />);
     const { onLongPress } = jest.mocked(AccountSection).mock.calls[0][0] as any;
-    act(() => { onLongPress("a-42", { x: 0, y: 0, width: 0, height: 0 }); });
-    const { onDelete } = jest.mocked(AccountContextMenu).mock.calls.at(-1)?.[0] as any;
-    act(() => { onDelete(); });
+    act(() => {
+      onLongPress("a-42", { x: 0, y: 0, width: 0, height: 0 });
+    });
+    const { onDelete } = jest
+      .mocked(AccountContextMenu)
+      .mock.calls.at(-1)?.[0] as any;
+    act(() => {
+      onDelete();
+    });
     expect(mockHandleDelete).toHaveBeenCalledWith("a-42");
-    const lastProps = jest.mocked(AccountContextMenu).mock.calls.at(-1)?.[0] as any;
+    const lastProps = jest
+      .mocked(AccountContextMenu)
+      .mock.calls.at(-1)?.[0] as any;
     expect(lastProps.visible).toBe(false);
   });
 
   it("onDelete não chama handleDelete quando accountId é null", () => {
     render(<AccountsTab republicId="rep-1" currentResidentId="r-1" />);
-    const { onDelete } = jest.mocked(AccountContextMenu).mock.calls[0][0] as any;
-    act(() => { onDelete(); });
+    const { onDelete } = jest.mocked(AccountContextMenu).mock
+      .calls[0][0] as any;
+    act(() => {
+      onDelete();
+    });
     expect(mockHandleDelete).not.toHaveBeenCalled();
   });
 });
@@ -398,7 +440,8 @@ describe("AccountsTab — AccountContextMenu", () => {
 describe("AccountsTab — pendingPaymentsCount", () => {
   it("chama onPendingPaymentsCountChange com a contagem de AGUARDANDO_CONFIRMACAO", () => {
     const mockOnPendingChange = jest.fn();
-    jest.mocked(getMoradorStatusVisual)
+    jest
+      .mocked(getMoradorStatusVisual)
       .mockReturnValueOnce(StatusPagamento.AGUARDANDO_CONFIRMACAO as any)
       .mockReturnValueOnce(StatusPagamento.PAGO as any)
       .mockReturnValueOnce(StatusPagamento.AGUARDANDO_CONFIRMACAO as any);

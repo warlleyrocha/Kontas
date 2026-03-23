@@ -149,7 +149,9 @@ describe("useProfileScreen — estado inicial", () => {
 
 function getHandleSignOut(): () => Promise<void> {
   // handleSignOut é passado como 2º argumento ao useSideMenu
-  return (jest.mocked(useSideMenu).mock.calls[0] as unknown[])[1] as () => Promise<void>;
+  return (
+    jest.mocked(useSideMenu).mock.calls[0] as unknown[]
+  )[1] as () => Promise<void>;
 }
 
 describe("useProfileScreen — handleSignOut", () => {
@@ -158,7 +160,9 @@ describe("useProfileScreen — handleSignOut", () => {
     renderHook(() => useProfileScreen());
     const handleSignOut = getHandleSignOut();
 
-    await act(async () => { await handleSignOut(); });
+    await act(async () => {
+      await handleSignOut();
+    });
 
     expect(mockLogout).toHaveBeenCalled();
     expect(mockRouter.replace).toHaveBeenCalledWith("/");
@@ -170,9 +174,15 @@ describe("useProfileScreen — handleSignOut", () => {
     renderHook(() => useProfileScreen());
     const handleSignOut = getHandleSignOut();
 
-    await act(async () => { await handleSignOut(); });
+    await act(async () => {
+      await handleSignOut();
+    });
 
-    expect(jest.mocked(logger.error)).toHaveBeenCalledWith("User", "Erro ao fazer logout", error);
+    expect(jest.mocked(logger.error)).toHaveBeenCalledWith(
+      "User",
+      "Erro ao fazer logout",
+      error
+    );
     expect(jest.mocked(toastErrors.logoutFailed)).toHaveBeenCalledWith(error);
   });
 
@@ -181,9 +191,15 @@ describe("useProfileScreen — handleSignOut", () => {
     renderHook(() => useProfileScreen());
     const handleSignOut = getHandleSignOut();
 
-    await act(async () => { await handleSignOut(); });
+    await act(async () => {
+      await handleSignOut();
+    });
 
-    expect(jest.mocked(logger.error)).toHaveBeenCalledWith("User", "Erro ao fazer logout", undefined);
+    expect(jest.mocked(logger.error)).toHaveBeenCalledWith(
+      "User",
+      "Erro ao fazer logout",
+      undefined
+    );
   });
 });
 
@@ -191,10 +207,19 @@ describe("useProfileScreen — handleSignOut", () => {
 
 describe("useProfileScreen — handleSaveProfile", () => {
   it("retorna imediatamente quando user é null", async () => {
-    jest.mocked(useAuth).mockReturnValue({ user: null, logout: mockLogout, completeProfile: mockCompleteProfile, updateUser: mockUpdateUser } as any);
+    jest
+      .mocked(useAuth)
+      .mockReturnValue({
+        user: null,
+        logout: mockLogout,
+        completeProfile: mockCompleteProfile,
+        updateUser: mockUpdateUser,
+      } as any);
     const { result } = renderHook(() => useProfileScreen());
 
-    await act(async () => { await result.current.handleSaveProfile("Ana"); });
+    await act(async () => {
+      await result.current.handleSaveProfile("Ana");
+    });
 
     expect(mockCompleteProfile).not.toHaveBeenCalled();
     expect(mockUpdateUser).not.toHaveBeenCalled();
@@ -202,33 +227,62 @@ describe("useProfileScreen — handleSaveProfile", () => {
 
   it("exibe Alert quando perfil incompleto e phone ou pixKey estão ausentes", async () => {
     jest.mocked(useAuth).mockReturnValue({
-      user: { id: "u-1", nome: "Ana", email: "ana@email.com", perfilCompleto: false },
-      logout: mockLogout, completeProfile: mockCompleteProfile, updateUser: mockUpdateUser,
+      user: {
+        id: "u-1",
+        nome: "Ana",
+        email: "ana@email.com",
+        perfilCompleto: false,
+      },
+      logout: mockLogout,
+      completeProfile: mockCompleteProfile,
+      updateUser: mockUpdateUser,
     } as any);
     const { result } = renderHook(() => useProfileScreen());
 
-    await act(async () => { await result.current.handleSaveProfile("Ana"); });
+    await act(async () => {
+      await result.current.handleSaveProfile("Ana");
+    });
 
-    expect(alertSpy).toHaveBeenCalledWith("Campos Obrigatórios", expect.any(String));
+    expect(alertSpy).toHaveBeenCalledWith(
+      "Campos Obrigatórios",
+      expect.any(String)
+    );
     expect(mockCompleteProfile).not.toHaveBeenCalled();
   });
 
   it("chama completeProfile quando o perfil está incompleto e todos os campos preenchidos", async () => {
     mockCompleteProfile.mockResolvedValue(undefined);
     jest.mocked(useAuth).mockReturnValue({
-      user: { id: "u-1", nome: "Ana", email: "ana@email.com", perfilCompleto: false },
-      logout: mockLogout, completeProfile: mockCompleteProfile, updateUser: mockUpdateUser,
+      user: {
+        id: "u-1",
+        nome: "Ana",
+        email: "ana@email.com",
+        perfilCompleto: false,
+      },
+      logout: mockLogout,
+      completeProfile: mockCompleteProfile,
+      updateUser: mockUpdateUser,
     } as any);
     const { result } = renderHook(() => useProfileScreen());
 
     await act(async () => {
-      await result.current.handleSaveProfile("Ana", "ana@pix", undefined, "11999");
+      await result.current.handleSaveProfile(
+        "Ana",
+        "ana@pix",
+        undefined,
+        "11999"
+      );
     });
 
     expect(mockCompleteProfile).toHaveBeenCalledWith({
-      nome: "Ana", telefone: "11999", chavePix: "ana@pix", fotoPerfil: undefined,
+      nome: "Ana",
+      telefone: "11999",
+      chavePix: "ana@pix",
+      fotoPerfil: undefined,
     });
-    expect(jest.mocked(showToast.success)).toHaveBeenCalledWith("Perfil salvo com sucesso!");
+    expect(jest.mocked(showToast.success)).toHaveBeenCalledWith(
+      "Perfil salvo com sucesso!"
+    );
   });
 
   it("chama updateUser quando o perfil já está completo", async () => {
@@ -236,13 +290,23 @@ describe("useProfileScreen — handleSaveProfile", () => {
     const { result } = renderHook(() => useProfileScreen());
 
     await act(async () => {
-      await result.current.handleSaveProfile("Ana", "ana@pix", undefined, "11999");
+      await result.current.handleSaveProfile(
+        "Ana",
+        "ana@pix",
+        undefined,
+        "11999"
+      );
     });
 
     expect(mockUpdateUser).toHaveBeenCalledWith({
-      nome: "Ana", telefone: "11999", chavePix: "ana@pix", fotoPerfil: undefined,
+      nome: "Ana",
+      telefone: "11999",
+      chavePix: "ana@pix",
+      fotoPerfil: undefined,
     });
-    expect(jest.mocked(showToast.success)).toHaveBeenCalledWith("Perfil atualizado com sucesso!");
+    expect(jest.mocked(showToast.success)).toHaveBeenCalledWith(
+      "Perfil atualizado com sucesso!"
+    );
   });
 
   it("loga erro e chama toastErrors.profileUpdateFailed ao falhar", async () => {
@@ -251,11 +315,22 @@ describe("useProfileScreen — handleSaveProfile", () => {
     const { result } = renderHook(() => useProfileScreen());
 
     await act(async () => {
-      await result.current.handleSaveProfile("Ana", "ana@pix", undefined, "11999");
+      await result.current.handleSaveProfile(
+        "Ana",
+        "ana@pix",
+        undefined,
+        "11999"
+      );
     });
 
-    expect(jest.mocked(logger.error)).toHaveBeenCalledWith("User", "Erro ao salvar perfil", error);
-    expect(jest.mocked(toastErrors.profileUpdateFailed)).toHaveBeenCalledWith(error);
+    expect(jest.mocked(logger.error)).toHaveBeenCalledWith(
+      "User",
+      "Erro ao salvar perfil",
+      error
+    );
+    expect(jest.mocked(toastErrors.profileUpdateFailed)).toHaveBeenCalledWith(
+      error
+    );
   });
 
   it("loga undefined quando a atualização falha com valor que não é Error", async () => {
@@ -263,7 +338,12 @@ describe("useProfileScreen — handleSaveProfile", () => {
     const { result } = renderHook(() => useProfileScreen());
 
     await act(async () => {
-      await result.current.handleSaveProfile("Ana", "ana@pix", undefined, "11999");
+      await result.current.handleSaveProfile(
+        "Ana",
+        "ana@pix",
+        undefined,
+        "11999"
+      );
     });
 
     expect(jest.mocked(logger.error)).toHaveBeenCalledWith(
@@ -282,19 +362,25 @@ describe("useProfileScreen — handleSaveProfile", () => {
 describe("useProfileScreen — navegação", () => {
   it("handleCreateRepublic navega para /register/republic", () => {
     const { result } = renderHook(() => useProfileScreen());
-    act(() => { result.current.handleCreateRepublic(); });
+    act(() => {
+      result.current.handleCreateRepublic();
+    });
     expect(mockRouter.push).toHaveBeenCalledWith("/register/republic");
   });
 
   it("handleViewInvites navega para /(userProfile)/invites", () => {
     const { result } = renderHook(() => useProfileScreen());
-    act(() => { result.current.handleViewInvites(); });
+    act(() => {
+      result.current.handleViewInvites();
+    });
     expect(mockRouter.push).toHaveBeenCalledWith("/(userProfile)/invites");
   });
 
   it("handleSelectRepublic navega para /(republics)/:id", () => {
     const { result } = renderHook(() => useProfileScreen());
-    act(() => { result.current.handleSelectRepublic("rep-1"); });
+    act(() => {
+      result.current.handleSelectRepublic("rep-1");
+    });
     expect(mockRouter.push).toHaveBeenCalledWith("/(republics)/rep-1");
   });
 });
@@ -306,7 +392,9 @@ describe("useProfileScreen — context menu", () => {
     const position = { x: 10, y: 20, width: 100, height: 50 };
     const { result } = renderHook(() => useProfileScreen());
 
-    act(() => { result.current.handleLongPressRepublic(mockRepublic, position); });
+    act(() => {
+      result.current.handleLongPressRepublic(mockRepublic, position);
+    });
 
     expect(result.current.selectedRepublic).toEqual(mockRepublic);
     expect(result.current.contextMenuPosition).toEqual(position);
@@ -315,37 +403,63 @@ describe("useProfileScreen — context menu", () => {
 
   it("handleCloseContextMenu fecha o menu", () => {
     const { result } = renderHook(() => useProfileScreen());
-    act(() => { result.current.handleLongPressRepublic(mockRepublic, { x: 0, y: 0, width: 0, height: 0 }); });
-    act(() => { result.current.handleCloseContextMenu(); });
+    act(() => {
+      result.current.handleLongPressRepublic(mockRepublic, {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+      });
+    });
+    act(() => {
+      result.current.handleCloseContextMenu();
+    });
     expect(result.current.contextMenuVisible).toBe(false);
   });
 
   it("handleOpenEditFromMenu fecha o menu e abre o modal de edição", () => {
     const { result } = renderHook(() => useProfileScreen());
-    act(() => { result.current.handleOpenEditFromMenu(); });
+    act(() => {
+      result.current.handleOpenEditFromMenu();
+    });
     expect(result.current.contextMenuVisible).toBe(false);
     expect(mockSetShowEditModal).toHaveBeenCalledWith(true);
   });
 
   it("handleCloseEditModal fecha o modal e limpa selectedRepublic", () => {
     const { result } = renderHook(() => useProfileScreen());
-    act(() => { result.current.handleLongPressRepublic(mockRepublic, { x: 0, y: 0, width: 0, height: 0 }); });
-    act(() => { result.current.handleCloseEditModal(); });
+    act(() => {
+      result.current.handleLongPressRepublic(mockRepublic, {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+      });
+    });
+    act(() => {
+      result.current.handleCloseEditModal();
+    });
     expect(mockSetShowEditModal).toHaveBeenCalledWith(false);
     expect(result.current.selectedRepublic).toBeNull();
   });
 
   it("handleInviteFromMenu fecha o menu e abre o modal de convite", () => {
     const { result } = renderHook(() => useProfileScreen());
-    act(() => { result.current.handleInviteFromMenu(); });
+    act(() => {
+      result.current.handleInviteFromMenu();
+    });
     expect(result.current.contextMenuVisible).toBe(false);
     expect(result.current.showInviteModal).toBe(true);
   });
 
   it("handleCloseInviteModal fecha o modal de convite", () => {
     const { result } = renderHook(() => useProfileScreen());
-    act(() => { result.current.handleInviteFromMenu(); });
-    act(() => { result.current.handleCloseInviteModal(); });
+    act(() => {
+      result.current.handleInviteFromMenu();
+    });
+    act(() => {
+      result.current.handleCloseInviteModal();
+    });
     expect(result.current.showInviteModal).toBe(false);
   });
 });
@@ -367,14 +481,22 @@ describe("useProfileScreen — handleSaveRepublicEdit", () => {
     mockUpdateRepublic.mockResolvedValue(undefined);
     const { result } = renderHook(() => useProfileScreen());
 
-    act(() => { result.current.handleLongPressRepublic(mockRepublic, { x: 0, y: 0, width: 0, height: 0 }); });
+    act(() => {
+      result.current.handleLongPressRepublic(mockRepublic, {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+      });
+    });
 
     await act(async () => {
       await result.current.handleSaveRepublicEdit("Novo Nome", "img.jpg");
     });
 
     expect(mockUpdateRepublic).toHaveBeenCalledWith("rep-1", {
-      nome: "Novo Nome", imagemRepublica: "img.jpg",
+      nome: "Novo Nome",
+      imagemRepublica: "img.jpg",
     });
     expect(mockFetchRepublics).toHaveBeenCalled();
   });
@@ -385,15 +507,26 @@ describe("useProfileScreen — handleSaveRepublicEdit", () => {
 describe("useProfileScreen — handleDeleteFromMenu", () => {
   it("retorna imediatamente quando selectedRepublic é null", () => {
     const { result } = renderHook(() => useProfileScreen());
-    act(() => { result.current.handleDeleteFromMenu(); });
+    act(() => {
+      result.current.handleDeleteFromMenu();
+    });
     expect(jest.mocked(showToast.confirm)).not.toHaveBeenCalled();
   });
 
   it("exibe confirmação com o nome da república quando selectedRepublic está definida", () => {
     const { result } = renderHook(() => useProfileScreen());
 
-    act(() => { result.current.handleLongPressRepublic(mockRepublic, { x: 0, y: 0, width: 0, height: 0 }); });
-    act(() => { result.current.handleDeleteFromMenu(); });
+    act(() => {
+      result.current.handleLongPressRepublic(mockRepublic, {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+      });
+    });
+    act(() => {
+      result.current.handleDeleteFromMenu();
+    });
 
     expect(jest.mocked(showToast.confirm)).toHaveBeenCalledWith(
       'Excluir "Alpha"?',
@@ -407,8 +540,17 @@ describe("useProfileScreen — handleDeleteFromMenu", () => {
 
     const { result } = renderHook(() => useProfileScreen());
 
-    act(() => { result.current.handleLongPressRepublic(mockRepublic, { x: 0, y: 0, width: 0, height: 0 }); });
-    await act(async () => { result.current.handleDeleteFromMenu(); });
+    act(() => {
+      result.current.handleLongPressRepublic(mockRepublic, {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0,
+      });
+    });
+    await act(async () => {
+      result.current.handleDeleteFromMenu();
+    });
 
     expect(mockDeleteRepublic).toHaveBeenCalledWith("rep-1");
     await act(async () => {});
@@ -426,8 +568,15 @@ describe("useProfileScreen — efeitos", () => {
 
   it("não chama fetchRepublics quando perfilCompleto é false", () => {
     jest.mocked(useAuth).mockReturnValue({
-      user: { id: "u-1", nome: "Ana", email: "ana@email.com", perfilCompleto: false },
-      logout: mockLogout, completeProfile: mockCompleteProfile, updateUser: mockUpdateUser,
+      user: {
+        id: "u-1",
+        nome: "Ana",
+        email: "ana@email.com",
+        perfilCompleto: false,
+      },
+      logout: mockLogout,
+      completeProfile: mockCompleteProfile,
+      updateUser: mockUpdateUser,
     } as any);
 
     renderHook(() => useProfileScreen());
@@ -437,7 +586,10 @@ describe("useProfileScreen — efeitos", () => {
 
   it("registra fetchRepublics no sistema de refresh com chave 'profile'", () => {
     renderHook(() => useProfileScreen());
-    expect(mockRegisterRefresh).toHaveBeenCalledWith("profile", mockFetchRepublics);
+    expect(mockRegisterRefresh).toHaveBeenCalledWith(
+      "profile",
+      mockFetchRepublics
+    );
   });
 });
 
@@ -446,7 +598,10 @@ describe("useProfileScreen — efeitos", () => {
 describe("useProfileScreen — sideMenuUser", () => {
   it("retorna null quando user é null", () => {
     jest.mocked(useAuth).mockReturnValue({
-      user: null, logout: mockLogout, completeProfile: mockCompleteProfile, updateUser: mockUpdateUser,
+      user: null,
+      logout: mockLogout,
+      completeProfile: mockCompleteProfile,
+      updateUser: mockUpdateUser,
     } as any);
 
     const { result } = renderHook(() => useProfileScreen());

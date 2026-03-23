@@ -161,7 +161,9 @@ describe("useAccountActions", () => {
       status: payload.status,
       metodoPagamento: payload.metodoPagamento,
     });
-    expect(mockAccountResidentsService.vincularMoradores).not.toHaveBeenCalled();
+    expect(
+      mockAccountResidentsService.vincularMoradores
+    ).not.toHaveBeenCalled();
     expect(mockShowToast.success).toHaveBeenCalledWith(
       "Conta criada com sucesso."
     );
@@ -178,7 +180,9 @@ describe("useAccountActions", () => {
     mockAccountService.criarConta.mockResolvedValue({
       id: "account-9",
     } as never);
-    mockAccountResidentsService.vincularMoradores.mockResolvedValue([] as never);
+    mockAccountResidentsService.vincularMoradores.mockResolvedValue(
+      [] as never
+    );
 
     const { result } = renderHook(() => useAccountActions());
 
@@ -368,7 +372,9 @@ describe("useAccountActions", () => {
   });
 
   it("exibe error.message quando handlePatch rejeita com instância de Error (L192)", async () => {
-    mockAccountService.pagarConta.mockRejectedValue(new Error("falha no pagamento"));
+    mockAccountService.pagarConta.mockRejectedValue(
+      new Error("falha no pagamento")
+    );
 
     const { result } = renderHook(() => useAccountActions());
 
@@ -393,7 +399,9 @@ describe("useAccountActions", () => {
     });
 
     expect(mockToast.dismiss).not.toHaveBeenCalled();
-    expect(mockShowToast.success).toHaveBeenCalledWith("Remoção cancelada com sucesso.");
+    expect(mockShowToast.success).toHaveBeenCalledWith(
+      "Remoção cancelada com sucesso."
+    );
   });
 
   it("não chama toast.dismiss quando toastId é undefined no callback do setTimeout (L144)", async () => {
@@ -409,7 +417,9 @@ describe("useAccountActions", () => {
     await advanceRecoveryWindow();
 
     expect(mockToast.dismiss).not.toHaveBeenCalled();
-    expect(mockAccountService.removerConta).toHaveBeenCalledWith({ id: "account-12" });
+    expect(mockAccountService.removerConta).toHaveBeenCalledWith({
+      id: "account-12",
+    });
   });
 
   it("busca contas por morador", async () => {
@@ -430,9 +440,9 @@ describe("useAccountActions", () => {
       response = await result.current.fetchContasPorMorador("resident-9");
     });
 
-    expect(mockAccountResidentsService.listarContasPorMorador).toHaveBeenCalledWith(
-      "resident-9"
-    );
+    expect(
+      mockAccountResidentsService.listarContasPorMorador
+    ).toHaveBeenCalledWith("resident-9");
     expect(response).toEqual(contas);
   });
 

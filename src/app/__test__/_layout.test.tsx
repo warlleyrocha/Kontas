@@ -116,7 +116,7 @@ describe("_layout render", () => {
     expect(mockStack).not.toHaveBeenCalled();
     expect(mockToaster).toHaveBeenCalledWith(
       expect.objectContaining({ position: "bottom-center" }),
-      undefined,
+      undefined
     );
   });
 
@@ -129,11 +129,11 @@ describe("_layout render", () => {
       expect.objectContaining({
         screenOptions: { headerShown: false },
       }),
-      undefined,
+      undefined
     );
     expect(mockToaster).toHaveBeenCalledWith(
       expect.objectContaining({ position: "bottom-center" }),
-      undefined,
+      undefined
     );
   });
 });

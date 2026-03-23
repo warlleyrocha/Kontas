@@ -38,7 +38,9 @@ let consoleErrorSpy: jest.SpyInstance;
 
 beforeEach(() => {
   jest.clearAllMocks();
-  jest.mocked(getErrorMessage).mockImplementation((_err, fallback) => fallback ?? "erro");
+  jest
+    .mocked(getErrorMessage)
+    .mockImplementation((_err, fallback) => fallback ?? "erro");
   consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 });
 
@@ -60,9 +62,9 @@ describe("useResidents — estado inicial", () => {
 describe("useResidents — fetchResidents (sucesso)", () => {
   it("define isLoading=true durante a busca e false ao finalizar", async () => {
     let resolve!: (v: ResidentResponse[]) => void;
-    jest.mocked(residentService.getResidents).mockReturnValue(
-      new Promise((r) => (resolve = r))
-    );
+    jest
+      .mocked(residentService.getResidents)
+      .mockReturnValue(new Promise((r) => (resolve = r)));
 
     const { result } = renderHook(() => useResidents());
 
@@ -109,7 +111,9 @@ describe("useResidents — fetchResidents (erro)", () => {
   it("loga o erro, exibe toast e retorna null ao falhar", async () => {
     const error = new Error("fail");
     jest.mocked(residentService.getResidents).mockRejectedValue(error);
-    jest.mocked(getErrorMessage).mockReturnValue("Não foi possível carregar os moradores.");
+    jest
+      .mocked(getErrorMessage)
+      .mockReturnValue("Não foi possível carregar os moradores.");
 
     const { result } = renderHook(() => useResidents());
 
@@ -118,7 +122,10 @@ describe("useResidents — fetchResidents (erro)", () => {
       returned = await result.current.fetchResidents("rep-1");
     });
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith("Erro ao buscar moradores:", error);
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Erro ao buscar moradores:",
+      error
+    );
     expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
       "Não foi possível carregar os moradores."
     );
@@ -127,7 +134,9 @@ describe("useResidents — fetchResidents (erro)", () => {
   });
 
   it("define isLoading=false no finally mesmo ao falhar", async () => {
-    jest.mocked(residentService.getResidents).mockRejectedValue(new Error("fail"));
+    jest
+      .mocked(residentService.getResidents)
+      .mockRejectedValue(new Error("fail"));
 
     const { result } = renderHook(() => useResidents());
 

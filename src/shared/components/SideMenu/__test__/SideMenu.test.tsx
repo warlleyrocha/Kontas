@@ -4,8 +4,9 @@ import { Image } from "react-native";
 import * as RN from "react-native";
 import { SideMenu, MenuButton } from "../index";
 
- 
-jest.mock("react-native-reanimated", () => require("react-native-reanimated/mock"));
+jest.mock("react-native-reanimated", () =>
+  require("react-native-reanimated/mock")
+);
 jest.mock("react-native-worklets", () => ({
   scheduleOnRN: jest.fn((fn: () => void) => fn()),
 }));
@@ -196,7 +197,9 @@ describe("SideMenu — backdrop", () => {
         menuItems={[]}
       />
     );
-    fireEvent.press(screen.getByRole("button", { name: "Fechar menu lateral" }));
+    fireEvent.press(
+      screen.getByRole("button", { name: "Fechar menu lateral" })
+    );
     expect(mockOnRequestClose).toHaveBeenCalled();
   });
 });
@@ -320,8 +323,12 @@ describe("SideMenu — MenuItem (expansível)", () => {
         menuItems={[expandableItem]}
       />
     );
-    fireEvent.press(screen.getByRole("button", { name: "Expandir Repúblicas" }));
-    expect(screen.getByRole("button", { name: "República Alpha" })).toBeTruthy();
+    fireEvent.press(
+      screen.getByRole("button", { name: "Expandir Repúblicas" })
+    );
+    expect(
+      screen.getByRole("button", { name: "República Alpha" })
+    ).toBeTruthy();
   });
 
   it("accessibilityLabel muda para 'Recolher' após expandir", () => {
@@ -332,7 +339,9 @@ describe("SideMenu — MenuItem (expansível)", () => {
         menuItems={[expandableItem]}
       />
     );
-    fireEvent.press(screen.getByRole("button", { name: "Expandir Repúblicas" }));
+    fireEvent.press(
+      screen.getByRole("button", { name: "Expandir Repúblicas" })
+    );
     expect(
       screen.getByRole("button", { name: "Recolher Repúblicas" })
     ).toBeTruthy();
@@ -346,8 +355,12 @@ describe("SideMenu — MenuItem (expansível)", () => {
         menuItems={[expandableItem]}
       />
     );
-    fireEvent.press(screen.getByRole("button", { name: "Expandir Repúblicas" }));
-    fireEvent.press(screen.getByRole("button", { name: "Recolher Repúblicas" }));
+    fireEvent.press(
+      screen.getByRole("button", { name: "Expandir Repúblicas" })
+    );
+    fireEvent.press(
+      screen.getByRole("button", { name: "Recolher Repúblicas" })
+    );
     expect(
       screen.queryByRole("button", { name: "República Alpha" })
     ).toBeNull();
@@ -368,7 +381,9 @@ describe("SideMenu — MenuItem (expansível)", () => {
         ]}
       />
     );
-    fireEvent.press(screen.getByRole("button", { name: "Expandir Repúblicas" }));
+    fireEvent.press(
+      screen.getByRole("button", { name: "Expandir Repúblicas" })
+    );
     expect(screen.getByText("Nenhuma república")).toBeTruthy();
   });
 
@@ -382,7 +397,9 @@ describe("SideMenu — MenuItem (expansível)", () => {
         ]}
       />
     );
-    fireEvent.press(screen.getByRole("button", { name: "Expandir Repúblicas" }));
+    fireEvent.press(
+      screen.getByRole("button", { name: "Expandir Repúblicas" })
+    );
     expect(screen.getByText("Nenhuma república disponível")).toBeTruthy();
   });
 });
@@ -394,9 +411,7 @@ describe("SideMenu — MenuSubItemComponent", () => {
   const expandableItem = makeMenuItem({
     id: "exp-1",
     label: "Repúblicas",
-    children: [
-      { id: "c-1", label: "República Alpha", onPress: childOnPress },
-    ],
+    children: [{ id: "c-1", label: "República Alpha", onPress: childOnPress }],
   });
 
   beforeEach(() => {
@@ -407,7 +422,9 @@ describe("SideMenu — MenuSubItemComponent", () => {
         menuItems={[expandableItem]}
       />
     );
-    fireEvent.press(screen.getByRole("button", { name: "Expandir Repúblicas" }));
+    fireEvent.press(
+      screen.getByRole("button", { name: "Expandir Repúblicas" })
+    );
   });
 
   it("exibe a inicial do filho quando não há imagem", () => {
@@ -444,7 +461,9 @@ describe("SideMenu — MenuSubItemComponent", () => {
         ]}
       />
     );
-    fireEvent.press(screen.getByRole("button", { name: "Expandir Repúblicas" }));
+    fireEvent.press(
+      screen.getByRole("button", { name: "Expandir Repúblicas" })
+    );
     const images = UNSAFE_getAllByType(Image);
     act(() => {
       images[images.length - 1].props.onError();
@@ -462,13 +481,20 @@ describe("SideMenu — MenuSubItemComponent", () => {
             id: "exp-active",
             label: "Repúblicas",
             children: [
-              { id: "c-active", label: "Alpha Ativa", onPress: jest.fn(), active: true },
+              {
+                id: "c-active",
+                label: "Alpha Ativa",
+                onPress: jest.fn(),
+                active: true,
+              },
             ],
           }),
         ]}
       />
     );
-    fireEvent.press(screen.getByRole("button", { name: "Expandir Repúblicas" }));
+    fireEvent.press(
+      screen.getByRole("button", { name: "Expandir Repúblicas" })
+    );
     expect(screen.getByRole("button", { name: "Alpha Ativa" })).toBeTruthy();
   });
 });

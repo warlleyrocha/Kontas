@@ -35,9 +35,7 @@ describe("AccountRecoveryToast", () => {
     const props = createProps();
     render(<AccountRecoveryToast {...props} />);
 
-    fireEvent.press(
-      screen.getByRole("button", { name: "Recuperar conta" }),
-    );
+    fireEvent.press(screen.getByRole("button", { name: "Recuperar conta" }));
 
     expect(props.onRecover).toHaveBeenCalledTimes(1);
   });

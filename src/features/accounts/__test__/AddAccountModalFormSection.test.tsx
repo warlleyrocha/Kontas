@@ -58,22 +58,19 @@ describe("AddAccountModalFormSection", () => {
     [MetodoPagamento.PIX, "PIX"],
     [MetodoPagamento.CARTAO, "Cartão"],
     [MetodoPagamento.DINHEIRO, "Dinheiro"],
-  ])(
-    "renderiza o método de pagamento %s com o rótulo correto",
-    (metodoPagamento, label) => {
-      render(
-        <AddAccountModalFormSection
-          {...createProps()}
-          metodoPagamento={metodoPagamento}
-        />
-      );
+  ])("renderiza o método de pagamento %s com o rótulo correto", (metodoPagamento, label) => {
+    render(
+      <AddAccountModalFormSection
+        {...createProps()}
+        metodoPagamento={metodoPagamento}
+      />
+    );
 
-      expect(screen.getByText(label)).toBeTruthy();
-      expect(
-        screen.getByLabelText(`Selecionar método de pagamento ${label}`)
-      ).toBeTruthy();
-    }
-  );
+    expect(screen.getByText(label)).toBeTruthy();
+    expect(
+      screen.getByLabelText(`Selecionar método de pagamento ${label}`)
+    ).toBeTruthy();
+  });
 
   it("monta sem erros e chama os callbacks principais", () => {
     const props = createProps();
@@ -83,7 +80,9 @@ describe("AddAccountModalFormSection", () => {
     fireEvent.changeText(screen.getByPlaceholderText("Ex: Cemig"), "Cemig");
     fireEvent.changeText(screen.getByPlaceholderText("0,00"), "245,90");
     fireEvent.press(screen.getByLabelText(/Selecionar vencimento/));
-    fireEvent.press(screen.getByLabelText("Selecionar método de pagamento PIX"));
+    fireEvent.press(
+      screen.getByLabelText("Selecionar método de pagamento PIX")
+    );
 
     expect(props.onDescricaoChange).toHaveBeenCalledWith("Cemig");
     expect(props.onValorTotalChange).toHaveBeenCalledWith("245,90");
@@ -95,9 +94,7 @@ describe("AddAccountModalFormSection", () => {
     setPlatformOS("ios");
     const props = createProps();
 
-    render(
-      <AddAccountModalFormSection {...props} showDatepicker={true} />
-    );
+    render(<AddAccountModalFormSection {...props} showDatepicker={true} />);
 
     fireEvent.press(screen.getByLabelText("Confirmar vencimento"));
 
@@ -116,9 +113,7 @@ describe("AddAccountModalFormSection", () => {
     setPlatformOS("android");
     const props = createProps();
 
-    render(
-      <AddAccountModalFormSection {...props} showDatepicker={true} />
-    );
+    render(<AddAccountModalFormSection {...props} showDatepicker={true} />);
 
     expect(mockDateTimePicker).toHaveBeenCalledTimes(1);
     expect(mockDateTimePicker.mock.calls[0]?.[0]).toMatchObject({

@@ -36,21 +36,33 @@ afterEach(() => {
 describe("InviteCardMe — renderização", () => {
   it("renderiza o id do convite", () => {
     render(
-      <InviteCardMe invite={mockInvite} onAccept={jest.fn()} onReject={jest.fn()} />
+      <InviteCardMe
+        invite={mockInvite}
+        onAccept={jest.fn()}
+        onReject={jest.fn()}
+      />
     );
     expect(screen.getByText("inv-1")).toBeTruthy();
   });
 
   it("renderiza 'Convidado por' com o republicaId", () => {
     render(
-      <InviteCardMe invite={mockInvite} onAccept={jest.fn()} onReject={jest.fn()} />
+      <InviteCardMe
+        invite={mockInvite}
+        onAccept={jest.fn()}
+        onReject={jest.fn()}
+      />
     );
     expect(screen.getByText("Convidado por rep-1")).toBeTruthy();
   });
 
   it("renderiza a data formatada de criadoEm", () => {
     render(
-      <InviteCardMe invite={mockInvite} onAccept={jest.fn()} onReject={jest.fn()} />
+      <InviteCardMe
+        invite={mockInvite}
+        onAccept={jest.fn()}
+        onReject={jest.fn()}
+      />
     );
     expect(screen.getByText("Recebido em: fmt:2026-01-01")).toBeTruthy();
   });
@@ -59,14 +71,22 @@ describe("InviteCardMe — renderização", () => {
 describe("InviteCardMe — status PENDENTE", () => {
   it("exibe o botão de aceitar", () => {
     render(
-      <InviteCardMe invite={mockInvite} onAccept={jest.fn()} onReject={jest.fn()} />
+      <InviteCardMe
+        invite={mockInvite}
+        onAccept={jest.fn()}
+        onReject={jest.fn()}
+      />
     );
     expect(screen.getByLabelText("Aceitar convite de rep-1")).toBeTruthy();
   });
 
   it("exibe o botão de recusar", () => {
     render(
-      <InviteCardMe invite={mockInvite} onAccept={jest.fn()} onReject={jest.fn()} />
+      <InviteCardMe
+        invite={mockInvite}
+        onAccept={jest.fn()}
+        onReject={jest.fn()}
+      />
     );
     expect(screen.getByLabelText("Recusar convite de rep-1")).toBeTruthy();
   });
@@ -74,7 +94,11 @@ describe("InviteCardMe — status PENDENTE", () => {
   it("chama onAccept ao pressionar o botão de aceitar", () => {
     const onAccept = jest.fn();
     render(
-      <InviteCardMe invite={mockInvite} onAccept={onAccept} onReject={jest.fn()} />
+      <InviteCardMe
+        invite={mockInvite}
+        onAccept={onAccept}
+        onReject={jest.fn()}
+      />
     );
     fireEvent.press(screen.getByLabelText("Aceitar convite de rep-1"));
     expect(onAccept).toHaveBeenCalledTimes(1);
@@ -83,7 +107,11 @@ describe("InviteCardMe — status PENDENTE", () => {
   it("chama onReject ao pressionar o botão de recusar", () => {
     const onReject = jest.fn();
     render(
-      <InviteCardMe invite={mockInvite} onAccept={jest.fn()} onReject={onReject} />
+      <InviteCardMe
+        invite={mockInvite}
+        onAccept={jest.fn()}
+        onReject={onReject}
+      />
     );
     fireEvent.press(screen.getByLabelText("Recusar convite de rep-1"));
     expect(onReject).toHaveBeenCalledTimes(1);
@@ -94,12 +122,16 @@ describe("InviteCardMe — status ACEITO", () => {
   const invite = { ...mockInvite, status: "ACEITO" };
 
   it("exibe o texto 'Aceito'", () => {
-    render(<InviteCardMe invite={invite} onAccept={jest.fn()} onReject={jest.fn()} />);
+    render(
+      <InviteCardMe invite={invite} onAccept={jest.fn()} onReject={jest.fn()} />
+    );
     expect(screen.getByText("Aceito")).toBeTruthy();
   });
 
   it("não exibe botões de ação", () => {
-    render(<InviteCardMe invite={invite} onAccept={jest.fn()} onReject={jest.fn()} />);
+    render(
+      <InviteCardMe invite={invite} onAccept={jest.fn()} onReject={jest.fn()} />
+    );
     expect(screen.queryByLabelText("Aceitar convite de rep-1")).toBeNull();
     expect(screen.queryByLabelText("Recusar convite de rep-1")).toBeNull();
   });
@@ -109,12 +141,16 @@ describe("InviteCardMe — status RECUSADO", () => {
   const invite = { ...mockInvite, status: "RECUSADO" };
 
   it("exibe o texto 'Recusado'", () => {
-    render(<InviteCardMe invite={invite} onAccept={jest.fn()} onReject={jest.fn()} />);
+    render(
+      <InviteCardMe invite={invite} onAccept={jest.fn()} onReject={jest.fn()} />
+    );
     expect(screen.getByText("Recusado")).toBeTruthy();
   });
 
   it("não exibe botões de ação", () => {
-    render(<InviteCardMe invite={invite} onAccept={jest.fn()} onReject={jest.fn()} />);
+    render(
+      <InviteCardMe invite={invite} onAccept={jest.fn()} onReject={jest.fn()} />
+    );
     expect(screen.queryByLabelText("Aceitar convite de rep-1")).toBeNull();
     expect(screen.queryByLabelText("Recusar convite de rep-1")).toBeNull();
   });

@@ -85,7 +85,7 @@ describe("ToastConfirm", () => {
     render(
       <ToastConfirm
         {...createProps({ confirmLabel: "Sim", cancelLabel: "Não" })}
-      />,
+      />
     );
     expect(screen.getByText("Sim")).toBeTruthy();
     expect(screen.getByText("Não")).toBeTruthy();
@@ -95,9 +95,7 @@ describe("ToastConfirm", () => {
     const props = createProps();
     render(<ToastConfirm {...props} />);
 
-    fireEvent.press(
-      screen.getByRole("button", { name: "Confirmar exclusão" }),
-    );
+    fireEvent.press(screen.getByRole("button", { name: "Confirmar exclusão" }));
 
     expect(props.onConfirm).toHaveBeenCalledTimes(1);
   });
@@ -106,9 +104,7 @@ describe("ToastConfirm", () => {
     const props = createProps();
     render(<ToastConfirm {...props} />);
 
-    fireEvent.press(
-      screen.getByRole("button", { name: "Cancelar exclusão" }),
-    );
+    fireEvent.press(screen.getByRole("button", { name: "Cancelar exclusão" }));
 
     expect(props.onCancel).toHaveBeenCalledTimes(1);
   });

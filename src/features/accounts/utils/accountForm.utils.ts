@@ -1,7 +1,4 @@
-import type {
-  MoradorDivisao,
-  TipoDivisao,
-} from "../types/accountForm.types";
+import type { MoradorDivisao, TipoDivisao } from "../types/accountForm.types";
 
 export function parseCurrencyValue(value: string): number {
   const normalized = value.replace(/\./g, "").replace(",", ".").trim();

@@ -58,7 +58,9 @@ describe("residentService.createResident", () => {
     const error = new Error("fail");
     mockApi.post.mockRejectedValue(error);
 
-    await expect(residentService.createResident(createPayload)).rejects.toBeDefined();
+    await expect(
+      residentService.createResident(createPayload)
+    ).rejects.toBeDefined();
 
     expect(mockToUserFriendlyError).toHaveBeenCalledWith(error, {
       defaultMessage: "Erro ao criar morador.",
@@ -75,7 +77,9 @@ describe("residentService.createResident", () => {
     mockApi.post.mockRejectedValue(new Error("original"));
     mockToUserFriendlyError.mockReturnValue(friendly);
 
-    await expect(residentService.createResident(createPayload)).rejects.toBe(friendly);
+    await expect(residentService.createResident(createPayload)).rejects.toBe(
+      friendly
+    );
   });
 });
 

@@ -1,7 +1,10 @@
 import { api } from "@/src/services/api";
 import { toUserFriendlyError } from "@/src/services/httpError";
 import { logger } from "@/src/shared/utils/logger";
-import type { RepublicPost, RepublicResponse } from "../../types/republic.types";
+import type {
+  RepublicPost,
+  RepublicResponse,
+} from "../../types/republic.types";
 import { republicService } from "../republic.service";
 
 jest.mock("@/src/services/api", () => ({
@@ -69,7 +72,9 @@ describe("republicService.createRepublic", () => {
     mockApi.post.mockRejectedValue(new Error("original"));
     mockToUserFriendlyError.mockReturnValue(friendly);
 
-    await expect(republicService.createRepublic(payload)).rejects.toBe(friendly);
+    await expect(republicService.createRepublic(payload)).rejects.toBe(
+      friendly
+    );
   });
 });
 
@@ -146,7 +151,9 @@ describe("republicService.getRepublicById", () => {
     const error = new Error("fail");
     mockApi.get.mockRejectedValue(error);
 
-    await expect(republicService.getRepublicById("rep-1")).rejects.toBeDefined();
+    await expect(
+      republicService.getRepublicById("rep-1")
+    ).rejects.toBeDefined();
 
     expect(mockToUserFriendlyError).toHaveBeenCalledWith(error, {
       defaultMessage: "Erro ao obter detalhes da república.",
@@ -163,7 +170,9 @@ describe("republicService.getRepublicById", () => {
     mockApi.get.mockRejectedValue(new Error("original"));
     mockToUserFriendlyError.mockReturnValue(friendly);
 
-    await expect(republicService.getRepublicById("rep-1")).rejects.toBe(friendly);
+    await expect(republicService.getRepublicById("rep-1")).rejects.toBe(
+      friendly
+    );
   });
 });
 
@@ -174,9 +183,13 @@ describe("republicService.updateRepublic", () => {
     const updated: RepublicResponse = { id: "rep-1", nome: "Nova" };
     mockApi.patch.mockResolvedValue({ data: updated });
 
-    const result = await republicService.updateRepublic("rep-1", { nome: "Nova" });
+    const result = await republicService.updateRepublic("rep-1", {
+      nome: "Nova",
+    });
 
-    expect(mockApi.patch).toHaveBeenCalledWith("/republicas/rep-1", { nome: "Nova" });
+    expect(mockApi.patch).toHaveBeenCalledWith("/republicas/rep-1", {
+      nome: "Nova",
+    });
     expect(result).toEqual(updated);
   });
 
@@ -215,7 +228,9 @@ describe("republicService.deleteRepublic", () => {
   it("chama DELETE /republicas/:id e resolve sem valor", async () => {
     mockApi.delete.mockResolvedValue({});
 
-    await expect(republicService.deleteRepublic("rep-1")).resolves.toBeUndefined();
+    await expect(
+      republicService.deleteRepublic("rep-1")
+    ).resolves.toBeUndefined();
 
     expect(mockApi.delete).toHaveBeenCalledWith("/republicas/rep-1");
   });
@@ -241,6 +256,8 @@ describe("republicService.deleteRepublic", () => {
     mockApi.delete.mockRejectedValue(new Error("original"));
     mockToUserFriendlyError.mockReturnValue(friendly);
 
-    await expect(republicService.deleteRepublic("rep-1")).rejects.toBe(friendly);
+    await expect(republicService.deleteRepublic("rep-1")).rejects.toBe(
+      friendly
+    );
   });
 });

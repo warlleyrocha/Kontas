@@ -39,7 +39,7 @@ describe("ResumoCard", () => {
 
   it("exibe ActivityIndicator quando isLoading é true", () => {
     const { UNSAFE_getByType } = render(
-      <ResumoCard {...createProps({ isLoading: true })} />,
+      <ResumoCard {...createProps({ isLoading: true })} />
     );
     expect(UNSAFE_getByType(ActivityIndicator)).toBeTruthy();
   });

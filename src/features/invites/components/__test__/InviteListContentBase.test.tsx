@@ -127,7 +127,8 @@ describe("InviteListContentBase — estado vazio", () => {
         <Text>conteúdo</Text>
       </InviteListContentBase>
     );
-    const { onPress: renderedOnPress } = jest.mocked(EmptyState).mock.calls[0][0] as any;
+    const { onPress: renderedOnPress } = jest.mocked(EmptyState).mock
+      .calls[0][0] as any;
     renderedOnPress();
     expect(onPress).toHaveBeenCalledTimes(1);
   });

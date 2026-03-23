@@ -47,7 +47,9 @@ describe("RenderDots", () => {
     const { Animated } = require("react-native");
     // Animated.View é usado para cada dot
     // verifica que montou sem erros com o número correto de slides
-    expect(UNSAFE_getAllByType(require("react-native").View).length).toBeGreaterThan(0);
+    expect(
+      UNSAFE_getAllByType(require("react-native").View).length
+    ).toBeGreaterThan(0);
   });
 
   it("renderiza com currentIndex no meio", () => {
@@ -60,7 +62,9 @@ describe("RenderDots", () => {
 
   it("renderiza com um único slide", () => {
     render(
-      <RenderDots {...createProps({ slides: [mockSlides[0]], currentIndex: 0 })} />,
+      <RenderDots
+        {...createProps({ slides: [mockSlides[0]], currentIndex: 0 })}
+      />
     );
   });
 });

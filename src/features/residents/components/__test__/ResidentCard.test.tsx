@@ -83,9 +83,9 @@ describe("ResidentCard", () => {
   });
 
   it("renderiza a imagem quando fotoPerfil está definida e imageError é false", () => {
-    jest.mocked(useResidentCard).mockReturnValue(
-      createHookReturn({ imageError: false })
-    );
+    jest
+      .mocked(useResidentCard)
+      .mockReturnValue(createHookReturn({ imageError: false }));
 
     const moradorComFoto: ResidentResponse = {
       ...mockMorador,
@@ -98,9 +98,9 @@ describe("ResidentCard", () => {
   });
 
   it("exibe iniciais quando imageError é true mesmo com fotoPerfil definida", () => {
-    jest.mocked(useResidentCard).mockReturnValue(
-      createHookReturn({ imageError: true })
-    );
+    jest
+      .mocked(useResidentCard)
+      .mockReturnValue(createHookReturn({ imageError: true }));
 
     const moradorComFoto: ResidentResponse = {
       ...mockMorador,
@@ -113,9 +113,9 @@ describe("ResidentCard", () => {
   });
 
   it("chama setImageError ao disparar onError na imagem", () => {
-    jest.mocked(useResidentCard).mockReturnValue(
-      createHookReturn({ imageError: false })
-    );
+    jest
+      .mocked(useResidentCard)
+      .mockReturnValue(createHookReturn({ imageError: false }));
 
     const moradorComFoto: ResidentResponse = {
       ...mockMorador,
@@ -138,9 +138,9 @@ describe("ResidentCard", () => {
   });
 
   it("usa accessibilityLabel 'Recolher detalhes' quando expanded=true", () => {
-    jest.mocked(useResidentCard).mockReturnValue(
-      createHookReturn({ expanded: true })
-    );
+    jest
+      .mocked(useResidentCard)
+      .mockReturnValue(createHookReturn({ expanded: true }));
 
     render(<ResidentCard morador={mockMorador} onCopyPix={jest.fn()} />);
 
@@ -180,9 +180,9 @@ describe("ResidentCard", () => {
   });
 
   it("usa accessibilityLabel 'Chave PIX copiada' quando copiado=true", () => {
-    jest.mocked(useResidentCard).mockReturnValue(
-      createHookReturn({ copiado: true })
-    );
+    jest
+      .mocked(useResidentCard)
+      .mockReturnValue(createHookReturn({ copiado: true }));
 
     const moradorComPix: ResidentResponse = {
       ...mockMorador,

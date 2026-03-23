@@ -127,7 +127,10 @@ describe("InvitesInboxContent — lista de convites", () => {
 
   it("callbacks de múltiplos convites são independentes", () => {
     const onAcceptInvite = jest.fn();
-    const invites = [makeInvite("inv-1", "rep-1"), makeInvite("inv-2", "rep-2")];
+    const invites = [
+      makeInvite("inv-1", "rep-1"),
+      makeInvite("inv-2", "rep-2"),
+    ];
     render(
       <InvitesInboxContent
         {...defaultProps}

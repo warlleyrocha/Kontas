@@ -39,9 +39,7 @@ describe("RenderSlide", () => {
   it("exibe a descrição do slide", () => {
     render(<RenderSlide {...createProps()} />);
     expect(
-      screen.getByText(
-        "Controle todas as despesas da república em um só lugar",
-      ),
+      screen.getByText("Controle todas as despesas da república em um só lugar")
     ).toBeTruthy();
   });
 
@@ -61,9 +59,7 @@ describe("RenderSlide", () => {
     render(<RenderSlide {...createProps({ item: outroSlide, index: 1 })} />);
     expect(screen.getByText("Divida as Despesas")).toBeTruthy();
     expect(
-      screen.getByText(
-        "Calcule automaticamente quanto cada morador deve pagar",
-      ),
+      screen.getByText("Calcule automaticamente quanto cada morador deve pagar")
     ).toBeTruthy();
   });
 });

@@ -44,7 +44,7 @@ describe("useRepublicResidents", () => {
 
   it("não carrega moradores quando o hook estiver desabilitado", async () => {
     const { result } = renderHook(() =>
-      useRepublicResidents(republics, "user@example.com", false),
+      useRepublicResidents(republics, "user@example.com", false)
     );
 
     expect(mockResidentService.getResidents).not.toHaveBeenCalled();
@@ -97,7 +97,7 @@ describe("useRepublicResidents", () => {
       .mockResolvedValueOnce([] as never);
 
     const { result } = renderHook(() =>
-      useRepublicResidents(republics, "user@example.com"),
+      useRepublicResidents(republics, "user@example.com")
     );
 
     await waitFor(() => {
@@ -125,7 +125,7 @@ describe("useRepublicResidents", () => {
     mockResidentService.getResidents.mockResolvedValue(undefined as never);
 
     const { result } = renderHook(() =>
-      useRepublicResidents(republics.slice(0, 1), "user@example.com"),
+      useRepublicResidents(republics.slice(0, 1), "user@example.com")
     );
 
     await waitFor(() => {
@@ -153,7 +153,7 @@ describe("useRepublicResidents", () => {
       ({ list }) => useRepublicResidents(list, "user@example.com"),
       {
         initialProps: { list: republics.slice(0, 1) },
-      },
+      }
     );
 
     await waitFor(() => {
@@ -185,7 +185,7 @@ describe("useRepublicResidents", () => {
     mockResidentService.getResidents.mockRejectedValue(error);
 
     const { result } = renderHook(() =>
-      useRepublicResidents(republics.slice(0, 1), "user@example.com"),
+      useRepublicResidents(republics.slice(0, 1), "user@example.com")
     );
 
     await waitFor(() => {
@@ -196,7 +196,7 @@ describe("useRepublicResidents", () => {
     expect(mockLogger.error).toHaveBeenCalledWith(
       "Residents",
       "Erro ao buscar moradores da república rep-1",
-      error,
+      error
     );
   });
 
@@ -204,7 +204,7 @@ describe("useRepublicResidents", () => {
     mockResidentService.getResidents.mockRejectedValue("falha em texto");
 
     const { result } = renderHook(() =>
-      useRepublicResidents(republics.slice(0, 1), "user@example.com"),
+      useRepublicResidents(republics.slice(0, 1), "user@example.com")
     );
 
     await waitFor(() => {
@@ -215,15 +215,17 @@ describe("useRepublicResidents", () => {
     expect(mockLogger.error).toHaveBeenCalledWith(
       "Residents",
       "Erro ao buscar moradores da república rep-1",
-      undefined,
+      undefined
     );
   });
 
   it("não tenta preencher roles no catch interno quando currentUserEmail não for informado", async () => {
-    mockResidentService.getResidents.mockRejectedValue(new Error("falha sem email"));
+    mockResidentService.getResidents.mockRejectedValue(
+      new Error("falha sem email")
+    );
 
     const { result } = renderHook(() =>
-      useRepublicResidents(republics.slice(0, 1)),
+      useRepublicResidents(republics.slice(0, 1))
     );
 
     await waitFor(() => {
@@ -235,7 +237,7 @@ describe("useRepublicResidents", () => {
     expect(mockLogger.error).toHaveBeenCalledWith(
       "Residents",
       "Erro ao buscar moradores da república rep-1",
-      expect.any(Error),
+      expect.any(Error)
     );
   });
 
@@ -253,7 +255,7 @@ describe("useRepublicResidents", () => {
     ] as never);
 
     const { result } = renderHook(() =>
-      useRepublicResidents(republics.slice(0, 1)),
+      useRepublicResidents(republics.slice(0, 1))
     );
 
     await waitFor(() => {
@@ -265,21 +267,21 @@ describe("useRepublicResidents", () => {
 
   it("captura erro inesperado do carregamento externo", async () => {
     const error = new Error("falha externa");
-    const promiseAllSpy = jest.spyOn(Promise, "all").mockRejectedValueOnce(error);
+    const promiseAllSpy = jest
+      .spyOn(Promise, "all")
+      .mockRejectedValueOnce(error);
     const badRepublics = {
       length: 1,
       map: () => [],
     } as unknown as typeof republics;
 
-    renderHook(() =>
-      useRepublicResidents(badRepublics, "user@example.com"),
-    );
+    renderHook(() => useRepublicResidents(badRepublics, "user@example.com"));
 
     await waitFor(() => {
       expect(mockLogger.error).toHaveBeenCalledWith(
         "Residents",
         "Erro inesperado ao carregar moradores",
-        error,
+        error
       );
     });
 
@@ -301,7 +303,7 @@ describe("useRepublicResidents", () => {
       expect(mockLogger.error).toHaveBeenCalledWith(
         "Residents",
         "Erro inesperado ao carregar moradores",
-        undefined,
+        undefined
       );
     });
 

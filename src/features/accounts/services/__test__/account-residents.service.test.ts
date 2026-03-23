@@ -52,7 +52,11 @@ beforeEach(() => {
 // ─── vincularMoradores ────────────────────────────────────────────────────────
 
 describe("accountResidentsService.vincularMoradores", () => {
-  const payload = { contaId: "c-1", moradorIds: ["r-1", "r-2"], valorTotal: 200 };
+  const payload = {
+    contaId: "c-1",
+    moradorIds: ["r-1", "r-2"],
+    valorTotal: 200,
+  };
 
   it("chama POST /contas-moradores e retorna response.data", async () => {
     mockApi.post.mockResolvedValue({ data: [mockContaMorador] });

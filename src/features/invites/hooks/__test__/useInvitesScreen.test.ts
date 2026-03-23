@@ -94,9 +94,13 @@ describe("useInvitesScreen — handleSignOut", () => {
 
     // handleSignOut é passado ao useSideMenu como 2º argumento
     renderHook(() => useInvitesScreen());
-    const handleSignOut = (jest.mocked(useSideMenu).mock.calls[0] as unknown[])[1] as () => Promise<void>;
+    const handleSignOut = (
+      jest.mocked(useSideMenu).mock.calls[0] as unknown[]
+    )[1] as () => Promise<void>;
 
-    await act(async () => { await handleSignOut(); });
+    await act(async () => {
+      await handleSignOut();
+    });
 
     expect(mockLogout).toHaveBeenCalled();
     expect(jest.mocked(toastErrors.logoutFailed)).not.toHaveBeenCalled();
@@ -107,11 +111,18 @@ describe("useInvitesScreen — handleSignOut", () => {
     mockLogout.mockRejectedValue(error);
 
     renderHook(() => useInvitesScreen());
-    const handleSignOut = (jest.mocked(useSideMenu).mock.calls[0] as unknown[])[1] as () => Promise<void>;
+    const handleSignOut = (
+      jest.mocked(useSideMenu).mock.calls[0] as unknown[]
+    )[1] as () => Promise<void>;
 
-    await act(async () => { await handleSignOut(); });
+    await act(async () => {
+      await handleSignOut();
+    });
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith("Erro ao fazer logout da conta:", error);
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Erro ao fazer logout da conta:",
+      error
+    );
     expect(jest.mocked(toastErrors.logoutFailed)).toHaveBeenCalledWith(error);
     consoleErrorSpy.mockClear();
   });

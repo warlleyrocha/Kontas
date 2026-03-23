@@ -30,7 +30,11 @@ describe("EmptyRepublic", () => {
       />
     );
 
-    fireEvent.press(screen.getByAccessibilityHint ? screen.getByText("Criar República") : screen.getByText("Criar República"));
+    fireEvent.press(
+      screen.getByAccessibilityHint
+        ? screen.getByText("Criar República")
+        : screen.getByText("Criar República")
+    );
 
     expect(onCreateRepublic).toHaveBeenCalledTimes(1);
   });

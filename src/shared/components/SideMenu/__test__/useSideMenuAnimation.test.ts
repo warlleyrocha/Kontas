@@ -2,8 +2,9 @@ import { act, renderHook } from "@testing-library/react-native";
 import * as reanimated from "react-native-reanimated";
 import { useSideMenuAnimation } from "../useSideMenuAnimation";
 
- 
-jest.mock("react-native-reanimated", () => require("react-native-reanimated/mock"));
+jest.mock("react-native-reanimated", () =>
+  require("react-native-reanimated/mock")
+);
 jest.mock("react-native-worklets", () => ({
   // factory sem variável externa — evita problema de hoisting
   scheduleOnRN: jest.fn((fn: () => void) => fn()),
@@ -32,10 +33,14 @@ describe("useSideMenuAnimation — closeMenu (L25)", () => {
       useSideMenuAnimation({ menuWidth: 300, onRequestClose })
     );
 
-    act(() => { result.current.closeMenu(); });
+    act(() => {
+      result.current.closeMenu();
+    });
     const firstCallCount = onRequestClose.mock.calls.length;
 
-    act(() => { result.current.closeMenu(); });
+    act(() => {
+      result.current.closeMenu();
+    });
 
     expect(onRequestClose.mock.calls.length).toBe(firstCallCount);
   });
@@ -50,7 +55,10 @@ describe("useSideMenuAnimation — closeMenu (L30)", () => {
     // A spy invoca cb?.(false) — só o segundo call tem callback, e com false
     // onRequestClose não deve ser chamado.
     jest.spyOn(reanimated, "withTiming").mockImplementation(
-      jest.fn((_toValue, _config, cb) => { cb?.(false); return 0; })
+      jest.fn((_toValue, _config, cb) => {
+        cb?.(false);
+        return 0;
+      })
     );
 
     const onRequestClose = jest.fn();
@@ -58,7 +66,9 @@ describe("useSideMenuAnimation — closeMenu (L30)", () => {
       useSideMenuAnimation({ menuWidth: 300, onRequestClose })
     );
 
-    act(() => { result.current.closeMenu(); });
+    act(() => {
+      result.current.closeMenu();
+    });
 
     expect(onRequestClose).not.toHaveBeenCalled();
   });

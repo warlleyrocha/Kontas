@@ -2,7 +2,10 @@ import { act, renderHook } from "@testing-library/react-native";
 import { useRouter } from "expo-router";
 import { useRepublicList } from "@/src/features/republic/hooks/useRepublicList";
 import { showToast } from "@/src/shared/utils/showToast";
-import type { RepublicPost, RepublicResponse } from "../../types/republic.types";
+import type {
+  RepublicPost,
+  RepublicResponse,
+} from "../../types/republic.types";
 import { republicService } from "../../services/republic.service";
 import { useRepublicActions } from "../useRepublicActions";
 
@@ -67,7 +70,9 @@ describe("useRepublicActions", () => {
 
   describe("createRepublic", () => {
     it("chama republicService.createRepublic e retorna a república criada", async () => {
-      jest.mocked(republicService.createRepublic).mockResolvedValue(mockRepublic);
+      jest
+        .mocked(republicService.createRepublic)
+        .mockResolvedValue(mockRepublic);
 
       const { result } = renderHook(() => useRepublicActions());
       let returned: RepublicResponse | undefined;
@@ -81,7 +86,9 @@ describe("useRepublicActions", () => {
     });
 
     it("adiciona a nova república à lista via setRepublics", async () => {
-      jest.mocked(republicService.createRepublic).mockResolvedValue(mockRepublic);
+      jest
+        .mocked(republicService.createRepublic)
+        .mockResolvedValue(mockRepublic);
 
       const { result } = renderHook(() => useRepublicActions());
 
@@ -96,7 +103,9 @@ describe("useRepublicActions", () => {
     });
 
     it("não adiciona república duplicada à lista", async () => {
-      jest.mocked(republicService.createRepublic).mockResolvedValue(mockRepublic);
+      jest
+        .mocked(republicService.createRepublic)
+        .mockResolvedValue(mockRepublic);
 
       const { result } = renderHook(() => useRepublicActions());
 
@@ -112,7 +121,9 @@ describe("useRepublicActions", () => {
     });
 
     it("exibe toast de sucesso e navega para a república", async () => {
-      jest.mocked(republicService.createRepublic).mockResolvedValue(mockRepublic);
+      jest
+        .mocked(republicService.createRepublic)
+        .mockResolvedValue(mockRepublic);
 
       const { result } = renderHook(() => useRepublicActions());
 
@@ -120,7 +131,9 @@ describe("useRepublicActions", () => {
         await result.current.createRepublic(payload);
       });
 
-      expect(showToast.success).toHaveBeenCalledWith("República criada com sucesso");
+      expect(showToast.success).toHaveBeenCalledWith(
+        "República criada com sucesso"
+      );
       expect(mockReplace).toHaveBeenCalledWith("/(republics)/rep-1");
     });
   });
@@ -176,7 +189,9 @@ describe("useRepublicActions", () => {
 
   describe("deleteRepublic", () => {
     it("chama republicService.deleteRepublic com o id correto", async () => {
-      jest.mocked(republicService.deleteRepublic).mockResolvedValue(undefined as any);
+      jest
+        .mocked(republicService.deleteRepublic)
+        .mockResolvedValue(undefined as any);
 
       const { result } = renderHook(() => useRepublicActions());
 
@@ -188,7 +203,9 @@ describe("useRepublicActions", () => {
     });
 
     it("remove a república da lista via setRepublics", async () => {
-      jest.mocked(republicService.deleteRepublic).mockResolvedValue(undefined as any);
+      jest
+        .mocked(republicService.deleteRepublic)
+        .mockResolvedValue(undefined as any);
       const other: RepublicResponse = { id: "rep-2", nome: "Outra" };
 
       const { result } = renderHook(() => useRepublicActions());
@@ -204,7 +221,9 @@ describe("useRepublicActions", () => {
     });
 
     it("exibe toast de sucesso", async () => {
-      jest.mocked(republicService.deleteRepublic).mockResolvedValue(undefined as any);
+      jest
+        .mocked(republicService.deleteRepublic)
+        .mockResolvedValue(undefined as any);
 
       const { result } = renderHook(() => useRepublicActions());
 

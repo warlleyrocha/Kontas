@@ -37,15 +37,13 @@ describe("Tabs", () => {
     expect(resumoButton.props.accessibilityState).toEqual({ selected: false });
 
     expect(screen.getByText("Contas").props.className).toBe(
-      "font-semibold text-teal",
+      "font-semibold text-teal"
     );
-    expect(screen.getByText("Moradores").props.className).toBe(
-      "text-gray-500",
-    );
+    expect(screen.getByText("Moradores").props.className).toBe("text-gray-500");
     expect(screen.getByText("Resumo").props.className).toBe("text-gray-500");
 
     expect(
-      mockMaterialCommunityIcons.mock.calls.map(([props]) => props),
+      mockMaterialCommunityIcons.mock.calls.map(([props]) => props)
     ).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -63,7 +61,7 @@ describe("Tabs", () => {
           size: 20,
           color: "#6b6b6b",
         }),
-      ]),
+      ])
     );
   });
 

@@ -8,7 +8,10 @@ jest.mock("@sentry/react-native", () => ({
 }));
 
 const mockCaptureException = jest.mocked(captureException);
-const originalDevDescriptor = Object.getOwnPropertyDescriptor(global, "__DEV__");
+const originalDevDescriptor = Object.getOwnPropertyDescriptor(
+  global,
+  "__DEV__"
+);
 
 function setDev(value: boolean) {
   Object.defineProperty(global, "__DEV__", {
@@ -38,12 +41,12 @@ describe("RouteErrorFallback", () => {
     const retry = jest.fn();
 
     render(
-      <RouteErrorFallback domain="Payments" error={error} retry={retry} />,
+      <RouteErrorFallback domain="Payments" error={error} retry={retry} />
     );
 
     expect(screen.getByText("Ops! Falha no domínio Payments")).toBeTruthy();
     expect(
-      screen.getByText("Ocorreu um erro inesperado nesta área do app."),
+      screen.getByText("Ocorreu um erro inesperado nesta área do app.")
     ).toBeTruthy();
     expect(screen.getByText("falha na rota")).toBeTruthy();
 
@@ -68,7 +71,7 @@ describe("RouteErrorFallback", () => {
         domain="Profile"
         error={new Error("mensagem interna")}
         retry={() => {}}
-      />,
+      />
     );
 
     expect(screen.getByText("Ops! Falha no domínio Profile")).toBeTruthy();

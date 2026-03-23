@@ -22,7 +22,7 @@ describe("inputMasks", () => {
         .mockImplementation(function (
           this: string,
           searchString: string,
-          endPosition?: number,
+          endPosition?: number
         ) {
           if (searchString === "-") {
             return undefined as unknown as boolean;

@@ -40,8 +40,7 @@ describe("legal constants", () => {
 
   it("exporta legalLinks com URLs tratadas do ambiente", () => {
     process.env.EXPO_PUBLIC_TERMS_OF_USE_URL = " https://kontas.app/terms ";
-    process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL =
-      " https://kontas.app/privacy ";
+    process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL = " https://kontas.app/privacy ";
 
     const { legalLinks } = importLegalModule();
 
@@ -73,7 +72,7 @@ describe("openLegalLink", () => {
 
     expect(mockAlertAlert).toHaveBeenCalledWith(
       "Link não configurado",
-      "Defina a URL pública de termos de uso no ambiente do app.",
+      "Defina a URL pública de termos de uso no ambiente do app."
     );
     expect(mockCanOpenURL).not.toHaveBeenCalled();
     expect(mockOpenURL).not.toHaveBeenCalled();
@@ -85,12 +84,8 @@ describe("openLegalLink", () => {
 
     await openLegalLink("https://kontas.app/terms", "termos de uso");
 
-    expect(mockCanOpenURL).toHaveBeenCalledWith(
-      "https://kontas.app/terms",
-    );
-    expect(mockOpenURL).toHaveBeenCalledWith(
-      "https://kontas.app/terms",
-    );
+    expect(mockCanOpenURL).toHaveBeenCalledWith("https://kontas.app/terms");
+    expect(mockOpenURL).toHaveBeenCalledWith("https://kontas.app/terms");
     expect(mockAlertAlert).not.toHaveBeenCalled();
   });
 
@@ -98,15 +93,16 @@ describe("openLegalLink", () => {
     const { openLegalLink } = importLegalModule();
     mockCanOpenURL.mockResolvedValue(false as never);
 
-    await openLegalLink("https://kontas.app/privacy", "política de privacidade");
-
-    expect(mockCanOpenURL).toHaveBeenCalledWith(
+    await openLegalLink(
       "https://kontas.app/privacy",
+      "política de privacidade"
     );
+
+    expect(mockCanOpenURL).toHaveBeenCalledWith("https://kontas.app/privacy");
     expect(mockOpenURL).not.toHaveBeenCalled();
     expect(mockAlertAlert).toHaveBeenCalledWith(
       "Não foi possível abrir o link",
-      "Verifique se a URL pública de política de privacidade está válida.",
+      "Verifique se a URL pública de política de privacidade está válida."
     );
   });
 
@@ -115,14 +111,15 @@ describe("openLegalLink", () => {
     mockCanOpenURL.mockResolvedValue(true as never);
     mockOpenURL.mockRejectedValue(new Error("falha ao abrir"));
 
-    await openLegalLink("https://kontas.app/privacy", "política de privacidade");
-
-    expect(mockOpenURL).toHaveBeenCalledWith(
+    await openLegalLink(
       "https://kontas.app/privacy",
+      "política de privacidade"
     );
+
+    expect(mockOpenURL).toHaveBeenCalledWith("https://kontas.app/privacy");
     expect(mockAlertAlert).toHaveBeenCalledWith(
       "Não foi possível abrir o link",
-      "Verifique se a URL pública de política de privacidade está válida.",
+      "Verifique se a URL pública de política de privacidade está válida."
     );
   });
 });

@@ -50,7 +50,9 @@ describe('useSideMenu — context "profile"', () => {
     const { result } = renderHook(() =>
       useSideMenu("profile", mockHandleSignOut)
     );
-    act(() => { result.current.menuItems[0].onPress?.(); });
+    act(() => {
+      result.current.menuItems[0].onPress?.();
+    });
     expect(mockPush).toHaveBeenCalledWith("/(userProfile)/invites");
   });
 });
@@ -81,7 +83,9 @@ describe('useSideMenu — context "home" / USER', () => {
 
   it("não inclui item de pagamentos para USER", () => {
     const { result } = renderHome();
-    expect(result.current.menuItems.find((i) => i.id === "payment")).toBeUndefined();
+    expect(
+      result.current.menuItems.find((i) => i.id === "payment")
+    ).toBeUndefined();
   });
 
   it("badge de 'Convites Enviados' reflete pendingInvitesSentCount", () => {
@@ -93,14 +97,18 @@ describe('useSideMenu — context "home" / USER', () => {
   it("onPress de 'Meu Perfil' navega para /(userProfile)/profile", () => {
     const { result } = renderHome();
     const item = result.current.menuItems.find((i) => i.id === "profile")!;
-    act(() => { item.onPress?.(); });
+    act(() => {
+      item.onPress?.();
+    });
     expect(mockPush).toHaveBeenCalledWith("/(userProfile)/profile");
   });
 
   it("onPress de 'Convites Enviados' navega para /(republics)/[id]/invites-sent", () => {
     const { result } = renderHome();
     const item = result.current.menuItems.find((i) => i.id === "invitesSent")!;
-    act(() => { item.onPress?.(); });
+    act(() => {
+      item.onPress?.();
+    });
     expect(mockPush).toHaveBeenCalledWith({
       pathname: "/(republics)/[id]/invites-sent",
       params: { id: "rep-1" },
@@ -114,7 +122,9 @@ describe('useSideMenu — context "home" / USER', () => {
       })
     );
     const item = result.current.menuItems.find((i) => i.id === "invitesSent")!;
-    act(() => { item.onPress?.(); });
+    act(() => {
+      item.onPress?.();
+    });
     expect(mockPush).not.toHaveBeenCalled();
   });
 });
@@ -153,7 +163,9 @@ describe('useSideMenu — context "home" / ADMIN', () => {
   it("onPress de 'Pagamentos' navega para /(republics)/[id]/payments", () => {
     const { result } = renderHome();
     const item = result.current.menuItems.find((i) => i.id === "payment")!;
-    act(() => { item.onPress?.(); });
+    act(() => {
+      item.onPress?.();
+    });
     expect(mockPush).toHaveBeenCalledWith({
       pathname: "/(republics)/[id]/payments",
       params: { id: "rep-1" },
@@ -167,7 +179,9 @@ describe('useSideMenu — context "home" / ADMIN', () => {
       })
     );
     const item = result.current.menuItems.find((i) => i.id === "payment")!;
-    act(() => { item.onPress?.(); });
+    act(() => {
+      item.onPress?.();
+    });
     expect(mockPush).not.toHaveBeenCalled();
   });
 });
@@ -238,7 +252,9 @@ describe("useSideMenu — republicMenuItems", () => {
     const children = result.current.menuItems.find(
       (i) => i.id === "switchRepublic"
     )!.children!;
-    act(() => { children[1].onPress(); });
+    act(() => {
+      children[1].onPress();
+    });
     expect(mockPush).toHaveBeenCalledWith("/(republics)/rep-2");
   });
 
@@ -253,7 +269,9 @@ describe("useSideMenu — republicMenuItems", () => {
     const children = result.current.menuItems.find(
       (i) => i.id === "switchRepublic"
     )!.children!;
-    act(() => { children[0].onPress(); });
+    act(() => {
+      children[0].onPress();
+    });
     expect(mockPush).not.toHaveBeenCalled();
   });
 
@@ -289,7 +307,9 @@ describe("useSideMenu — footerItems", () => {
       useSideMenu("profile", mockHandleSignOut)
     );
     const item = result.current.footerItems.find((i) => i.id === "termsOfUse")!;
-    act(() => { item.onPress?.(); });
+    act(() => {
+      item.onPress?.();
+    });
     expect(mockPush).toHaveBeenCalledWith("/terms-of-use");
   });
 
@@ -297,8 +317,12 @@ describe("useSideMenu — footerItems", () => {
     const { result } = renderHook(() =>
       useSideMenu("profile", mockHandleSignOut)
     );
-    const item = result.current.footerItems.find((i) => i.id === "privacyPolicy")!;
-    act(() => { item.onPress?.(); });
+    const item = result.current.footerItems.find(
+      (i) => i.id === "privacyPolicy"
+    )!;
+    act(() => {
+      item.onPress?.();
+    });
     expect(mockPush).toHaveBeenCalledWith("/privacy-policy");
   });
 
@@ -307,7 +331,9 @@ describe("useSideMenu — footerItems", () => {
       useSideMenu("profile", mockHandleSignOut)
     );
     const item = result.current.footerItems.find((i) => i.id === "logout")!;
-    act(() => { item.onPress?.(); });
+    act(() => {
+      item.onPress?.();
+    });
     expect(mockHandleSignOut).toHaveBeenCalled();
   });
 

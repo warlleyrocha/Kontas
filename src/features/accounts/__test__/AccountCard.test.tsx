@@ -89,7 +89,7 @@ describe("AccountCard", () => {
     render(
       <AccountCard
         {...createProps({ conta: { ...mockConta, vencimento: "not-a-date" } })}
-      />,
+      />
     );
     expect(screen.getByText("Data inválida")).toBeTruthy();
   });
@@ -172,7 +172,7 @@ describe("AccountCard", () => {
     render(
       <AccountCard
         {...createProps({ conta: { ...mockConta, status: StatusConta.PAGA } })}
-      />,
+      />
     );
     expect(screen.queryByText("Copiar PIX")).toBeNull();
   });
@@ -241,7 +241,7 @@ describe("AccountCard", () => {
 
     expect(props.onPatch).toHaveBeenCalledWith(
       "conta-1",
-      MetodoPagamento.CARTAO,
+      MetodoPagamento.CARTAO
     );
   });
 
@@ -258,15 +258,17 @@ describe("AccountCard", () => {
 
     expect(props.onPatch).toHaveBeenCalledWith(
       "conta-1",
-      MetodoPagamento.DINHEIRO,
+      MetodoPagamento.DINHEIRO
     );
   });
 
   it("exibe borda laranja quando a conta está atrasada", () => {
     render(
       <AccountCard
-        {...createProps({ conta: { ...mockConta, status: StatusConta.ATRASADA } })}
-      />,
+        {...createProps({
+          conta: { ...mockConta, status: StatusConta.ATRASADA },
+        })}
+      />
     );
     // componente renderiza sem erros com status atrasado
   });
@@ -277,9 +279,18 @@ describe("AccountCard", () => {
 
     const outerView = UNSAFE_getAllByType(View)[0];
     outerView.instance.measure = jest.fn(
-      (cb: (x: number, y: number, w: number, h: number, px: number, py: number) => void) => {
+      (
+        cb: (
+          x: number,
+          y: number,
+          w: number,
+          h: number,
+          px: number,
+          py: number
+        ) => void
+      ) => {
         cb(0, 0, 100, 50, 10, 20);
-      },
+      }
     );
 
     fireEvent(UNSAFE_getAllByType(TouchableOpacity)[0], "longPress");
