@@ -34,6 +34,22 @@ interface ContextMenuProps {
   ) => React.ReactNode;
 }
 
+export function resolveMenuPlacement(
+  resolvedPosition: CardPosition,
+  screenHeight: number,
+  menuTotalHeight: number
+) {
+  const spaceBelow = screenHeight - (resolvedPosition.y + resolvedPosition.height);
+
+  return {
+    menuY:
+      spaceBelow >= menuTotalHeight + 20
+        ? resolvedPosition.y + resolvedPosition.height + 8
+        : resolvedPosition.y - menuTotalHeight - 8,
+    translateYOutput: spaceBelow >= menuTotalHeight + 20 ? -8 : 8,
+  };
+}
+
 function useContextMenuAnimation(translateYOutput: number) {
   const scale = useSharedValue(0.85);
   const opacity = useSharedValue(0);
@@ -93,14 +109,11 @@ export function ContextMenu({
   let menuX = resolvedPosition.x + resolvedPosition.width / 2 - MENU_WIDTH / 2;
   menuX = Math.max(12, Math.min(menuX, screenWidth - MENU_WIDTH - 12));
 
-  const spaceBelow =
-    screenHeight - (resolvedPosition.y + resolvedPosition.height);
-  const menuY =
-    spaceBelow >= menuTotalHeight + 20
-      ? resolvedPosition.y + resolvedPosition.height + 8
-      : resolvedPosition.y - menuTotalHeight - 8;
-
-  const translateYOutput = spaceBelow >= menuTotalHeight + 20 ? -8 : 8;
+  const { menuY, translateYOutput } = resolveMenuPlacement(
+    resolvedPosition,
+    screenHeight,
+    menuTotalHeight
+  );
 
   const { handleOpen, handleClose, menuAnimatedStyle } =
     useContextMenuAnimation(translateYOutput);
