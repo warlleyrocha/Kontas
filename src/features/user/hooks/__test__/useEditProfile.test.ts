@@ -90,6 +90,34 @@ describe("useEditProfile — handleClose", () => {
     expect(result.current.isUploading).toBe(false);
     expect(onClose).toHaveBeenCalledTimes(1);
   });
+
+  it("restaura pixKey e phone para vazio e photoUri para a foto atual quando valores opcionais não existem", () => {
+    const onClose = jest.fn();
+    const { result } = renderHook(() =>
+      useEditProfile({
+        ...defaultProps,
+        currentPixKey: undefined,
+        currentPhoto: "file://current-photo.jpg",
+        currentPhone: undefined,
+        onClose,
+      })
+    );
+
+    act(() => {
+      result.current.setPixKey("nova-chave");
+      result.current.setPhotoUri("file://new-photo.jpg");
+      result.current.setPhone("(11) 98888-7777");
+    });
+
+    act(() => {
+      result.current.handleClose();
+    });
+
+    expect(result.current.pixKey).toBe("");
+    expect(result.current.photoUri).toBe("file://current-photo.jpg");
+    expect(result.current.phone).toBe("");
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
 });
 
 // ─── handleSave ──────────────────────────────────────────────────────────────

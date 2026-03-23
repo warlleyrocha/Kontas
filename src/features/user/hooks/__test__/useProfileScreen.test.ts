@@ -257,6 +257,24 @@ describe("useProfileScreen — handleSaveProfile", () => {
     expect(jest.mocked(logger.error)).toHaveBeenCalledWith("User", "Erro ao salvar perfil", error);
     expect(jest.mocked(toastErrors.profileUpdateFailed)).toHaveBeenCalledWith(error);
   });
+
+  it("loga undefined quando a atualização falha com valor que não é Error", async () => {
+    mockUpdateUser.mockRejectedValue("save fail");
+    const { result } = renderHook(() => useProfileScreen());
+
+    await act(async () => {
+      await result.current.handleSaveProfile("Ana", "ana@pix", undefined, "11999");
+    });
+
+    expect(jest.mocked(logger.error)).toHaveBeenCalledWith(
+      "User",
+      "Erro ao salvar perfil",
+      undefined
+    );
+    expect(jest.mocked(toastErrors.profileUpdateFailed)).toHaveBeenCalledWith(
+      "save fail"
+    );
+  });
 });
 
 // ─── navegação ────────────────────────────────────────────────────────────────
@@ -440,6 +458,17 @@ describe("useProfileScreen — sideMenuUser", () => {
 
     expect(result.current.sideMenuUser).toMatchObject({
       name: "Ana",
+      email: "ana@email.com",
+    });
+  });
+
+  it("usa string vazia quando user.nome é null", () => {
+    setupMocks({ nome: null });
+
+    const { result } = renderHook(() => useProfileScreen());
+
+    expect(result.current.sideMenuUser).toMatchObject({
+      name: "",
       email: "ana@email.com",
     });
   });
