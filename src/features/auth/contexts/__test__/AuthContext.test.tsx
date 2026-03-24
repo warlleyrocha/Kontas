@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -18,8 +19,15 @@ import { AuthProvider, useAuth } from "../AuthContext";
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
   getItem: jest.fn(),
+  removeItem: jest.fn(),
   setItem: jest.fn(),
   multiRemove: jest.fn(),
+}));
+
+jest.mock("expo-secure-store", () => ({
+  getItemAsync: jest.fn(),
+  setItemAsync: jest.fn(),
+  deleteItemAsync: jest.fn(),
 }));
 
 jest.mock("@react-native-google-signin/google-signin", () => ({
@@ -74,6 +82,7 @@ const mockQueryClient = {
 };
 
 function mockStorageNoToken() {
+  jest.mocked(SecureStore.getItemAsync).mockResolvedValue(null);
   jest.mocked(AsyncStorage.getItem).mockResolvedValue(null);
 }
 
@@ -81,8 +90,8 @@ function mockStorageWithToken(
   user: User = mockUser,
   republicData: string | null = null
 ) {
+  jest.mocked(SecureStore.getItemAsync).mockResolvedValue("jwt-abc");
   jest.mocked(AsyncStorage.getItem).mockImplementation((key: string) => {
-    if (key === "@app:token") return Promise.resolve("jwt-abc");
     if (key === "@app:user") return Promise.resolve(JSON.stringify(user));
     if (key === "republic-data") return Promise.resolve(republicData);
     return Promise.resolve(null);
@@ -90,8 +99,8 @@ function mockStorageWithToken(
 }
 
 function mockStorageWithTokenButNoUser(republicData: string | null = null) {
+  jest.mocked(SecureStore.getItemAsync).mockResolvedValue("jwt-abc");
   jest.mocked(AsyncStorage.getItem).mockImplementation((key: string) => {
-    if (key === "@app:token") return Promise.resolve("jwt-abc");
     if (key === "@app:user") return Promise.resolve(null);
     if (key === "republic-data") return Promise.resolve(republicData);
     return Promise.resolve(null);
@@ -118,7 +127,10 @@ async function flush() {
 beforeEach(() => {
   jest.clearAllMocks();
   jest.mocked(useQueryClient).mockReturnValue(mockQueryClient as any);
+  jest.mocked(SecureStore.setItemAsync).mockResolvedValue(undefined);
+  jest.mocked(SecureStore.deleteItemAsync).mockResolvedValue(undefined);
   jest.mocked(AsyncStorage.setItem).mockResolvedValue(undefined);
+  jest.mocked(AsyncStorage.removeItem).mockResolvedValue(undefined);
   jest.mocked(AsyncStorage.multiRemove).mockResolvedValue(undefined);
   jest.mocked(GoogleSignin.signOut).mockResolvedValue(undefined as any);
   jest.mocked(isUnauthorizedError).mockReturnValue(false);
@@ -219,10 +231,12 @@ describe("checkAuth — token inválido (401)", () => {
     await flush();
 
     expect(mockQueryClient.cancelQueries).toHaveBeenCalled();
-    expect(jest.mocked(AsyncStorage.multiRemove)).toHaveBeenCalledWith([
-      "@app:token",
-      "@app:user",
-    ]);
+    expect(jest.mocked(SecureStore.deleteItemAsync)).toHaveBeenCalledWith(
+      "token"
+    );
+    expect(jest.mocked(AsyncStorage.removeItem)).toHaveBeenCalledWith(
+      "@app:user"
+    );
     expect(result.current.user).toBeNull();
   });
 });
@@ -245,10 +259,9 @@ describe("checkAuth — falha transitória de rede", () => {
 
 describe("checkAuth — erro externo (AsyncStorage lança)", () => {
   it("loga o erro e define loading=false mesmo com falha no storage", async () => {
-    jest.mocked(AsyncStorage.getItem).mockImplementation((key: string) => {
-      if (key === "@app:token") return Promise.reject(new Error("disk error"));
-      return Promise.resolve(null);
-    });
+    jest
+      .mocked(SecureStore.getItemAsync)
+      .mockRejectedValue(new Error("disk error"));
 
     const { result } = renderWithProvider();
     await flush();
@@ -262,10 +275,7 @@ describe("checkAuth — erro externo (AsyncStorage lança)", () => {
   });
 
   it("loga undefined quando a falha externa não é uma instância de Error", async () => {
-    jest.mocked(AsyncStorage.getItem).mockImplementation((key: string) => {
-      if (key === "@app:token") return Promise.reject("disk error");
-      return Promise.resolve(null);
-    });
+    jest.mocked(SecureStore.getItemAsync).mockRejectedValue("disk error");
 
     const { result } = renderWithProvider();
     await flush();
@@ -297,8 +307,8 @@ describe("loginWithGoogle", () => {
     expect(jest.mocked(authService.googleLogin)).toHaveBeenCalledWith(
       "google-token"
     );
-    expect(jest.mocked(AsyncStorage.setItem)).toHaveBeenCalledWith(
-      "@app:token",
+    expect(jest.mocked(SecureStore.setItemAsync)).toHaveBeenCalledWith(
+      "token",
       mockAuthResponse.token
     );
     expect(jest.mocked(AsyncStorage.setItem)).toHaveBeenCalledWith(
@@ -342,8 +352,10 @@ describe("logout", () => {
     });
 
     expect(mockQueryClient.cancelQueries).toHaveBeenCalled();
+    expect(jest.mocked(SecureStore.deleteItemAsync)).toHaveBeenCalledWith(
+      "token"
+    );
     expect(jest.mocked(AsyncStorage.multiRemove)).toHaveBeenCalledWith([
-      "@app:token",
       "@app:user",
       "republic-data",
     ]);

@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getItemAsync, deleteItemAsync, setItemAsync } from "expo-secure-store";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -56,7 +57,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // Buscar token e user do AsyncStorage
       const [storedToken, storedUser] = await Promise.all([
-        AsyncStorage.getItem("@app:token"),
+        getItemAsync("token"),
         AsyncStorage.getItem("@app:user"),
       ]);
 
@@ -87,7 +88,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
           // Token inválido → limpar tudo
           await queryClient.cancelQueries();
-          await AsyncStorage.multiRemove(["@app:token", "@app:user"]);
+          await Promise.all([
+            deleteItemAsync("token"),
+            AsyncStorage.removeItem("@app:user"),
+          ]);
           setUser(null);
         } else {
           // Em falhas transitórias de rede, preserva sessão local e tenta novamente depois.
@@ -101,7 +105,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       logger.error(
         "Auth",
         "Erro na verificação de auth",
-        error instanceof Error ? error : undefined
+        error instanceof Error ? error : undefined,
       );
     } finally {
       setLoading(false);
@@ -124,7 +128,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         // Salvar no AsyncStorage em paralelo
         await Promise.all([
-          AsyncStorage.setItem("@app:token", data.token),
+          setItemAsync("token", data.token),
           AsyncStorage.setItem("@app:user", JSON.stringify(data.user)),
         ]);
 
@@ -140,7 +144,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return null;
       }
     },
-    []
+    [],
   );
 
   // Logout
@@ -152,7 +156,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // Limpa a sessão do app e a conta mantida pelo Google Sign-In.
       await Promise.allSettled([
-        AsyncStorage.multiRemove(["@app:token", "@app:user", "republic-data"]),
+        deleteItemAsync("token"),
+        AsyncStorage.multiRemove(["@app:user", "republic-data"]),
         GoogleSignin.signOut(),
       ]);
 
@@ -169,7 +174,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       logger.error(
         "Auth",
         "Erro ao fazer logout",
-        error instanceof Error ? error : undefined
+        error instanceof Error ? error : undefined,
       );
     }
   }, [queryClient]);
@@ -196,7 +201,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         logger.error(
           "Auth",
           "Erro ao completar perfil",
-          new Error(errorMessage)
+          new Error(errorMessage),
         );
 
         setError(errorMessage);
@@ -206,7 +211,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         throw error;
       }
     },
-    []
+    [],
   );
 
   // Atualizar dados do usuário
@@ -220,7 +225,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       logger.error(
         "Auth",
         "Erro ao atualizar usuário",
-        error instanceof Error ? error : undefined
+        error instanceof Error ? error : undefined,
       );
       throw error;
     }
@@ -272,7 +277,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       logout,
       updateUser,
       completeProfile,
-    ]
+    ],
   );
 
   return (
