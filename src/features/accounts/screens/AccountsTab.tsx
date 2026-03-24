@@ -21,14 +21,19 @@ import {
 import { useAccountsTab } from "@/src/features/accounts/hooks/useAccountsTab";
 import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import { getMoradorStatusVisual } from "@/src/features/accounts/utils/accountStatus.utils";
+import { useTabResidents } from "@/src/features/residents/hooks/useTabResidents";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
+import type { ResidentResponse } from "@/src/shared/types/resident.types";
 import { formatMounthYear } from "@/src/shared/utils/formats";
+import { showToast } from "@/src/shared/utils/showToast";
 import { ToastConfirm } from "@/src/shared/components/ui/toast-custom";
+import type { Conta } from "@/src/features/accounts/types/account.types";
 
 interface AccountsTabProps {
   readonly republicId: string;
   readonly currentResidentId: string | null;
+  readonly residents: ResidentResponse[];
   readonly isAdmin?: boolean;
   readonly onPendingPaymentsCountChange?: (count: number) => void;
 }
@@ -36,10 +41,26 @@ interface AccountsTabProps {
 export function AccountsTab({
   republicId,
   currentResidentId,
+  residents,
   isAdmin = false,
   onPendingPaymentsCountChange,
 }: AccountsTabProps) {
   useComponentLogger("AccountsTab");
+  const { copiarChavePix } = useTabResidents();
+
+  const handleCopyPixFromAccount = useCallback(
+    async (conta: Conta) => {
+      const morador = residents.find((r) => r.id === conta.criadoPorId);
+      if (!morador) {
+        showToast.error("Não foi possível localizar o responsável pela conta.");
+        return false;
+      }
+
+      return copiarChavePix(morador);
+    },
+    [residents, copiarChavePix]
+  );
+
   const {
     accountResidentsById,
     closeAccountModal,
@@ -272,6 +293,7 @@ export function AccountsTab({
               onLongPress={handleAccountLongPress}
               onConfirmResidentPayment={confirmResidentPayment}
               onPatch={handlePatchAndRefresh}
+              onCopyPix={handleCopyPixFromAccount}
             />
 
             <AccountSection
@@ -292,6 +314,7 @@ export function AccountsTab({
               onLongPress={handleAccountLongPress}
               onConfirmResidentPayment={confirmResidentPayment}
               onPatch={handlePatchAndRefresh}
+              onCopyPix={handleCopyPixFromAccount}
             />
           </View>
         )}

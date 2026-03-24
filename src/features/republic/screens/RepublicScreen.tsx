@@ -116,6 +116,7 @@ export function RepublicScreen({ republicId }: Props) {
           <AccountsTab
             republicId={republicId}
             currentResidentId={currentResidentId}
+            residents={residents}
             isAdmin={currentUserRole === ResidentRole.ADMIN}
             onPendingPaymentsCountChange={handlePendingPaymentsCountChange}
           />
