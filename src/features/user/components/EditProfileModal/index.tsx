@@ -1,5 +1,6 @@
 import Feather from "@expo/vector-icons/Feather";
 import type { FC } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Image,
   KeyboardAvoidingView,
@@ -57,7 +58,7 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <View className="flex-1 justify-end bg-black/40">
-          <View className="rounded-xl bg-white px-6 py-6">
+          <SafeAreaView className="rounded-xl bg-white px-6 py-6">
             {/* Header */}
             <View className="mb-6 flex-row items-center justify-between">
               <Text className="text-lg font-semibold">Editar Perfil</Text>
@@ -148,7 +149,7 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
                 <Text className="font-semibold text-gray-700">Cancelar</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </SafeAreaView>
         </View>
       </KeyboardAvoidingView>
     </Modal>

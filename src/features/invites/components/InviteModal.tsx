@@ -1,5 +1,6 @@
 import Feather from "@expo/vector-icons/Feather";
 import React, { useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -54,7 +55,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
         style={{ flex: 1 }}
       >
         <View className="flex-1 justify-end bg-black/40">
-          <View className="rounded-t-2xl bg-white px-6 py-6">
+          <SafeAreaView className="rounded-t-2xl bg-white px-6 py-6">
             {/* Header */}
             <View className="mb-6 flex-row items-center justify-between">
               <Text className="text-xl font-semibold">Enviar convite</Text>
@@ -112,7 +113,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
                 <Text className="font-semibold text-gray-700">Cancelar</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </SafeAreaView>
         </View>
       </KeyboardAvoidingView>
     </Modal>
