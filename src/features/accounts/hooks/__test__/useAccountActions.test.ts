@@ -91,7 +91,7 @@ function loadUseAccountActionsWithPendingRefs({
   toastId = "pending-toast",
 }: {
   accountId?: string;
-  toastId?: string | number | undefined;
+  toastId?: string | number;
 } = {}) {
   const timeoutId = setTimeout(() => {}, 1000);
   const pendingDeleteTimeouts = new Map<string, ReturnType<typeof setTimeout>>([
