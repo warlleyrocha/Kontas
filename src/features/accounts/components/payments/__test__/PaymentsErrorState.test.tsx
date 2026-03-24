@@ -7,15 +7,15 @@ describe("PaymentsErrorState", () => {
       <PaymentsErrorState
         message="Falha ao consultar a API"
         onRetry={() => {}}
-      />,
+      />
     );
 
     expect(
-      screen.getByText("Não foi possível carregar os pagamentos."),
+      screen.getByText("Não foi possível carregar os pagamentos.")
     ).toBeTruthy();
     expect(screen.getByText("Falha ao consultar a API")).toBeTruthy();
     expect(
-      screen.getByLabelText("Tentar carregar pagamentos novamente"),
+      screen.getByLabelText("Tentar carregar pagamentos novamente")
     ).toBeTruthy();
   });
 
@@ -26,11 +26,11 @@ describe("PaymentsErrorState", () => {
       <PaymentsErrorState
         message="Falha ao consultar a API"
         onRetry={onRetry}
-      />,
+      />
     );
 
     fireEvent.press(
-      screen.getByLabelText("Tentar carregar pagamentos novamente"),
+      screen.getByLabelText("Tentar carregar pagamentos novamente")
     );
 
     expect(onRetry).toHaveBeenCalledTimes(1);

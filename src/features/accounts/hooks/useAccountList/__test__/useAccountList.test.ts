@@ -125,7 +125,7 @@ describe("useAccountList — estado retornado", () => {
     });
 
     const { result } = renderHook(() =>
-      useAccountList({ republicId: "rep-1" }),
+      useAccountList({ republicId: "rep-1" })
     );
 
     expect(result.current.loading).toBe(true);
@@ -143,7 +143,7 @@ describe("useAccountList — estado retornado", () => {
     });
 
     const { result } = renderHook(() =>
-      useAccountList({ republicId: "rep-1" }),
+      useAccountList({ republicId: "rep-1" })
     );
 
     expect(result.current.mesSelecionado).toBe("2026-03");
@@ -161,7 +161,7 @@ describe("useAccountList — estado retornado", () => {
     });
 
     const { result } = renderHook(() =>
-      useAccountList({ republicId: "rep-1" }),
+      useAccountList({ republicId: "rep-1" })
     );
 
     expect(result.current.mesesDisponiveis).toBe(mesesDisponiveis);
@@ -180,12 +180,12 @@ describe("useAccountList — estado retornado", () => {
     } as any);
 
     const { result } = renderHook(() =>
-      useAccountList({ republicId: "rep-1" }),
+      useAccountList({ republicId: "rep-1" })
     );
 
     expect(result.current.accountResidentsById).toBe(accountResidentsById);
     expect(result.current.confirmResidentPayment).toBe(
-      mockConfirmResidentPayment,
+      mockConfirmResidentPayment
     );
   });
 });
@@ -223,7 +223,7 @@ describe("useAccountList — registro no RefreshContext", () => {
 
     expect(mockRegisterRefresh).toHaveBeenCalledWith(
       expect.stringContaining("accounts-rep-99-"),
-      expect.any(Function),
+      expect.any(Function)
     );
   });
 
@@ -256,7 +256,7 @@ describe("useAccountList — refresh público", () => {
     mockLoadResidents.mockResolvedValue(undefined);
 
     const { result } = renderHook(() =>
-      useAccountList({ republicId: "rep-1" }),
+      useAccountList({ republicId: "rep-1" })
     );
     await act(async () => {}); // flush mount effect
 

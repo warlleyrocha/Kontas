@@ -10,13 +10,13 @@ import { residentCopyFeedback } from "@/src/shared/constants/pixCopyFeedback";
 
 export function useResidentCard(
   morador: ResidentResponse,
-  onCopyPix: (morador: ResidentResponse) => boolean | Promise<boolean>,
+  onCopyPix: (morador: ResidentResponse) => boolean | Promise<boolean>
 ) {
   const [expanded, setExpanded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const { handleCopy, copyFeedback } = useCopyFeedback(
     () => onCopyPix(morador),
-    residentCopyFeedback,
+    residentCopyFeedback
   );
   const animatedHeight = useSharedValue(0);
   const animatedOpacity = useSharedValue(0);
@@ -26,7 +26,7 @@ export function useResidentCard(
       opacity: animatedOpacity.value,
       overflow: "hidden",
     }),
-    [animatedHeight, animatedOpacity],
+    [animatedHeight, animatedOpacity]
   );
 
   function toggleExpanded() {

@@ -30,7 +30,7 @@ describe("republic layout", () => {
       expect.objectContaining({
         screenOptions: { headerShown: false },
       }),
-      undefined,
+      undefined
     );
   });
 

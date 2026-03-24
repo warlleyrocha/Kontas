@@ -46,7 +46,7 @@ describe("PendingPaymentsList", () => {
         onConfirmResidentPayment={() => {}}
         onRefresh={() => {}}
         selectedStatus={StatusPagamento.AGUARDANDO_CONFIRMACAO}
-      />,
+      />
     );
 
     expect(screen.UNSAFE_getByType(ScrollView)).toBeTruthy();
@@ -68,7 +68,7 @@ describe("PendingPaymentsList", () => {
         onConfirmResidentPayment={onConfirmResidentPayment}
         onRefresh={() => {}}
         selectedStatus={StatusPagamento.PAGO}
-      />,
+      />
     );
 
     expect(mockPendingPaymentCard).toHaveBeenCalledTimes(2);

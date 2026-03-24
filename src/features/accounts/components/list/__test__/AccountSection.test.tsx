@@ -1,8 +1,12 @@
 import { fireEvent, render, screen } from "@testing-library/react-native";
 import { TouchableOpacity } from "react-native";
+
 import { AccountSection } from "../AccountSection";
-import { MetodoPagamento, StatusConta } from "../../../types/account.types";
-import type { Conta } from "../../../types/account.types";
+import {
+  MetodoPagamento,
+  StatusConta,
+  type Conta,
+} from "../../../types/account.types";
 
 jest.mock("@expo/vector-icons/MaterialCommunityIcons", () => ({
   __esModule: true,
@@ -78,6 +82,7 @@ const createProps = (overrides = {}) => ({
   onLongPress: jest.fn(),
   onConfirmResidentPayment: jest.fn(),
   onPatch: jest.fn(),
+  onCopyPix: jest.fn(),
   ...overrides,
 });
 

@@ -75,28 +75,28 @@ afterEach(() => {
 describe("useAccountData — estado inicial", () => {
   it("contas começa como []", () => {
     const { result } = renderHook(() =>
-      useAccountData({ republicId: "rep-1" }),
+      useAccountData({ republicId: "rep-1" })
     );
     expect(result.current.contas).toEqual([]);
   });
 
   it("loading começa como true", () => {
     const { result } = renderHook(() =>
-      useAccountData({ republicId: "rep-1" }),
+      useAccountData({ republicId: "rep-1" })
     );
     expect(result.current.loading).toBe(true);
   });
 
   it("error começa como null", () => {
     const { result } = renderHook(() =>
-      useAccountData({ republicId: "rep-1" }),
+      useAccountData({ republicId: "rep-1" })
     );
     expect(result.current.error).toBeNull();
   });
 
   it("expõe fetchAccounts e fetchAccountResidents como funções", () => {
     const { result } = renderHook(() =>
-      useAccountData({ republicId: "rep-1" }),
+      useAccountData({ republicId: "rep-1" })
     );
     expect(typeof result.current.fetchAccounts).toBe("function");
     expect(typeof result.current.fetchAccountResidents).toBe("function");
@@ -110,14 +110,14 @@ describe("useAccountData — fetchAccounts (sucesso)", () => {
       .mockResolvedValue([mockConta]);
 
     const { result } = renderHook(() =>
-      useAccountData({ republicId: "rep-1" }),
+      useAccountData({ republicId: "rep-1" })
     );
     await act(async () => {
       await result.current.fetchAccounts();
     });
 
     expect(
-      jest.mocked(accountService.listarContasPorRepublica),
+      jest.mocked(accountService.listarContasPorRepublica)
     ).toHaveBeenCalledWith("rep-1");
   });
 
@@ -127,7 +127,7 @@ describe("useAccountData — fetchAccounts (sucesso)", () => {
       .mockResolvedValue([mockConta]);
 
     const { result } = renderHook(() =>
-      useAccountData({ republicId: "rep-1" }),
+      useAccountData({ republicId: "rep-1" })
     );
     await act(async () => {
       await result.current.fetchAccounts();
@@ -142,7 +142,7 @@ describe("useAccountData — fetchAccounts (sucesso)", () => {
       .mockResolvedValue([mockConta]);
 
     const { result } = renderHook(() =>
-      useAccountData({ republicId: "rep-1" }),
+      useAccountData({ republicId: "rep-1" })
     );
     let returned: Conta[] = [];
     await act(async () => {
@@ -156,7 +156,7 @@ describe("useAccountData — fetchAccounts (sucesso)", () => {
     jest.mocked(accountService.listarContasPorRepublica).mockResolvedValue([]);
 
     const { result } = renderHook(() =>
-      useAccountData({ republicId: "rep-1" }),
+      useAccountData({ republicId: "rep-1" })
     );
     await act(async () => {
       await result.current.fetchAccounts();
@@ -169,7 +169,7 @@ describe("useAccountData — fetchAccounts (sucesso)", () => {
     jest.mocked(accountService.listarContasPorRepublica).mockResolvedValue([]);
 
     const { result } = renderHook(() =>
-      useAccountData({ republicId: "rep-1" }),
+      useAccountData({ republicId: "rep-1" })
     );
     await act(async () => {
       await result.current.fetchAccounts();
@@ -182,7 +182,7 @@ describe("useAccountData — fetchAccounts (sucesso)", () => {
     jest.mocked(accountService.listarContasPorRepublica).mockResolvedValue([]);
 
     const { result } = renderHook(() =>
-      useAccountData({ republicId: "rep-1" }),
+      useAccountData({ republicId: "rep-1" })
     );
 
     // Primeira chamada: ativa loading e marca hasLoadedRef
@@ -214,7 +214,7 @@ describe("useAccountData — fetchAccounts (falha)", () => {
       .mockRejectedValue(new Error("Falha de rede"));
 
     const { result } = renderHook(() =>
-      useAccountData({ republicId: "rep-1" }),
+      useAccountData({ republicId: "rep-1" })
     );
     let returned: Conta[] = [mockConta];
     await act(async () => {
@@ -230,7 +230,7 @@ describe("useAccountData — fetchAccounts (falha)", () => {
     jest.mocked(accountService.listarContasPorRepublica).mockRejectedValue(err);
 
     const { result } = renderHook(() =>
-      useAccountData({ republicId: "rep-1" }),
+      useAccountData({ republicId: "rep-1" })
     );
     await act(async () => {
       await result.current.fetchAccounts();
@@ -247,7 +247,7 @@ describe("useAccountData — fetchAccounts (falha)", () => {
     jest.mocked(getErrorMessage).mockReturnValue("mensagem tratada");
 
     const { result } = renderHook(() =>
-      useAccountData({ republicId: "rep-1" }),
+      useAccountData({ republicId: "rep-1" })
     );
     await act(async () => {
       await result.current.fetchAccounts();
@@ -265,7 +265,7 @@ describe("useAccountData — fetchAccounts (falha)", () => {
       .mockRejectedValueOnce(new Error("fail"));
 
     const { result } = renderHook(() =>
-      useAccountData({ republicId: "rep-1" }),
+      useAccountData({ republicId: "rep-1" })
     );
 
     await act(async () => {
@@ -286,7 +286,7 @@ describe("useAccountData — fetchAccounts (falha)", () => {
       .mockRejectedValue(new Error("fail"));
 
     const { result } = renderHook(() =>
-      useAccountData({ republicId: "rep-1" }),
+      useAccountData({ republicId: "rep-1" })
     );
     await act(async () => {
       await result.current.fetchAccounts();
@@ -304,14 +304,14 @@ describe("useAccountData — fetchAccounts (falha)", () => {
       .mockReturnValue("Não foi possível carregar as contas.");
 
     const { result } = renderHook(() =>
-      useAccountData({ republicId: "rep-1" }),
+      useAccountData({ republicId: "rep-1" })
     );
     await act(async () => {
       await result.current.fetchAccounts();
     });
 
     expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
-      "Não foi possível carregar as contas.",
+      "Não foi possível carregar as contas."
     );
     consoleErrorSpy.mockClear();
   });
@@ -321,7 +321,7 @@ describe("useAccountData — fetchAccounts (falha)", () => {
     jest.mocked(accountService.listarContasPorRepublica).mockRejectedValue(err);
 
     const { result } = renderHook(() =>
-      useAccountData({ republicId: "rep-1" }),
+      useAccountData({ republicId: "rep-1" })
     );
     await act(async () => {
       await result.current.fetchAccounts();
@@ -339,14 +339,14 @@ describe("useAccountData — fetchAccountResidents (sucesso)", () => {
       .mockResolvedValue([mockContaMorador]);
 
     const { result } = renderHook(() =>
-      useAccountData({ republicId: "rep-1" }),
+      useAccountData({ republicId: "rep-1" })
     );
     await act(async () => {
       await result.current.fetchAccountResidents("acc-1");
     });
 
     expect(
-      jest.mocked(accountResidentsService.listarContasMoradores),
+      jest.mocked(accountResidentsService.listarContasMoradores)
     ).toHaveBeenCalledWith("acc-1");
   });
 
@@ -356,7 +356,7 @@ describe("useAccountData — fetchAccountResidents (sucesso)", () => {
       .mockResolvedValue([mockContaMorador]);
 
     const { result } = renderHook(() =>
-      useAccountData({ republicId: "rep-1" }),
+      useAccountData({ republicId: "rep-1" })
     );
     let returned: ContaMorador[] = [];
     await act(async () => {
@@ -374,7 +374,7 @@ describe("useAccountData — fetchAccountResidents (falha)", () => {
       .mockRejectedValue(new Error("fail"));
 
     const { result } = renderHook(() =>
-      useAccountData({ republicId: "rep-1" }),
+      useAccountData({ republicId: "rep-1" })
     );
     let returned: ContaMorador[] = [mockContaMorador];
     await act(async () => {
@@ -395,14 +395,14 @@ describe("useAccountData — fetchAccountResidents (falha)", () => {
       .mockReturnValue("Não foi possível carregar os moradores da conta.");
 
     const { result } = renderHook(() =>
-      useAccountData({ republicId: "rep-1" }),
+      useAccountData({ republicId: "rep-1" })
     );
     await act(async () => {
       await result.current.fetchAccountResidents("acc-1");
     });
 
     expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
-      "Não foi possível carregar os moradores da conta.",
+      "Não foi possível carregar os moradores da conta."
     );
     consoleErrorSpy.mockClear();
   });
@@ -414,7 +414,7 @@ describe("useAccountData — fetchAccountResidents (falha)", () => {
       .mockRejectedValue(err);
 
     const { result } = renderHook(() =>
-      useAccountData({ republicId: "rep-1" }),
+      useAccountData({ republicId: "rep-1" })
     );
     await act(async () => {
       await result.current.fetchAccountResidents("acc-1");
@@ -422,7 +422,7 @@ describe("useAccountData — fetchAccountResidents (falha)", () => {
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       "Erro ao buscar moradores da conta:",
-      err,
+      err
     );
     consoleErrorSpy.mockClear();
   });

@@ -30,7 +30,7 @@ describe("userProfile layout", () => {
       expect.objectContaining({
         screenOptions: { headerShown: false },
       }),
-      undefined,
+      undefined
     );
   });
 

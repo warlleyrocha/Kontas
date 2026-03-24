@@ -14,7 +14,7 @@ function mesRef(dateStr: string): string {
 }
 
 function makeConta(
-  overrides: Partial<Conta> & { id: string; vencimento: string },
+  overrides: Partial<Conta> & { id: string; vencimento: string }
 ): Conta {
   return {
     descricao: "Conta teste",
@@ -62,7 +62,7 @@ afterEach(() => {
 describe("useAccountDerivedData — mesesDisponiveis", () => {
   it("retorna lista vazia quando não há contas", () => {
     const { result } = renderHook(() =>
-      useAccountDerivedData({ contas: [], mesSelecionado: "todos" }),
+      useAccountDerivedData({ contas: [], mesSelecionado: "todos" })
     );
     expect(result.current.mesesDisponiveis).toEqual([]);
   });
@@ -72,7 +72,7 @@ describe("useAccountDerivedData — mesesDisponiveis", () => {
       useAccountDerivedData({
         contas: [CONTA_JAN, CONTA_MAR],
         mesSelecionado: "todos",
-      }),
+      })
     );
     expect(result.current.mesesDisponiveis).toContain(MES_JAN);
     expect(result.current.mesesDisponiveis).toContain(MES_MAR);
@@ -83,10 +83,10 @@ describe("useAccountDerivedData — mesesDisponiveis", () => {
       useAccountDerivedData({
         contas: [CONTA_JAN, CONTA_JAN2, CONTA_PAGA],
         mesSelecionado: "todos",
-      }),
+      })
     );
     const occurrences = result.current.mesesDisponiveis.filter(
-      (m) => m === MES_JAN,
+      (m) => m === MES_JAN
     ).length;
     expect(occurrences).toBe(1);
   });
@@ -96,7 +96,7 @@ describe("useAccountDerivedData — mesesDisponiveis", () => {
       useAccountDerivedData({
         contas: [CONTA_MAR, CONTA_JAN],
         mesSelecionado: "todos",
-      }),
+      })
     );
     const [primeiro, segundo] = result.current.mesesDisponiveis;
     expect(primeiro < segundo).toBe(true);
@@ -106,7 +106,7 @@ describe("useAccountDerivedData — mesesDisponiveis", () => {
 describe("useAccountDerivedData — mesReferencia por conta", () => {
   it("adiciona mesReferencia correto às contas adaptadas", () => {
     const { result } = renderHook(() =>
-      useAccountDerivedData({ contas: [CONTA_JAN], mesSelecionado: "todos" }),
+      useAccountDerivedData({ contas: [CONTA_JAN], mesSelecionado: "todos" })
     );
     const conta = result.current.contasOrdenadas.abertas[0];
     expect(conta.mesReferencia).toBe(MES_JAN);
@@ -119,7 +119,7 @@ describe("useAccountDerivedData — contasOrdenadas com mesSelecionado='todos'",
       useAccountDerivedData({
         contas: [CONTA_JAN, CONTA_MAR, CONTA_PAGA],
         mesSelecionado: "todos",
-      }),
+      })
     );
     const ids = result.current.contasOrdenadas.abertas.map((c) => c.id);
     expect(ids).toContain("c1");
@@ -132,7 +132,7 @@ describe("useAccountDerivedData — contasOrdenadas com mesSelecionado='todos'",
       useAccountDerivedData({
         contas: [CONTA_JAN, CONTA_PAGA],
         mesSelecionado: "todos",
-      }),
+      })
     );
     const ids = result.current.contasOrdenadas.pagas.map((c) => c.id);
     expect(ids).toEqual(["c4"]);
@@ -148,7 +148,7 @@ describe("useAccountDerivedData — contasOrdenadas com mesSelecionado='todos'",
       useAccountDerivedData({
         contas: [CONTA_JAN, atrasada],
         mesSelecionado: "todos",
-      }),
+      })
     );
     const ids = result.current.contasOrdenadas.abertas.map((c) => c.id);
     expect(ids).toContain("c1");
@@ -162,7 +162,7 @@ describe("useAccountDerivedData — contasOrdenadas com filtro de mês", () => {
       useAccountDerivedData({
         contas: [CONTA_JAN, CONTA_MAR],
         mesSelecionado: MES_JAN,
-      }),
+      })
     );
     const ids = result.current.contasOrdenadas.abertas.map((c) => c.id);
     expect(ids).toContain("c1");
@@ -174,7 +174,7 @@ describe("useAccountDerivedData — contasOrdenadas com filtro de mês", () => {
       useAccountDerivedData({
         contas: [CONTA_JAN],
         mesSelecionado: "2025-12",
-      }),
+      })
     );
     expect(result.current.contasOrdenadas.abertas).toHaveLength(0);
     expect(result.current.contasOrdenadas.pagas).toHaveLength(0);
@@ -185,7 +185,7 @@ describe("useAccountDerivedData — contasOrdenadas com filtro de mês", () => {
       useAccountDerivedData({
         contas: [CONTA_JAN, CONTA_PAGA, CONTA_MAR],
         mesSelecionado: MES_JAN,
-      }),
+      })
     );
     expect(result.current.contasOrdenadas.abertas.map((c) => c.id)).toEqual([
       "c1",

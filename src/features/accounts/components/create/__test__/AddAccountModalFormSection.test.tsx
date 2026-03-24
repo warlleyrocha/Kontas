@@ -58,22 +58,19 @@ describe("AddAccountModalFormSection", () => {
     [MetodoPagamento.PIX, "PIX"],
     [MetodoPagamento.CARTAO, "Cartão"],
     [MetodoPagamento.DINHEIRO, "Dinheiro"],
-  ])(
-    "renderiza o método de pagamento %s com o rótulo correto",
-    (metodoPagamento, label) => {
-      render(
-        <AddAccountModalFormSection
-          {...createProps()}
-          metodoPagamento={metodoPagamento}
-        />,
-      );
+  ])("renderiza o método de pagamento %s com o rótulo correto", (metodoPagamento, label) => {
+    render(
+      <AddAccountModalFormSection
+        {...createProps()}
+        metodoPagamento={metodoPagamento}
+      />
+    );
 
-      expect(screen.getByText(label)).toBeTruthy();
-      expect(
-        screen.getByLabelText(`Selecionar método de pagamento ${label}`),
-      ).toBeTruthy();
-    },
-  );
+    expect(screen.getByText(label)).toBeTruthy();
+    expect(
+      screen.getByLabelText(`Selecionar método de pagamento ${label}`)
+    ).toBeTruthy();
+  });
 
   it("monta sem erros e chama os callbacks principais", () => {
     const props = createProps();
@@ -84,7 +81,7 @@ describe("AddAccountModalFormSection", () => {
     fireEvent.changeText(screen.getByPlaceholderText("0,00"), "245,90");
     fireEvent.press(screen.getByLabelText(/Selecionar vencimento/));
     fireEvent.press(
-      screen.getByLabelText("Selecionar método de pagamento PIX"),
+      screen.getByLabelText("Selecionar método de pagamento PIX")
     );
 
     expect(props.onDescricaoChange).toHaveBeenCalledWith("Cemig");

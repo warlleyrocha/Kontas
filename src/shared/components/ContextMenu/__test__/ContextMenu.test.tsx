@@ -80,7 +80,7 @@ describe("ContextMenu", () => {
       1,
       expect.objectContaining({
         duration: 150,
-      }),
+      })
     );
   });
 
@@ -89,7 +89,7 @@ describe("ContextMenu", () => {
     render(<ContextMenu {...createProps({ onClose })} />);
 
     fireEvent.press(
-      screen.getByRole("button", { name: "Fechar menu de contexto" }),
+      screen.getByRole("button", { name: "Fechar menu de contexto" })
     );
   });
 
@@ -107,7 +107,7 @@ describe("ContextMenu", () => {
     jest.mocked(Reanimated.withTiming).mockImplementation(((
       toValue: number,
       _config?: unknown,
-      callback?: (finished?: boolean) => void,
+      callback?: (finished?: boolean) => void
     ) => {
       if (callback) callback(true);
       return toValue;
@@ -130,7 +130,7 @@ describe("ContextMenu", () => {
     render(
       <ContextMenu
         {...createProps({ position, menuTotalHeight: 100, children })}
-      />,
+      />
     );
     expect(children).toHaveBeenCalled();
   });
@@ -140,8 +140,8 @@ describe("ContextMenu", () => {
       resolveMenuPlacement(
         { x: 100, y: 300, width: 150, height: 50 },
         SCREEN_HEIGHT,
-        100,
-      ),
+        100
+      )
     ).toEqual({
       menuY: 358,
       translateYOutput: -8,
@@ -155,7 +155,7 @@ describe("ContextMenu", () => {
     render(
       <ContextMenu
         {...createProps({ position, menuTotalHeight: 300, children })}
-      />,
+      />
     );
     expect(children).toHaveBeenCalled();
   });
@@ -165,8 +165,8 @@ describe("ContextMenu", () => {
       resolveMenuPlacement(
         { x: 100, y: 780, width: 150, height: 50 },
         SCREEN_HEIGHT,
-        300,
-      ),
+        300
+      )
     ).toEqual({
       menuY: 472,
       translateYOutput: 8,
@@ -200,7 +200,7 @@ describe("ContextMenu", () => {
   it("exibe o overlay com acessibilidade correta", () => {
     render(<ContextMenu {...createProps()} />);
     expect(
-      screen.getByRole("button", { name: "Fechar menu de contexto" }),
+      screen.getByRole("button", { name: "Fechar menu de contexto" })
     ).toBeTruthy();
   });
 });

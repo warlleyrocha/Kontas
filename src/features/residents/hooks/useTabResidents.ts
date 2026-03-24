@@ -4,7 +4,7 @@ import { showToast } from "@/src/shared/utils/showToast";
 
 export const useTabResidents = () => {
   const copiarChavePix = async (
-    morador: ResidentResponse,
+    morador: ResidentResponse
   ): Promise<boolean> => {
     if (!morador.chavePix) {
       showToast.error("Morador não possui chave PIX cadastrada.");

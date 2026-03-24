@@ -13,14 +13,14 @@ import { AppProviders } from "../AppProviders";
 jest.mock("react-native-gesture-handler", () => ({
   __esModule: true,
   GestureHandlerRootView: jest.fn(
-    ({ children }: { children: ReactNode }) => children,
+    ({ children }: { children: ReactNode }) => children
   ),
 }));
 
 jest.mock("@tanstack/react-query", () => ({
   __esModule: true,
   QueryClientProvider: jest.fn(
-    ({ children }: { children: ReactNode }) => children,
+    ({ children }: { children: ReactNode }) => children
   ),
 }));
 
@@ -32,14 +32,14 @@ jest.mock("@/src/features/auth/contexts", () => ({
 jest.mock("@/src/features/republic/contexts/RepublicListContext", () => ({
   __esModule: true,
   RepublicListProvider: jest.fn(
-    ({ children }: { children: ReactNode }) => children,
+    ({ children }: { children: ReactNode }) => children
   ),
 }));
 
 jest.mock("@/src/shared/components/error-boundary/GlobalErrorBoundary", () => ({
   __esModule: true,
   GlobalErrorBoundary: jest.fn(
-    ({ children }: { children: ReactNode }) => children,
+    ({ children }: { children: ReactNode }) => children
   ),
 }));
 
@@ -69,21 +69,21 @@ describe("AppProviders", () => {
     render(
       <AppProviders>
         <Text>conteudo filho</Text>
-      </AppProviders>,
+      </AppProviders>
     );
 
     expect(mockGestureHandlerRootView).toHaveBeenCalledWith(
       expect.objectContaining({
         style: { flex: 1 },
       }),
-      undefined,
+      undefined
     );
     expect(mockGlobalErrorBoundary).toHaveBeenCalledTimes(1);
     expect(mockQueryClientProvider).toHaveBeenCalledWith(
       expect.objectContaining({
         client: queryClient,
       }),
-      undefined,
+      undefined
     );
     expect(mockAuthProvider).toHaveBeenCalledTimes(1);
     expect(mockRepublicListProvider).toHaveBeenCalledTimes(1);

@@ -27,17 +27,17 @@ interface AccountCardProps {
   onLongPress?: (position: CardPosition) => void;
   onConfirmResidentPayment?: (
     accountId: string,
-    accountResidentId: string,
+    accountResidentId: string
   ) => Promise<void> | void;
   onPatch?: (
     accountId: string,
-    metodoPagamento: MetodoPagamento,
+    metodoPagamento: MetodoPagamento
   ) => Promise<void> | void;
   onCopyPix?: (conta: Conta) => boolean | Promise<boolean>;
 }
 
 const normalizeMetodoPagamento = (
-  metodoPagamento: string | null,
+  metodoPagamento: string | null
 ): MetodoPagamento => {
   if (!metodoPagamento) return MetodoPagamento.PIX; // fallback
 
@@ -77,7 +77,7 @@ export const AccountCard = ({
 
   const { handleCopy: handleCopyPix, copyFeedback } = useCopyFeedback(
     () => onCopyPix?.(conta) ?? false,
-    accountCopyFeedback,
+    accountCopyFeedback
   );
 
   const vencimento = parseContaVencimento(conta.vencimento);

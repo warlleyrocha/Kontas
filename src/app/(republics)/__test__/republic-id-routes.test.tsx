@@ -58,7 +58,7 @@ describe("republic [id] routes", () => {
 
     expect(mockRedirect).toHaveBeenCalledWith(
       expect.objectContaining({ href: "/" }),
-      undefined,
+      undefined
     );
     expect(mockRepublicScreen).not.toHaveBeenCalled();
   });
@@ -70,7 +70,7 @@ describe("republic [id] routes", () => {
 
     expect(mockRepublicScreen).toHaveBeenCalledWith(
       expect.objectContaining({ republicId: "rep-1" }),
-      undefined,
+      undefined
     );
     expect(mockRedirect).not.toHaveBeenCalled();
   });
@@ -82,7 +82,7 @@ describe("republic [id] routes", () => {
 
     expect(mockRedirect).toHaveBeenCalledWith(
       expect.objectContaining({ href: "/" }),
-      undefined,
+      undefined
     );
     expect(mockInvitesSentScreen).not.toHaveBeenCalled();
   });
@@ -94,7 +94,7 @@ describe("republic [id] routes", () => {
 
     expect(mockInvitesSentScreen).toHaveBeenCalledWith(
       expect.objectContaining({ republicId: "rep-2" }),
-      undefined,
+      undefined
     );
     expect(mockRedirect).not.toHaveBeenCalled();
   });
@@ -113,7 +113,7 @@ describe("republic [id] routes", () => {
         error: props.error,
         retry: props.retry,
       }),
-      undefined,
+      undefined
     );
   });
 
@@ -124,7 +124,7 @@ describe("republic [id] routes", () => {
 
     expect(mockRedirect).toHaveBeenCalledWith(
       expect.objectContaining({ href: "/" }),
-      undefined,
+      undefined
     );
     expect(mockPaymentsScreen).not.toHaveBeenCalled();
   });
@@ -136,7 +136,7 @@ describe("republic [id] routes", () => {
 
     expect(mockPaymentsScreen).toHaveBeenCalledWith(
       expect.objectContaining({ republicId: "rep-3" }),
-      undefined,
+      undefined
     );
     expect(mockRedirect).not.toHaveBeenCalled();
   });
@@ -155,7 +155,7 @@ describe("republic [id] routes", () => {
         error: props.error,
         retry: props.retry,
       }),
-      undefined,
+      undefined
     );
   });
 });

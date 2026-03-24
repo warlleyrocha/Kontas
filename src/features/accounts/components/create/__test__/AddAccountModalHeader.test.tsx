@@ -19,7 +19,7 @@ describe("AddAccountModalHeader", () => {
   it("exibe a descrição da conta", () => {
     render(<AddAccountModalHeader onClose={() => {}} />);
     expect(
-      screen.getByText("Adicione uma nova conta para a república"),
+      screen.getByText("Adicione uma nova conta para a república")
     ).toBeTruthy();
   });
 

@@ -81,7 +81,7 @@ describe("EditProfileModal", () => {
 
     fireEvent.changeText(
       screen.getByPlaceholderText("Seu telefone"),
-      "11987654321",
+      "11987654321"
     );
 
     expect(mockSetPhone).toHaveBeenCalledWith("(11) 98765-4321");
@@ -92,7 +92,7 @@ describe("EditProfileModal", () => {
 
     fireEvent.changeText(
       screen.getByPlaceholderText("Sua chave Pix"),
-      "nova-chave",
+      "nova-chave"
     );
 
     expect(mockSetPixKey).toHaveBeenCalledWith("nova-chave");

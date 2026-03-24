@@ -15,7 +15,7 @@ export type CopyFeedbackMap = Record<CopyStatus, CopyFeedbackItem>;
 export function useCopyFeedback(
   onCopy: CopyHandler,
   feedbackMap: CopyFeedbackMap,
-  resetDelay = 2000,
+  resetDelay = 2000
 ) {
   const [status, setStatus] = useState<CopyStatus>("idle");
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);

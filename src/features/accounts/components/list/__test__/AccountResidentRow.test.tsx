@@ -51,7 +51,7 @@ describe("AccountResidentRow", () => {
     render(
       <AccountResidentRow
         {...createProps({ morador: { ...mockMorador, valor: 0 } })}
-      />,
+      />
     );
     expect(screen.queryByText(/R\$/)).toBeNull();
   });
@@ -67,7 +67,7 @@ describe("AccountResidentRow", () => {
         {...createProps({
           morador: { ...mockMorador, status: StatusPagamento.PAGO },
         })}
-      />,
+      />
     );
     expect(screen.getByText("Pago")).toBeTruthy();
   });
@@ -81,7 +81,7 @@ describe("AccountResidentRow", () => {
             status: StatusPagamento.AGUARDANDO_CONFIRMACAO,
           },
         })}
-      />,
+      />
     );
     expect(screen.getByText("Aguardando")).toBeTruthy();
   });
@@ -98,7 +98,7 @@ describe("AccountResidentRow", () => {
 
     expect(props.onConfirmResidentPayment).toHaveBeenCalledWith(
       "conta-1",
-      "cm-1",
+      "cm-1"
     );
   });
 
