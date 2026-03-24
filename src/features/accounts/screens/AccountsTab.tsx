@@ -1,6 +1,7 @@
 import Feather from "@expo/vector-icons/Feather";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  Modal,
   RefreshControl,
   ScrollView,
   Text,
@@ -23,6 +24,7 @@ import { getMoradorStatusVisual } from "@/src/features/accounts/utils/accountSta
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 import { formatMounthYear } from "@/src/shared/utils/formats";
+import { ToastConfirm } from "@/src/shared/components/ui/toast-custom";
 
 interface AccountsTabProps {
   readonly republicId: string;
@@ -71,6 +73,12 @@ export function AccountsTab({
     position: CardPosition | null;
   }>({ visible: false, accountId: null, position: null });
 
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    visible: boolean;
+    accountId: string | null;
+    descricao: string;
+  }>({ visible: false, accountId: null, descricao: "" });
+
   const handleAccountLongPress = useCallback(
     (accountId: string, position: CardPosition) => {
       setContextMenu({ visible: true, accountId, position });
@@ -84,10 +92,17 @@ export function AccountsTab({
 
   const handleContextMenuDelete = useCallback(() => {
     handleContextMenuClose();
-    if (contextMenu.accountId) {
-      void handleDelete(contextMenu.accountId);
-    }
-  }, [contextMenu.accountId, handleContextMenuClose, handleDelete]);
+    if (!contextMenu.accountId) return;
+    const accountId = contextMenu.accountId;
+    const conta =
+      contasOrdenadas.abertas.find((c) => c.id === accountId) ??
+      contasOrdenadas.pagas.find((c) => c.id === accountId);
+    setDeleteConfirm({
+      visible: true,
+      accountId,
+      descricao: conta?.descricao ?? "esta conta",
+    });
+  }, [contextMenu.accountId, contasOrdenadas, handleContextMenuClose]);
 
   const { refreshing, onRefresh } = useRefresh();
   const pendingPaymentsCount = useMemo(
@@ -301,6 +316,29 @@ export function AccountsTab({
         onEdit={() => {}}
         onDelete={handleContextMenuDelete}
       />
+
+      <Modal
+        visible={deleteConfirm.visible}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+      >
+        <View className="flex-1 justify-end pb-8">
+          <ToastConfirm
+            message={deleteConfirm.descricao}
+            duration={8000}
+            onConfirm={() => {
+              setDeleteConfirm((prev) => ({ ...prev, visible: false }));
+              if (deleteConfirm.accountId) {
+                void handleDelete(deleteConfirm.accountId);
+              }
+            }}
+            onCancel={() =>
+              setDeleteConfirm((prev) => ({ ...prev, visible: false }))
+            }
+          />
+        </View>
+      </Modal>
     </View>
   );
 }
