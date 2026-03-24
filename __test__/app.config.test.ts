@@ -288,6 +288,12 @@ describe("app.config.ts", () => {
             "com.googleusercontent.apps.475215012202-oq93e4s85f7uuhfji6k2nkhdb7i2dfm3",
         },
       ],
+      [
+        "expo-secure-store",
+        {
+          configureAndroidBackup: true,
+        },
+      ],
     ]);
 
     expect(result.experiments).toEqual({
