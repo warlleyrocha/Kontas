@@ -1,10 +1,12 @@
 import { fireEvent, render, screen } from "@testing-library/react-native";
-import { Image } from "react-native";
+import { Image, Linking } from "react-native";
+
 import { useResidentCard } from "@/src/features/residents/hooks/useResidentCard";
 import {
   ResidentRole,
   type ResidentResponse,
 } from "@/src/shared/types/resident.types";
+
 import { ResidentCard } from "../ResidentCard";
 
 jest.mock("react-native-reanimated", () =>
@@ -14,12 +16,20 @@ jest.mock("react-native-reanimated", () =>
 jest.mock("@expo/vector-icons", () => ({
   Feather: "Feather",
   Ionicons: "Ionicons",
+  FontAwesome: "FontAwesome",
 }));
 
 jest.mock("@/src/features/residents/hooks/useResidentCard");
 jest.mock("@/src/shared/utils/getInitials", () => ({
   getInitials: (nome: string) => nome.slice(0, 2).toUpperCase(),
 }));
+jest.mock("@/assets/icons/pix-icon.svg", () => {
+  const { View } = jest.requireActual("react-native");
+  return {
+    __esModule: true,
+    default: () => <View testID="pix-icon" />,
+  };
+});
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -40,7 +50,11 @@ const mockSetImageError = jest.fn();
 function createHookReturn(overrides = {}) {
   return {
     expanded: false,
-    copiado: false,
+    copyFeedback: {
+      accessibilityLabel: "Copiar chave PIX",
+      icon: null,
+      text: "",
+    },
     imageError: false,
     animatedStyle: { maxHeight: 0, opacity: 0, overflow: "hidden" as const },
     toggleExpanded: mockToggleExpanded,
@@ -53,10 +67,12 @@ function createHookReturn(overrides = {}) {
 // ─── Setup ────────────────────────────────────────────────────────────────────
 
 let consoleErrorSpy: jest.SpyInstance;
+let openURLSpy: jest.SpyInstance;
 
 beforeEach(() => {
   jest.clearAllMocks();
   jest.mocked(useResidentCard).mockReturnValue(createHookReturn());
+  openURLSpy = jest.spyOn(Linking, "openURL").mockResolvedValue(true as any);
 
   // Falha o teste se o componente logar erros reais (prop inválida, render quebrado, etc.)
   consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
@@ -65,6 +81,7 @@ beforeEach(() => {
 afterEach(() => {
   expect(consoleErrorSpy).not.toHaveBeenCalled();
   consoleErrorSpy.mockRestore();
+  openURLSpy.mockRestore();
 });
 
 // ─── ResidentCard ─────────────────────────────────────────────────────────────
@@ -179,10 +196,42 @@ describe("ResidentCard", () => {
     expect(mockHandleCopyPix).toHaveBeenCalledTimes(1);
   });
 
-  it("usa accessibilityLabel 'Chave PIX copiada' quando copiado=true", () => {
-    jest
-      .mocked(useResidentCard)
-      .mockReturnValue(createHookReturn({ copiado: true }));
+  it("abre o app de e-mail ao pressionar o endereço", () => {
+    const moradorComEmail: ResidentResponse = {
+      ...mockMorador,
+      email: "ana@email.com",
+    };
+
+    render(<ResidentCard morador={moradorComEmail} onCopyPix={jest.fn()} />);
+
+    fireEvent.press(screen.getByText("ana@email.com"));
+
+    expect(openURLSpy).toHaveBeenCalledWith("mailto:ana@email.com");
+  });
+
+  it("abre o WhatsApp com o telefone sanitizado ao pressionar o número", () => {
+    const moradorComTelefone: ResidentResponse = {
+      ...mockMorador,
+      telefone: "(11) 99999-9999",
+    };
+
+    render(<ResidentCard morador={moradorComTelefone} onCopyPix={jest.fn()} />);
+
+    fireEvent.press(screen.getByText("(11) 99999-9999"));
+
+    expect(openURLSpy).toHaveBeenCalledWith("https://wa.me/5511999999999");
+  });
+
+  it("usa accessibilityLabel 'Chave PIX copiada' quando o feedback é de sucesso", () => {
+    jest.mocked(useResidentCard).mockReturnValue(
+      createHookReturn({
+        copyFeedback: {
+          accessibilityLabel: "Chave PIX copiada",
+          icon: null,
+          text: "",
+        },
+      })
+    );
 
     const moradorComPix: ResidentResponse = {
       ...mockMorador,
@@ -192,6 +241,27 @@ describe("ResidentCard", () => {
     render(<ResidentCard morador={moradorComPix} onCopyPix={jest.fn()} />);
 
     expect(screen.getByLabelText("Chave PIX copiada")).toBeTruthy();
+  });
+
+  it("usa accessibilityLabel de erro quando o feedback é de erro", () => {
+    jest.mocked(useResidentCard).mockReturnValue(
+      createHookReturn({
+        copyFeedback: {
+          accessibilityLabel: "Falha ao copiar chave PIX",
+          icon: null,
+          text: "",
+        },
+      })
+    );
+
+    const moradorComPix: ResidentResponse = {
+      ...mockMorador,
+      chavePix: "ana@pix",
+    };
+
+    render(<ResidentCard morador={moradorComPix} onCopyPix={jest.fn()} />);
+
+    expect(screen.getByLabelText("Falha ao copiar chave PIX")).toBeTruthy();
   });
 
   it("passa morador e onCopyPix corretos para o hook", () => {

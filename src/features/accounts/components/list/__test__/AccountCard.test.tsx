@@ -1,8 +1,12 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { TouchableOpacity, View } from "react-native";
-import { MetodoPagamento, StatusConta } from "../../../types/account.types";
-import type { Conta } from "../../../types/account.types";
+
 import { AccountCard } from "../AccountCard";
+import {
+  MetodoPagamento,
+  StatusConta,
+  type Conta,
+} from "../../../types/account.types";
 
 jest.mock("@expo/vector-icons/Feather", () => ({
   __esModule: true,
@@ -57,6 +61,7 @@ const createProps = (overrides = {}) => ({
   onLongPress: jest.fn(),
   onConfirmResidentPayment: jest.fn(),
   onPatch: jest.fn().mockResolvedValue(undefined),
+  onCopyPix: jest.fn(() => false),
   ...overrides,
 });
 
@@ -89,7 +94,7 @@ describe("AccountCard", () => {
     render(
       <AccountCard
         {...createProps({ conta: { ...mockConta, vencimento: "not-a-date" } })}
-      />,
+      />
     );
     expect(screen.getByText("Data inválida")).toBeTruthy();
   });
@@ -157,22 +162,72 @@ describe("AccountCard", () => {
     expect(screen.getByText("Copiar PIX")).toBeTruthy();
   });
 
-  it('executa o onPress de "Copiar PIX" sem disparar outras ações', () => {
+  it('executa o onPress de "Copiar PIX" sem disparar outras ações', async () => {
     const props = createProps();
     const { UNSAFE_getAllByType } = render(<AccountCard {...props} />);
 
     const buttons = UNSAFE_getAllByType(TouchableOpacity);
-    fireEvent.press(buttons[3]);
+    await act(async () => {
+      fireEvent.press(buttons[3]);
+    });
 
     expect(props.onPatch).not.toHaveBeenCalled();
     expect(props.onToggleExpand).not.toHaveBeenCalled();
+  });
+
+  it('exibe "PIX Copiado" quando a cópia da chave é bem-sucedida', async () => {
+    const props = createProps({
+      onCopyPix: jest.fn(() => true),
+    });
+    const { UNSAFE_getAllByType } = render(<AccountCard {...props} />);
+
+    const buttons = UNSAFE_getAllByType(TouchableOpacity);
+
+    await act(async () => {
+      fireEvent.press(buttons[3]);
+    });
+
+    expect(props.onCopyPix).toHaveBeenCalledWith(mockConta);
+    expect(screen.getByText("PIX Copiado")).toBeTruthy();
+  });
+
+  it('mantém "Copiar PIX" quando a cópia da chave falha', async () => {
+    const props = createProps({
+      onCopyPix: jest.fn(() => false),
+    });
+    const { UNSAFE_getAllByType } = render(<AccountCard {...props} />);
+
+    const buttons = UNSAFE_getAllByType(TouchableOpacity);
+    await act(async () => {
+      fireEvent.press(buttons[3]);
+    });
+
+    expect(props.onCopyPix).toHaveBeenCalledWith(mockConta);
+    expect(screen.getByText("Falha ao copiar")).toBeTruthy();
+    expect(screen.queryByText("PIX Copiado")).toBeNull();
+    expect(screen.getByLabelText("Falha ao copiar chave PIX")).toBeTruthy();
+  });
+
+  it("exibe feedback de erro quando onCopyPix não é fornecido", async () => {
+    const props = createProps({
+      onCopyPix: undefined,
+    });
+    const { UNSAFE_getAllByType } = render(<AccountCard {...props} />);
+
+    const buttons = UNSAFE_getAllByType(TouchableOpacity);
+    await act(async () => {
+      fireEvent.press(buttons[3]);
+    });
+
+    expect(screen.getByText("Falha ao copiar")).toBeTruthy();
+    expect(screen.getByLabelText("Falha ao copiar chave PIX")).toBeTruthy();
   });
 
   it('não exibe "Copiar PIX" quando a conta está paga', () => {
     render(
       <AccountCard
         {...createProps({ conta: { ...mockConta, status: StatusConta.PAGA } })}
-      />,
+      />
     );
     expect(screen.queryByText("Copiar PIX")).toBeNull();
   });
@@ -241,7 +296,24 @@ describe("AccountCard", () => {
 
     expect(props.onPatch).toHaveBeenCalledWith(
       "conta-1",
-      MetodoPagamento.CARTAO,
+      MetodoPagamento.CARTAO
+    );
+  });
+
+  it("normaliza metodoPagamento com espaços e acento para CARTAO", async () => {
+    const props = createProps({
+      conta: { ...mockConta, metodoPagamento: "  cartão  " },
+    });
+    const { UNSAFE_getAllByType } = render(<AccountCard {...props} />);
+
+    const buttons = UNSAFE_getAllByType(TouchableOpacity);
+    await act(async () => {
+      fireEvent.press(buttons[1], { stopPropagation: jest.fn() });
+    });
+
+    expect(props.onPatch).toHaveBeenCalledWith(
+      "conta-1",
+      MetodoPagamento.CARTAO
     );
   });
 
@@ -258,7 +330,7 @@ describe("AccountCard", () => {
 
     expect(props.onPatch).toHaveBeenCalledWith(
       "conta-1",
-      MetodoPagamento.DINHEIRO,
+      MetodoPagamento.DINHEIRO
     );
   });
 
@@ -268,7 +340,7 @@ describe("AccountCard", () => {
         {...createProps({
           conta: { ...mockConta, status: StatusConta.ATRASADA },
         })}
-      />,
+      />
     );
     // componente renderiza sem erros com status atrasado
   });
@@ -286,11 +358,11 @@ describe("AccountCard", () => {
           w: number,
           h: number,
           px: number,
-          py: number,
-        ) => void,
+          py: number
+        ) => void
       ) => {
         cb(0, 0, 100, 50, 10, 20);
-      },
+      }
     );
 
     fireEvent(UNSAFE_getAllByType(TouchableOpacity)[0], "longPress");
