@@ -63,7 +63,7 @@ export const privacyPolicy: LegalDoc = {
         {
           kind: "bullets",
           items: [
-            "Dados de sessão: token JWT armazenado localmente no dispositivo via AsyncStorage para manter você autenticado.",
+            "Dados de sessão: token JWT armazenado localmente no dispositivo via SecureStore para manter você autenticado.",
             "Dados de uso e erros: o App utiliza o Sentry para rastreamento de erros e crashes. Isso pode incluir informações técnicas sobre o dispositivo, versão do sistema operacional, stack trace de erros e breadcrumbs de navegação. Não são coletados dados financeiros ou senhas por essa ferramenta.",
           ],
         },
@@ -130,7 +130,7 @@ export const privacyPolicy: LegalDoc = {
             "Os dados são armazenados em servidor hospedado no Railway, com comunicação protegida por HTTPS.",
             "A autenticação é realizada via token JWT com envio automático em todas as requisições autenticadas.",
             "A camada HTTP do App conta com circuit breaker e timeout para proteger contra falhas de rede.",
-            "O token de sessão é armazenado localmente no dispositivo via AsyncStorage e removido ao realizar logout.",
+            "O token de sessão é armazenado localmente no dispositivo via SecureStore e removido ao realizar logout.",
             "Nenhuma senha é armazenada pelo Kontas. A autenticação é delegada ao Google.",
           ],
         },

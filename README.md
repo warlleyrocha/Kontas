@@ -57,7 +57,7 @@
 
 :heavy_check_mark: Login com Google (OAuth)
 
-:heavy_check_mark: Persistência de sessão (AsyncStorage)
+:heavy_check_mark: Persistência segura de sessão (SecureStore)
 
 :heavy_check_mark: Validação automática de sessão ao iniciar o app
 

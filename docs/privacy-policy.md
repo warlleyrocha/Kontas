@@ -33,7 +33,7 @@ Durante o uso do App, você pode fornecer:
 
 ### 2.3. Dados gerados pelo uso do App
 
-- **Dados de sessão:** token JWT armazenado localmente no dispositivo via AsyncStorage para manter você autenticado.
+- **Dados de sessão:** token JWT armazenado localmente no dispositivo via SecureStore para manter você autenticado.
 - **Dados de uso e erros:** o App utiliza o Sentry para rastreamento de erros e crashes. Isso pode incluir informações técnicas sobre o dispositivo, versão do sistema operacional, stack trace de erros e breadcrumbs de navegação. Não são coletados dados financeiros ou senhas por essa ferramenta.
 
 ---
@@ -75,7 +75,7 @@ O Kontas não vende, aluga ou compartilha seus dados pessoais com terceiros para
 
 5.3. A camada HTTP do App conta com circuit breaker e timeout para proteger contra falhas de rede.
 
-5.4. O token de sessão é armazenado localmente no dispositivo via AsyncStorage e removido ao realizar logout.
+5.4. O token de sessão é armazenado localmente no dispositivo via SecureStore e removido ao realizar logout.
 
 5.5. Nenhuma senha é armazenada pelo Kontas. A autenticação é delegada ao Google.
 
