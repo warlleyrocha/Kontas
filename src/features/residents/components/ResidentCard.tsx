@@ -1,4 +1,4 @@
-import { Feather, FontAwesome, Ionicons } from "@expo/vector-icons";
+import { Feather, FontAwesome } from "@expo/vector-icons";
 import type { FC } from "react";
 import { Image, Linking, Text, TouchableOpacity, View } from "react-native";
 import Animated from "react-native-reanimated";
@@ -9,13 +9,13 @@ import PixIcon from "@/assets/icons/pix-icon.svg";
 
 interface ResidentCardProps {
   morador: ResidentResponse;
-  onCopyPix: (morador: ResidentResponse) => void;
+  onCopyPix: (morador: ResidentResponse) => boolean | Promise<boolean>;
 }
 
 export const ResidentCard: FC<ResidentCardProps> = ({ morador, onCopyPix }) => {
   const {
     expanded,
-    copiado,
+    copyFeedback,
     imageError,
     animatedStyle,
     toggleExpanded,
@@ -141,16 +141,10 @@ export const ResidentCard: FC<ResidentCardProps> = ({ morador, onCopyPix }) => {
                 activeOpacity={0.85}
                 onPress={handleCopyPix}
                 accessibilityRole="button"
-                accessibilityLabel={
-                  copiado ? "Chave PIX copiada" : "Copiar chave PIX"
-                }
+                accessibilityLabel={copyFeedback.accessibilityLabel}
                 className="min-h-11 min-w-11 flex-row items-center justify-center rounded-full bg-white px-4"
               >
-                {copiado ? (
-                  <Ionicons name="checkmark" size={18} color="#16a34a" />
-                ) : (
-                  <Feather name="copy" size={18} color="#337176" />
-                )}
+                {copyFeedback.icon}
               </TouchableOpacity>
             ) : null}
           </View>

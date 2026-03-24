@@ -3,14 +3,22 @@ import { ResidentResponse } from "@/src/shared/types/resident.types";
 import { showToast } from "@/src/shared/utils/showToast";
 
 export const useTabResidents = () => {
-  const copiarChavePix = async (morador: ResidentResponse) => {
+  const copiarChavePix = async (
+    morador: ResidentResponse,
+  ): Promise<boolean> => {
     if (!morador.chavePix) {
       showToast.error("Morador não possui chave PIX cadastrada.");
-      return;
+      return false;
     }
 
-    await setStringAsync(morador.chavePix);
-    showToast.info("Chave copiada para a área de transferência.");
+    try {
+      await setStringAsync(morador.chavePix);
+
+      return true;
+    } catch {
+      showToast.error("Não foi possível copiar a chave PIX.");
+      return false;
+    }
   };
 
   return {
