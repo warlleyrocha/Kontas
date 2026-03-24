@@ -1,9 +1,9 @@
-import { createElement, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { getErrorMessage } from "@/src/services/httpError";
 import { toast } from "@/src/shared/components/ui/sonner";
 import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
-import { AccountRecoveryToast } from "../components";
+//import { AccountRecoveryToast } from "../components";
 import { accountService } from "../services/account.service";
 import { accountResidentsService } from "../services/account-residents.service";
 import type {
@@ -12,7 +12,7 @@ import type {
   MetodoPagamento,
 } from "../types/account.types";
 
-const RECOVERY_TOAST_DURATION_MS = 10_000;
+//const RECOVERY_TOAST_DURATION_MS = 10_000;
 
 interface UseAccountActionsOptions {
   onRefresh?: () => Promise<unknown> | void;
@@ -182,15 +182,15 @@ export function useAccountActions({
   const handleDelete = useCallback(
     async (accountId: string) => {
       setIsDeleting(true);
-      try{
-        await accountService.removerConta({ id: accountId});
+      try {
+        await accountService.removerConta({ id: accountId });
         showToast.success("Conta removida com sucesso.");
         await onRefresh?.();
-      }catch(error) {
+      } catch (error) {
         showToast.error(
           getErrorMessage(error, "Não foi possível remover a conta.")
         );
-      }finally{
+      } finally {
         setIsDeleting(false);
       }
     },
