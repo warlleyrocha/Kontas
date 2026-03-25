@@ -15,6 +15,7 @@ import { useAuth } from "@/src/features/auth/contexts/AuthContext";
 import { getErrorMessage } from "@/src/services/httpError";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 import { showToast } from "@/src/shared/utils/showToast";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type GoogleSignInResult = Awaited<ReturnType<typeof GoogleSignin.signIn>>;
 
@@ -55,8 +56,8 @@ export default function LoginScreen() {
       showToast.error(
         getErrorMessage(
           error,
-          "Erro ao fazer login com Google. Tente novamente."
-        )
+          "Erro ao fazer login com Google. Tente novamente.",
+        ),
       );
     }
 
@@ -78,11 +79,11 @@ export default function LoginScreen() {
         }}
       />
 
-      <View
+      <SafeAreaView
         className="mt-8 w-full flex-1 items-center justify-between overflow-hidden rounded-t-[24px] bg-white px-6 py-8 shadow-lg"
         style={{
           marginTop: -25,
-          paddingTop: 40,
+          paddingTop: 0,
           minHeight: height * 0.5,
         }}
       >
@@ -114,7 +115,7 @@ export default function LoginScreen() {
           )}
         </TouchableOpacity>
 
-        <Text className="px-12 text-center text-xs leading-5 text-gray-500">
+        <Text className="px-20 text-center text-xs leading-5 text-gray-500">
           Ao continuar, você concorda com nossos{" "}
           <Text
             className="font-semibold text-teal"
@@ -133,7 +134,7 @@ export default function LoginScreen() {
         </Text>
 
         {error && <Text style={{ color: "red" }}>{error}</Text>}
-      </View>
+      </SafeAreaView>
     </View>
   );
 }
