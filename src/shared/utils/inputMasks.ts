@@ -1,6 +1,8 @@
 // utils/inputMasks.ts
 // Utilitário para máscaras de input
 
+import { formatIntWithDots } from "./formats";
+
 export function maskPhone(value: string): string {
   // Remove tudo que não for número
   let cleaned = value.replaceAll(/\D/g, "");
@@ -69,8 +71,7 @@ export function maskCurrencyBRL(raw: string): string {
   const value = (valueInCents / 100).toFixed(2);
   const [intPart, decPart] = value.split(".");
 
-  const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  return `${formattedInt},${decPart}`;
+  return `${formatIntWithDots(intPart)},${decPart}`;
 }
 
 /**
