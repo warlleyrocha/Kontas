@@ -1,13 +1,26 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
-import { KeyboardAvoidingView, Platform, View } from "react-native";
 import AddAccountModal from "../AddAccountModal";
 import { useAccountForm } from "../../../hooks/useAccountForm";
 import { MetodoPagamento, StatusConta } from "../../../types/account.types";
 
-jest.mock("@/src/shared/components/ui/sonner", () => ({ Toaster: () => null }));
+jest.mock("@expo/vector-icons/Feather", () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+jest.mock("react-native-safe-area-context", () => ({
+  SafeAreaView: ({ children, ...props }: any) => {
+    const { View } = jest.requireActual("react-native");
+    return <View {...props}>{children}</View>;
+  },
+}));
 
 jest.mock("../../../hooks/useAccountForm", () => ({
   useAccountForm: jest.fn(),
+}));
+
+jest.mock("@/src/shared/utils/formats", () => ({
+  formatBRL: (v: number) => v.toFixed(2).replace(".", ","),
 }));
 
 jest.mock("../AddAccountModalHeader", () => ({
@@ -50,20 +63,7 @@ jest.mock("../AddAccountModalFormSection", () => ({
 }));
 
 jest.mock("../AddAccountModalResidentsSection", () => ({
-  AddAccountModalResidentsSection: ({
-    onValorInputFocusChange,
-  }: {
-    onValorInputFocusChange: (focused: boolean) => void;
-  }) => {
-    const { TouchableOpacity } = jest.requireActual("react-native");
-    return (
-      <TouchableOpacity
-        onPress={() => onValorInputFocusChange(true)}
-        accessibilityRole="button"
-        accessibilityLabel="focar valor"
-      />
-    );
-  },
+  AddAccountModalResidentsSection: () => null,
 }));
 
 jest.mock("../AddAccountModalActions", () => ({
@@ -85,6 +85,32 @@ jest.mock("../AddAccountModalActions", () => ({
         <TouchableOpacity
           onPress={onCancel}
           accessibilityRole="button"
+          accessibilityLabel="voltar"
+        />
+      </View>
+    );
+  },
+}));
+
+jest.mock("@/src/shared/components/NextButton", () => ({
+  NextButton: ({
+    onNext,
+    onCancel,
+  }: {
+    onNext: () => void;
+    onCancel: () => void;
+  }) => {
+    const { TouchableOpacity, View } = jest.requireActual("react-native");
+    return (
+      <View>
+        <TouchableOpacity
+          onPress={onNext}
+          accessibilityRole="button"
+          accessibilityLabel="próximo"
+        />
+        <TouchableOpacity
+          onPress={onCancel}
+          accessibilityRole="button"
           accessibilityLabel="cancelar"
         />
       </View>
@@ -99,14 +125,28 @@ const fixedDate = new Date("2026-03-22T00:00:00.000Z");
 
 const createHookReturn = () => ({
   formData: {
-    descricao: "",
+    descricao: "Conta de luz",
     valorTotal: "100,00",
     vencimento: fixedDate,
     metodoPagamento: MetodoPagamento.PIX,
     tipoDivisao: "equal" as const,
     moradoresDivisao: [
-      { moradorId: "1", nome: "Ana", checked: true, valor: "50,00" },
-      { moradorId: "2", nome: "Bruno", checked: false, valor: "" },
+      {
+        moradorId: "1",
+        nome: "Ana",
+        fotoPerfil: null,
+        role: "Morador",
+        checked: true,
+        valor: "50,00",
+      },
+      {
+        moradorId: "2",
+        nome: "Bruno",
+        fotoPerfil: null,
+        role: "Morador",
+        checked: false,
+        valor: "",
+      },
     ],
   },
   tempVencimento: fixedDate,
@@ -150,12 +190,47 @@ describe("AddAccountModal", () => {
     expect(mockHandleCloseModal).toHaveBeenCalledTimes(1);
   });
 
-  it("chama handleCloseModal ao pressionar cancelar", () => {
+  it("inicia na aba form e exibe NextButton", () => {
+    render(<AddAccountModal {...defaultProps} />);
+
+    expect(
+      screen.getByRole("button", { name: "próximo" }),
+    ).toBeTruthy();
+    expect(
+      screen.queryByRole("button", { name: "adicionar conta" }),
+    ).toBeNull();
+  });
+
+  it("chama handleCloseModal ao pressionar cancelar na aba form", () => {
     render(<AddAccountModal {...defaultProps} />);
 
     fireEvent.press(screen.getByRole("button", { name: "cancelar" }));
 
     expect(mockHandleCloseModal).toHaveBeenCalledTimes(1);
+  });
+
+  it("navega para aba residents ao pressionar próximo", () => {
+    render(<AddAccountModal {...defaultProps} />);
+
+    fireEvent.press(screen.getByRole("button", { name: "próximo" }));
+
+    expect(
+      screen.getByRole("button", { name: "adicionar conta" }),
+    ).toBeTruthy();
+    expect(
+      screen.queryByRole("button", { name: "próximo" }),
+    ).toBeNull();
+  });
+
+  it("volta para aba form ao pressionar voltar na aba residents", () => {
+    render(<AddAccountModal {...defaultProps} />);
+
+    fireEvent.press(screen.getByRole("button", { name: "próximo" }));
+    fireEvent.press(screen.getByRole("button", { name: "voltar" }));
+
+    expect(
+      screen.getByRole("button", { name: "próximo" }),
+    ).toBeTruthy();
   });
 
   it("atualiza descricao via setFormData ao chamar handleDescricaoChange", () => {
@@ -175,28 +250,32 @@ describe("AddAccountModal", () => {
     const updater = mockSetFormData.mock.calls[0][0] as (prev: any) => any;
 
     expect(
-      updater({ metodoPagamento: MetodoPagamento.PIX }).metodoPagamento
+      updater({ metodoPagamento: MetodoPagamento.PIX }).metodoPagamento,
     ).toBe(MetodoPagamento.CARTAO);
 
     expect(
-      updater({ metodoPagamento: MetodoPagamento.CARTAO }).metodoPagamento
+      updater({ metodoPagamento: MetodoPagamento.CARTAO }).metodoPagamento,
     ).toBe(MetodoPagamento.DINHEIRO);
 
     expect(
-      updater({ metodoPagamento: MetodoPagamento.DINHEIRO }).metodoPagamento
+      updater({ metodoPagamento: MetodoPagamento.DINHEIRO }).metodoPagamento,
     ).toBe(MetodoPagamento.PIX);
   });
 
-  it("chama onSubmit com o payload correto ao confirmar", async () => {
+  it("chama onSubmit com o payload correto ao confirmar na aba residents", async () => {
     const onSubmit = jest.fn();
     render(<AddAccountModal {...defaultProps} onSubmit={onSubmit} />);
 
+    fireEvent.press(screen.getByRole("button", { name: "próximo" }));
+
     await act(async () => {
-      fireEvent.press(screen.getByRole("button", { name: "adicionar conta" }));
+      fireEvent.press(
+        screen.getByRole("button", { name: "adicionar conta" }),
+      );
     });
 
     expect(onSubmit).toHaveBeenCalledWith({
-      descricao: "",
+      descricao: "Conta de luz",
       valor: 100,
       vencimento: fixedDate.toISOString(),
       metodoPagamento: MetodoPagamento.PIX,
@@ -214,45 +293,26 @@ describe("AddAccountModal", () => {
     });
     render(<AddAccountModal {...defaultProps} onSubmit={onSubmit} />);
 
+    fireEvent.press(screen.getByRole("button", { name: "próximo" }));
+
     await act(async () => {
-      fireEvent.press(screen.getByRole("button", { name: "adicionar conta" }));
+      fireEvent.press(
+        screen.getByRole("button", { name: "adicionar conta" }),
+      );
     });
 
     expect(onSubmit).toHaveBeenCalledWith(
-      expect.objectContaining({ valor: 0 })
+      expect.objectContaining({ valor: 0 }),
     );
   });
 
-  it("aplica translateY -135 quando isValorInputFocused é true", () => {
-    const { UNSAFE_getAllByType } = render(
-      <AddAccountModal {...defaultProps} />
-    );
+  it("exibe o total preenchido e restante no footer da aba residents", () => {
+    render(<AddAccountModal {...defaultProps} />);
 
-    act(() => {
-      fireEvent.press(screen.getByRole("button", { name: "focar valor" }));
-    });
+    fireEvent.press(screen.getByRole("button", { name: "próximo" }));
 
-    const views = UNSAFE_getAllByType(View);
-    const styledView = views.find(
-      (v) => v.props.style?.transform?.[0]?.translateY === -135
-    );
-    expect(styledView).toBeTruthy();
-  });
-
-  it("usa behavior 'padding' no iOS", () => {
-    Platform.OS = "ios";
-    const { UNSAFE_getByType } = render(<AddAccountModal {...defaultProps} />);
-    expect(UNSAFE_getByType(KeyboardAvoidingView).props.behavior).toBe(
-      "padding"
-    );
-    Platform.OS = "android";
-  });
-
-  it("usa behavior 'height' no Android", () => {
-    Platform.OS = "android";
-    const { UNSAFE_getByType } = render(<AddAccountModal {...defaultProps} />);
-    expect(UNSAFE_getByType(KeyboardAvoidingView).props.behavior).toBe(
-      "height"
-    );
+    expect(screen.getByText("TOTAL PREENCHIDO")).toBeTruthy();
+    expect(screen.getByText("RESTANTE")).toBeTruthy();
+    expect(screen.getAllByText("R$ 50,00").length).toBeGreaterThanOrEqual(1);
   });
 });

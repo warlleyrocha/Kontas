@@ -361,6 +361,9 @@ describe("useAccountForm — handleMoradorValorChange", () => {
   it("atualiza o valor do morador", () => {
     const { result } = renderForm();
     act(() => {
+      result.current.handleValorTotalChange("100,00");
+    });
+    act(() => {
       result.current.handleMoradorValorChange("r-1", "12,50");
     });
     const morador = result.current.formData.moradoresDivisao.find(
@@ -372,12 +375,29 @@ describe("useAccountForm — handleMoradorValorChange", () => {
   it("remove caracteres inválidos (letras, símbolos) do valor", () => {
     const { result } = renderForm();
     act(() => {
+      result.current.handleValorTotalChange("100,00");
+    });
+    act(() => {
       result.current.handleMoradorValorChange("r-1", "1a2b,5!0");
     });
     const morador = result.current.formData.moradoresDivisao.find(
       (m) => m.moradorId === "r-1"
     );
     expect(morador?.valor).toBe("12,50");
+  });
+
+  it("não permite valor acima do restante disponível", () => {
+    const { result } = renderForm();
+    act(() => {
+      result.current.handleValorTotalChange("50,00");
+    });
+    act(() => {
+      result.current.handleMoradorValorChange("r-1", "80,00");
+    });
+    const morador = result.current.formData.moradoresDivisao.find(
+      (m) => m.moradorId === "r-1"
+    );
+    expect(morador?.valor).toBe("50,00");
   });
 });
 
@@ -417,6 +437,9 @@ describe("useAccountForm — handleValorTotalChange", () => {
   it("modo custom: não recalcula o valor dos moradores", () => {
     setupResidentsMock([mockResident]);
     const { result } = renderForm();
+    act(() => {
+      result.current.handleValorTotalChange("50,00");
+    });
     act(() => {
       result.current.handleSetTipoDivisao("custom");
     });
@@ -478,6 +501,9 @@ describe("useAccountForm — applySplitByType: modo custom com moradores", () =>
   it("morador marcado com valor definido mantém o valor ao redistribuir no modo custom", () => {
     const { result } = renderForm();
     act(() => {
+      result.current.handleValorTotalChange("100,00");
+    });
+    act(() => {
       result.current.handleSetTipoDivisao("custom");
     });
     act(() => {
@@ -532,6 +558,9 @@ describe("useAccountForm — totalDivisaoPreenchido", () => {
 
   it("ignora moradores desmarcados no cálculo do total", () => {
     const { result } = renderForm();
+    act(() => {
+      result.current.handleValorTotalChange("100,00");
+    });
     // Troca para custom para poder definir valores fixos sem recalculá-los
     act(() => {
       result.current.handleSetTipoDivisao("custom");

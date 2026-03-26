@@ -209,12 +209,17 @@ describe("useAccountActions", () => {
     expect(
       mockAccountResidentsService.vincularMoradores
     ).not.toHaveBeenCalled();
+    expect(result.current.showAccountModal).toBe(false);
+    expect(result.current.isSubmitting).toBe(false);
+    expect(onRefresh).toHaveBeenCalledTimes(1);
+
+    // Toast é chamado via setTimeout(300ms)
+    act(() => {
+      jest.advanceTimersByTime(300);
+    });
     expect(mockShowToast.success).toHaveBeenCalledWith(
       "Conta criada com sucesso."
     );
-    expect(onRefresh).toHaveBeenCalledTimes(1);
-    expect(result.current.showAccountModal).toBe(false);
-    expect(result.current.isSubmitting).toBe(false);
   });
 
   it("submete uma conta e vincula moradores quando houver ids", async () => {

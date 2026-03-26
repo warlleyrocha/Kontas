@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react-native";
-import { AddAccountButton } from "../AddAccountButton";
+import { PlusButton as AddAccountButton } from "../../../../../shared/components/PlusButton";
 
 jest.mock("@expo/vector-icons/Feather", () => ({
   __esModule: true,

@@ -7,18 +7,33 @@ jest.mock("@expo/vector-icons/Feather", () => ({
 }));
 
 const mockMoradores = [
-  { moradorId: "1", nome: "Ana", checked: true, valor: "50,00" },
-  { moradorId: "2", nome: "Bruno", checked: false, valor: "" },
+  {
+    moradorId: "1",
+    nome: "Ana",
+    fotoPerfil: null,
+    role: "Morador",
+    checked: true,
+    valor: "50,00",
+  },
+  {
+    moradorId: "2",
+    nome: "Bruno",
+    fotoPerfil: null,
+    role: "Morador",
+    checked: false,
+    valor: "",
+  },
 ];
 
 const createProps = (overrides = {}) => ({
   tipoDivisao: "equal" as const,
   moradoresDivisao: mockMoradores,
   totalDivisaoPreenchido: 50,
+  valorTotalNumerico: 100,
+  restante: 50,
   onSetTipoDivisao: jest.fn(),
   onToggleMorador: jest.fn(),
   onMoradorValorChange: jest.fn(),
-  onValorInputFocusChange: jest.fn(),
   ...overrides,
 });
 
@@ -31,13 +46,6 @@ describe("AddAccountModalResidentsSection", () => {
     render(<AddAccountModalResidentsSection {...createProps()} />);
     expect(screen.getByText("Tipo de Divisão")).toBeTruthy();
     expect(screen.getByText("Selecione os Moradores")).toBeTruthy();
-    expect(screen.getByText("Total preenchido")).toBeTruthy();
-  });
-
-  it("exibe as opções de divisão", () => {
-    render(<AddAccountModalResidentsSection {...createProps()} />);
-    expect(screen.getByText("Dividir igualmente")).toBeTruthy();
-    expect(screen.getByText("Valores customizados")).toBeTruthy();
   });
 
   it("exibe os nomes dos moradores", () => {
@@ -46,32 +54,23 @@ describe("AddAccountModalResidentsSection", () => {
     expect(screen.getByText("Bruno")).toBeTruthy();
   });
 
-  it("exibe o total preenchido formatado", () => {
-    render(<AddAccountModalResidentsSection {...createProps()} />);
-    expect(screen.getByText("R$ 50,00")).toBeTruthy();
-  });
-
-  it("chama onSetTipoDivisao('equal') ao pressionar Dividir igualmente", () => {
+  it("chama onSetTipoDivisao('equal') ao pressionar DIVIDIR IGUALMENTE", () => {
     const props = createProps();
     render(<AddAccountModalResidentsSection {...props} />);
 
     fireEvent.press(
-      screen.getByRole("button", {
-        name: "Opção selecionada Dividir igualmente",
-      })
+      screen.getByLabelText(/Opção selecionada DIVIDIR/),
     );
 
     expect(props.onSetTipoDivisao).toHaveBeenCalledWith("equal");
   });
 
-  it("chama onSetTipoDivisao('custom') ao pressionar Valores customizados", () => {
+  it("chama onSetTipoDivisao('custom') ao pressionar VALORES CUSTOMIZADOS", () => {
     const props = createProps();
     render(<AddAccountModalResidentsSection {...props} />);
 
     fireEvent.press(
-      screen.getByRole("button", {
-        name: "Selecionar opção Valores customizados",
-      })
+      screen.getByLabelText(/Selecionar opção VALORES/),
     );
 
     expect(props.onSetTipoDivisao).toHaveBeenCalledWith("custom");
@@ -81,18 +80,14 @@ describe("AddAccountModalResidentsSection", () => {
     render(
       <AddAccountModalResidentsSection
         {...createProps({ tipoDivisao: "custom" })}
-      />
+      />,
     );
 
     expect(
-      screen.getByRole("button", {
-        name: "Opção selecionada Valores customizados",
-      })
+      screen.getByLabelText(/Opção selecionada VALORES/),
     ).toBeTruthy();
     expect(
-      screen.getByRole("button", {
-        name: "Selecionar opção Dividir igualmente",
-      })
+      screen.getByLabelText(/Selecionar opção DIVIDIR/),
     ).toBeTruthy();
   });
 
@@ -101,7 +96,7 @@ describe("AddAccountModalResidentsSection", () => {
     render(<AddAccountModalResidentsSection {...props} />);
 
     fireEvent.press(
-      screen.getByRole("button", { name: "Desmarcar morador Ana" })
+      screen.getByRole("button", { name: "Desmarcar morador Ana" }),
     );
 
     expect(props.onToggleMorador).toHaveBeenCalledWith("1");
@@ -111,52 +106,82 @@ describe("AddAccountModalResidentsSection", () => {
     render(<AddAccountModalResidentsSection {...createProps()} />);
 
     expect(
-      screen.getByRole("button", { name: "Selecionar morador Bruno" })
+      screen.getByRole("button", { name: "Selecionar morador Bruno" }),
     ).toBeTruthy();
   });
 
-  it("chama onValorInputFocusChange(true) ao focar no TextInput", () => {
-    const props = createProps();
-    render(<AddAccountModalResidentsSection {...props} />);
+  it("exibe valor como texto quando tipoDivisao é equal", () => {
+    render(<AddAccountModalResidentsSection {...createProps()} />);
 
-    screen.getAllByDisplayValue("50,00")[0].props.onFocus();
-
-    expect(props.onValorInputFocusChange).toHaveBeenCalledWith(true);
+    expect(screen.getByText(/50,00/)).toBeTruthy();
+    expect(screen.queryByPlaceholderText("0,00")).toBeNull();
   });
 
-  it("chama onValorInputFocusChange(false) ao desfocar o TextInput", () => {
-    const props = createProps();
-    render(<AddAccountModalResidentsSection {...props} />);
+  it("exibe TextInput editável quando tipoDivisao é custom e morador checked", () => {
+    render(
+      <AddAccountModalResidentsSection
+        {...createProps({ tipoDivisao: "custom" })}
+      />,
+    );
 
-    screen.getAllByDisplayValue("50,00")[0].props.onBlur();
-
-    expect(props.onValorInputFocusChange).toHaveBeenCalledWith(false);
+    const input = screen.getByDisplayValue("50,00");
+    expect(input).toBeTruthy();
   });
 
-  it("chama onMoradorValorChange ao digitar no TextInput", () => {
+  it("chama onMoradorValorChange ao digitar no TextInput no modo custom", () => {
     const props = createProps({ tipoDivisao: "custom" });
     render(<AddAccountModalResidentsSection {...props} />);
 
-    fireEvent.changeText(screen.getAllByDisplayValue("50,00")[0], "75,00");
+    fireEvent.changeText(screen.getByDisplayValue("50,00"), "7500");
 
     expect(props.onMoradorValorChange).toHaveBeenCalledWith("1", "75,00");
   });
 
-  it("TextInput é editável quando checked e tipoDivisao é custom", () => {
+  it("não exibe TextInput para morador desmarcado no modo custom", () => {
     render(
       <AddAccountModalResidentsSection
         {...createProps({ tipoDivisao: "custom" })}
-      />
+      />,
     );
 
-    const input = screen.getAllByDisplayValue("50,00")[0];
-    expect(input.props.editable).toBe(true);
+    // Ana (checked) tem TextInput com valor, Bruno (unchecked) exibe texto estático
+    // Apenas 1 TextInput (da Ana) deve existir
+    expect(screen.queryAllByDisplayValue("50,00")).toHaveLength(1);
   });
 
-  it("TextInput não é editável quando tipoDivisao é equal", () => {
+  it("exibe barra de progresso no modo custom", () => {
+    render(
+      <AddAccountModalResidentsSection
+        {...createProps({ tipoDivisao: "custom" })}
+      />,
+    );
+
+    expect(
+      screen.getByText(/R\$ 50,00 de R\$ 100,00/),
+    ).toBeTruthy();
+    expect(
+      screen.getByText(/Faltam R\$ 50,00/),
+    ).toBeTruthy();
+  });
+
+  it("exibe 'Completo' quando totalDivisaoPreenchido >= valorTotal", () => {
+    render(
+      <AddAccountModalResidentsSection
+        {...createProps({
+          tipoDivisao: "custom",
+          totalDivisaoPreenchido: 100,
+          restante: 0,
+        })}
+      />,
+    );
+
+    expect(screen.getByText("Completo")).toBeTruthy();
+  });
+
+  it("não exibe barra de progresso no modo equal", () => {
     render(<AddAccountModalResidentsSection {...createProps()} />);
 
-    const input = screen.getAllByDisplayValue("50,00")[0];
-    expect(input.props.editable).toBe(false);
+    expect(screen.queryByText(/Faltam/)).toBeNull();
+    expect(screen.queryByText("Completo")).toBeNull();
   });
 });

@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react-native";
 
 import {
   AccountSection,
-  AddAccountButton,
+  PlusButton,
   AddAccountModal,
 } from "@/src/features/accounts/components";
 import { AccountContextMenu } from "@/src/features/accounts/components/AccountContextMenu";
@@ -16,10 +16,13 @@ import { showToast } from "@/src/shared/utils/showToast";
 
 import { AccountsTab } from "../AccountsTab";
 
-jest.mock("@expo/vector-icons/Feather", () => "Feather");
+jest.mock("@expo/vector-icons/Feather", () => ({
+  __esModule: true,
+  default: () => null,
+}));
 jest.mock("@/src/features/accounts/components", () => ({
   AccountSection: jest.fn(() => null),
-  AddAccountButton: jest.fn(() => null),
+  PlusButton: jest.fn(() => null),
   AddAccountModal: jest.fn(() => null),
 }));
 jest.mock("@/src/features/accounts/components/AccountContextMenu", () => ({
@@ -437,21 +440,21 @@ describe("AccountsTab — AccountSection", () => {
   });
 });
 
-// ─── AddAccountButton ─────────────────────────────────────────────────────────
+// ─── PlusButton ─────────────────────────────────────────────────────────
 
-describe("AccountsTab — AddAccountButton", () => {
-  it("renderiza AddAccountButton na view principal", () => {
+describe("AccountsTab — PlusButton", () => {
+  it("renderiza PlusButton na view principal", () => {
     render(
       <AccountsTab republicId="rep-1" currentResidentId="r-1" residents={[]} />
     );
-    expect(jest.mocked(AddAccountButton)).toHaveBeenCalled();
+    expect(jest.mocked(PlusButton)).toHaveBeenCalled();
   });
 
-  it("onPress do AddAccountButton chama openAccountModal", () => {
+  it("onPress do PlusButton chama openAccountModal", () => {
     render(
       <AccountsTab republicId="rep-1" currentResidentId="r-1" residents={[]} />
     );
-    const { onPress } = jest.mocked(AddAccountButton).mock.calls[0][0] as any;
+    const { onPress } = jest.mocked(PlusButton).mock.calls[0][0] as any;
     act(() => {
       onPress();
     });
