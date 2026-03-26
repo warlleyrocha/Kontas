@@ -1,4 +1,4 @@
-export { AddAccountButton } from "./create/AddAccountButton";
+export { PlusButton } from "../../../shared/components/PlusButton";
 export { default as AddAccountModal } from "./create/AddAccountModal";
 export { AddAccountModalActions } from "./create/AddAccountModalActions";
 export { AddAccountModalFormSection } from "./create/AddAccountModalFormSection";
