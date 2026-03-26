@@ -41,7 +41,7 @@ export function useAccountForm({
 }: UseAccountFormParams) {
   const { residents, fetchResidents } = useResidents();
   const [formData, setFormData] = useState<AccountFormData>(
-    createInitialFormData
+    createInitialFormData,
   );
   const [tempVencimento, setTempVencimento] = useState(formData.vencimento);
   const [showDatepicker, setShowDatepicker] = useState(false);
@@ -60,6 +60,8 @@ export function useAccountForm({
   useEffect(() => {
     const moradores = residents.map((resident) => ({
       moradorId: resident.id,
+      fotoPerfil: resident.fotoPerfil,
+      role: resident.role,
       nome: resident.nome,
       checked: true,
       valor: "",
@@ -70,7 +72,7 @@ export function useAccountForm({
       moradoresDivisao: applySplitByType(
         moradores,
         prev.tipoDivisao,
-        prev.valorTotal
+        prev.valorTotal,
       ),
     }));
   }, [residents]);
@@ -108,7 +110,7 @@ export function useAccountForm({
       moradoresDivisao: applySplitByType(
         prev.moradoresDivisao,
         type,
-        prev.valorTotal
+        prev.valorTotal,
       ),
     }));
   };
@@ -118,7 +120,7 @@ export function useAccountForm({
       const updated = prev.moradoresDivisao.map((morador) =>
         morador.moradorId === moradorId
           ? { ...morador, checked: !morador.checked }
-          : morador
+          : morador,
       );
 
       return {
@@ -126,7 +128,7 @@ export function useAccountForm({
         moradoresDivisao: applySplitByType(
           updated,
           prev.tipoDivisao,
-          prev.valorTotal
+          prev.valorTotal,
         ),
       };
     });
@@ -134,14 +136,28 @@ export function useAccountForm({
 
   const handleMoradorValorChange = (moradorId: string, value: string) => {
     const sanitized = value.replace(/[^\d.,]/g, "");
-    setFormData((prev) => ({
-      ...prev,
-      moradoresDivisao: prev.moradoresDivisao.map((morador) =>
-        morador.moradorId === moradorId
-          ? { ...morador, valor: sanitized }
-          : morador
-      ),
-    }));
+    setFormData((prev) => {
+      const valorTotal = parseCurrencyValue(prev.valorTotal);
+      const somaOutros = prev.moradoresDivisao.reduce((acc, m) => {
+        if (!m.checked || m.moradorId === moradorId) return acc;
+        return acc + parseCurrencyValue(m.valor);
+      }, 0);
+      const maxPermitido = Math.max(valorTotal - somaOutros, 0);
+      const valorDigitado = parseCurrencyValue(sanitized);
+      const valorFinal =
+        valorDigitado > maxPermitido
+          ? maxPermitido.toFixed(2).replace(".", ",")
+          : sanitized;
+
+      return {
+        ...prev,
+        moradoresDivisao: prev.moradoresDivisao.map((morador) =>
+          morador.moradorId === moradorId
+            ? { ...morador, valor: valorFinal }
+            : morador,
+        ),
+      };
+    });
   };
 
   const handleValorTotalChange = (value: string) => {
@@ -161,7 +177,7 @@ export function useAccountForm({
         if (!morador.checked) return acc;
         return acc + parseCurrencyValue(morador.valor);
       }, 0),
-    [formData.moradoresDivisao]
+    [formData.moradoresDivisao],
   );
 
   return {
