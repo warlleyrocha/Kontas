@@ -15,7 +15,8 @@ interface AddAccountModalResidentsSectionProps {
   readonly tipoDivisao: TipoDivisao;
   readonly moradoresDivisao: MoradorDivisao[];
   readonly totalDivisaoPreenchido: number;
-  readonly valorTotal: string;
+  readonly valorTotalNumerico: number;
+  readonly restante: number;
   readonly onSetTipoDivisao: (type: TipoDivisao) => void;
   readonly onToggleMorador: (moradorId: string) => void;
   readonly onMoradorValorChange: (moradorId: string, value: string) => void;
@@ -25,13 +26,12 @@ export function AddAccountModalResidentsSection({
   tipoDivisao,
   moradoresDivisao,
   totalDivisaoPreenchido,
-  valorTotal,
+  valorTotalNumerico,
+  restante,
   onSetTipoDivisao,
   onToggleMorador,
   onMoradorValorChange,
 }: AddAccountModalResidentsSectionProps) {
-  const valorTotalNumerico = parseFloat(valorTotal.replace(",", ".")) || 0;
-  const restante = valorTotalNumerico - totalDivisaoPreenchido;
   const progressPercent =
     valorTotalNumerico > 0
       ? Math.min((totalDivisaoPreenchido / valorTotalNumerico) * 100, 100)
