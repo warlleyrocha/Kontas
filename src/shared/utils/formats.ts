@@ -27,5 +27,7 @@ export const formatDate = (dateStr: string) => {
 };
 
 export function formatBRL(value: number): string {
-  return value.toFixed(2).replace(".", ",");
+  const [intPart, decPart] = value.toFixed(2).split(".");
+  const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return `${formattedInt},${decPart}`;
 }

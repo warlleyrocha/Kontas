@@ -1,6 +1,13 @@
 import Feather from "@expo/vector-icons/Feather";
 import React, { useState } from "react";
-import { Modal, ScrollView, Text, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import { useAccountForm } from "../../hooks/useAccountForm";
 import {
   type CriarContaComMoradoresRequest,
@@ -9,6 +16,7 @@ import {
 } from "../../types/account.types";
 import { NextButton } from "@/src/shared/components/NextButton";
 import { formatBRL } from "@/src/shared/utils/formats";
+import { parseCurrencyValue } from "../../utils/accountForm.utils";
 import { AddAccountModalActions } from "./AddAccountModalActions";
 import { AddAccountModalFormSection } from "./AddAccountModalFormSection";
 import { AddAccountModalHeader } from "./AddAccountModalHeader";
@@ -69,7 +77,7 @@ export default function AddAccountModal({
     moradoresDivisao,
   } = formData;
 
-  const valorTotalNumerico = parseFloat(valorTotal.replace(",", ".")) || 0;
+  const valorTotalNumerico = parseCurrencyValue(valorTotal);
   const restante = valorTotalNumerico - totalDivisaoPreenchido;
 
   const handleDescricaoChange = (value: string) => {
@@ -129,10 +137,15 @@ export default function AddAccountModal({
         </View>
 
         {/* Body — scrollável, bg cinza */}
-        <View className="w-full flex-1 bg-[#EFF1F0] px-6 pt-6">
+        <KeyboardAvoidingView
+          className="w-full flex-1 bg-[#EFF1F0]"
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
           <ScrollView
+            className="px-6 pt-6"
             contentContainerStyle={{ paddingBottom: 16 }}
             showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
           >
             {activeTab === "form" && (
               <AddAccountModalFormSection
@@ -164,7 +177,7 @@ export default function AddAccountModal({
               />
             )}
           </ScrollView>
-        </View>
+        </KeyboardAvoidingView>
 
         {/* Footer — fixo, bg white, conteúdo condicional */}
         <View className="w-full bg-white px-6 pt-4 pb-6">
