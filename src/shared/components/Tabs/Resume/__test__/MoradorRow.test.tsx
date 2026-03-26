@@ -24,7 +24,7 @@ describe("MoradorRow", () => {
 
   it("exibe o valor formatado", () => {
     render(<MoradorRow morador={mockMorador} valor={75.5} />);
-    expect(screen.getByText("R$ 75.50")).toBeTruthy();
+    expect(screen.getByText("R$ 75,50")).toBeTruthy();
   });
 
   it("exibe 'Pendente' quando valor > 0", () => {

@@ -1,5 +1,5 @@
 import { act, render, screen } from "@testing-library/react-native";
-import { AddAccountButton } from "@/src/features/accounts/components";
+import { PlusButton } from "@/src/shared/components/PlusButton";
 import { InviteModal } from "@/src/features/invites/components/InviteModal";
 import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
 import { ResidentCard } from "@/src/features/residents/components/ResidentCard";
@@ -30,8 +30,8 @@ jest.mock("@/src/shared/contexts/RefreshContext", () => ({
 jest.mock("@/src/shared/hooks/useComponentLogger", () => ({
   useComponentLogger: jest.fn(),
 }));
-jest.mock("@/src/features/accounts/components", () => ({
-  AddAccountButton: jest.fn(() => null),
+jest.mock("@/src/shared/components/PlusButton", () => ({
+  PlusButton: jest.fn(() => null),
 }));
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
@@ -108,19 +108,19 @@ describe("ResidentsTab — lista de moradores", () => {
 });
 
 describe("ResidentsTab — controle de admin", () => {
-  it("renderiza AddAccountButton quando isAdmin=true", () => {
+  it("renderiza PlusButton quando isAdmin=true", () => {
     render(<ResidentsTab residents={[]} republicId="rep-1" isAdmin={true} />);
-    expect(jest.mocked(AddAccountButton)).toHaveBeenCalled();
+    expect(jest.mocked(PlusButton)).toHaveBeenCalled();
   });
 
-  it("não renderiza AddAccountButton quando isAdmin=false", () => {
+  it("não renderiza PlusButton quando isAdmin=false", () => {
     render(<ResidentsTab residents={[]} republicId="rep-1" isAdmin={false} />);
-    expect(jest.mocked(AddAccountButton)).not.toHaveBeenCalled();
+    expect(jest.mocked(PlusButton)).not.toHaveBeenCalled();
   });
 
-  it("não renderiza AddAccountButton quando isAdmin não é passado", () => {
+  it("não renderiza PlusButton quando isAdmin não é passado", () => {
     render(<ResidentsTab residents={[]} republicId="rep-1" />);
-    expect(jest.mocked(AddAccountButton)).not.toHaveBeenCalled();
+    expect(jest.mocked(PlusButton)).not.toHaveBeenCalled();
   });
 });
 
@@ -131,9 +131,9 @@ describe("ResidentsTab — modal de convite", () => {
     expect(props.open).toBe(false);
   });
 
-  it("abre o modal ao pressionar AddAccountButton", () => {
+  it("abre o modal ao pressionar PlusButton", () => {
     render(<ResidentsTab residents={[]} republicId="rep-1" isAdmin={true} />);
-    const { onPress } = jest.mocked(AddAccountButton).mock.calls[0][0] as any;
+    const { onPress } = jest.mocked(PlusButton).mock.calls[0][0] as any;
     act(() => {
       onPress();
     });
@@ -143,7 +143,7 @@ describe("ResidentsTab — modal de convite", () => {
 
   it("fecha o modal ao chamar onClose do InviteModal", () => {
     render(<ResidentsTab residents={[]} republicId="rep-1" isAdmin={true} />);
-    const { onPress } = jest.mocked(AddAccountButton).mock.calls[0][0] as any;
+    const { onPress } = jest.mocked(PlusButton).mock.calls[0][0] as any;
     act(() => {
       onPress();
     });

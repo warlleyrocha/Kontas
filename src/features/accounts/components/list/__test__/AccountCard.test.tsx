@@ -77,7 +77,7 @@ describe("AccountCard", () => {
 
   it("exibe o valor formatado", () => {
     render(<AccountCard {...createProps()} />);
-    expect(screen.getByText("R$ 150.00")).toBeTruthy();
+    expect(screen.getByText("R$ 150,00")).toBeTruthy();
   });
 
   it("exibe o nome do responsável", () => {

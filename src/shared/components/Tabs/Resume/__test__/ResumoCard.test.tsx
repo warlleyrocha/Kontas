@@ -24,7 +24,7 @@ describe("ResumoCard", () => {
 
   it("exibe o valor formatado quando não está carregando", () => {
     render(<ResumoCard {...createProps()} />);
-    expect(screen.getByText("R$ 200.00")).toBeTruthy();
+    expect(screen.getByText("R$ 200,00")).toBeTruthy();
   });
 
   it("exibe a descrição", () => {
