@@ -2,6 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useRef, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import { formatBRL } from "@/src/shared/utils/formats";
 import { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
 import { useCopyFeedback } from "@/src/shared/hooks/useCopyFeedback";
 import { accountCopyFeedback } from "@/src/shared/constants/pixCopyFeedback";
@@ -150,7 +151,7 @@ export const AccountCard = ({
             </TouchableOpacity>
 
             <Text className="ml-2 font-bold text-teal">
-              R$ {conta.valor.toFixed(2)}
+              R$ {formatBRL(conta.valor)}
             </Text>
           </View>
 

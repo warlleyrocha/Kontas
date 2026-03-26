@@ -1,4 +1,5 @@
 import { Text, View } from "react-native";
+import { formatBRL } from "@/src/shared/utils/formats";
 import type { ResidentResponse } from "@/src/shared/types/resident.types";
 
 interface MoradorRowProps {
@@ -22,7 +23,7 @@ export const MoradorRow = ({ morador, valor }: MoradorRowProps) => {
 
       <View className="items-end">
         <Text className={`font-semibold ${valorColor}`}>
-          R$ {valor.toFixed(2)}
+          R$ {formatBRL(valor)}
         </Text>
         <View className={`mt-1 rounded-md border px-2 py-1 ${borderColor}`}>
           <Text className={`text-sm ${valorColor}`}>

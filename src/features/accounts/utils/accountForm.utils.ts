@@ -1,13 +1,10 @@
 import type { MoradorDivisao, TipoDivisao } from "../types/accountForm.types";
+import { formatBRL } from "@/src/shared/utils/formats";
 
 export function parseCurrencyValue(value: string): number {
   const normalized = value.replace(/\./g, "").replace(",", ".").trim();
   const parsed = Number(normalized);
   return Number.isFinite(parsed) ? parsed : 0;
-}
-
-function formatCurrencyValue(value: number): string {
-  return value.toFixed(2).replace(".", ",");
 }
 
 export function splitEvenly(total: number, parts: number): number[] {
@@ -38,7 +35,7 @@ export function applyEqualSplitValues(
 
     return {
       ...morador,
-      valor: formatCurrencyValue(nextValue),
+      valor: formatBRL(nextValue),
     };
   });
 }

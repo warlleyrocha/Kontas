@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Platform } from "react-native";
 import { useResidents } from "@/src/features/residents/hooks/useResidents";
 import { MetodoPagamento } from "../types/account.types";
+import { formatBRL } from "@/src/shared/utils/formats";
 import type { MoradorDivisao, TipoDivisao } from "../types/accountForm.types";
 import {
   applySplitByType,
@@ -146,7 +147,7 @@ export function useAccountForm({
       const valorDigitado = parseCurrencyValue(sanitized);
       const valorFinal =
         valorDigitado > maxPermitido
-          ? maxPermitido.toFixed(2).replace(".", ",")
+          ? formatBRL(maxPermitido)
           : sanitized;
 
       return {

@@ -8,6 +8,7 @@ import {
   getMoradorStatusBadge,
   getMoradorStatusVisual,
 } from "@/src/features/accounts/utils/accountStatus.utils";
+import { formatBRL } from "@/src/shared/utils/formats";
 
 interface PendingPaymentResidentCardProps {
   readonly accountId: string;
@@ -20,7 +21,7 @@ interface PendingPaymentResidentCardProps {
 }
 
 function formatCurrency(value: number) {
-  return `R$ ${value.toFixed(2).replace(".", ",")}`;
+  return `R$ ${formatBRL(value)}`;
 }
 
 function getInitials(name: string) {

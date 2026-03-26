@@ -6,7 +6,7 @@ import type {
   PaymentAccount,
   PaymentStatusFilter,
 } from "@/src/features/accounts/types/payments.types";
-import { formatDate } from "@/src/shared/utils/formats";
+import { formatBRL, formatDate } from "@/src/shared/utils/formats";
 
 import { PendingPaymentResidentCard } from "./PendingPaymentResidentCard";
 
@@ -21,7 +21,7 @@ interface PendingPaymentCardProps {
 }
 
 function formatCurrency(value: number) {
-  return `R$ ${value.toFixed(2).replace(".", ",")}`;
+  return `R$ ${formatBRL(value)}`;
 }
 
 function getResidentsLabel(total: number) {
