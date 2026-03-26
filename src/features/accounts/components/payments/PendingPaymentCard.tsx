@@ -6,7 +6,7 @@ import type {
   PaymentAccount,
   PaymentStatusFilter,
 } from "@/src/features/accounts/types/payments.types";
-import { formatBRL, formatDate } from "@/src/shared/utils/formats";
+import { formatCurrency, formatDate } from "@/src/shared/utils/formats";
 
 import { PendingPaymentResidentCard } from "./PendingPaymentResidentCard";
 
@@ -18,10 +18,6 @@ interface PendingPaymentCardProps {
     residentId: string
   ) => Promise<void> | void;
   readonly selectedStatus: PaymentStatusFilter;
-}
-
-function formatCurrency(value: number) {
-  return `R$ ${formatBRL(value)}`;
 }
 
 function getResidentsLabel(total: number) {

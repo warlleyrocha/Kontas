@@ -12,6 +12,7 @@ import {
   getContaStatusVisual,
   parseContaVencimento,
 } from "../../utils/accountStatus.utils";
+import { normalizeMetodoPagamento } from "../../utils/paymentMethod.utils";
 import { type CardPosition } from "../AccountContextMenu";
 import { AccountStatusIcon } from "../shared/AccountStatusIcon";
 import { AccountResidentsContent } from "./AccountResidentsContent";
@@ -36,28 +37,6 @@ interface AccountCardProps {
   ) => Promise<void> | void;
   onCopyPix?: (conta: Conta) => boolean | Promise<boolean>;
 }
-
-const normalizeMetodoPagamento = (
-  metodoPagamento: string | null
-): MetodoPagamento => {
-  if (!metodoPagamento) return MetodoPagamento.PIX; // fallback
-
-  const normalized = metodoPagamento
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim()
-    .toUpperCase();
-
-  if (normalized === MetodoPagamento.CARTAO) {
-    return MetodoPagamento.CARTAO;
-  }
-
-  if (normalized === MetodoPagamento.DINHEIRO) {
-    return MetodoPagamento.DINHEIRO;
-  }
-
-  return MetodoPagamento.PIX;
-};
 
 export const AccountCard = ({
   conta,

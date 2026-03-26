@@ -31,3 +31,7 @@ export function formatBRL(value: number): string {
   const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   return `${formattedInt},${decPart}`;
 }
+
+export function formatCurrency(value: number): string {
+  return `R$ ${formatBRL(value)}`;
+}
