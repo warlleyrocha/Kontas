@@ -84,8 +84,10 @@ export function useAccountActions({
           });
         }
 
-        showToast.success("Conta criada com sucesso.");
         setShowAccountModal(false);
+        setTimeout(() => {
+          showToast.success("Conta criada com sucesso.");
+        }, 300);
         await onRefresh?.();
       } catch (error) {
         showToast.error(

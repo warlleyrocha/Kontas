@@ -85,8 +85,8 @@ function getHandlers(api: AxiosInstance) {
 function importApiModule(apiUrl = "https://api.example.com") {
   jest.resetModules();
 
-  const asyncStorage = {
-    getItem: jest.fn(),
+  const secureStore = {
+    getItemAsync: jest.fn(),
   };
 
   const logger: MockedLogger = {
@@ -96,9 +96,9 @@ function importApiModule(apiUrl = "https://api.example.com") {
     table: jest.fn(),
   };
 
-  jest.doMock("@react-native-async-storage/async-storage", () => ({
+  jest.doMock("expo-secure-store", () => ({
     __esModule: true,
-    default: asyncStorage,
+    ...secureStore,
   }));
 
   jest.doMock("@/src/shared/utils/logger", () => ({
@@ -122,7 +122,7 @@ function importApiModule(apiUrl = "https://api.example.com") {
 
   return {
     api,
-    asyncStorage,
+    secureStore,
     logger,
     ...getHandlers(api),
   };
@@ -158,8 +158,8 @@ describe("api service", () => {
   });
 
   it("anexa o token no request e loga o payload enviado", async () => {
-    const { asyncStorage, logger, request } = importApiModule();
-    asyncStorage.getItem.mockResolvedValue("token-123");
+    const { secureStore, logger, request } = importApiModule();
+    secureStore.getItemAsync.mockResolvedValue("token-123");
 
     const config = createConfig({
       method: "post",
@@ -169,7 +169,7 @@ describe("api service", () => {
 
     const result = await request.fulfilled(config);
 
-    expect(asyncStorage.getItem).toHaveBeenCalledWith("@app:token");
+    expect(secureStore.getItemAsync).toHaveBeenCalledWith("token");
     expect(result.headers.Authorization).toBe("Bearer token-123");
     expect((result as RequestConfig)._cbHalfOpen).toBe(false);
     expect(logger.debug).toHaveBeenCalledWith("API", "➡️ POST /payments", {
@@ -178,8 +178,8 @@ describe("api service", () => {
   });
 
   it("loga params quando não há data e não injeta Authorization sem token", async () => {
-    const { asyncStorage, logger, request } = importApiModule();
-    asyncStorage.getItem.mockResolvedValue(null);
+    const { secureStore, logger, request } = importApiModule();
+    secureStore.getItemAsync.mockResolvedValue(null);
 
     const config = createConfig({
       method: "get",
@@ -258,8 +258,8 @@ describe("api service", () => {
     const nowSpy = jest.spyOn(Date, "now");
     nowSpy.mockReturnValue(1000);
 
-    const { asyncStorage, logger, request, response } = importApiModule();
-    asyncStorage.getItem.mockResolvedValue(null);
+    const { secureStore, logger, request, response } = importApiModule();
+    secureStore.getItemAsync.mockResolvedValue(null);
 
     const failure = createAxiosError({
       status: 500,
@@ -407,8 +407,8 @@ describe("api service", () => {
   });
 
   it("não define Authorization quando config.headers é nulo com token presente (L136)", async () => {
-    const { asyncStorage, request } = importApiModule();
-    asyncStorage.getItem.mockResolvedValue("token-abc");
+    const { secureStore, request } = importApiModule();
+    secureStore.getItemAsync.mockResolvedValue("token-abc");
 
     const config = createConfig({ headers: null as any });
     const result = await request.fulfilled(config);
@@ -435,8 +435,8 @@ describe("api service", () => {
     const nowSpy = jest.spyOn(Date, "now");
     nowSpy.mockReturnValue(1000);
 
-    const { asyncStorage, request, response } = importApiModule();
-    asyncStorage.getItem.mockResolvedValue(null);
+    const { secureStore, request, response } = importApiModule();
+    secureStore.getItemAsync.mockResolvedValue(null);
 
     const failure = createAxiosError({
       status: 500,
@@ -482,8 +482,8 @@ describe("api service", () => {
   });
 
   it("erro cancelado em request normal não modifica o circuito (L191–196)", async () => {
-    const { asyncStorage, request, response } = importApiModule();
-    asyncStorage.getItem.mockResolvedValue(null);
+    const { secureStore, request, response } = importApiModule();
+    secureStore.getItemAsync.mockResolvedValue(null);
 
     const normalConfig = await request.fulfilled(
       createConfig({ url: "/cancel-test" })

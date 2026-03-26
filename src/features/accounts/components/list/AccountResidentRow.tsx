@@ -9,6 +9,7 @@ import {
   getMoradorStatusIcon,
   getMoradorStatusVisual,
 } from "../../utils/accountStatus.utils";
+import { formatBRL } from "@/src/shared/utils/formats";
 import { AccountStatusIcon } from "../shared/AccountStatusIcon";
 
 interface AccountResidentRowProps {
@@ -89,7 +90,7 @@ export function AccountResidentRow({
           </Text>
           {morador.valor > 0 && (
             <Text className="mt-1 text-xs text-gray-500">
-              R$ {morador.valor.toFixed(2).replace(".", ",")}
+              R$ {formatBRL(morador.valor)}
             </Text>
           )}
         </View>

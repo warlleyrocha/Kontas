@@ -10,6 +10,7 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import ImageDefault from "@/assets/images/image-register.webp";
 import InputField from "@/src/shared/components/ui/input-field";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
@@ -73,12 +74,12 @@ export function RegisterRepublicScreen() {
           </View>
         </ImageBackground>
 
-        <View
+        <SafeAreaView
           className="flex-1 rounded-t-[24px] bg-[#FAFAFA] px-6 pb-8"
           style={{
             width: width,
             marginTop: -20,
-            paddingTop: 32,
+            paddingTop: -22,
           }}
         >
           {/* Seleção de Imagem */}
@@ -126,7 +127,7 @@ export function RegisterRepublicScreen() {
               Cadastrar República
             </Text>
           </TouchableOpacity>
-        </View>
+        </SafeAreaView>
       </ScrollView>
     </KeyboardAvoidingView>
   );

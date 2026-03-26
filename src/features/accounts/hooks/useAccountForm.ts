@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Platform } from "react-native";
 import { useResidents } from "@/src/features/residents/hooks/useResidents";
 import { MetodoPagamento } from "../types/account.types";
+import { formatBRL } from "@/src/shared/utils/formats";
 import type { MoradorDivisao, TipoDivisao } from "../types/accountForm.types";
 import {
   applySplitByType,
@@ -60,6 +61,8 @@ export function useAccountForm({
   useEffect(() => {
     const moradores = residents.map((resident) => ({
       moradorId: resident.id,
+      fotoPerfil: resident.fotoPerfil,
+      role: resident.role,
       nome: resident.nome,
       checked: true,
       valor: "",
@@ -134,14 +137,26 @@ export function useAccountForm({
 
   const handleMoradorValorChange = (moradorId: string, value: string) => {
     const sanitized = value.replace(/[^\d.,]/g, "");
-    setFormData((prev) => ({
-      ...prev,
-      moradoresDivisao: prev.moradoresDivisao.map((morador) =>
-        morador.moradorId === moradorId
-          ? { ...morador, valor: sanitized }
-          : morador
-      ),
-    }));
+    setFormData((prev) => {
+      const valorTotal = parseCurrencyValue(prev.valorTotal);
+      const somaOutros = prev.moradoresDivisao.reduce((acc, m) => {
+        if (!m.checked || m.moradorId === moradorId) return acc;
+        return acc + parseCurrencyValue(m.valor);
+      }, 0);
+      const maxPermitido = Math.max(valorTotal - somaOutros, 0);
+      const valorDigitado = parseCurrencyValue(sanitized);
+      const valorFinal =
+        valorDigitado > maxPermitido ? formatBRL(maxPermitido) : sanitized;
+
+      return {
+        ...prev,
+        moradoresDivisao: prev.moradoresDivisao.map((morador) =>
+          morador.moradorId === moradorId
+            ? { ...morador, valor: valorFinal }
+            : morador
+        ),
+      };
+    });
   };
 
   const handleValorTotalChange = (value: string) => {

@@ -1,138 +1,113 @@
 import Feather from "@expo/vector-icons/Feather";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Text, View } from "react-native";
+
+import DivisionOption from "@/src/shared/components/DivisionOption";
+import ResidentRow from "./AddAccountModalResidentRow";
 
 import type {
   MoradorDivisao,
   TipoDivisao,
 } from "../../types/accountForm.types";
 
+import { formatBRL } from "@/src/shared/utils/formats";
+
 interface AddAccountModalResidentsSectionProps {
   readonly tipoDivisao: TipoDivisao;
   readonly moradoresDivisao: MoradorDivisao[];
   readonly totalDivisaoPreenchido: number;
+  readonly valorTotalNumerico: number;
+  readonly restante: number;
   readonly onSetTipoDivisao: (type: TipoDivisao) => void;
   readonly onToggleMorador: (moradorId: string) => void;
   readonly onMoradorValorChange: (moradorId: string, value: string) => void;
-  readonly onValorInputFocusChange: (isFocused: boolean) => void;
-}
-
-interface DivisionOptionProps {
-  readonly selected: boolean;
-  readonly label: string;
-  readonly onPress: () => void;
-  readonly className?: string;
-}
-
-function DivisionOption({
-  selected,
-  label,
-  onPress,
-  className,
-}: DivisionOptionProps) {
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={`${selected ? "Opção selecionada" : "Selecionar opção"} ${label}`}
-      className={`flex-row items-center ${className ?? ""}`}
-    >
-      <View
-        className={`mr-3 h-4 w-4 rounded-full border border-teal ${
-          selected ? "bg-teal" : "bg-transparent"
-        }`}
-      />
-      <Text>{label}</Text>
-    </TouchableOpacity>
-  );
 }
 
 export function AddAccountModalResidentsSection({
   tipoDivisao,
   moradoresDivisao,
   totalDivisaoPreenchido,
+  valorTotalNumerico,
+  restante,
   onSetTipoDivisao,
   onToggleMorador,
   onMoradorValorChange,
-  onValorInputFocusChange,
 }: AddAccountModalResidentsSectionProps) {
+  const progressPercent =
+    valorTotalNumerico > 0
+      ? Math.min((totalDivisaoPreenchido / valorTotalNumerico) * 100, 100)
+      : 0;
   return (
     <>
-      <View className="mb-3 border-t border-gray-200 pt-3">
+      <View className="mb-3">
         <Text className="mb-2 text-sm text-gray-700">Tipo de Divisão</Text>
-        <View>
+        <View className="flex-row justify-between gap-2">
           <DivisionOption
             selected={tipoDivisao === "equal"}
-            label="Dividir igualmente"
+            label={"DIVIDIR\nIGUALMENTE"}
             onPress={() => onSetTipoDivisao("equal")}
-            className="mb-2"
+            icon={
+              <Feather
+                name="bar-chart-2"
+                size={24}
+                color={tipoDivisao === "equal" ? "#BEFCFE" : "#666"}
+              />
+            }
           />
 
           <DivisionOption
             selected={tipoDivisao === "custom"}
-            label="Valores customizados"
+            label={"VALORES\nCUSTOMIZADOS"}
             onPress={() => onSetTipoDivisao("custom")}
+            icon={
+              <Feather
+                name="edit-2"
+                size={24}
+                color={tipoDivisao === "custom" ? "#BEFCFE" : "#666"}
+              />
+            }
           />
         </View>
       </View>
+
+      {tipoDivisao === "custom" && (
+        <View className="mb-3">
+          <View className="flex-row justify-between mb-1">
+            <Text className="text-xs text-gray-500">
+              R$ {formatBRL(totalDivisaoPreenchido)} de R${" "}
+              {formatBRL(valorTotalNumerico)}
+            </Text>
+            <Text
+              className={`text-xs font-semibold ${restante <= 0 ? "text-teal" : "text-gray-400"}`}
+            >
+              {restante <= 0 ? "Completo" : `Faltam R$ ${formatBRL(restante)}`}
+            </Text>
+          </View>
+          <View className="h-2 rounded-full bg-gray-200">
+            <View
+              className="h-2 rounded-full bg-teal"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </View>
+        </View>
+      )}
 
       <View className="mb-4">
         <Text className="mb-2 text-sm text-gray-700">
           Selecione os Moradores
         </Text>
 
-        <View className="space-y-2">
+        <View className="gap-3">
           {moradoresDivisao.map((morador) => (
-            <View
+            <ResidentRow
               key={morador.moradorId}
-              className="flex-row items-center justify-between rounded-md bg-teal/5 px-3 py-2"
-            >
-              <View className="flex-row items-center">
-                <TouchableOpacity
-                  onPress={() => onToggleMorador(morador.moradorId)}
-                  accessibilityRole="button"
-                  accessibilityLabel={`${morador.checked ? "Desmarcar" : "Selecionar"} morador ${morador.nome}`}
-                  className={`mr-3 h-6 w-6 items-center justify-center rounded-sm border ${
-                    morador.checked
-                      ? "border-teal bg-teal"
-                      : "border-gray-300 bg-white"
-                  }`}
-                >
-                  <Feather
-                    name="check"
-                    size={14}
-                    color={morador.checked ? "#fff" : "transparent"}
-                  />
-                </TouchableOpacity>
-
-                <Text>{morador.nome}</Text>
-              </View>
-
-              <View style={{ width: 120 }}>
-                <TextInput
-                  value={morador.valor}
-                  editable={morador.checked && tipoDivisao === "custom"}
-                  onFocus={() => onValorInputFocusChange(true)}
-                  onBlur={() => onValorInputFocusChange(false)}
-                  onChangeText={(value) =>
-                    onMoradorValorChange(morador.moradorId, value)
-                  }
-                  keyboardType="numeric"
-                  className={`rounded px-2 py-1 text-right ${
-                    morador.checked && tipoDivisao === "custom"
-                      ? "bg-white"
-                      : "bg-white text-gray-900"
-                  }`}
-                />
-              </View>
-            </View>
+              morador={morador}
+              tipoDivisao={tipoDivisao}
+              onToggle={() => onToggleMorador(morador.moradorId)}
+              onValorChange={(value) =>
+                onMoradorValorChange(morador.moradorId, value)
+              }
+            />
           ))}
-        </View>
-
-        <View className="mr-2 mt-8 flex-row items-center justify-between">
-          <Text className="text-sm text-gray-500">Total preenchido</Text>
-          <Text className="text-sm font-semibold">
-            R$ {totalDivisaoPreenchido.toFixed(2).replace(".", ",")}
-          </Text>
         </View>
       </View>
     </>

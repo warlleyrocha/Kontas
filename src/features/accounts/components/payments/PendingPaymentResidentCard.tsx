@@ -8,6 +8,9 @@ import {
   getMoradorStatusBadge,
   getMoradorStatusVisual,
 } from "@/src/features/accounts/utils/accountStatus.utils";
+import { formatPaymentMethodLabel } from "@/src/features/accounts/utils/paymentMethod.utils";
+import { formatCurrency } from "@/src/shared/utils/formats";
+import { getInitials } from "@/src/shared/utils/getInitials";
 
 interface PendingPaymentResidentCardProps {
   readonly accountId: string;
@@ -17,41 +20,6 @@ interface PendingPaymentResidentCardProps {
     residentId: string
   ) => Promise<void> | void;
   readonly resident: ContaMorador;
-}
-
-function formatCurrency(value: number) {
-  return `R$ ${value.toFixed(2).replace(".", ",")}`;
-}
-
-function getInitials(name: string) {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("");
-}
-
-function formatPaymentMethod(method: string | null) {
-  if (!method) {
-    return "Pagamento enviado para confirmação";
-  }
-
-  const normalized = method
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim()
-    .toUpperCase();
-
-  if (normalized === "CARTAO") {
-    return "Via Cartão";
-  }
-
-  if (normalized === "DINHEIRO") {
-    return "Via Dinheiro";
-  }
-
-  return `Via ${normalized}`;
 }
 
 export function PendingPaymentResidentCard({
@@ -85,7 +53,7 @@ export function PendingPaymentResidentCard({
               </Text>
 
               <Text className="mt-1 text-xs text-gray-500">
-                {formatPaymentMethod(resident.metodoPagamento)}
+                {formatPaymentMethodLabel(resident.metodoPagamento)}
               </Text>
             </View>
           </View>

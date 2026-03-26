@@ -93,7 +93,7 @@ export default function RepublicCard({
         activeOpacity={1}
         accessibilityRole="button"
         accessibilityLabel={`Abrir república ${republic.nome}`}
-        className="mb-4 w-44 overflow-hidden rounded-3xl bg-white shadow-sm"
+        className="mb-4 h-64 w-44 overflow-hidden rounded-3xl bg-white shadow-sm"
       >
         {/* Imagem */}
         <View className="h-36 w-full items-center justify-center overflow-hidden bg-gray-100">
@@ -110,18 +110,16 @@ export default function RepublicCard({
         </View>
 
         {/* Info */}
-        <View className="p-4">
+        <View className="flex-1 justify-between p-4">
           <Text className="text-lg font-bold text-gray-800" numberOfLines={2}>
             {republic.nome}
           </Text>
 
-          <View className="mt-2 flex-row items-center justify-between">
-            <View className="flex-row items-center">
-              <Ionicons name="people-outline" size={14} color="#337176" />
-              <Text className="ml-1 text-sm font-medium text-gray-600">
-                {residentsCount} {residentsLabel}
-              </Text>
-            </View>
+          <View className="mt-2 flex-row items-center">
+            <Ionicons name="people-outline" size={14} color="#337176" />
+            <Text className="ml-1 text-sm font-medium text-gray-600">
+              {residentsCount} {residentsLabel}
+            </Text>
           </View>
         </View>
       </TouchableOpacity>

@@ -1,22 +1,27 @@
+import Feather from "@expo/vector-icons/Feather";
 import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
   Modal,
   Platform,
   ScrollView,
+  Text,
   View,
 } from "react-native";
-import { Toaster } from "@/src/shared/components/ui/sonner";
 import { useAccountForm } from "../../hooks/useAccountForm";
 import {
   type CriarContaComMoradoresRequest,
   MetodoPagamento,
   StatusConta,
 } from "../../types/account.types";
+import { NextButton } from "@/src/shared/components/NextButton";
+import { formatBRL } from "@/src/shared/utils/formats";
+import { parseCurrencyValue } from "../../utils/accountForm.utils";
 import { AddAccountModalActions } from "./AddAccountModalActions";
 import { AddAccountModalFormSection } from "./AddAccountModalFormSection";
 import { AddAccountModalHeader } from "./AddAccountModalHeader";
 import { AddAccountModalResidentsSection } from "./AddAccountModalResidentsSection";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface AddAccountModalProps {
   readonly visible: boolean;
@@ -45,6 +50,7 @@ export default function AddAccountModal({
   republicId,
   onSubmit,
 }: AddAccountModalProps) {
+  const [activeTab, setActiveTab] = useState<"form" | "residents">("form");
   const {
     formData,
     tempVencimento,
@@ -71,7 +77,8 @@ export default function AddAccountModal({
     moradoresDivisao,
   } = formData;
 
-  const [isValorInputFocused, setIsValorInputFocused] = useState(false);
+  const valorTotalNumerico = parseCurrencyValue(valorTotal);
+  const restante = valorTotalNumerico - totalDivisaoPreenchido;
 
   const handleDescricaoChange = (value: string) => {
     setFormData((prev) => ({ ...prev, descricao: value }));
@@ -88,9 +95,6 @@ export default function AddAccountModal({
     // Converte a data para formato ISO string
     const vencimentoISO = vencimento.toISOString();
 
-    // Converte o valor de string para número
-    const valorNumerico = parseFloat(valorTotal.replace(",", ".")) || 0;
-
     // Monta o payload no formato REST
     const moradorIds = moradoresDivisao
       .filter((morador) => morador.checked)
@@ -98,7 +102,7 @@ export default function AddAccountModal({
 
     const payload: CriarContaComMoradoresRequest = {
       descricao,
-      valor: valorNumerico,
+      valor: valorTotalNumerico,
       vencimento: vencimentoISO,
       metodoPagamento,
       republicaId: republicId,
@@ -111,23 +115,39 @@ export default function AddAccountModal({
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-      >
-        <View className="flex-1 items-center justify-center bg-black/40 px-4">
-          <View
-            className="max-h-[90%] w-full max-w-[480px] rounded-xl bg-white px-6 pt-6"
-            style={{
-              transform: [{ translateY: isValorInputFocused ? -135 : 0 }],
-            }}
-          >
-            <AddAccountModalHeader onClose={handleCloseModal} />
+      <SafeAreaView className="flex-1 items-center justify-end bg-black/40">
+        {/* Header — fixo, bg white */}
+        <AddAccountModalHeader onClose={handleCloseModal} />
 
-            <ScrollView
-              contentContainerStyle={{ paddingBottom: 16 }}
-              showsVerticalScrollIndicator={false}
-            >
+        {/* Card informativo */}
+        <View className="w-full bg-[#EFF1F0] px-6 py-6">
+          <View className="flex-row items-center rounded-2xl bg-teal px-5 py-5">
+            <View className="flex-1">
+              <Text className="text-lg font-inter-bold text-white">
+                Informações Básicas
+              </Text>
+              <Text className="mt-1 text-sm text-teal-200">
+                Preencha os dados da conta{"\n"}para dividir com a república.
+              </Text>
+            </View>
+            <View className="ml-3 opacity-30">
+              <Feather name="file-text" size={48} color="#fff" />
+            </View>
+          </View>
+        </View>
+
+        {/* Body — scrollável, bg cinza */}
+        <KeyboardAvoidingView
+          className="w-full flex-1 bg-[#EFF1F0]"
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
+          <ScrollView
+            className="px-6 pt-6"
+            contentContainerStyle={{ paddingBottom: 16 }}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            {activeTab === "form" && (
               <AddAccountModalFormSection
                 descricao={descricao}
                 valorTotal={valorTotal}
@@ -142,26 +162,63 @@ export default function AddAccountModal({
                 onDateChange={handleDateChange}
                 onCycleMetodoPagamento={handleCyclePaymentMethod}
               />
+            )}
 
+            {activeTab === "residents" && (
               <AddAccountModalResidentsSection
                 tipoDivisao={tipoDivisao}
                 moradoresDivisao={moradoresDivisao}
                 totalDivisaoPreenchido={totalDivisaoPreenchido}
+                valorTotalNumerico={valorTotalNumerico}
+                restante={restante}
                 onSetTipoDivisao={handleSetTipoDivisao}
                 onToggleMorador={handleToggleMorador}
                 onMoradorValorChange={handleMoradorValorChange}
-                onValorInputFocusChange={setIsValorInputFocused}
               />
+            )}
+          </ScrollView>
+        </KeyboardAvoidingView>
+
+        {/* Footer — fixo, bg white, conteúdo condicional */}
+        <View className="w-full bg-white px-6 pt-4 pb-6">
+          {activeTab === "form" && (
+            <NextButton
+              onNext={() => setActiveTab("residents")}
+              onCancel={handleCloseModal}
+              disabled={!descricao.trim() || !valorTotal.trim()}
+            />
+          )}
+
+          {activeTab === "residents" && (
+            <>
+              {/* Total preenchido / restante */}
+              <View className="flex-row justify-between items-end mb-4">
+                <View>
+                  <Text className="text-xs text-gray-500 font-inter-bold">
+                    TOTAL PREENCHIDO
+                  </Text>
+                  <Text className="text-2xl font-inter-bold text-gray-900">
+                    R$ {formatBRL(totalDivisaoPreenchido)}
+                  </Text>
+                </View>
+                <View className="items-end">
+                  <Text className="text-xs text-gray-400 font-inter-bold">
+                    RESTANTE
+                  </Text>
+                  <Text className="text-lg text-gray-400 font-inter-bold">
+                    R$ {formatBRL(restante)}
+                  </Text>
+                </View>
+              </View>
 
               <AddAccountModalActions
                 onSubmit={handleSubmit}
-                onCancel={handleCloseModal}
+                onCancel={() => setActiveTab("form")}
               />
-            </ScrollView>
-          </View>
+            </>
+          )}
         </View>
-      </KeyboardAvoidingView>
-      <Toaster position="top-center" />
+      </SafeAreaView>
     </Modal>
   );
 }

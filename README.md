@@ -57,7 +57,7 @@
 
 :heavy_check_mark: Login com Google (OAuth)
 
-:heavy_check_mark: Persistência de sessão (AsyncStorage)
+:heavy_check_mark: Persistência segura de sessão (Expo SecureStore)
 
 :heavy_check_mark: Validação automática de sessão ao iniciar o app
 
@@ -101,13 +101,15 @@
 
 :heavy_check_mark: Exibição de dados (e-mail, telefone, Pix)
 
-:heavy_check_mark: Cópia rápida da chave Pix
+:heavy_check_mark: Cópia rápida da chave Pix com feedback visual (ícone de sucesso/erro)
+
+:heavy_check_mark: Redirecionamento para contato (WhatsApp/telefone) direto do card
 
 :heavy_check_mark: Controle de permissões (ADMIN / USER)
 
 ### Contas e pagamentos
 
-:heavy_check_mark: Cadastro de contas compartilhadas
+:heavy_check_mark: Cadastro de contas compartilhadas com navegação por abas (dados da conta / seleção de moradores)
 
 :heavy_check_mark: Associação de moradores às contas
 
@@ -116,6 +118,8 @@
 :heavy_check_mark: Separação entre contas pendentes e pagas
 
 :heavy_check_mark: Menu contextual por toque longo no card da conta
+
+:heavy_check_mark: Cópia da chave Pix diretamente do card da conta com feedback visual
 
 :heavy_check_mark: Remoção de contas com restrição por perfil (`ADMIN`)
 
@@ -154,7 +158,9 @@ src/
 ├── app/                          # Rotas file-based com Expo Router
 │   ├── (auth)/                   # Login, onboarding, checkEmail
 │   ├── (republics)/[id]/         # República com abas dinâmicas
-│   └── (userProfile)/            # Perfil, convites, cadastro de república
+│   ├── (userProfile)/            # Perfil, convites, cadastro de república
+│   ├── privacy-policy.tsx        # Tela de política de privacidade
+│   └── terms-of-use.tsx          # Tela de termos de uso
 │
 ├── features/
 │   ├── auth/                     # Autenticação, contexto de sessão, Google Sign-In
@@ -162,19 +168,25 @@ src/
 │   ├── residents/                # Listagem e detalhes de moradores
 │   ├── invites/                  # Envio, recebimento e gestão de convites
 │   ├── accounts/                 # Contas compartilhadas e pagamentos
-│   └── user/                    # Perfil, edição de dados e listagem de repúblicas
+│   ├── legal/                    # Exibição de termos de uso e política de privacidade
+│   └── user/                     # Perfil, edição de dados e listagem de repúblicas
+│
+├── hooks/                        # Hooks globais (useAppReady, useAppFonts)
+├── lib/                          # Inicialização de libs externas (Sentry, Google Sign-In, Fonts)
+├── providers/                    # AppProviders — composição centralizada de providers
 │
 ├── services/
-│   ├── api.ts                    # Axios com bearer token, timeout, circuit breaker e interceptors
+│   ├── api.ts                    # Axios com bearer token via SecureStore, timeout, circuit breaker e interceptors
 │   ├── httpError.ts              # Normalização de erros HTTP
-│   └── queryClient.ts           # Configuração global do React Query
+│   └── queryClient.ts            # Configuração global do React Query
 │
 └── shared/
-    ├── components/               # ScreenLayout, SideMenu, Tabs, error boundaries, UI base
+    ├── components/               # ScreenLayout, SideMenu, ContextMenu, Tabs, error boundaries, UI base
+    ├── constants/                # Conteúdo legal, configurações de feedback de cópia Pix
     ├── contexts/                 # RefreshContext para coordenação global de recargas
-    ├── hooks/                    # Hooks compartilhados entre features
+    ├── hooks/                    # Hooks compartilhados (useCopyFeedback, useComponentLogger, etc.)
     ├── types/                    # Tipos globais (Resident, Resume, assets)
-    └── utils/                    # Formatação, máscaras, logger, toasts
+    └── utils/                    # Formatação (BRL), máscaras (moeda, telefone), logger, toasts
 ```
 
 Cada feature segue a mesma estrutura interna:
@@ -186,6 +198,8 @@ features/<domínio>/
 ├── hooks/        # Lógica de estado e efeitos colaterais
 ├── services/     # Chamadas à API
 ├── types/        # Tipagem do domínio
+├── utils/        # Utilitários do domínio (formatação, validação, helpers)
+├── constants/    # Constantes do domínio
 └── contexts/     # Contexto React quando necessário
 ```
 
@@ -304,13 +318,13 @@ npm run ios
 
 ## Build e distribuição
 
-Perfis definidos em `eas.json`:
+Perfis definidos em `eas.json`. As variáveis de ambiente (incluindo `EXPO_PUBLIC_API_URL`) são gerenciadas pelo EAS Environments — não há valores hardcoded nos perfis de build.
 
-| Perfil        | Distribuição           | API                    |
-| ------------- | ---------------------- | ---------------------- |
-| `development` | Interna (dev client)   | `http://10.0.2.2:3333` |
-| `preview`     | Interna                | Railway (produção)     |
-| `production`  | App Store / Play Store | Railway (produção)     |
+| Perfil        | Distribuição           | Ambiente EAS    |
+| ------------- | ---------------------- | --------------- |
+| `development` | Interna (dev client)   | `development`   |
+| `preview`     | Interna (APK)          | `preview`       |
+| `production`  | App Store / Play Store | `production`    |
 
 ```bash
 # Build de preview para Android
@@ -330,7 +344,7 @@ Repositório da API: `https://github.com/Ameglebm/kontas-back-end`
 
 ### Camada HTTP (`src/services/api.ts`)
 
-- **Bearer token automático** — injeta o JWT em toda requisição autenticada
+- **Bearer token automático** — injeta o JWT (armazenado via SecureStore) em toda requisição autenticada
 - **Circuit breaker** — abre após 3 falhas consecutivas, fecha após 10 segundos
 - **Timeout** — 10 segundos por requisição
 - **Logs HTTP** — integração com o logger estruturado do app
@@ -359,7 +373,7 @@ Repositório da API: `https://github.com/Ameglebm/kontas-back-end`
 - **Toasts padronizados** — via Sonner Native para feedback de sucesso e erro
 - **Logger estruturado** — centraliza logs e breadcrumbs usados pelo app
 - **React Query** — cache e sincronização de estado do servidor com stale-while-revalidate
-- **Jest + Testing Library** — suíte versionada cobrindo rotas, hooks, serviços e componentes
+- **Jest + Testing Library** — cobertura ampla cobrindo rotas, hooks, serviços, componentes, contextos, utilitários e configuração do app
 - **Biome** — formatação e lint unificados
 - **SonarQube local** — via Docker Compose para análise estática
 
@@ -378,8 +392,6 @@ npm run sonar:scan
 :memo: A UI do modal de conta já oferece "Valores customizados", mas o payload atual só envia `moradorIds` e `valorTotal`.
 
 :memo: O menu contextual da conta já existe, mas a ação de edição ainda não foi implementada no frontend.
-
-:memo: O botão de copiar Pix no card da conta ainda é placeholder no frontend.
 
 :memo: A rota `/(auth)/checkEmail` existe como tela isolada, mas não participa do fluxo principal.
 
@@ -410,6 +422,7 @@ npm run sonar:scan
 | [Axios](https://axios-http.com/)                                               | Cliente HTTP com interceptors       |
 | [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/) | Animações nativas                   |
 | [Google Sign-In](https://github.com/react-native-google-signin/google-signin)  | Autenticação OAuth                  |
+| [Expo SecureStore](https://docs.expo.dev/versions/latest/sdk/securestore/)     | Armazenamento seguro de credenciais |
 | [Sentry](https://sentry.io/)                                                   | Rastreamento de erros               |
 | [EAS](https://expo.dev/eas)                                                    | Build e distribuição                |
 

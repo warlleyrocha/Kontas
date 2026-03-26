@@ -21,7 +21,7 @@ const mockMorador: ResidentResponse = {
   role: ResidentRole.USER,
 };
 
-const onCopyPix = jest.fn();
+const onCopyPix = jest.fn(() => true);
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -35,13 +35,15 @@ afterEach(() => {
 // ─── useResidentCard ──────────────────────────────────────────────────────────
 
 describe("useResidentCard — estado inicial", () => {
-  it("inicia com expanded=false, copiado=false, imageError=false", () => {
+  it("inicia com expanded=false, feedback idle e imageError=false", () => {
     const { result } = renderHook(() =>
       useResidentCard(mockMorador, onCopyPix)
     );
 
     expect(result.current.expanded).toBe(false);
-    expect(result.current.copiado).toBe(false);
+    expect(result.current.copyFeedback.accessibilityLabel).toBe(
+      "Copiar chave PIX"
+    );
     expect(result.current.imageError).toBe(false);
   });
 
@@ -87,35 +89,57 @@ describe("useResidentCard — toggleExpanded", () => {
 });
 
 describe("useResidentCard — handleCopyPix", () => {
-  it("chama onCopyPix com o morador e define copiado=true", () => {
+  it("chama onCopyPix com o morador e define feedback de sucesso", async () => {
     const { result } = renderHook(() =>
       useResidentCard(mockMorador, onCopyPix)
     );
 
-    act(() => {
-      result.current.handleCopyPix();
+    await act(async () => {
+      await result.current.handleCopyPix();
     });
 
     expect(onCopyPix).toHaveBeenCalledWith(mockMorador);
-    expect(result.current.copiado).toBe(true);
+    expect(result.current.copyFeedback.accessibilityLabel).toBe(
+      "Chave PIX copiada"
+    );
   });
 
-  it("redefine copiado=false após 2000ms", () => {
+  it("redefine o status para idle após 2000ms", async () => {
     const { result } = renderHook(() =>
       useResidentCard(mockMorador, onCopyPix)
     );
 
-    act(() => {
-      result.current.handleCopyPix();
+    await act(async () => {
+      await result.current.handleCopyPix();
     });
 
-    expect(result.current.copiado).toBe(true);
+    expect(result.current.copyFeedback.accessibilityLabel).toBe(
+      "Chave PIX copiada"
+    );
 
     act(() => {
       jest.advanceTimersByTime(2000);
     });
 
-    expect(result.current.copiado).toBe(false);
+    expect(result.current.copyFeedback.accessibilityLabel).toBe(
+      "Copiar chave PIX"
+    );
+  });
+
+  it("define feedback de erro quando a cópia falha", async () => {
+    const onCopyPixWithFailure = jest.fn(async () => false);
+    const { result } = renderHook(() =>
+      useResidentCard(mockMorador, onCopyPixWithFailure)
+    );
+
+    await act(async () => {
+      await result.current.handleCopyPix();
+    });
+
+    expect(onCopyPixWithFailure).toHaveBeenCalledWith(mockMorador);
+    expect(result.current.copyFeedback.accessibilityLabel).toBe(
+      "Falha ao copiar chave PIX"
+    );
   });
 });
 
@@ -134,13 +158,13 @@ describe("useResidentCard — setImageError", () => {
 });
 
 describe("useResidentCard — cleanup", () => {
-  it("limpa o timeout ao desmontar sem lançar erros", () => {
+  it("limpa o timeout ao desmontar sem lançar erros", async () => {
     const { result, unmount } = renderHook(() =>
       useResidentCard(mockMorador, onCopyPix)
     );
 
-    act(() => {
-      result.current.handleCopyPix();
+    await act(async () => {
+      await result.current.handleCopyPix();
     });
 
     expect(() => unmount()).not.toThrow();

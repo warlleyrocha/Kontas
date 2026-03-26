@@ -12,6 +12,7 @@ import { RepublicContextMenu } from "@/src/features/user/components/RepublicCont
 
 import { MenuButton, SideMenu } from "@/src/shared/components/SideMenu";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
+import { getInitials } from "@/src/shared/utils/getInitials";
 import { maskPhone } from "@/src/shared/utils/inputMasks";
 import { useProfileScreen } from "../hooks/useProfileScreen";
 
@@ -140,7 +141,7 @@ export function ProfileScreen() {
             />
           ) : (
             <Text className="text-xl font-bold text-teal">
-              {user.nome?.charAt(0).toUpperCase() ?? "?"}
+              {user.nome ? getInitials(user.nome) : "?"}
             </Text>
           )}
         </View>

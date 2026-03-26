@@ -9,7 +9,7 @@ import { useTabResidents } from "@/src/features/residents/hooks/useTabResidents"
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 import type { ResidentResponse } from "@/src/shared/types/resident.types";
-import { AddAccountButton } from "../../accounts/components";
+import { PlusButton } from "@/src/shared/components/PlusButton";
 
 interface ResidentsTabProps {
   residents: ResidentResponse[];
@@ -60,7 +60,7 @@ export const ResidentsTab: FC<ResidentsTabProps> = ({
         }
       />
 
-      {isAdmin && <AddAccountButton onPress={() => setModalOpen(true)} />}
+      {isAdmin && <PlusButton onPress={() => setModalOpen(true)} />}
       <InviteModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}

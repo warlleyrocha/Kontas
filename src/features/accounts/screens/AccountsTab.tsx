@@ -1,6 +1,7 @@
 import Feather from "@expo/vector-icons/Feather";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  Modal,
   RefreshControl,
   ScrollView,
   Text,
@@ -10,7 +11,7 @@ import {
 
 import {
   AccountSection,
-  AddAccountButton,
+  PlusButton,
   AddAccountModal,
 } from "@/src/features/accounts/components";
 import {
@@ -20,13 +21,20 @@ import {
 import { useAccountsTab } from "@/src/features/accounts/hooks/useAccountsTab";
 import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import { getMoradorStatusVisual } from "@/src/features/accounts/utils/accountStatus.utils";
+import { useTabResidents } from "@/src/features/residents/hooks/useTabResidents";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
+import type { ResidentResponse } from "@/src/shared/types/resident.types";
 import { formatMounthYear } from "@/src/shared/utils/formats";
+import { showToast } from "@/src/shared/utils/showToast";
+import { ToastConfirm } from "@/src/shared/components/ui/toast-custom";
+import type { Conta } from "@/src/features/accounts/types/account.types";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface AccountsTabProps {
   readonly republicId: string;
   readonly currentResidentId: string | null;
+  readonly residents: ResidentResponse[];
   readonly isAdmin?: boolean;
   readonly onPendingPaymentsCountChange?: (count: number) => void;
 }
@@ -34,10 +42,26 @@ interface AccountsTabProps {
 export function AccountsTab({
   republicId,
   currentResidentId,
+  residents,
   isAdmin = false,
   onPendingPaymentsCountChange,
 }: AccountsTabProps) {
   useComponentLogger("AccountsTab");
+  const { copiarChavePix } = useTabResidents();
+
+  const handleCopyPixFromAccount = useCallback(
+    async (conta: Conta) => {
+      const morador = residents.find((r) => r.id === conta.criadoPorId);
+      if (!morador) {
+        showToast.error("Não foi possível localizar o responsável pela conta.");
+        return false;
+      }
+
+      return copiarChavePix(morador);
+    },
+    [residents, copiarChavePix]
+  );
+
   const {
     accountResidentsById,
     closeAccountModal,
@@ -71,6 +95,12 @@ export function AccountsTab({
     position: CardPosition | null;
   }>({ visible: false, accountId: null, position: null });
 
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    visible: boolean;
+    accountId: string | null;
+    descricao: string;
+  }>({ visible: false, accountId: null, descricao: "" });
+
   const handleAccountLongPress = useCallback(
     (accountId: string, position: CardPosition) => {
       setContextMenu({ visible: true, accountId, position });
@@ -84,10 +114,17 @@ export function AccountsTab({
 
   const handleContextMenuDelete = useCallback(() => {
     handleContextMenuClose();
-    if (contextMenu.accountId) {
-      void handleDelete(contextMenu.accountId);
-    }
-  }, [contextMenu.accountId, handleContextMenuClose, handleDelete]);
+    if (!contextMenu.accountId) return;
+    const accountId = contextMenu.accountId;
+    const conta =
+      contasOrdenadas.abertas.find((c) => c.id === accountId) ??
+      contasOrdenadas.pagas.find((c) => c.id === accountId);
+    setDeleteConfirm({
+      visible: true,
+      accountId,
+      descricao: conta?.descricao ?? "esta conta",
+    });
+  }, [contextMenu.accountId, contasOrdenadas, handleContextMenuClose]);
 
   const { refreshing, onRefresh } = useRefresh();
   const pendingPaymentsCount = useMemo(
@@ -257,6 +294,7 @@ export function AccountsTab({
               onLongPress={handleAccountLongPress}
               onConfirmResidentPayment={confirmResidentPayment}
               onPatch={handlePatchAndRefresh}
+              onCopyPix={handleCopyPixFromAccount}
             />
 
             <AccountSection
@@ -277,12 +315,13 @@ export function AccountsTab({
               onLongPress={handleAccountLongPress}
               onConfirmResidentPayment={confirmResidentPayment}
               onPatch={handlePatchAndRefresh}
+              onCopyPix={handleCopyPixFromAccount}
             />
           </View>
         )}
       </ScrollView>
 
-      <AddAccountButton onPress={openAccountModal} />
+      <PlusButton onPress={openAccountModal} />
 
       {showAccountModal && (
         <AddAccountModal
@@ -301,6 +340,29 @@ export function AccountsTab({
         onEdit={() => {}}
         onDelete={handleContextMenuDelete}
       />
+
+      <Modal
+        visible={deleteConfirm.visible}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+      >
+        <SafeAreaView className="flex-1 justify-end pb-[2px]">
+          <ToastConfirm
+            message={deleteConfirm.descricao}
+            duration={8000}
+            onConfirm={() => {
+              setDeleteConfirm((prev) => ({ ...prev, visible: false }));
+              if (deleteConfirm.accountId) {
+                void handleDelete(deleteConfirm.accountId);
+              }
+            }}
+            onCancel={() =>
+              setDeleteConfirm((prev) => ({ ...prev, visible: false }))
+            }
+          />
+        </SafeAreaView>
+      </Modal>
     </View>
   );
 }
