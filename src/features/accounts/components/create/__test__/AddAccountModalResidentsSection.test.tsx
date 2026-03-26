@@ -58,9 +58,7 @@ describe("AddAccountModalResidentsSection", () => {
     const props = createProps();
     render(<AddAccountModalResidentsSection {...props} />);
 
-    fireEvent.press(
-      screen.getByLabelText(/Opção selecionada DIVIDIR/),
-    );
+    fireEvent.press(screen.getByLabelText(/Opção selecionada DIVIDIR/));
 
     expect(props.onSetTipoDivisao).toHaveBeenCalledWith("equal");
   });
@@ -69,9 +67,7 @@ describe("AddAccountModalResidentsSection", () => {
     const props = createProps();
     render(<AddAccountModalResidentsSection {...props} />);
 
-    fireEvent.press(
-      screen.getByLabelText(/Selecionar opção VALORES/),
-    );
+    fireEvent.press(screen.getByLabelText(/Selecionar opção VALORES/));
 
     expect(props.onSetTipoDivisao).toHaveBeenCalledWith("custom");
   });
@@ -80,15 +76,11 @@ describe("AddAccountModalResidentsSection", () => {
     render(
       <AddAccountModalResidentsSection
         {...createProps({ tipoDivisao: "custom" })}
-      />,
+      />
     );
 
-    expect(
-      screen.getByLabelText(/Opção selecionada VALORES/),
-    ).toBeTruthy();
-    expect(
-      screen.getByLabelText(/Selecionar opção DIVIDIR/),
-    ).toBeTruthy();
+    expect(screen.getByLabelText(/Opção selecionada VALORES/)).toBeTruthy();
+    expect(screen.getByLabelText(/Selecionar opção DIVIDIR/)).toBeTruthy();
   });
 
   it("chama onToggleMorador ao pressionar o checkbox do morador", () => {
@@ -96,7 +88,7 @@ describe("AddAccountModalResidentsSection", () => {
     render(<AddAccountModalResidentsSection {...props} />);
 
     fireEvent.press(
-      screen.getByRole("button", { name: "Desmarcar morador Ana" }),
+      screen.getByRole("button", { name: "Desmarcar morador Ana" })
     );
 
     expect(props.onToggleMorador).toHaveBeenCalledWith("1");
@@ -106,7 +98,7 @@ describe("AddAccountModalResidentsSection", () => {
     render(<AddAccountModalResidentsSection {...createProps()} />);
 
     expect(
-      screen.getByRole("button", { name: "Selecionar morador Bruno" }),
+      screen.getByRole("button", { name: "Selecionar morador Bruno" })
     ).toBeTruthy();
   });
 
@@ -121,7 +113,7 @@ describe("AddAccountModalResidentsSection", () => {
     render(
       <AddAccountModalResidentsSection
         {...createProps({ tipoDivisao: "custom" })}
-      />,
+      />
     );
 
     const input = screen.getByDisplayValue("50,00");
@@ -141,7 +133,7 @@ describe("AddAccountModalResidentsSection", () => {
     render(
       <AddAccountModalResidentsSection
         {...createProps({ tipoDivisao: "custom" })}
-      />,
+      />
     );
 
     // Ana (checked) tem TextInput com valor, Bruno (unchecked) exibe texto estático
@@ -153,15 +145,11 @@ describe("AddAccountModalResidentsSection", () => {
     render(
       <AddAccountModalResidentsSection
         {...createProps({ tipoDivisao: "custom" })}
-      />,
+      />
     );
 
-    expect(
-      screen.getByText(/R\$ 50,00 de R\$ 100,00/),
-    ).toBeTruthy();
-    expect(
-      screen.getByText(/Faltam R\$ 50,00/),
-    ).toBeTruthy();
+    expect(screen.getByText(/R\$ 50,00 de R\$ 100,00/)).toBeTruthy();
+    expect(screen.getByText(/Faltam R\$ 50,00/)).toBeTruthy();
   });
 
   it("exibe 'Completo' quando totalDivisaoPreenchido >= valorTotal", () => {
@@ -172,7 +160,7 @@ describe("AddAccountModalResidentsSection", () => {
           totalDivisaoPreenchido: 100,
           restante: 0,
         })}
-      />,
+      />
     );
 
     expect(screen.getByText("Completo")).toBeTruthy();

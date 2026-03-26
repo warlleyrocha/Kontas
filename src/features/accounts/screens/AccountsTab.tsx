@@ -59,7 +59,7 @@ export function AccountsTab({
 
       return copiarChavePix(morador);
     },
-    [residents, copiarChavePix],
+    [residents, copiarChavePix]
   );
 
   const {
@@ -105,7 +105,7 @@ export function AccountsTab({
     (accountId: string, position: CardPosition) => {
       setContextMenu({ visible: true, accountId, position });
     },
-    [],
+    []
   );
 
   const handleContextMenuClose = useCallback(() => {
@@ -135,11 +135,11 @@ export function AccountsTab({
           residents.filter(
             (resident) =>
               getMoradorStatusVisual(resident) ===
-              StatusPagamento.AGUARDANDO_CONFIRMACAO,
+              StatusPagamento.AGUARDANDO_CONFIRMACAO
           ).length,
-        0,
+        0
       ),
-    [accountResidentsById],
+    [accountResidentsById]
   );
 
   useEffect(() => {

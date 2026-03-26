@@ -56,8 +56,8 @@ export default function LoginScreen() {
       showToast.error(
         getErrorMessage(
           error,
-          "Erro ao fazer login com Google. Tente novamente.",
-        ),
+          "Erro ao fazer login com Google. Tente novamente."
+        )
       );
     }
 

@@ -42,7 +42,7 @@ export function useAccountForm({
 }: UseAccountFormParams) {
   const { residents, fetchResidents } = useResidents();
   const [formData, setFormData] = useState<AccountFormData>(
-    createInitialFormData,
+    createInitialFormData
   );
   const [tempVencimento, setTempVencimento] = useState(formData.vencimento);
   const [showDatepicker, setShowDatepicker] = useState(false);
@@ -73,7 +73,7 @@ export function useAccountForm({
       moradoresDivisao: applySplitByType(
         moradores,
         prev.tipoDivisao,
-        prev.valorTotal,
+        prev.valorTotal
       ),
     }));
   }, [residents]);
@@ -111,7 +111,7 @@ export function useAccountForm({
       moradoresDivisao: applySplitByType(
         prev.moradoresDivisao,
         type,
-        prev.valorTotal,
+        prev.valorTotal
       ),
     }));
   };
@@ -121,7 +121,7 @@ export function useAccountForm({
       const updated = prev.moradoresDivisao.map((morador) =>
         morador.moradorId === moradorId
           ? { ...morador, checked: !morador.checked }
-          : morador,
+          : morador
       );
 
       return {
@@ -129,7 +129,7 @@ export function useAccountForm({
         moradoresDivisao: applySplitByType(
           updated,
           prev.tipoDivisao,
-          prev.valorTotal,
+          prev.valorTotal
         ),
       };
     });
@@ -146,16 +146,14 @@ export function useAccountForm({
       const maxPermitido = Math.max(valorTotal - somaOutros, 0);
       const valorDigitado = parseCurrencyValue(sanitized);
       const valorFinal =
-        valorDigitado > maxPermitido
-          ? formatBRL(maxPermitido)
-          : sanitized;
+        valorDigitado > maxPermitido ? formatBRL(maxPermitido) : sanitized;
 
       return {
         ...prev,
         moradoresDivisao: prev.moradoresDivisao.map((morador) =>
           morador.moradorId === moradorId
             ? { ...morador, valor: valorFinal }
-            : morador,
+            : morador
         ),
       };
     });
@@ -178,7 +176,7 @@ export function useAccountForm({
         if (!morador.checked) return acc;
         return acc + parseCurrencyValue(morador.valor);
       }, 0),
-    [formData.moradoresDivisao],
+    [formData.moradoresDivisao]
   );
 
   return {

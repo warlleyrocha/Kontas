@@ -105,7 +105,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       logger.error(
         "Auth",
         "Erro na verificação de auth",
-        error instanceof Error ? error : undefined,
+        error instanceof Error ? error : undefined
       );
     } finally {
       setLoading(false);
@@ -144,7 +144,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return null;
       }
     },
-    [],
+    []
   );
 
   // Logout
@@ -174,7 +174,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       logger.error(
         "Auth",
         "Erro ao fazer logout",
-        error instanceof Error ? error : undefined,
+        error instanceof Error ? error : undefined
       );
     }
   }, [queryClient]);
@@ -201,7 +201,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         logger.error(
           "Auth",
           "Erro ao completar perfil",
-          new Error(errorMessage),
+          new Error(errorMessage)
         );
 
         setError(errorMessage);
@@ -211,7 +211,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         throw error;
       }
     },
-    [],
+    []
   );
 
   // Atualizar dados do usuário
@@ -225,7 +225,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       logger.error(
         "Auth",
         "Erro ao atualizar usuário",
-        error instanceof Error ? error : undefined,
+        error instanceof Error ? error : undefined
       );
       throw error;
     }
@@ -277,7 +277,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       logout,
       updateUser,
       completeProfile,
-    ],
+    ]
   );
 
   return (

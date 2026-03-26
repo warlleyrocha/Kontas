@@ -193,11 +193,9 @@ describe("AddAccountModal", () => {
   it("inicia na aba form e exibe NextButton", () => {
     render(<AddAccountModal {...defaultProps} />);
 
+    expect(screen.getByRole("button", { name: "próximo" })).toBeTruthy();
     expect(
-      screen.getByRole("button", { name: "próximo" }),
-    ).toBeTruthy();
-    expect(
-      screen.queryByRole("button", { name: "adicionar conta" }),
+      screen.queryByRole("button", { name: "adicionar conta" })
     ).toBeNull();
   });
 
@@ -215,11 +213,9 @@ describe("AddAccountModal", () => {
     fireEvent.press(screen.getByRole("button", { name: "próximo" }));
 
     expect(
-      screen.getByRole("button", { name: "adicionar conta" }),
+      screen.getByRole("button", { name: "adicionar conta" })
     ).toBeTruthy();
-    expect(
-      screen.queryByRole("button", { name: "próximo" }),
-    ).toBeNull();
+    expect(screen.queryByRole("button", { name: "próximo" })).toBeNull();
   });
 
   it("volta para aba form ao pressionar voltar na aba residents", () => {
@@ -228,9 +224,7 @@ describe("AddAccountModal", () => {
     fireEvent.press(screen.getByRole("button", { name: "próximo" }));
     fireEvent.press(screen.getByRole("button", { name: "voltar" }));
 
-    expect(
-      screen.getByRole("button", { name: "próximo" }),
-    ).toBeTruthy();
+    expect(screen.getByRole("button", { name: "próximo" })).toBeTruthy();
   });
 
   it("atualiza descricao via setFormData ao chamar handleDescricaoChange", () => {
@@ -250,15 +244,15 @@ describe("AddAccountModal", () => {
     const updater = mockSetFormData.mock.calls[0][0] as (prev: any) => any;
 
     expect(
-      updater({ metodoPagamento: MetodoPagamento.PIX }).metodoPagamento,
+      updater({ metodoPagamento: MetodoPagamento.PIX }).metodoPagamento
     ).toBe(MetodoPagamento.CARTAO);
 
     expect(
-      updater({ metodoPagamento: MetodoPagamento.CARTAO }).metodoPagamento,
+      updater({ metodoPagamento: MetodoPagamento.CARTAO }).metodoPagamento
     ).toBe(MetodoPagamento.DINHEIRO);
 
     expect(
-      updater({ metodoPagamento: MetodoPagamento.DINHEIRO }).metodoPagamento,
+      updater({ metodoPagamento: MetodoPagamento.DINHEIRO }).metodoPagamento
     ).toBe(MetodoPagamento.PIX);
   });
 
@@ -269,9 +263,7 @@ describe("AddAccountModal", () => {
     fireEvent.press(screen.getByRole("button", { name: "próximo" }));
 
     await act(async () => {
-      fireEvent.press(
-        screen.getByRole("button", { name: "adicionar conta" }),
-      );
+      fireEvent.press(screen.getByRole("button", { name: "adicionar conta" }));
     });
 
     expect(onSubmit).toHaveBeenCalledWith({
@@ -296,13 +288,11 @@ describe("AddAccountModal", () => {
     fireEvent.press(screen.getByRole("button", { name: "próximo" }));
 
     await act(async () => {
-      fireEvent.press(
-        screen.getByRole("button", { name: "adicionar conta" }),
-      );
+      fireEvent.press(screen.getByRole("button", { name: "adicionar conta" }));
     });
 
     expect(onSubmit).toHaveBeenCalledWith(
-      expect.objectContaining({ valor: 0 }),
+      expect.objectContaining({ valor: 0 })
     );
   });
 

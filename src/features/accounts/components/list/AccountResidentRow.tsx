@@ -20,7 +20,7 @@ interface AccountResidentRowProps {
   readonly currentResidentId: string | null;
   readonly onConfirmResidentPayment?: (
     accountId: string,
-    accountResidentId: string,
+    accountResidentId: string
   ) => Promise<void> | void;
 }
 

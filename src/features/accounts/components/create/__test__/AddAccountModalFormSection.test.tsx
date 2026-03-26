@@ -77,7 +77,10 @@ describe("AddAccountModalFormSection", () => {
 
     render(<AddAccountModalFormSection {...props} />);
 
-    fireEvent.changeText(screen.getByPlaceholderText("Ex: Energia, Internet, Aluguel"), "Cemig");
+    fireEvent.changeText(
+      screen.getByPlaceholderText("Ex: Energia, Internet, Aluguel"),
+      "Cemig"
+    );
     fireEvent.changeText(screen.getByPlaceholderText("0,00"), "245,90");
     fireEvent.press(screen.getByLabelText(/Selecionar vencimento/));
     fireEvent.press(
