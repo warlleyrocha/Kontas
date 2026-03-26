@@ -25,3 +25,7 @@ export const formatDate = (dateStr: string) => {
     month: "short",
   });
 };
+
+export function formatBRL(value: number): string {
+  return value.toFixed(2).replace(".", ",");
+}

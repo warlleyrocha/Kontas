@@ -43,3 +43,41 @@ export function maskPhoneWrite(value: string): string {
   // (99) 99999-9999 (celular)
   return `(${ddd}) ${rest.slice(0, 5)}-${rest.slice(5)}`;
 }
+
+/**
+ * Formata um valor numérico (em centavos) para o padrão BRL.
+ * Ex: 150099 → "R$ 1.500,99"
+ */
+export function formatCurrencyBRL(valueInCents: number): string {
+  const value = valueInCents / 100;
+  return value.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+}
+
+/**
+ * Aplica máscara BRL a uma string de input (aceita apenas dígitos).
+ * Ideal para usar em onChangeText de TextInput.
+ * Ex: "150099" → "1.500,99"
+ */
+export function maskCurrencyBRL(raw: string): string {
+  const digits = raw.replace(/\D/g, "");
+  if (!digits) return "";
+
+  const valueInCents = parseInt(digits, 10);
+  const value = (valueInCents / 100).toFixed(2);
+  const [intPart, decPart] = value.split(".");
+
+  const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return `${formattedInt},${decPart}`;
+}
+
+/**
+ * Remove a máscara e retorna o valor em centavos (inteiro).
+ * Ex: "1.500,99" → 150099
+ */
+export function unmaskCurrencyBRL(masked: string): number {
+  const digits = masked.replace(/\D/g, "");
+  return parseInt(digits, 10) || 0;
+}
