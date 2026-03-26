@@ -23,11 +23,11 @@ interface AccountSectionProps {
   readonly onLongPress: (accountId: string, position: CardPosition) => void;
   readonly onConfirmResidentPayment: (
     accountId: string,
-    accountResidentId: string
+    accountResidentId: string,
   ) => Promise<void> | void;
   readonly onPatch: (
     accountId: string,
-    metodoPagamento: MetodoPagamento
+    metodoPagamento: MetodoPagamento,
   ) => Promise<void> | void;
   readonly onCopyPix: (conta: Conta) => boolean | Promise<boolean>;
 }

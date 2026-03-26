@@ -29,6 +29,7 @@ import { formatMounthYear } from "@/src/shared/utils/formats";
 import { showToast } from "@/src/shared/utils/showToast";
 import { ToastConfirm } from "@/src/shared/components/ui/toast-custom";
 import type { Conta } from "@/src/features/accounts/types/account.types";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface AccountsTabProps {
   readonly republicId: string;
@@ -346,7 +347,7 @@ export function AccountsTab({
         animationType="fade"
         statusBarTranslucent
       >
-        <View className="flex-1 justify-end pb-8">
+        <SafeAreaView className="flex-1 justify-end pb-[2px]">
           <ToastConfirm
             message={deleteConfirm.descricao}
             duration={8000}
@@ -360,7 +361,7 @@ export function AccountsTab({
               setDeleteConfirm((prev) => ({ ...prev, visible: false }))
             }
           />
-        </View>
+        </SafeAreaView>
       </Modal>
     </View>
   );
