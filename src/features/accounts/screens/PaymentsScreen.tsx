@@ -22,6 +22,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
     isRefreshing,
     filteredPaymentAccounts,
     confirmingResidentById,
+    refusingResidentById,
     selectedStatus,
     subtitle,
     statusOptions,
@@ -35,6 +36,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
     <PendingPaymentsList
       paymentAccounts={filteredPaymentAccounts}
       confirmingResidentById={confirmingResidentById}
+      refusingResidentById={refusingResidentById}
       isRefreshing={isRefreshing}
       onConfirmResidentPayment={handleConfirmResidentPayment}
       onRefuseResidentPayment={handleRefuseResidentPayment}
