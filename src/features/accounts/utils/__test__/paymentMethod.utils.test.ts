@@ -33,7 +33,7 @@ describe("normalizeMetodoPagamento", () => {
 
   it("remove espaços ao redor", () => {
     expect(normalizeMetodoPagamento("  DINHEIRO  ")).toBe(
-      MetodoPagamento.DINHEIRO,
+      MetodoPagamento.DINHEIRO
     );
   });
 });
@@ -43,7 +43,7 @@ describe("normalizeMetodoPagamento", () => {
 describe("formatPaymentMethodLabel", () => {
   it("retorna mensagem padrão quando method é null", () => {
     expect(formatPaymentMethodLabel(null)).toBe(
-      "Pagamento enviado para confirmação",
+      "Pagamento enviado para confirmação"
     );
   });
 

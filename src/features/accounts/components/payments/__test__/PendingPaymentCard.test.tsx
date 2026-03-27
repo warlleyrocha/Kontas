@@ -32,9 +32,7 @@ function createResident(id: string) {
   };
 }
 
-function createAccount(
-  overrides?: Partial<PaymentAccount>
-): PaymentAccount {
+function createAccount(overrides?: Partial<PaymentAccount>): PaymentAccount {
   return {
     id: "account-1",
     descricao: "Conta de luz",
@@ -209,9 +207,7 @@ describe("PendingPaymentCard", () => {
 
     fireEvent.press(screen.getByText("Ver detalhes do pagamento"));
 
-    expect(
-      screen.getByText("Aguardando confirmação do admin")
-    ).toBeTruthy();
+    expect(screen.getByText("Aguardando confirmação do admin")).toBeTruthy();
   });
 
   it("exibe título 'Pagamentos por morador' quando status é 'todos'", () => {

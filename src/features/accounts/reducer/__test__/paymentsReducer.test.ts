@@ -11,7 +11,7 @@ import {
 
 function mockResident(
   id: string,
-  overrides?: Partial<ContaMorador>,
+  overrides?: Partial<ContaMorador>
 ): ContaMorador {
   return {
     id,
@@ -29,10 +29,7 @@ function mockResident(
   };
 }
 
-function mockAccount(
-  id: string,
-  residents: ContaMorador[],
-): PaymentAccount {
+function mockAccount(id: string, residents: ContaMorador[]): PaymentAccount {
   return {
     id,
     descricao: `Conta ${id}`,
@@ -180,7 +177,7 @@ describe("paymentsReducer — CONFIRM_RESIDENT", () => {
     });
 
     expect(result.accounts[1]?.residents[0]?.status).toBe(
-      StatusPagamento.AGUARDANDO_CONFIRMACAO,
+      StatusPagamento.AGUARDANDO_CONFIRMACAO
     );
   });
 
@@ -197,7 +194,7 @@ describe("paymentsReducer — CONFIRM_RESIDENT", () => {
     });
 
     expect(result.accounts[0]?.residents[1]?.status).toBe(
-      StatusPagamento.AGUARDANDO_CONFIRMACAO,
+      StatusPagamento.AGUARDANDO_CONFIRMACAO
     );
   });
 });

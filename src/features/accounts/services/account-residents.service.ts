@@ -11,12 +11,12 @@ import { logger } from "@/src/shared/utils/logger";
 
 export const accountResidentsService = {
   vincularMoradores: async (
-    data: VincularMoradoresRequest,
+    data: VincularMoradoresRequest
   ): Promise<ContaMorador[]> => {
     try {
       const response = await api.post<ContaMorador[]>(
         "/contas-moradores",
-        data,
+        data
       );
       return response.data;
     } catch (error) {
@@ -34,16 +34,16 @@ export const accountResidentsService = {
   },
 
   listarContasMoradores: async (
-    contaId: string,
+    contaId: string
   ): Promise<ListarContasResponse> => {
     try {
       const response = await api.get<ListarContasResponse>(
-        `/contas-moradores/conta/${contaId}`,
+        `/contas-moradores/conta/${contaId}`
       );
       logger.table(
         "AccountResidents",
         `Contas dos moradores da conta ${contaId}`,
-        response.data as object,
+        response.data as object
       );
       return response.data;
     } catch (error) {
@@ -59,16 +59,16 @@ export const accountResidentsService = {
   },
 
   listarContasPorMorador: async (
-    moradorId: string,
+    moradorId: string
   ): Promise<ListarContasResponse> => {
     try {
       const response = await api.get<ListarContasResponse>(
-        `contas-moradores/morador/${moradorId}`,
+        `contas-moradores/morador/${moradorId}`
       );
       logger.table(
         "AccountResidents",
         `Contas do morador ${moradorId}`,
-        response.data as object,
+        response.data as object
       );
       return response.data;
     } catch (error) {
@@ -91,7 +91,7 @@ export const accountResidentsService = {
       await api.patch(`/contas-moradores/${id}/pagar`);
       logger.info(
         "AccountResidents",
-        `Pagamento da conta ${id} enviado para confirmação do ADMIN`,
+        `Pagamento da conta ${id} enviado para confirmação do ADMIN`
       );
     } catch (error) {
       throw toUserFriendlyError(error, {
@@ -113,11 +113,11 @@ export const accountResidentsService = {
   }: ContaMoradorIdParams): Promise<ContaMorador> => {
     try {
       const response = await api.patch<ContaMorador>(
-        `/contas-moradores/${id}/confirmar`,
+        `/contas-moradores/${id}/confirmar`
       );
       logger.info(
         "AccountResidents",
-        `Pagamento da conta ${id} confirmado pelo ADMIN`,
+        `Pagamento da conta ${id} confirmado pelo ADMIN`
       );
       return response.data;
     } catch (error) {
@@ -139,11 +139,11 @@ export const accountResidentsService = {
   }: ContaMoradorIdParams): Promise<ContaMorador> => {
     try {
       const response = await api.patch<ContaMorador>(
-        `/contas-moradores/${id}/recusar`,
+        `/contas-moradores/${id}/recusar`
       );
       logger.info(
         "AccountResidents",
-        `Pagamento da conta ${id} recusado pelo ADMIN`,
+        `Pagamento da conta ${id} recusado pelo ADMIN`
       );
       return response.data;
     } catch (error) {
@@ -167,11 +167,11 @@ export const accountResidentsService = {
     try {
       const response = await api.patch<ContaMorador>(
         `/contas-moradores/${id}/visibilidade`,
-        { visivel },
+        { visivel }
       );
       logger.info(
         "AccountResidents",
-        `Visibilidade da conta ${id} atualizada pelo ADMIN`,
+        `Visibilidade da conta ${id} atualizada pelo ADMIN`
       );
       return response.data;
     } catch (error) {

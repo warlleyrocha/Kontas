@@ -95,9 +95,7 @@ export function PendingPaymentResidentCard({
             {isConfirming ? (
               <ActivityIndicator size="small" color="#FFFFFF" />
             ) : (
-              <Text className="text-sm font-semibold text-white">
-                Recusar
-              </Text>
+              <Text className="text-sm font-semibold text-white">Recusar</Text>
             )}
           </TouchableOpacity>
 

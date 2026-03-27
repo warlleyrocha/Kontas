@@ -5,9 +5,7 @@ import {
 } from "@/src/features/accounts/types/accountResidents.types";
 import { PendingPaymentResidentCard } from "../PendingPaymentResidentCard";
 
-function createResident(
-  overrides?: Partial<ContaMorador>
-): ContaMorador {
+function createResident(overrides?: Partial<ContaMorador>): ContaMorador {
   return {
     id: "resident-1",
     contaId: "account-1",
@@ -176,8 +174,6 @@ describe("PendingPaymentResidentCard", () => {
       />
     );
 
-    expect(
-      screen.getByText("Pagamento enviado para confirmação")
-    ).toBeTruthy();
+    expect(screen.getByText("Pagamento enviado para confirmação")).toBeTruthy();
   });
 });

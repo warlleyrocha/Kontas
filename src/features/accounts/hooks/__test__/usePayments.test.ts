@@ -9,9 +9,12 @@ import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { showToast } from "@/src/shared/utils/showToast";
 import { usePaymentsScreen } from "../usePayments";
 
-jest.mock("@/src/features/accounts/hooks/useAccountList/useAccountData", () => ({
-  useAccountData: jest.fn(),
-}));
+jest.mock(
+  "@/src/features/accounts/hooks/useAccountList/useAccountData",
+  () => ({
+    useAccountData: jest.fn(),
+  })
+);
 jest.mock("@/src/shared/contexts/RefreshContext", () => ({
   useRefresh: jest.fn(),
 }));
@@ -57,7 +60,7 @@ function mockConta(id: string, overrides?: Partial<Conta>): Conta {
 
 function mockContaMorador(
   id: string,
-  overrides?: Partial<ContaMorador>,
+  overrides?: Partial<ContaMorador>
 ): ContaMorador {
   return {
     id,
@@ -131,7 +134,7 @@ describe("usePaymentsScreen — estado inicial", () => {
   it("define selectedStatus como AGUARDANDO_CONFIRMACAO por padrão", async () => {
     const { result } = renderPayments();
     expect(result.current.selectedStatus).toBe(
-      StatusPagamento.AGUARDANDO_CONFIRMACAO,
+      StatusPagamento.AGUARDANDO_CONFIRMACAO
     );
     await act(async () => {});
   });
@@ -251,7 +254,7 @@ describe("usePaymentsScreen — filteredPaymentAccounts", () => {
     });
 
     expect(result.current.filteredPaymentAccounts[0]?.residents).toHaveLength(
-      2,
+      2
     );
   });
 
@@ -280,7 +283,7 @@ describe("usePaymentsScreen — subtitle", () => {
     await act(async () => {});
 
     expect(result.current.subtitle).toBe(
-      "Nenhum pagamento aguardando confirmação",
+      "Nenhum pagamento aguardando confirmação"
     );
   });
 
@@ -294,9 +297,7 @@ describe("usePaymentsScreen — subtitle", () => {
     const { result } = renderPayments();
     await act(async () => {});
 
-    expect(result.current.subtitle).toBe(
-      "1 pagamento aguardando confirmação",
-    );
+    expect(result.current.subtitle).toBe("1 pagamento aguardando confirmação");
   });
 
   it("retorna subtítulo para AGUARDANDO_CONFIRMACAO com múltiplos pagamentos", async () => {
@@ -314,9 +315,7 @@ describe("usePaymentsScreen — subtitle", () => {
     const { result } = renderPayments();
     await act(async () => {});
 
-    expect(result.current.subtitle).toBe(
-      "2 pagamentos aguardando confirmação",
-    );
+    expect(result.current.subtitle).toBe("2 pagamentos aguardando confirmação");
   });
 
   it("retorna subtítulo para PAGO com 0 pagamentos", async () => {
@@ -329,9 +328,7 @@ describe("usePaymentsScreen — subtitle", () => {
       result.current.setSelectedStatus(StatusPagamento.PAGO);
     });
 
-    expect(result.current.subtitle).toBe(
-      "Nenhum pagamento marcado como PAGO",
-    );
+    expect(result.current.subtitle).toBe("Nenhum pagamento marcado como PAGO");
   });
 
   it("retorna subtítulo para PAGO com 1 pagamento", async () => {
@@ -366,9 +363,7 @@ describe("usePaymentsScreen — subtitle", () => {
       result.current.setSelectedStatus(StatusPagamento.PAGO);
     });
 
-    expect(result.current.subtitle).toBe(
-      "2 pagamentos marcados como PAGO",
-    );
+    expect(result.current.subtitle).toBe("2 pagamentos marcados como PAGO");
   });
 
   it("retorna subtítulo para 'todos' com 0 pagamentos", async () => {
@@ -443,11 +438,11 @@ describe("usePaymentsScreen — handleConfirmResidentPayment", () => {
     });
 
     expect(
-      jest.mocked(accountResidentsService.confirmarPagamentoAdmin),
+      jest.mocked(accountResidentsService.confirmarPagamentoAdmin)
     ).toHaveBeenCalledWith({ id: "cm-1" });
     expect(mockRefreshAll).toHaveBeenCalledTimes(1);
     expect(jest.mocked(showToast.success)).toHaveBeenCalledWith(
-      "Pagamento marcado como PAGO.",
+      "Pagamento marcado como PAGO."
     );
   });
 
@@ -468,7 +463,7 @@ describe("usePaymentsScreen — handleConfirmResidentPayment", () => {
     });
 
     expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
-      "Não foi possível atualizar o pagamento.",
+      "Não foi possível atualizar o pagamento."
     );
   });
 
@@ -511,7 +506,10 @@ describe("usePaymentsScreen — handleConfirmResidentPayment", () => {
     jest
       .mocked(accountResidentsService.confirmarPagamentoAdmin)
       .mockImplementation(
-        () => new Promise<any>((resolve) => { resolveFirst = resolve; }),
+        () =>
+          new Promise<any>((resolve) => {
+            resolveFirst = resolve;
+          })
       );
 
     const { result } = renderPayments();
@@ -526,7 +524,7 @@ describe("usePaymentsScreen — handleConfirmResidentPayment", () => {
     });
 
     expect(
-      jest.mocked(accountResidentsService.confirmarPagamentoAdmin),
+      jest.mocked(accountResidentsService.confirmarPagamentoAdmin)
     ).toHaveBeenCalledTimes(1);
 
     await act(async () => {
@@ -556,11 +554,11 @@ describe("usePaymentsScreen — handleRefuseResidentPayment", () => {
     });
 
     expect(
-      jest.mocked(accountResidentsService.recusarPagamentoAdmin),
+      jest.mocked(accountResidentsService.recusarPagamentoAdmin)
     ).toHaveBeenCalledWith({ id: "cm-1" });
     expect(mockRefreshAll).toHaveBeenCalledTimes(1);
     expect(jest.mocked(showToast.success)).toHaveBeenCalledWith(
-      "Pagamento recusado.",
+      "Pagamento recusado."
     );
   });
 
@@ -581,7 +579,7 @@ describe("usePaymentsScreen — handleRefuseResidentPayment", () => {
     });
 
     expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
-      "Não foi possível recusar o pagamento.",
+      "Não foi possível recusar o pagamento."
     );
   });
 
@@ -624,7 +622,10 @@ describe("usePaymentsScreen — handleRefuseResidentPayment", () => {
     jest
       .mocked(accountResidentsService.recusarPagamentoAdmin)
       .mockImplementation(
-        () => new Promise<any>((resolve) => { resolveFirst = resolve; }),
+        () =>
+          new Promise<any>((resolve) => {
+            resolveFirst = resolve;
+          })
       );
 
     const { result } = renderPayments();
@@ -639,7 +640,7 @@ describe("usePaymentsScreen — handleRefuseResidentPayment", () => {
     });
 
     expect(
-      jest.mocked(accountResidentsService.recusarPagamentoAdmin),
+      jest.mocked(accountResidentsService.recusarPagamentoAdmin)
     ).toHaveBeenCalledTimes(1);
 
     await act(async () => {

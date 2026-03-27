@@ -23,7 +23,7 @@ export const paymentsInitialState: PaymentsState = {
 
 export function paymentsReducer(
   state: PaymentsState,
-  action: PaymentsAction,
+  action: PaymentsAction
 ): PaymentsState {
   switch (action.type) {
     case "LOAD_START":
@@ -49,7 +49,7 @@ export function paymentsReducer(
                       pagoEm: new Date().toISOString(),
                       status: StatusPagamento.PAGO,
                     }
-                  : resident,
+                  : resident
               ),
             };
           })
@@ -64,7 +64,7 @@ export function paymentsReducer(
             return {
               ...account,
               residents: account.residents.filter(
-                (resident) => resident.id !== action.residentId,
+                (resident) => resident.id !== action.residentId
               ),
             };
           })

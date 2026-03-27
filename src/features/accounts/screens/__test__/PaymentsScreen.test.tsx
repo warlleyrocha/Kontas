@@ -89,7 +89,7 @@ describe("PaymentsScreen — error", () => {
     jest.mocked(usePaymentsScreen).mockReturnValue(
       makeHookReturn({
         error: { message: "Falha de rede" },
-      }) as any,
+      }) as any
     );
 
     render(<PaymentsScreen republicId="rep-1" />);
@@ -103,13 +103,12 @@ describe("PaymentsScreen — error", () => {
     jest.mocked(usePaymentsScreen).mockReturnValue(
       makeHookReturn({
         error: { message: "err" },
-      }) as any,
+      }) as any
     );
 
     render(<PaymentsScreen republicId="rep-1" />);
 
-    const { onRetry } = jest.mocked(PaymentsErrorState).mock
-      .calls[0][0] as any;
+    const { onRetry } = jest.mocked(PaymentsErrorState).mock.calls[0][0] as any;
     onRetry();
     expect(mockLoadPayments).toHaveBeenCalled();
   });
@@ -120,9 +119,11 @@ describe("PaymentsScreen — error", () => {
 describe("PaymentsScreen — PendingPaymentsList", () => {
   it("renderiza PendingPaymentsList quando há contas", () => {
     const accounts = [{ id: "acc-1", residents: [] }] as any;
-    jest.mocked(usePaymentsScreen).mockReturnValue(
-      makeHookReturn({ filteredPaymentAccounts: accounts }) as any,
-    );
+    jest
+      .mocked(usePaymentsScreen)
+      .mockReturnValue(
+        makeHookReturn({ filteredPaymentAccounts: accounts }) as any
+      );
 
     render(<PaymentsScreen republicId="rep-1" />);
 
@@ -130,18 +131,18 @@ describe("PaymentsScreen — PendingPaymentsList", () => {
     const props = jest.mocked(PendingPaymentsList).mock.calls[0][0] as any;
     expect(props.paymentAccounts).toBe(accounts);
     expect(props.onConfirmResidentPayment).toBe(
-      mockHandleConfirmResidentPayment,
+      mockHandleConfirmResidentPayment
     );
-    expect(props.onRefuseResidentPayment).toBe(
-      mockHandleRefuseResidentPayment,
-    );
+    expect(props.onRefuseResidentPayment).toBe(mockHandleRefuseResidentPayment);
   });
 
   it("onRefresh do PendingPaymentsList chama loadPayments com true", () => {
     const accounts = [{ id: "acc-1", residents: [] }] as any;
-    jest.mocked(usePaymentsScreen).mockReturnValue(
-      makeHookReturn({ filteredPaymentAccounts: accounts }) as any,
-    );
+    jest
+      .mocked(usePaymentsScreen)
+      .mockReturnValue(
+        makeHookReturn({ filteredPaymentAccounts: accounts }) as any
+      );
 
     render(<PaymentsScreen republicId="rep-1" />);
 
@@ -156,9 +157,9 @@ describe("PaymentsScreen — PendingPaymentsList", () => {
 
 describe("PaymentsScreen — empty state", () => {
   it("renderiza PaymentsEmptyState quando não há contas filtradas", () => {
-    jest.mocked(usePaymentsScreen).mockReturnValue(
-      makeHookReturn({ filteredPaymentAccounts: [] }) as any,
-    );
+    jest
+      .mocked(usePaymentsScreen)
+      .mockReturnValue(makeHookReturn({ filteredPaymentAccounts: [] }) as any);
 
     render(<PaymentsScreen republicId="rep-1" />);
 
@@ -168,9 +169,9 @@ describe("PaymentsScreen — empty state", () => {
   });
 
   it("onRefresh do PaymentsEmptyState chama loadPayments com true", () => {
-    jest.mocked(usePaymentsScreen).mockReturnValue(
-      makeHookReturn({ filteredPaymentAccounts: [] }) as any,
-    );
+    jest
+      .mocked(usePaymentsScreen)
+      .mockReturnValue(makeHookReturn({ filteredPaymentAccounts: [] }) as any);
 
     render(<PaymentsScreen republicId="rep-1" />);
 
@@ -196,7 +197,7 @@ describe("PaymentsScreen — filtro de status", () => {
     render(<PaymentsScreen republicId="rep-1" />);
 
     fireEvent.press(
-      screen.getByRole("button", { name: "Filtrar pagamentos por Pago" }),
+      screen.getByRole("button", { name: "Filtrar pagamentos por Pago" })
     );
     expect(mockSetSelectedStatus).toHaveBeenCalledWith(StatusPagamento.PAGO);
   });
@@ -205,7 +206,7 @@ describe("PaymentsScreen — filtro de status", () => {
     render(<PaymentsScreen republicId="rep-1" />);
 
     fireEvent.press(
-      screen.getByRole("button", { name: "Filtrar pagamentos por Todos" }),
+      screen.getByRole("button", { name: "Filtrar pagamentos por Todos" })
     );
     expect(mockSetSelectedStatus).toHaveBeenCalledWith("todos");
   });
@@ -219,7 +220,7 @@ describe("PaymentsScreen — prioridade de conteúdo", () => {
       makeHookReturn({
         isLoading: true,
         error: { message: "err" },
-      }) as any,
+      }) as any
     );
 
     render(<PaymentsScreen republicId="rep-1" />);
@@ -233,7 +234,7 @@ describe("PaymentsScreen — prioridade de conteúdo", () => {
       makeHookReturn({
         error: { message: "err" },
         filteredPaymentAccounts: [],
-      }) as any,
+      }) as any
     );
 
     render(<PaymentsScreen republicId="rep-1" />);
