@@ -124,6 +124,41 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
     [confirmingResidentById, refreshAll],
   );
 
+  const handleRefuseResidentPayment = useCallback(
+    async (accountId: string, residentId: string) => {
+      if (confirmingResidentById[residentId]) {
+        return;
+      }
+
+      setConfirmingResidentById((previousState) => ({
+        ...previousState,
+        [residentId]: true,
+      }));
+
+      try {
+        await accountResidentsService.recusarPagamentoAdmin({
+          id: residentId,
+        });
+
+        dispatch({ type: "REFUSE_RESIDENT", accountId, residentId });
+
+        await refreshAll();
+        showToast.success("Pagamento recusado.");
+      } catch (error) {
+        showToast.error(
+          getErrorMessage(error, "Não foi possível recusar o pagamento."),
+        );
+      } finally {
+        setConfirmingResidentById((previousState) => {
+          const nextState = { ...previousState };
+          delete nextState[residentId];
+          return nextState;
+        });
+      }
+    },
+    [confirmingResidentById, refreshAll],
+  );
+
   const filteredPaymentAccounts = useMemo(
     () =>
       paymentAccounts
@@ -196,6 +231,7 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
     statusOptions,
     loadPayments,
     handleConfirmResidentPayment,
+    handleRefuseResidentPayment,
     setSelectedStatus,
   };
 }
