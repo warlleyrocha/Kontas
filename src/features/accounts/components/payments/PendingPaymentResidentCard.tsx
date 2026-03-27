@@ -15,6 +15,7 @@ import { getInitials } from "@/src/shared/utils/getInitials";
 interface PendingPaymentResidentCardProps {
   readonly accountId: string;
   readonly isConfirming: boolean;
+  readonly isRefusing: boolean;
   readonly onConfirmResidentPayment: (
     accountId: string,
     residentId: string
@@ -29,6 +30,7 @@ interface PendingPaymentResidentCardProps {
 export function PendingPaymentResidentCard({
   accountId,
   isConfirming,
+  isRefusing,
   onConfirmResidentPayment,
   onRefuseResidentPayment,
   resident,
@@ -84,15 +86,15 @@ export function PendingPaymentResidentCard({
         <View className="mt-4 flex-row gap-3">
           <TouchableOpacity
             activeOpacity={0.85}
-            disabled={isConfirming}
+            disabled={isRefusing || isConfirming}
             onPress={async () => {
               await onRefuseResidentPayment(accountId, resident.id);
             }}
             className={`min-h-11 flex-1 flex-row items-center justify-center rounded-full px-4 ${
-              isConfirming ? "bg-gray-300" : "bg-red-500"
+              isRefusing || isConfirming ? "bg-gray-300" : "bg-red-500"
             }`}
           >
-            {isConfirming ? (
+            {isRefusing ? (
               <ActivityIndicator size="small" color="#FFFFFF" />
             ) : (
               <Text className="text-sm font-semibold text-white">Recusar</Text>
@@ -101,12 +103,12 @@ export function PendingPaymentResidentCard({
 
           <TouchableOpacity
             activeOpacity={0.85}
-            disabled={isConfirming}
+            disabled={isConfirming || isRefusing}
             onPress={async () => {
               await onConfirmResidentPayment(accountId, resident.id);
             }}
             className={`min-h-11 flex-1 flex-row items-center justify-center rounded-full px-4 ${
-              isConfirming ? "bg-gray-300" : "bg-teal-dark"
+              isConfirming || isRefusing ? "bg-gray-300" : "bg-teal-dark"
             }`}
           >
             {isConfirming ? (
