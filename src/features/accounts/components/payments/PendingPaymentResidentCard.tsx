@@ -19,6 +19,10 @@ interface PendingPaymentResidentCardProps {
     accountId: string,
     residentId: string
   ) => Promise<void> | void;
+  readonly onRefuseResidentPayment: (
+    accountId: string,
+    residentId: string
+  ) => Promise<void> | void;
   readonly resident: ContaMorador;
 }
 
@@ -26,6 +30,7 @@ export function PendingPaymentResidentCard({
   accountId,
   isConfirming,
   onConfirmResidentPayment,
+  onRefuseResidentPayment,
   resident,
 }: PendingPaymentResidentCardProps) {
   const residentStatus = getMoradorStatusVisual(resident);
@@ -76,24 +81,45 @@ export function PendingPaymentResidentCard({
       </View>
 
       {!residentPaid && (
-        <TouchableOpacity
-          activeOpacity={0.85}
-          disabled={isConfirming}
-          onPress={async () => {
-            await onConfirmResidentPayment(accountId, resident.id);
-          }}
-          className={`mt-4 min-h-11 flex-row items-center justify-center rounded-full px-4 ${
-            isConfirming ? "bg-gray-300" : "bg-teal-dark"
-          }`}
-        >
-          {isConfirming ? (
-            <ActivityIndicator size="small" color="#FFFFFF" />
-          ) : (
-            <Text className="text-sm font-semibold text-white">
-              Marcar como PAGO
-            </Text>
-          )}
-        </TouchableOpacity>
+        <View className="mt-4 flex-row gap-3">
+          <TouchableOpacity
+            activeOpacity={0.85}
+            disabled={isConfirming}
+            onPress={async () => {
+              await onRefuseResidentPayment(accountId, resident.id);
+            }}
+            className={`min-h-11 flex-1 flex-row items-center justify-center rounded-full px-4 ${
+              isConfirming ? "bg-gray-300" : "bg-red-500"
+            }`}
+          >
+            {isConfirming ? (
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            ) : (
+              <Text className="text-sm font-semibold text-white">
+                Recusar
+              </Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.85}
+            disabled={isConfirming}
+            onPress={async () => {
+              await onConfirmResidentPayment(accountId, resident.id);
+            }}
+            className={`min-h-11 flex-1 flex-row items-center justify-center rounded-full px-4 ${
+              isConfirming ? "bg-gray-300" : "bg-teal-dark"
+            }`}
+          >
+            {isConfirming ? (
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            ) : (
+              <Text className="text-sm font-semibold text-white">
+                Confirmar
+              </Text>
+            )}
+          </TouchableOpacity>
+        </View>
       )}
     </View>
   );
