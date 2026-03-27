@@ -15,6 +15,10 @@ interface PendingPaymentsListProps {
     accountId: string,
     residentId: string
   ) => Promise<void> | void;
+  readonly onRefuseResidentPayment: (
+    accountId: string,
+    residentId: string
+  ) => Promise<void> | void;
   readonly onRefresh: () => void;
   readonly selectedStatus: PaymentStatusFilter;
 }
@@ -24,6 +28,7 @@ export function PendingPaymentsList({
   confirmingResidentById,
   isRefreshing,
   onConfirmResidentPayment,
+  onRefuseResidentPayment,
   onRefresh,
   selectedStatus,
 }: PendingPaymentsListProps) {
@@ -41,6 +46,7 @@ export function PendingPaymentsList({
           account={account}
           confirmingResidentById={confirmingResidentById}
           onConfirmResidentPayment={onConfirmResidentPayment}
+          onRefuseResidentPayment={onRefuseResidentPayment}
           selectedStatus={selectedStatus}
         />
       ))}

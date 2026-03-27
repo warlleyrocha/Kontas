@@ -17,6 +17,10 @@ interface PendingPaymentCardProps {
     accountId: string,
     residentId: string
   ) => Promise<void> | void;
+  readonly onRefuseResidentPayment: (
+    accountId: string,
+    residentId: string
+  ) => Promise<void> | void;
   readonly selectedStatus: PaymentStatusFilter;
 }
 
@@ -44,6 +48,7 @@ export function PendingPaymentCard({
   account,
   confirmingResidentById,
   onConfirmResidentPayment,
+  onRefuseResidentPayment,
   selectedStatus,
 }: PendingPaymentCardProps) {
   const [expanded, setExpanded] = useState(false);
@@ -111,6 +116,7 @@ export function PendingPaymentCard({
                 resident={resident}
                 isConfirming={Boolean(confirmingResidentById[resident.id])}
                 onConfirmResidentPayment={onConfirmResidentPayment}
+                onRefuseResidentPayment={onRefuseResidentPayment}
               />
             ))}
           </View>
