@@ -27,6 +27,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
     statusOptions,
     loadPayments,
     handleConfirmResidentPayment,
+    handleRefuseResidentPayment,
     setSelectedStatus,
   } = usePaymentsScreen({ republicId });
 
@@ -36,6 +37,7 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
       confirmingResidentById={confirmingResidentById}
       isRefreshing={isRefreshing}
       onConfirmResidentPayment={handleConfirmResidentPayment}
+      onRefuseResidentPayment={handleRefuseResidentPayment}
       onRefresh={() => void loadPayments(true)}
       selectedStatus={selectedStatus}
     />
