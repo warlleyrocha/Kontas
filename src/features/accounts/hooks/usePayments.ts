@@ -37,6 +37,10 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
     Record<string, boolean>
   >({});
 
+  const [refusingResidentById, setRefusingResidentById] = useState<
+    Record<string, boolean>
+  >({});
+
   const [selectedStatus, setSelectedStatus] = useState<PaymentStatusFilter>(
     StatusPagamento.AGUARDANDO_CONFIRMACAO
   );
@@ -126,11 +130,11 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
 
   const handleRefuseResidentPayment = useCallback(
     async (accountId: string, residentId: string) => {
-      if (confirmingResidentById[residentId]) {
+      if (refusingResidentById[residentId]) {
         return;
       }
 
-      setConfirmingResidentById((previousState) => ({
+      setRefusingResidentById((previousState) => ({
         ...previousState,
         [residentId]: true,
       }));
@@ -149,14 +153,14 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
           getErrorMessage(error, "Não foi possível recusar o pagamento.")
         );
       } finally {
-        setConfirmingResidentById((previousState) => {
+        setRefusingResidentById((previousState) => {
           const nextState = { ...previousState };
           delete nextState[residentId];
           return nextState;
         });
       }
     },
-    [confirmingResidentById, refreshAll]
+    [refusingResidentById, refreshAll]
   );
 
   const filteredPaymentAccounts = useMemo(
@@ -226,6 +230,7 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
     isRefreshing,
     filteredPaymentAccounts,
     confirmingResidentById,
+    refusingResidentById,
     selectedStatus,
     subtitle,
     statusOptions,
