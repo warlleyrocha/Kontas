@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
+import { Platform } from "react-native";
 import AddAccountModal from "../AddAccountModal";
 import { useAccountForm } from "../../../hooks/useAccountForm";
 import { MetodoPagamento, StatusConta } from "../../../types/account.types";
@@ -304,5 +305,31 @@ describe("AddAccountModal", () => {
     expect(screen.getByText("TOTAL PREENCHIDO")).toBeTruthy();
     expect(screen.getByText("RESTANTE")).toBeTruthy();
     expect(screen.getAllByText("R$ 50,00").length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("usa behavior 'padding' no KeyboardAvoidingView quando Platform.OS é ios", () => {
+    Platform.OS = "ios";
+
+    try {
+      render(<AddAccountModal {...defaultProps} />);
+
+      const keyboardView = screen.UNSAFE_getByType(
+        jest.requireActual("react-native").KeyboardAvoidingView
+      );
+      expect(keyboardView.props.behavior).toBe("padding");
+    } finally {
+      Platform.OS = "android";
+    }
+  });
+
+  it("usa behavior undefined no KeyboardAvoidingView quando Platform.OS não é ios", () => {
+    Platform.OS = "android";
+
+    render(<AddAccountModal {...defaultProps} />);
+
+    const keyboardView = screen.UNSAFE_getByType(
+      jest.requireActual("react-native").KeyboardAvoidingView
+    );
+    expect(keyboardView.props.behavior).toBeUndefined();
   });
 });

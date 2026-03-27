@@ -5,6 +5,11 @@ import type { PaymentAccount } from "@/src/features/accounts/types/payments.type
 import { PendingPaymentCard } from "../PendingPaymentCard";
 import { PendingPaymentResidentCard } from "../PendingPaymentResidentCard";
 
+jest.mock("@expo/vector-icons/Feather", () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
 jest.mock("../PendingPaymentResidentCard", () => ({
   __esModule: true,
   PendingPaymentResidentCard: jest.fn(() => null),

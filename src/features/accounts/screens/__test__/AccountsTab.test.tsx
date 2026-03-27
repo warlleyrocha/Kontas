@@ -20,6 +20,9 @@ jest.mock("@expo/vector-icons/Feather", () => ({
   __esModule: true,
   default: () => null,
 }));
+jest.mock("react-native-safe-area-context", () => ({
+  SafeAreaView: ({ children }: any) => children,
+}));
 jest.mock("@/src/features/accounts/components", () => ({
   AccountSection: jest.fn(() => null),
   PlusButton: jest.fn(() => null),
@@ -592,6 +595,88 @@ describe("AccountsTab — AccountContextMenu", () => {
       onConfirm();
     });
     expect(mockHandleDelete).toHaveBeenCalledWith("a-42");
+  });
+
+  it("onDelete busca a conta nas pagas quando não está nas abertas", () => {
+    mockHandleDelete.mockResolvedValue(undefined);
+    jest.mocked(useAccountsTab).mockReturnValue(
+      makeTabReturn({
+        contasOrdenadas: {
+          abertas: [],
+          pagas: [{ id: "a-99", descricao: "Internet" }],
+        },
+      }) as any
+    );
+    render(
+      <AccountsTab republicId="rep-1" currentResidentId="r-1" residents={[]} />
+    );
+    const { onLongPress } = jest.mocked(AccountSection).mock.calls[0][0] as any;
+    act(() => {
+      onLongPress("a-99", { x: 0, y: 0, width: 0, height: 0 });
+    });
+    const { onDelete } = jest
+      .mocked(AccountContextMenu)
+      .mock.calls.at(-1)?.[0] as any;
+    act(() => {
+      onDelete();
+    });
+    const toastProps = jest.mocked(ToastConfirm).mock.calls.at(-1)?.[0] as any;
+    expect(toastProps.message).toBe("Internet");
+  });
+
+  it("onCancel do ToastConfirm fecha a confirmação de exclusão", () => {
+    mockHandleDelete.mockResolvedValue(undefined);
+    jest.mocked(useAccountsTab).mockReturnValue(
+      makeTabReturn({
+        contasOrdenadas: {
+          abertas: [{ id: "a-42", descricao: "Água" }],
+          pagas: [],
+        },
+      }) as any
+    );
+    render(
+      <AccountsTab republicId="rep-1" currentResidentId="r-1" residents={[]} />
+    );
+    const { onLongPress } = jest.mocked(AccountSection).mock.calls[0][0] as any;
+    act(() => {
+      onLongPress("a-42", { x: 0, y: 0, width: 0, height: 0 });
+    });
+    const { onDelete } = jest
+      .mocked(AccountContextMenu)
+      .mock.calls.at(-1)?.[0] as any;
+    act(() => {
+      onDelete();
+    });
+    const { onCancel } = jest
+      .mocked(ToastConfirm)
+      .mock.calls.at(-1)?.[0] as any;
+    act(() => {
+      onCancel();
+    });
+    expect(mockHandleDelete).not.toHaveBeenCalled();
+  });
+
+  it("onDelete usa 'esta conta' como descricao quando a conta não é encontrada", () => {
+    jest.mocked(useAccountsTab).mockReturnValue(
+      makeTabReturn({
+        contasOrdenadas: { abertas: [], pagas: [] },
+      }) as any
+    );
+    render(
+      <AccountsTab republicId="rep-1" currentResidentId="r-1" residents={[]} />
+    );
+    const { onLongPress } = jest.mocked(AccountSection).mock.calls[0][0] as any;
+    act(() => {
+      onLongPress("inexistente", { x: 0, y: 0, width: 0, height: 0 });
+    });
+    const { onDelete } = jest
+      .mocked(AccountContextMenu)
+      .mock.calls.at(-1)?.[0] as any;
+    act(() => {
+      onDelete();
+    });
+    const toastProps = jest.mocked(ToastConfirm).mock.calls.at(-1)?.[0] as any;
+    expect(toastProps.message).toBe("esta conta");
   });
 
   it("onDelete não chama handleDelete quando accountId é null", () => {

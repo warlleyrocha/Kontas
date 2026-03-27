@@ -473,4 +473,38 @@ describe("useAccountActions", () => {
 
     clearTimeoutSpy.mockRestore();
   });
+
+  it("cancela remoção pendente sem chamar dismiss quando não há toastId", async () => {
+    const clearTimeoutSpy = jest.spyOn(global, "clearTimeout");
+    const {
+      useAccountActions: isolatedUseAccountActions,
+      toast: isolatedToast,
+      showToast: isolatedShowToast,
+      accountService: isolatedAccountService,
+      accountId,
+      timeoutId,
+      pendingDeleteTimeouts,
+      pendingDeleteToastIds,
+    } = loadUseAccountActionsWithPendingRefs();
+
+    // Remove o toastId do map para simular cenário sem toast pendente
+    pendingDeleteToastIds.delete(accountId);
+
+    const { result } = renderHook(() => isolatedUseAccountActions());
+
+    await act(async () => {
+      await result.current.handleRecovery(accountId);
+    });
+
+    expect(clearTimeoutSpy).toHaveBeenCalledWith(timeoutId);
+    expect(isolatedToast.dismiss).not.toHaveBeenCalled();
+    expect(isolatedShowToast.success).toHaveBeenCalledWith(
+      "Remoção cancelada com sucesso."
+    );
+    expect(isolatedAccountService.restaurarConta).not.toHaveBeenCalled();
+    expect(pendingDeleteTimeouts.has(accountId)).toBe(false);
+    expect(pendingDeleteToastIds.has(accountId)).toBe(false);
+
+    clearTimeoutSpy.mockRestore();
+  });
 });
