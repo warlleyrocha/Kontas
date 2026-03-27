@@ -127,6 +127,7 @@ describe("usePaymentsScreen — estado inicial", () => {
     expect(result.current.isLoading).toBe(true);
     expect(result.current.filteredPaymentAccounts).toEqual([]);
     expect(result.current.confirmingResidentById).toEqual({});
+    expect(result.current.refusingResidentById).toEqual({});
 
     await act(async () => {});
   });
@@ -583,7 +584,7 @@ describe("usePaymentsScreen — handleRefuseResidentPayment", () => {
     );
   });
 
-  it("limpa confirmingResidentById após sucesso", async () => {
+  it("limpa refusingResidentById após sucesso", async () => {
     mockFetchAccounts.mockResolvedValue([]);
     jest
       .mocked(accountResidentsService.recusarPagamentoAdmin)
@@ -596,10 +597,10 @@ describe("usePaymentsScreen — handleRefuseResidentPayment", () => {
       await result.current.handleRefuseResidentPayment("acc-1", "cm-1");
     });
 
-    expect(result.current.confirmingResidentById["cm-1"]).toBeUndefined();
+    expect(result.current.refusingResidentById["cm-1"]).toBeUndefined();
   });
 
-  it("limpa confirmingResidentById após erro", async () => {
+  it("limpa refusingResidentById após erro", async () => {
     mockFetchAccounts.mockResolvedValue([]);
     jest
       .mocked(accountResidentsService.recusarPagamentoAdmin)
@@ -612,7 +613,7 @@ describe("usePaymentsScreen — handleRefuseResidentPayment", () => {
       await result.current.handleRefuseResidentPayment("acc-1", "cm-1");
     });
 
-    expect(result.current.confirmingResidentById["cm-1"]).toBeUndefined();
+    expect(result.current.refusingResidentById["cm-1"]).toBeUndefined();
   });
 
   it("bloqueia chamada simultânea para o mesmo residente", async () => {

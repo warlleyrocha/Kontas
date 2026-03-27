@@ -37,6 +37,7 @@ function makeHookReturn(overrides = {}) {
     isRefreshing: false,
     filteredPaymentAccounts: [] as PaymentAccount[],
     confirmingResidentById: {},
+    refusingResidentById: {},
     selectedStatus: StatusPagamento.AGUARDANDO_CONFIRMACAO as any,
     subtitle: "Nenhum pagamento aguardando confirmação",
     statusOptions: [

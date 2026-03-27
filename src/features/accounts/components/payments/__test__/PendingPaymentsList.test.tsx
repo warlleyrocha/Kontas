@@ -42,8 +42,10 @@ describe("PendingPaymentsList", () => {
       <PendingPaymentsList
         paymentAccounts={[]}
         confirmingResidentById={{}}
+        refusingResidentById={{}}
         isRefreshing={false}
         onConfirmResidentPayment={() => {}}
+        onRefuseResidentPayment={() => {}}
         onRefresh={() => {}}
         selectedStatus={StatusPagamento.AGUARDANDO_CONFIRMACAO}
       />
@@ -64,8 +66,10 @@ describe("PendingPaymentsList", () => {
       <PendingPaymentsList
         paymentAccounts={paymentAccounts}
         confirmingResidentById={confirmingResidentById}
+        refusingResidentById={{}}
         isRefreshing={true}
         onConfirmResidentPayment={onConfirmResidentPayment}
+        onRefuseResidentPayment={jest.fn()}
         onRefresh={() => {}}
         selectedStatus={StatusPagamento.PAGO}
       />

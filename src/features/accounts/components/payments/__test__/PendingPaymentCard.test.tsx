@@ -64,6 +64,7 @@ describe("PendingPaymentCard", () => {
       <PendingPaymentCard
         account={account}
         confirmingResidentById={{}}
+        refusingResidentById={{}}
         onConfirmResidentPayment={jest.fn()}
         onRefuseResidentPayment={jest.fn()}
         selectedStatus={StatusPagamento.AGUARDANDO_CONFIRMACAO}
@@ -84,6 +85,7 @@ describe("PendingPaymentCard", () => {
       <PendingPaymentCard
         account={account}
         confirmingResidentById={{}}
+        refusingResidentById={{}}
         onConfirmResidentPayment={jest.fn()}
         onRefuseResidentPayment={jest.fn()}
         selectedStatus={StatusPagamento.AGUARDANDO_CONFIRMACAO}
@@ -100,6 +102,7 @@ describe("PendingPaymentCard", () => {
       <PendingPaymentCard
         account={account}
         confirmingResidentById={{}}
+        refusingResidentById={{}}
         onConfirmResidentPayment={jest.fn()}
         onRefuseResidentPayment={jest.fn()}
         selectedStatus={StatusPagamento.AGUARDANDO_CONFIRMACAO}
@@ -114,6 +117,7 @@ describe("PendingPaymentCard", () => {
       <PendingPaymentCard
         account={createAccount()}
         confirmingResidentById={{}}
+        refusingResidentById={{}}
         onConfirmResidentPayment={jest.fn()}
         onRefuseResidentPayment={jest.fn()}
         selectedStatus={StatusPagamento.AGUARDANDO_CONFIRMACAO}
@@ -128,12 +132,14 @@ describe("PendingPaymentCard", () => {
     const onConfirmResidentPayment = jest.fn();
     const onRefuseResidentPayment = jest.fn();
     const confirmingResidentById = { "resident-1": true };
+    const refusingResidentById = {};
     const account = createAccount();
 
     render(
       <PendingPaymentCard
         account={account}
         confirmingResidentById={confirmingResidentById}
+        refusingResidentById={refusingResidentById}
         onConfirmResidentPayment={onConfirmResidentPayment}
         onRefuseResidentPayment={onRefuseResidentPayment}
         selectedStatus={StatusPagamento.AGUARDANDO_CONFIRMACAO}
@@ -148,6 +154,7 @@ describe("PendingPaymentCard", () => {
       accountId: "account-1",
       resident: account.residents[0],
       isConfirming: true,
+      isRefusing: false,
       onConfirmResidentPayment,
       onRefuseResidentPayment,
     });
@@ -155,6 +162,7 @@ describe("PendingPaymentCard", () => {
       accountId: "account-1",
       resident: account.residents[1],
       isConfirming: false,
+      isRefusing: false,
       onConfirmResidentPayment,
       onRefuseResidentPayment,
     });
@@ -165,6 +173,7 @@ describe("PendingPaymentCard", () => {
       <PendingPaymentCard
         account={createAccount()}
         confirmingResidentById={{}}
+        refusingResidentById={{}}
         onConfirmResidentPayment={jest.fn()}
         onRefuseResidentPayment={jest.fn()}
         selectedStatus={StatusPagamento.AGUARDANDO_CONFIRMACAO}
@@ -183,6 +192,7 @@ describe("PendingPaymentCard", () => {
       <PendingPaymentCard
         account={createAccount()}
         confirmingResidentById={{}}
+        refusingResidentById={{}}
         onConfirmResidentPayment={jest.fn()}
         onRefuseResidentPayment={jest.fn()}
         selectedStatus={StatusPagamento.PAGO}
@@ -199,6 +209,7 @@ describe("PendingPaymentCard", () => {
       <PendingPaymentCard
         account={createAccount()}
         confirmingResidentById={{}}
+        refusingResidentById={{}}
         onConfirmResidentPayment={jest.fn()}
         onRefuseResidentPayment={jest.fn()}
         selectedStatus={StatusPagamento.AGUARDANDO_CONFIRMACAO}
@@ -215,6 +226,7 @@ describe("PendingPaymentCard", () => {
       <PendingPaymentCard
         account={createAccount()}
         confirmingResidentById={{}}
+        refusingResidentById={{}}
         onConfirmResidentPayment={jest.fn()}
         onRefuseResidentPayment={jest.fn()}
         selectedStatus="todos"

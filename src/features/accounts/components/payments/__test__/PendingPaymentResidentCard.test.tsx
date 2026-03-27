@@ -25,6 +25,7 @@ function createResident(overrides?: Partial<ContaMorador>): ContaMorador {
 const defaultProps = {
   accountId: "account-1",
   isConfirming: false,
+  isRefusing: false,
   onConfirmResidentPayment: jest.fn(),
   onRefuseResidentPayment: jest.fn(),
 };
@@ -153,7 +154,7 @@ describe("PendingPaymentResidentCard", () => {
     );
   });
 
-  it("exibe ActivityIndicator e desabilita botões quando isConfirming é true", () => {
+  it("exibe ActivityIndicator no botão Confirmar e desabilita ambos quando isConfirming é true", () => {
     render(
       <PendingPaymentResidentCard
         {...defaultProps}
@@ -163,7 +164,20 @@ describe("PendingPaymentResidentCard", () => {
     );
 
     expect(screen.queryByText("Confirmar")).toBeNull();
+    expect(screen.getByText("Recusar")).toBeTruthy();
+  });
+
+  it("exibe ActivityIndicator no botão Recusar e desabilita ambos quando isRefusing é true", () => {
+    render(
+      <PendingPaymentResidentCard
+        {...defaultProps}
+        isRefusing={true}
+        resident={createResident()}
+      />
+    );
+
     expect(screen.queryByText("Recusar")).toBeNull();
+    expect(screen.getByText("Confirmar")).toBeTruthy();
   });
 
   it("exibe mensagem padrão quando metodoPagamento é null", () => {
