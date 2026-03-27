@@ -12,7 +12,8 @@ export type PaymentsAction =
   | { type: "REFRESH_START" }
   | { type: "LOAD_SUCCESS"; accounts: PaymentAccount[] }
   | { type: "LOAD_DONE" }
-  | { type: "CONFIRM_RESIDENT"; accountId: string; residentId: string };
+  | { type: "CONFIRM_RESIDENT"; accountId: string; residentId: string }
+  | { type: "REFUSE_RESIDENT"; accountId: string; residentId: string };
 
 export const paymentsInitialState: PaymentsState = {
   accounts: [],
@@ -49,6 +50,21 @@ export function paymentsReducer(
                       status: StatusPagamento.PAGO,
                     }
                   : resident,
+              ),
+            };
+          })
+          .filter((account) => account.residents.length > 0),
+      };
+    case "REFUSE_RESIDENT":
+      return {
+        ...state,
+        accounts: state.accounts
+          .map((account) => {
+            if (account.id !== action.accountId) return account;
+            return {
+              ...account,
+              residents: account.residents.filter(
+                (resident) => resident.id !== action.residentId,
               ),
             };
           })
