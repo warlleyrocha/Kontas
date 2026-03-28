@@ -54,7 +54,9 @@ export function useRepublicScreen(republicId: string) {
       return;
     }
 
-    console.warn("Não foi possível carregar república:", republicError);
+    logger.warn("Republic", "Não foi possível carregar república:", {
+      republicId,
+    });
     showToast.error(getErrorMessage(republicError, "Erro ao carregar república"));
     router.back();
   }, [republicError, republicId, router]);
@@ -107,7 +109,11 @@ export function useRepublicScreen(republicId: string) {
       await logout();
       router.replace("/");
     } catch (error) {
-      console.error("Erro ao fazer logout:", error);
+      logger.error(
+        "Republic",
+        "Erro ao fazer logout",
+        error instanceof Error ? error : undefined
+      );
       toastErrors.logoutFailed(error);
     }
   }, [logout, router]);
@@ -142,10 +148,21 @@ export function useRepublicScreen(republicId: string) {
     async (nome: string, imagem?: string) => {
       if (!republic) return;
 
-      await updateRepublic(republic.id, {
-        nome,
-        imagemRepublica: imagem,
-      });
+      try {
+        await updateRepublic(republic.id, {
+          nome,
+          imagemRepublica: imagem,
+        });
+      } catch (error) {
+        logger.error(
+          "Republic",
+          "Erro ao atualizar república",
+          error instanceof Error ? error : undefined
+        );
+        showToast.error(
+          getErrorMessage(error, "Não foi possível atualizar a república.")
+        );
+      }
     },
     [republic, updateRepublic]
   );

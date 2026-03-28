@@ -160,11 +160,22 @@ export function useProfileScreen() {
   const handleSaveRepublicEdit = useCallback(
     async (name: string, image?: string) => {
       if (!selectedRepublic) return;
-      await updateRepublic(selectedRepublic.id, {
-        nome: name,
-        imagemRepublica: image,
-      });
-      handleCloseEditModal();
+      try {
+        await updateRepublic(selectedRepublic.id, {
+          nome: name,
+          imagemRepublica: image,
+        });
+        handleCloseEditModal();
+      } catch (error) {
+        logger.error(
+          "Republic",
+          "Erro ao atualizar república",
+          error instanceof Error ? error : undefined
+        );
+        showToast.error(
+          getErrorMessage(error, "Não foi possível atualizar a república.")
+        );
+      }
     },
     [selectedRepublic, updateRepublic, handleCloseEditModal]
   );
@@ -174,10 +185,20 @@ export function useProfileScreen() {
     if (!selectedRepublic) return;
     const republicName = selectedRepublic.nome;
     const republicId = selectedRepublic.id;
-    showToast.confirm(`Excluir "${republicName}"?`, () => {
-      deleteRepublic(republicId).then(() => {
+    showToast.confirm(`Excluir "${republicName}"?`, async () => {
+      try {
+        await deleteRepublic(republicId);
         setSelectedRepublic(null);
-      });
+      } catch (error) {
+        logger.error(
+          "Republic",
+          "Erro ao excluir república",
+          error instanceof Error ? error : undefined
+        );
+        showToast.error(
+          getErrorMessage(error, "Não foi possível excluir a república.")
+        );
+      }
     });
   }, [selectedRepublic, deleteRepublic]);
 
