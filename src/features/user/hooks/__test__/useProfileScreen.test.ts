@@ -5,7 +5,7 @@ import { Alert } from "react-native";
 import { useAuth } from "@/src/features/auth/contexts";
 import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
 import { useRepublicActions } from "@/src/features/republic/hooks/useRepublicActions";
-import { useRepublicList } from "@/src/features/republic/hooks/useRepublicList";
+import { useRepublicsQuery } from "@/src/features/republic/hooks/useRepublicQueries";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
@@ -24,8 +24,8 @@ jest.mock("@/src/features/invites/contexts/InvitesContext", () => ({
 jest.mock("@/src/features/republic/hooks/useRepublicActions", () => ({
   useRepublicActions: jest.fn(),
 }));
-jest.mock("@/src/features/republic/hooks/useRepublicList", () => ({
-  useRepublicList: jest.fn(),
+jest.mock("@/src/features/republic/hooks/useRepublicQueries", () => ({
+  useRepublicsQuery: jest.fn(),
 }));
 jest.mock("@/src/shared/components/SideMenu/useSideMenu", () => ({
   useSideMenu: jest.fn(),
@@ -82,9 +82,10 @@ function setupMocks(userOverrides = {}) {
     completeProfile: mockCompleteProfile,
     updateUser: mockUpdateUser,
   } as any);
-  jest.mocked(useRepublicList).mockReturnValue({
-    republics: [mockRepublic],
-    fetchRepublics: mockFetchRepublics,
+  jest.mocked(useRepublicsQuery).mockReturnValue({
+    data: [mockRepublic],
+    error: null,
+    refetch: mockFetchRepublics,
   } as any);
   jest.mocked(useRepublicActions).mockReturnValue({
     deleteRepublic: mockDeleteRepublic,
@@ -475,7 +476,7 @@ describe("useProfileScreen — handleSaveRepublicEdit", () => {
     expect(mockUpdateRepublic).not.toHaveBeenCalled();
   });
 
-  it("chama updateRepublic, fecha o modal e refaz fetch quando selectedRepublic está definida", async () => {
+  it("chama updateRepublic e fecha o modal quando selectedRepublic está definida", async () => {
     mockUpdateRepublic.mockResolvedValue(undefined);
     const { result } = renderHook(() => useProfileScreen());
 
@@ -496,7 +497,7 @@ describe("useProfileScreen — handleSaveRepublicEdit", () => {
       nome: "Novo Nome",
       imagemRepublica: "img.jpg",
     });
-    expect(mockFetchRepublics).toHaveBeenCalled();
+    expect(mockFetchRepublics).not.toHaveBeenCalled();
   });
 });
 
@@ -532,7 +533,7 @@ describe("useProfileScreen — handleDeleteFromMenu", () => {
     );
   });
 
-  it("chama deleteRepublic e refaz fetch ao confirmar exclusão", async () => {
+  it("chama deleteRepublic ao confirmar exclusão", async () => {
     mockDeleteRepublic.mockResolvedValue(undefined);
     jest.mocked(showToast.confirm).mockImplementation((_msg, cb) => cb());
 
@@ -552,19 +553,19 @@ describe("useProfileScreen — handleDeleteFromMenu", () => {
 
     expect(mockDeleteRepublic).toHaveBeenCalledWith("rep-1");
     await act(async () => {});
-    expect(mockFetchRepublics).toHaveBeenCalled();
+    expect(mockFetchRepublics).not.toHaveBeenCalled();
   });
 });
 
 // ─── efeitos ──────────────────────────────────────────────────────────────────
 
 describe("useProfileScreen — efeitos", () => {
-  it("chama fetchRepublics quando perfilCompleto é true", () => {
+  it("não força refetch inicial quando perfilCompleto é true", () => {
     renderHook(() => useProfileScreen());
-    expect(mockFetchRepublics).toHaveBeenCalled();
+    expect(mockFetchRepublics).not.toHaveBeenCalled();
   });
 
-  it("não chama fetchRepublics quando perfilCompleto é false", () => {
+  it("configura a query com enabled=false quando perfilCompleto é false", () => {
     jest.mocked(useAuth).mockReturnValue({
       user: {
         id: "u-1",
@@ -579,14 +580,16 @@ describe("useProfileScreen — efeitos", () => {
 
     renderHook(() => useProfileScreen());
 
-    expect(mockFetchRepublics).not.toHaveBeenCalled();
+    expect(jest.mocked(useRepublicsQuery)).toHaveBeenCalledWith({
+      enabled: false,
+    });
   });
 
-  it("registra fetchRepublics no sistema de refresh com chave 'profile'", () => {
+  it("registra um callback de refetch no sistema de refresh com chave 'profile'", () => {
     renderHook(() => useProfileScreen());
     expect(mockRegisterRefresh).toHaveBeenCalledWith(
       "profile",
-      mockFetchRepublics
+      expect.any(Function)
     );
   });
 });
