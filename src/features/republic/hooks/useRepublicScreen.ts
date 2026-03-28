@@ -1,8 +1,8 @@
+import { useIsFocused } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useAuth } from "@/src/features/auth/contexts";
-import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import { useResidents } from "@/src/features/residents/hooks/useResidents";
 import { getErrorMessage } from "@/src/services/httpError";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
@@ -13,78 +13,82 @@ import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
 import { toastErrors } from "@/src/shared/utils/toastMessages";
 import { useRepublicActions } from "./useRepublicActions";
-import { useRepublicList } from "./useRepublicList";
+import { useRepublicQuery, useRepublicsQuery } from "./useRepublicQueries";
 
 export function useRepublicScreen(republicId: string) {
   const router = useRouter();
   const { user, logout } = useAuth();
 
-  const { republics, fetchRepublics, fetchRepublicById } = useRepublicList();
+  const isFocused = useIsFocused();
+
+  const { data: republics = [], refetch: refetchRepublics } =
+    useRepublicsQuery({
+      enabled: Boolean(user?.perfilCompleto),
+    });
+  const {
+    data: republic = null,
+    error: republicError,
+    isLoading,
+    isSuccess,
+    refetch: refetchRepublic,
+  } = useRepublicQuery(republicId);
   const { updateRepublic, showEditModal, setShowEditModal } =
     useRepublicActions();
 
   const { residents, fetchResidents } = useResidents();
   const { registerRefresh } = useRefresh();
 
-  const [republic, setRepublic] = useState<RepublicResponse | null>(null);
   const [tab, setTab] = useState<TabKey>("contas");
-  const [isLoading, setIsLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
 
-  // 🔹 Carregar República
   useEffect(() => {
-    async function loadRepublic() {
-      if (!republicId) {
-        showToast.error("ID da república não encontrado");
-        router.back();
-        return;
-      }
+    if (!republicId) {
+      showToast.error("ID da república não encontrado");
+      router.back();
+    }
+  }, [republicId, router]);
 
-      setIsLoading(true);
-      try {
-        const data = await fetchRepublicById(republicId);
-
-        if (!data) {
-          showToast.error("República não encontrada");
-          router.back();
-          return;
-        }
-
-        setRepublic(data);
-      } catch (error) {
-        console.warn("Não foi possível carregar república:", error);
-        showToast.error(getErrorMessage(error, "Erro ao carregar república"));
-        router.back();
-      } finally {
-        setIsLoading(false);
-      }
+  useEffect(() => {
+    if (!republicId || !republicError) {
+      return;
     }
 
-    loadRepublic();
-  }, [republicId, fetchRepublicById, router]);
+    console.warn("Não foi possível carregar república:", republicError);
+    showToast.error(getErrorMessage(republicError, "Erro ao carregar república"));
+    router.back();
+  }, [republicError, republicId, router]);
 
-  // 🔹 Carregar moradores
+  useEffect(() => {
+    if (!republicId || !isSuccess || republic !== null || !isFocused) {
+      return;
+    }
+
+    showToast.error("República não encontrada");
+    router.back();
+  }, [isSuccess, republic, republicId, router, isFocused]);
+
   useEffect(() => {
     if (republic?.id) {
-      fetchResidents(republic.id);
+      void fetchResidents(republic.id);
     }
   }, [republic?.id, fetchResidents]);
 
-  // 🔹 Registrar refresh global (república + moradores)
   const fetchData = useCallback(async () => {
-    const data = await fetchRepublicById(republicId);
-    if (data) {
-      setRepublic(data);
-      await fetchResidents(data.id);
+    if (!republicId) {
+      return;
     }
-  }, [republicId, fetchRepublicById, fetchResidents]);
+
+    const result = await refetchRepublic();
+    if (result.data?.id) {
+      await fetchResidents(result.data.id);
+    }
+  }, [fetchResidents, refetchRepublic, republicId]);
 
   useEffect(() => {
     return registerRefresh(`republic-${republicId}`, fetchData);
   }, [registerRefresh, republicId, fetchData]);
 
-  // Obtém numero de moradores
   const residentsCount = residents.length;
 
   const toggleFavorite = useCallback(() => {
@@ -114,7 +118,11 @@ export function useRepublicScreen(republicId: string) {
       !republics.some((item) => item.id === republicId)
     ) {
       try {
-        await fetchRepublics();
+        const result = await refetchRepublics();
+
+        if (result.error) {
+          throw result.error;
+        }
       } catch (error) {
         logger.warn(
           "Republic",
@@ -128,7 +136,7 @@ export function useRepublicScreen(republicId: string) {
     }
 
     setIsMenuOpen(true);
-  }, [fetchRepublics, republicId, republics, user?.perfilCompleto]);
+  }, [refetchRepublics, republicId, republics, user?.perfilCompleto]);
 
   const handleSaveRepublic = useCallback(
     async (nome: string, imagem?: string) => {
@@ -138,8 +146,6 @@ export function useRepublicScreen(republicId: string) {
         nome,
         imagemRepublica: imagem,
       });
-
-      setRepublic((prev) => mergeSavedRepublic(prev, nome, imagem));
     },
     [republic, updateRepublic]
   );
@@ -193,12 +199,4 @@ export function useRepublicScreen(republicId: string) {
     currentResidentId,
     republics,
   };
-}
-
-export function mergeSavedRepublic(
-  prev: RepublicResponse | null,
-  nome: string,
-  imagem?: string
-): RepublicResponse | null {
-  return prev ? { ...prev, nome, imagemRepublica: imagem } : null;
 }

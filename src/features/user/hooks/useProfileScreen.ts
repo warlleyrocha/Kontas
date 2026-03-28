@@ -6,8 +6,9 @@ import { Alert } from "react-native";
 import { useAuth } from "@/src/features/auth/contexts";
 import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
 import { useRepublicActions } from "@/src/features/republic/hooks/useRepublicActions";
-import { useRepublicList } from "@/src/features/republic/hooks/useRepublicList";
+import { useRepublicsQuery } from "@/src/features/republic/hooks/useRepublicQueries";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
+import { getErrorMessage } from "@/src/services/httpError";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { useRepublicResidents } from "@/src/shared/hooks/useRepublicResidents";
@@ -28,7 +29,13 @@ export function useProfileScreen() {
   const isFocused = useIsFocused();
 
   const { user, logout, completeProfile, updateUser } = useAuth();
-  const { republics, fetchRepublics } = useRepublicList();
+  const {
+    data: republics = [],
+    error: republicsError,
+    refetch: refetchRepublics,
+  } = useRepublicsQuery({
+    enabled: Boolean(user?.perfilCompleto),
+  });
   const { deleteRepublic, updateRepublic, showEditModal, setShowEditModal } =
     useRepublicActions();
   const { getResidentsCount, isAdmin } = useRepublicResidents(
@@ -158,9 +165,8 @@ export function useProfileScreen() {
         imagemRepublica: image,
       });
       handleCloseEditModal();
-      fetchRepublics();
     },
-    [selectedRepublic, updateRepublic, handleCloseEditModal, fetchRepublics]
+    [selectedRepublic, updateRepublic, handleCloseEditModal]
   );
 
   const handleDeleteFromMenu = useCallback(() => {
@@ -171,10 +177,9 @@ export function useProfileScreen() {
     showToast.confirm(`Excluir "${republicName}"?`, () => {
       deleteRepublic(republicId).then(() => {
         setSelectedRepublic(null);
-        fetchRepublics();
       });
     });
-  }, [selectedRepublic, deleteRepublic, fetchRepublics]);
+  }, [selectedRepublic, deleteRepublic]);
 
   const [showInviteModal, setShowInviteModal] = useState(false);
 
@@ -188,13 +193,20 @@ export function useProfileScreen() {
   }, []);
 
   useEffect(() => {
-    if (!user?.perfilCompleto) return;
-    fetchRepublics();
-  }, [user?.perfilCompleto, fetchRepublics]);
+    if (!republicsError) {
+      return;
+    }
+
+    showToast.error(
+      getErrorMessage(republicsError, "Não foi possível carregar as repúblicas.")
+    );
+  }, [republicsError]);
 
   useEffect(() => {
-    return registerRefresh("profile", fetchRepublics);
-  }, [registerRefresh, fetchRepublics]);
+    return registerRefresh("profile", async () => {
+      await refetchRepublics();
+    });
+  }, [registerRefresh, refetchRepublics]);
 
   const { menuItems, footerItems } = useSideMenu("profile", handleSignOut, {
     republics,
