@@ -3,7 +3,12 @@ import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert } from "react-native";
 
-import { useAuth } from "@/src/features/auth/contexts";
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
+import {
+  useCompleteProfileMutation,
+  useLogoutMutation,
+  useUpdateUserMutation,
+} from "@/src/features/auth/hooks/useAuthQueries";
 import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
 import { useRepublicActions } from "@/src/features/republic/hooks/useRepublicActions";
 import { useRepublicsQuery } from "@/src/features/republic/hooks/useRepublicQueries";
@@ -28,7 +33,10 @@ export function useProfileScreen() {
   const router = useRouter();
   const isFocused = useIsFocused();
 
-  const { user, logout, completeProfile, updateUser } = useAuth();
+  const { user } = useAuth();
+  const { mutateAsync: logout } = useLogoutMutation();
+  const { mutateAsync: completeProfile } = useCompleteProfileMutation();
+  const { mutateAsync: updateUser } = useUpdateUserMutation();
   const {
     data: republics = [],
     error: republicsError,

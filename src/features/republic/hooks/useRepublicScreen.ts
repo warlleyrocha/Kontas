@@ -2,7 +2,8 @@ import { useIsFocused } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { useAuth } from "@/src/features/auth/contexts";
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
+import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthQueries";
 import { useResidents } from "@/src/features/residents/hooks/useResidents";
 import { getErrorMessage } from "@/src/services/httpError";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
@@ -17,7 +18,8 @@ import { useRepublicQuery, useRepublicsQuery } from "./useRepublicQueries";
 
 export function useRepublicScreen(republicId: string) {
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
+  const { mutateAsync: logout } = useLogoutMutation();
 
   const isFocused = useIsFocused();
 
