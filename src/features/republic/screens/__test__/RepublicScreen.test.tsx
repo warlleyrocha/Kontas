@@ -1,6 +1,6 @@
 import { act, render, screen } from "@testing-library/react-native";
 import { AccountsTab } from "@/src/features/accounts";
-import { useInvitesByRepublicQuery } from "@/src/features/invites/contexts/InvitesContext";
+import { useInvitesByRepublicQuery } from "@/src/features/invites/hooks/useInvitesQueries";
 import { StatusInvite } from "@/src/features/invites/types/invite.types";
 import { EditRepublicModal } from "@/src/features/republic/components/EditRepublicModal";
 import { useRepublicScreen } from "@/src/features/republic/hooks/useRepublicScreen";
@@ -20,7 +20,7 @@ jest.mock(
 jest.mock("@/src/features/accounts", () => ({
   AccountsTab: jest.fn(() => null),
 }));
-jest.mock("@/src/features/invites/contexts/InvitesContext", () => ({
+jest.mock("@/src/features/invites/hooks/useInvitesQueries", () => ({
   useInvitesByRepublicQuery: jest.fn(),
 }));
 jest.mock("@/src/features/republic/components/EditRepublicModal", () => ({

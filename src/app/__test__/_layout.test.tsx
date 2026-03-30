@@ -1,4 +1,5 @@
 import { render } from "@testing-library/react-native";
+import { useQueryClient } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { preventAutoHideAsync } from "expo-splash-screen";
 import { wrap } from "@sentry/react-native";
@@ -21,6 +22,11 @@ jest.mock("expo-router", () => ({
 jest.mock("expo-splash-screen", () => ({
   __esModule: true,
   preventAutoHideAsync: jest.fn(),
+}));
+
+jest.mock("@tanstack/react-query", () => ({
+  __esModule: true,
+  useQueryClient: jest.fn(),
 }));
 
 jest.mock("@sentry/react-native", () => ({
@@ -71,6 +77,7 @@ const mockStack = jest.mocked(Stack);
 const mockPreventAutoHideAsync = jest.mocked(preventAutoHideAsync);
 const mockWrap = jest.mocked(wrap);
 const mockUseAuth = jest.mocked(useAuth);
+const mockUseQueryClient = jest.mocked(useQueryClient);
 const mockConfigureGoogleSignin = jest.mocked(configureGoogleSignin);
 const mockInitSentry = jest.mocked(initSentry);
 const mockUseAppReady = jest.mocked(useAppReady);
@@ -91,7 +98,8 @@ describe("_layout render", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseAppReady.mockReturnValue(true);
-    mockUseAuth.mockReturnValue({ loading: false } as never);
+    mockUseAuth.mockReturnValue({ user: null, isLoading: false } as never);
+    mockUseQueryClient.mockReturnValue({ clear: jest.fn() } as never);
   });
 
   it("retorna null enquanto o app não estiver pronto", () => {
@@ -107,7 +115,7 @@ describe("_layout render", () => {
   });
 
   it("renderiza LoadingScreen quando a autenticação ainda está carregando", () => {
-    mockUseAuth.mockReturnValue({ loading: true } as never);
+    mockUseAuth.mockReturnValue({ user: null, isLoading: true } as never);
 
     render(<AppLayout />);
 

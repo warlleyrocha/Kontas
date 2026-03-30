@@ -1,13 +1,28 @@
 import { act, renderHook } from "@testing-library/react-native";
+import { useRouter } from "expo-router";
 import { useAuth } from "@/src/features/auth/hooks/useAuth";
-import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
+import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthQueries";
+import { StatusInvite } from "@/src/features/invites/types/invite.types";
+import { getErrorMessage } from "@/src/services/httpError";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
 import { toastErrors } from "@/src/shared/utils/toastMessages";
+import {
+  useInvitesByUserQuery,
+  useUpdateInviteStatusMutation,
+} from "../useInvitesQueries";
 import { useInvitesScreen } from "../useInvitesScreen";
 
+jest.mock("expo-router", () => ({ useRouter: jest.fn() }));
 jest.mock("@/src/features/auth/hooks/useAuth", () => ({ useAuth: jest.fn() }));
-jest.mock("@/src/features/invites/contexts/InvitesContext", () => ({
-  useInvitesContext: jest.fn(),
+jest.mock("@/src/features/auth/hooks/useAuthQueries", () => ({
+  useLogoutMutation: jest.fn(),
+}));
+jest.mock("@/src/features/invites/hooks/useInvitesQueries", () => ({
+  useInvitesByUserQuery: jest.fn(),
+  useUpdateInviteStatusMutation: jest.fn(),
+}));
+jest.mock("@/src/services/httpError", () => ({
+  getErrorMessage: jest.fn(),
 }));
 jest.mock("@/src/shared/components/SideMenu/useSideMenu", () => ({
   useSideMenu: jest.fn(),
@@ -19,32 +34,34 @@ jest.mock("@/src/shared/utils/toastMessages", () => ({
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
 const mockLogout = jest.fn();
-const mockFetchInvitesByUser = jest.fn();
-const mockHandleAcceptInvite = jest.fn();
-const mockHandleRejectInvite = jest.fn();
+const mockRefetch = jest.fn();
+const mockMutateAsync = jest.fn();
+const mockRouterReplace = jest.fn();
 
 function setupMocks(userOverrides = {}) {
+  jest.mocked(useRouter).mockReturnValue({ replace: mockRouterReplace } as any);
   jest.mocked(useAuth).mockReturnValue({
-    user: {
-      id: "u-1",
-      nome: "Ana",
-      fotoPerfil: null,
-      ...userOverrides,
-    },
-    logout: mockLogout,
+    user: { id: "u-1", nome: "Ana", fotoPerfil: null, ...userOverrides },
   } as any);
-  jest.mocked(useInvitesContext).mockReturnValue({
-    invitesByUser: [],
-    pendingCount: 2,
+  jest.mocked(useLogoutMutation).mockReturnValue({
+    mutateAsync: mockLogout,
+  } as any);
+  jest.mocked(useInvitesByUserQuery).mockReturnValue({
+    data: [],
     error: null,
-    fetchInvitesByUser: mockFetchInvitesByUser,
-    handleAcceptInvite: mockHandleAcceptInvite,
-    handleRejectInvite: mockHandleRejectInvite,
+    refetch: mockRefetch,
+  } as any);
+  jest.mocked(useUpdateInviteStatusMutation).mockReturnValue({
+    mutateAsync: mockMutateAsync,
+    error: null,
   } as any);
   jest.mocked(useSideMenu).mockReturnValue({
     menuItems: [],
     footerItems: [],
   } as any);
+  jest
+    .mocked(getErrorMessage)
+    .mockImplementation((_err, fallback) => fallback ?? "erro");
 }
 
 // ─── Setup ────────────────────────────────────────────────────────────────────
@@ -61,7 +78,7 @@ afterEach(() => {
   consoleErrorSpy.mockRestore();
 });
 
-// ─── useInvitesScreen ─────────────────────────────────────────────────────────
+// ─── Estado inicial ───────────────────────────────────────────────────────────
 
 describe("useInvitesScreen — estado inicial", () => {
   it("retorna as propriedades esperadas", () => {
@@ -78,6 +95,16 @@ describe("useInvitesScreen — estado inicial", () => {
   });
 
   it("passa pendingCount ao useSideMenu", () => {
+    jest.mocked(useInvitesByUserQuery).mockReturnValue({
+      data: [
+        { id: "1", status: StatusInvite.PENDENTE },
+        { id: "2", status: StatusInvite.PENDENTE },
+        { id: "3", status: StatusInvite.ACEITO },
+      ],
+      error: null,
+      refetch: mockRefetch,
+    } as any);
+
     renderHook(() => useInvitesScreen());
 
     expect(jest.mocked(useSideMenu)).toHaveBeenCalledWith(
@@ -86,13 +113,31 @@ describe("useInvitesScreen — estado inicial", () => {
       { pendingInvitesCount: 2 }
     );
   });
+
+  it("formata error da query quando presente", () => {
+    const error = new Error("fetch fail");
+    jest.mocked(useInvitesByUserQuery).mockReturnValue({
+      data: [],
+      error,
+      refetch: mockRefetch,
+    } as any);
+
+    const { result } = renderHook(() => useInvitesScreen());
+
+    expect(jest.mocked(getErrorMessage)).toHaveBeenCalledWith(
+      error,
+      "Não foi possível carregar os convites."
+    );
+    expect(result.current.error).toBe("Não foi possível carregar os convites.");
+  });
 });
+
+// ─── handleSignOut ────────────────────────────────────────────────────────────
 
 describe("useInvitesScreen — handleSignOut", () => {
   it("chama logout com sucesso sem lançar erros", async () => {
     mockLogout.mockResolvedValue(undefined);
 
-    // handleSignOut é passado ao useSideMenu como 2º argumento
     renderHook(() => useInvitesScreen());
     const handleSignOut = (
       jest.mocked(useSideMenu).mock.calls[0] as unknown[]
@@ -128,17 +173,96 @@ describe("useInvitesScreen — handleSignOut", () => {
   });
 });
 
+// ─── fetchInvitesByUser ───────────────────────────────────────────────────────
+
+describe("useInvitesScreen — fetchInvitesByUser", () => {
+  it("chama refetch ao ser invocado", async () => {
+    mockRefetch.mockResolvedValue(undefined);
+    const { result } = renderHook(() => useInvitesScreen());
+
+    await act(async () => {
+      await result.current.fetchInvitesByUser();
+    });
+
+    expect(mockRefetch).toHaveBeenCalledTimes(1);
+  });
+});
+
+// ─── handleAcceptInvite ───────────────────────────────────────────────────────
+
+describe("useInvitesScreen — handleAcceptInvite", () => {
+  it("chama mutateAsync com ACEITO e navega para a república", async () => {
+    mockMutateAsync.mockResolvedValue(undefined);
+    const { result } = renderHook(() => useInvitesScreen());
+
+    await act(async () => {
+      await result.current.handleAcceptInvite("inv-1", "rep-1");
+    });
+
+    expect(mockMutateAsync).toHaveBeenCalledWith({
+      inviteId: "inv-1",
+      status: StatusInvite.ACEITO,
+    });
+    expect(mockRouterReplace).toHaveBeenCalledWith("/(republics)/rep-1");
+  });
+
+  it("loga o erro e não navega quando a mutation falha", async () => {
+    const error = new Error("update fail");
+    mockMutateAsync.mockRejectedValue(error);
+    const { result } = renderHook(() => useInvitesScreen());
+
+    await act(async () => {
+      await result.current.handleAcceptInvite("inv-1", "rep-1");
+    });
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith("Erro ao aceitar convite:", error);
+    expect(mockRouterReplace).not.toHaveBeenCalled();
+    consoleErrorSpy.mockClear();
+  });
+});
+
+// ─── handleRejectInvite ───────────────────────────────────────────────────────
+
+describe("useInvitesScreen — handleRejectInvite", () => {
+  it("chama mutateAsync com RECUSADO", async () => {
+    mockMutateAsync.mockResolvedValue(undefined);
+    const { result } = renderHook(() => useInvitesScreen());
+
+    await act(async () => {
+      await result.current.handleRejectInvite("inv-1");
+    });
+
+    expect(mockMutateAsync).toHaveBeenCalledWith({
+      inviteId: "inv-1",
+      status: StatusInvite.RECUSADO,
+    });
+  });
+
+  it("loga o erro quando a mutation falha", async () => {
+    const error = new Error("reject fail");
+    mockMutateAsync.mockRejectedValue(error);
+    const { result } = renderHook(() => useInvitesScreen());
+
+    await act(async () => {
+      await result.current.handleRejectInvite("inv-1");
+    });
+
+    expect(consoleErrorSpy).toHaveBeenCalledWith("Erro ao recusar convite:", error);
+    consoleErrorSpy.mockClear();
+  });
+});
+
+// ─── sideMenuUser ─────────────────────────────────────────────────────────────
+
 describe("useInvitesScreen — sideMenuUser", () => {
   it("retorna nome e foto do usuário", () => {
     const { result } = renderHook(() => useInvitesScreen());
-
     expect(result.current.sideMenuUser).toEqual({ name: "Ana", photo: null });
   });
 
   it("usa 'Usuário' como fallback quando user.nome é undefined", () => {
     setupMocks({ nome: undefined });
     const { result } = renderHook(() => useInvitesScreen());
-
     expect(result.current.sideMenuUser.name).toBe("Usuário");
   });
 });
