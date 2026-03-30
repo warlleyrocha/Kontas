@@ -3,7 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { preventAutoHideAsync } from "expo-splash-screen";
 import { wrap } from "@sentry/react-native";
-import { useAuth } from "@/src/features/auth/hooks/useAuth";
+import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 import { configureGoogleSignin } from "@/src/lib/google-signin";
 import { initSentry } from "@/src/lib/sentry";
 import useAppReady from "@/src/hooks/useAppReady";
@@ -44,9 +44,9 @@ jest.mock("@/src/lib/google-signin", () => ({
   configureGoogleSignin: jest.fn(),
 }));
 
-jest.mock("@/src/features/auth/hooks/useAuth", () => ({
+jest.mock("@/src/features/user/hooks/useUserQueries", () => ({
   __esModule: true,
-  useAuth: jest.fn(),
+  useCurrentUserQuery: jest.fn(),
 }));
 
 jest.mock("@/src/hooks/useAppReady", () => ({
@@ -76,7 +76,7 @@ jest.mock("@/src/shared/components/ui/sonner", () => ({
 const mockStack = jest.mocked(Stack);
 const mockPreventAutoHideAsync = jest.mocked(preventAutoHideAsync);
 const mockWrap = jest.mocked(wrap);
-const mockUseAuth = jest.mocked(useAuth);
+const mockUseCurrentUserQuery = jest.mocked(useCurrentUserQuery);
 const mockUseQueryClient = jest.mocked(useQueryClient);
 const mockConfigureGoogleSignin = jest.mocked(configureGoogleSignin);
 const mockInitSentry = jest.mocked(initSentry);
@@ -98,7 +98,10 @@ describe("_layout render", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseAppReady.mockReturnValue(true);
-    mockUseAuth.mockReturnValue({ user: null, isLoading: false } as never);
+    mockUseCurrentUserQuery.mockReturnValue({
+      data: null,
+      isLoading: false,
+    } as never);
     mockUseQueryClient.mockReturnValue({ clear: jest.fn() } as never);
   });
 
@@ -108,14 +111,17 @@ describe("_layout render", () => {
     const { toJSON } = render(<AppLayout />);
 
     expect(toJSON()).toBeNull();
-    expect(mockUseAuth).not.toHaveBeenCalled();
+    expect(mockUseCurrentUserQuery).not.toHaveBeenCalled();
     expect(mockAppProviders).not.toHaveBeenCalled();
     expect(mockStack).not.toHaveBeenCalled();
     expect(mockToaster).not.toHaveBeenCalled();
   });
 
   it("renderiza LoadingScreen quando a autenticação ainda está carregando", () => {
-    mockUseAuth.mockReturnValue({ user: null, isLoading: true } as never);
+    mockUseCurrentUserQuery.mockReturnValue({
+      data: null,
+      isLoading: true,
+    } as never);
 
     render(<AppLayout />);
 

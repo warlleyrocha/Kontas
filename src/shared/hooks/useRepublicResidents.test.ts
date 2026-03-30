@@ -1,13 +1,13 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native";
-import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { residentService } from "@/src/features/residents/services/resident.service";
+import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 import { ResidentRole } from "@/src/shared/types/resident.types";
 import { logger } from "@/src/shared/utils/logger";
 import { useRepublicResidents } from "./useRepublicResidents";
 
-jest.mock("@/src/features/auth/hooks/useAuth", () => ({
+jest.mock("@/src/features/user/hooks/useUserQueries", () => ({
   __esModule: true,
-  useAuth: jest.fn(),
+  useCurrentUserQuery: jest.fn(),
 }));
 
 jest.mock("@/src/features/residents/services/resident.service", () => ({
@@ -24,7 +24,7 @@ jest.mock("@/src/shared/utils/logger", () => ({
   },
 }));
 
-const mockUseAuth = jest.mocked(useAuth);
+const mockUseCurrentUserQuery = jest.mocked(useCurrentUserQuery);
 const mockResidentService = jest.mocked(residentService);
 const mockLogger = jest.mocked(logger);
 
@@ -37,7 +37,9 @@ describe("useRepublicResidents", () => {
   beforeEach(() => {
     jest.restoreAllMocks();
     jest.spyOn(console, "error").mockImplementation(() => {});
-    mockUseAuth.mockReturnValue({ isAuthenticated: true } as never);
+    mockUseCurrentUserQuery.mockReturnValue({
+      data: { id: "u-1" },
+    } as never);
     mockResidentService.getResidents.mockReset();
     mockLogger.error.mockReset();
   });
@@ -160,7 +162,7 @@ describe("useRepublicResidents", () => {
       expect(result.current.residentsCount).toEqual({ "rep-1": 1 });
     });
 
-    mockUseAuth.mockReturnValue({ isAuthenticated: false } as never);
+    mockUseCurrentUserQuery.mockReturnValue({ data: null } as never);
 
     rerender({ list: republics.slice(0, 1) });
 
@@ -170,7 +172,9 @@ describe("useRepublicResidents", () => {
 
     expect(result.current.getUserRole("rep-1")).toBeNull();
 
-    mockUseAuth.mockReturnValue({ isAuthenticated: true } as never);
+    mockUseCurrentUserQuery.mockReturnValue({
+      data: { id: "u-1" },
+    } as never);
 
     rerender({ list: [] });
 

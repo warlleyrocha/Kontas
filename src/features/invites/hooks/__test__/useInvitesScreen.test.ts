@@ -1,9 +1,9 @@
 import { act, renderHook } from "@testing-library/react-native";
 import { useRouter } from "expo-router";
-import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthQueries";
 import { StatusInvite } from "@/src/features/invites/types/invite.types";
 import { getErrorMessage } from "@/src/services/httpError";
+import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
 import { toastErrors } from "@/src/shared/utils/toastMessages";
 import {
@@ -13,9 +13,11 @@ import {
 import { useInvitesScreen } from "../useInvitesScreen";
 
 jest.mock("expo-router", () => ({ useRouter: jest.fn() }));
-jest.mock("@/src/features/auth/hooks/useAuth", () => ({ useAuth: jest.fn() }));
 jest.mock("@/src/features/auth/hooks/useAuthQueries", () => ({
   useLogoutMutation: jest.fn(),
+}));
+jest.mock("@/src/features/user/hooks/useUserQueries", () => ({
+  useCurrentUserQuery: jest.fn(),
 }));
 jest.mock("@/src/features/invites/hooks/useInvitesQueries", () => ({
   useInvitesByUserQuery: jest.fn(),
@@ -40,8 +42,8 @@ const mockRouterReplace = jest.fn();
 
 function setupMocks(userOverrides = {}) {
   jest.mocked(useRouter).mockReturnValue({ replace: mockRouterReplace } as any);
-  jest.mocked(useAuth).mockReturnValue({
-    user: { id: "u-1", nome: "Ana", fotoPerfil: null, ...userOverrides },
+  jest.mocked(useCurrentUserQuery).mockReturnValue({
+    data: { id: "u-1", nome: "Ana", fotoPerfil: null, ...userOverrides },
   } as any);
   jest.mocked(useLogoutMutation).mockReturnValue({
     mutateAsync: mockLogout,

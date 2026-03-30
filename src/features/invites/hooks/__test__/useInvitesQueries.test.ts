@@ -1,7 +1,7 @@
 import { renderHook } from "@testing-library/react-native";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { inviteService } from "@/src/features/invites/services/invite.service";
+import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 import type {
   GetInvitesByUser,
   Invite,
@@ -20,7 +20,9 @@ jest.mock("@tanstack/react-query", () => ({
   useMutation: jest.fn(),
   useQueryClient: jest.fn(),
 }));
-jest.mock("@/src/features/auth/hooks/useAuth", () => ({ useAuth: jest.fn() }));
+jest.mock("@/src/features/user/hooks/useUserQueries", () => ({
+  useCurrentUserQuery: jest.fn(),
+}));
 jest.mock("@/src/features/invites/services/invite.service", () => ({
   inviteService: {
     getInvitesByUser: jest.fn(),
@@ -46,7 +48,9 @@ const mockInvite: Invite = {
 
 beforeEach(() => {
   jest.clearAllMocks();
-  jest.mocked(useAuth).mockReturnValue({ isAuthenticated: true } as any);
+  jest.mocked(useCurrentUserQuery).mockReturnValue({
+    data: { id: "u-1" },
+  } as any);
   jest
     .mocked(useQueryClient)
     .mockReturnValue({ setQueryData: mockSetQueryData } as any);
@@ -80,13 +84,15 @@ describe("useInvitesByUserQuery", () => {
   });
 
   it("enabled=true quando autenticado", () => {
-    jest.mocked(useAuth).mockReturnValue({ isAuthenticated: true } as any);
+    jest.mocked(useCurrentUserQuery).mockReturnValue({
+      data: { id: "u-1" },
+    } as any);
     renderHook(() => useInvitesByUserQuery());
     expect(capturedOptions.enabled).toBe(true);
   });
 
   it("enabled=false quando não autenticado", () => {
-    jest.mocked(useAuth).mockReturnValue({ isAuthenticated: false } as any);
+    jest.mocked(useCurrentUserQuery).mockReturnValue({ data: null } as any);
     renderHook(() => useInvitesByUserQuery());
     expect(capturedOptions.enabled).toBe(false);
   });
@@ -119,19 +125,23 @@ describe("useInvitesByRepublicQuery", () => {
   });
 
   it("enabled=true quando autenticado e republicId fornecido", () => {
-    jest.mocked(useAuth).mockReturnValue({ isAuthenticated: true } as any);
+    jest.mocked(useCurrentUserQuery).mockReturnValue({
+      data: { id: "u-1" },
+    } as any);
     renderHook(() => useInvitesByRepublicQuery("rep-1"));
     expect(capturedOptions.enabled).toBe(true);
   });
 
   it("enabled=false quando não autenticado", () => {
-    jest.mocked(useAuth).mockReturnValue({ isAuthenticated: false } as any);
+    jest.mocked(useCurrentUserQuery).mockReturnValue({ data: null } as any);
     renderHook(() => useInvitesByRepublicQuery("rep-1"));
     expect(capturedOptions.enabled).toBe(false);
   });
 
   it("enabled=false quando republicId é string vazia", () => {
-    jest.mocked(useAuth).mockReturnValue({ isAuthenticated: true } as any);
+    jest.mocked(useCurrentUserQuery).mockReturnValue({
+      data: { id: "u-1" },
+    } as any);
     renderHook(() => useInvitesByRepublicQuery(""));
     expect(capturedOptions.enabled).toBe(false);
   });

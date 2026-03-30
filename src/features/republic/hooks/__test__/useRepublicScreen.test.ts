@@ -2,11 +2,11 @@ import { act, renderHook } from "@testing-library/react-native";
 import { useIsFocused } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 
-import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthQueries";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import { useResidents } from "@/src/features/residents/hooks/useResidents";
 import { getErrorMessage } from "@/src/services/httpError";
+import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import {
   ResidentRole,
@@ -22,9 +22,11 @@ import { useRepublicScreen } from "../useRepublicScreen";
 
 jest.mock("@react-navigation/native", () => ({ useIsFocused: jest.fn() }));
 jest.mock("expo-router", () => ({ useRouter: jest.fn() }));
-jest.mock("@/src/features/auth/hooks/useAuth", () => ({ useAuth: jest.fn() }));
 jest.mock("@/src/features/auth/hooks/useAuthQueries", () => ({
   useLogoutMutation: jest.fn(),
+}));
+jest.mock("@/src/features/user/hooks/useUserQueries", () => ({
+  useCurrentUserQuery: jest.fn(),
 }));
 jest.mock("../useRepublicActions", () => ({ useRepublicActions: jest.fn() }));
 jest.mock("../useRepublicQueries", () => ({
@@ -74,8 +76,8 @@ const mockRefetchRepublics = jest.fn();
 function setupMocks(userOverrides = {}) {
   jest.mocked(useIsFocused).mockReturnValue(true);
   jest.mocked(useRouter).mockReturnValue(mockRouter as any);
-  jest.mocked(useAuth).mockReturnValue({
-    user: {
+  jest.mocked(useCurrentUserQuery).mockReturnValue({
+    data: {
       id: "u-1",
       nome: "Ana",
       email: "ana@email.com",
