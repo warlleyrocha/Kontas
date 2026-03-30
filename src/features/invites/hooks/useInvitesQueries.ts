@@ -51,7 +51,7 @@ export function useSendInviteMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: InviteRequest) => inviteService.sendInvite(payload),
+    mutationFn: inviteService.sendInvite,
     onSuccess: (invite, payload) => {
       const republicId = invite.republicaId ?? payload.republicaId;
 
