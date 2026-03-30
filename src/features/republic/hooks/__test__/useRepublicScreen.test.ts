@@ -2,7 +2,7 @@ import { act, renderHook } from "@testing-library/react-native";
 import { useIsFocused } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 
-import { useAuth } from "@/src/features/auth/contexts";
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import { useResidents } from "@/src/features/residents/hooks/useResidents";
 import { getErrorMessage } from "@/src/services/httpError";
@@ -21,7 +21,7 @@ import { useRepublicScreen } from "../useRepublicScreen";
 
 jest.mock("@react-navigation/native", () => ({ useIsFocused: jest.fn() }));
 jest.mock("expo-router", () => ({ useRouter: jest.fn() }));
-jest.mock("@/src/features/auth/contexts", () => ({ useAuth: jest.fn() }));
+jest.mock("@/src/features/auth/hooks/useAuth", () => ({ useAuth: jest.fn() }));
 jest.mock("../useRepublicActions", () => ({ useRepublicActions: jest.fn() }));
 jest.mock("../useRepublicQueries", () => ({
   useRepublicQuery: jest.fn(),

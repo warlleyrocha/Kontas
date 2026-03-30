@@ -2,7 +2,7 @@ import { render } from "@testing-library/react-native";
 import { Stack } from "expo-router";
 import { preventAutoHideAsync } from "expo-splash-screen";
 import { wrap } from "@sentry/react-native";
-import { useAuth } from "@/src/features/auth/contexts";
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { configureGoogleSignin } from "@/src/lib/google-signin";
 import { initSentry } from "@/src/lib/sentry";
 import useAppReady from "@/src/hooks/useAppReady";
@@ -38,7 +38,7 @@ jest.mock("@/src/lib/google-signin", () => ({
   configureGoogleSignin: jest.fn(),
 }));
 
-jest.mock("@/src/features/auth/contexts", () => ({
+jest.mock("@/src/features/auth/hooks/useAuth", () => ({
   __esModule: true,
   useAuth: jest.fn(),
 }));

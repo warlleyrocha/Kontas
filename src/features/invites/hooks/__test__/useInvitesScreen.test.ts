@@ -1,11 +1,11 @@
 import { act, renderHook } from "@testing-library/react-native";
-import { useAuth } from "@/src/features/auth/contexts";
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
 import { toastErrors } from "@/src/shared/utils/toastMessages";
 import { useInvitesScreen } from "../useInvitesScreen";
 
-jest.mock("@/src/features/auth/contexts", () => ({ useAuth: jest.fn() }));
+jest.mock("@/src/features/auth/hooks/useAuth", () => ({ useAuth: jest.fn() }));
 jest.mock("@/src/features/invites/contexts/InvitesContext", () => ({
   useInvitesContext: jest.fn(),
 }));

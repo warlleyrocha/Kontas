@@ -1,11 +1,11 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native";
-import { useAuth } from "@/src/features/auth/contexts";
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { residentService } from "@/src/features/residents/services/resident.service";
 import { ResidentRole } from "@/src/shared/types/resident.types";
 import { logger } from "@/src/shared/utils/logger";
 import { useRepublicResidents } from "./useRepublicResidents";
 
-jest.mock("@/src/features/auth/contexts", () => ({
+jest.mock("@/src/features/auth/hooks/useAuth", () => ({
   __esModule: true,
   useAuth: jest.fn(),
 }));

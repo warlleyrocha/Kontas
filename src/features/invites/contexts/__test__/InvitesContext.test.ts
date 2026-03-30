@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react-native";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useAuth } from "@/src/features/auth/contexts";
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { inviteService } from "@/src/features/invites/services/invite.service";
 import type {
   GetInvitesByUser,
@@ -24,7 +24,7 @@ jest.mock("@tanstack/react-query", () => ({
   useQueryClient: jest.fn(),
 }));
 jest.mock("expo-router", () => ({ useRouter: jest.fn() }));
-jest.mock("@/src/features/auth/contexts", () => ({ useAuth: jest.fn() }));
+jest.mock("@/src/features/auth/hooks/useAuth", () => ({ useAuth: jest.fn() }));
 jest.mock("@/src/features/invites/services/invite.service", () => ({
   inviteService: {
     getInvitesByUser: jest.fn(),

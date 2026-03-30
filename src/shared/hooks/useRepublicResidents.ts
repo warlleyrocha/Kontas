@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useAuth } from "@/src/features/auth/contexts";
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import { residentService } from "@/src/features/residents/services/resident.service";
 import { ResidentRole } from "@/src/shared/types/resident.types";

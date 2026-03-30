@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react-native";
 import { Redirect } from "expo-router";
-import { useAuth } from "@/src/features/auth/contexts";
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import LoadingScreen from "@/src/shared/components/ui/loading-screen";
 import Index from "../index";
 
@@ -9,7 +9,7 @@ jest.mock("expo-router", () => ({
   Redirect: jest.fn(() => null),
 }));
 
-jest.mock("@/src/features/auth/contexts", () => ({
+jest.mock("@/src/features/auth/hooks/useAuth", () => ({
   __esModule: true,
   useAuth: jest.fn(),
 }));

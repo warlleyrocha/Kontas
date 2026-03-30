@@ -2,7 +2,6 @@
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { GlobalErrorBoundary } from "@/src/shared/components/error-boundary/GlobalErrorBoundary";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { AuthProvider } from "@/src/features/auth/contexts";
 import { RefreshProvider } from "@/src/shared/contexts/RefreshContext";
 import { queryClient } from "@/src/services/queryClient";
 
@@ -15,9 +14,7 @@ export function AppProviders({
     <GestureHandlerRootView style={{ flex: 1 }}>
       <GlobalErrorBoundary>
         <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            <RefreshProvider>{children}</RefreshProvider>
-          </AuthProvider>
+          <RefreshProvider>{children}</RefreshProvider>
         </QueryClientProvider>
       </GlobalErrorBoundary>
     </GestureHandlerRootView>

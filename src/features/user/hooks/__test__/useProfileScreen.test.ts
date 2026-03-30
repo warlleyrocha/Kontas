@@ -2,7 +2,7 @@ import { act, renderHook } from "@testing-library/react-native";
 import { useIsFocused } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
-import { useAuth } from "@/src/features/auth/contexts";
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
 import { useRepublicActions } from "@/src/features/republic/hooks/useRepublicActions";
 import { useRepublicsQuery } from "@/src/features/republic/hooks/useRepublicQueries";
@@ -17,7 +17,7 @@ import { useProfileScreen } from "../useProfileScreen";
 
 jest.mock("@react-navigation/native", () => ({ useIsFocused: jest.fn() }));
 jest.mock("expo-router", () => ({ useRouter: jest.fn() }));
-jest.mock("@/src/features/auth/contexts", () => ({ useAuth: jest.fn() }));
+jest.mock("@/src/features/auth/hooks/useAuth", () => ({ useAuth: jest.fn() }));
 jest.mock("@/src/features/invites/contexts/InvitesContext", () => ({
   useInvitesContext: jest.fn(),
 }));
