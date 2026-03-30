@@ -13,7 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import IconGoogle from "@/assets/images/google-icon.svg";
 import ImageLogin from "@/assets/images/image-login.webp";
-import { useLoginWithGoogleMutation } from "@/src/features/auth/hooks/useAuthQueries";
+import { useLoginWithGoogleMutation } from "@/src/features/auth/hooks/useAuthMutations";
 import { getErrorMessage } from "@/src/services/httpError";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 import { showToast } from "@/src/shared/utils/showToast";
@@ -57,8 +57,8 @@ export default function LoginScreen() {
       showToast.error(
         getErrorMessage(
           error,
-          "Erro ao fazer login com Google. Tente novamente."
-        )
+          "Erro ao fazer login com Google. Tente novamente.",
+        ),
       );
     }
 

@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert } from "react-native";
 
-import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthQueries";
+import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthMutations";
 import {
   usePendingInvitesCount,
   useSendInviteMutation,
@@ -52,7 +52,7 @@ export function useProfileScreen() {
   const { getResidentsCount, isAdmin } = useRepublicResidents(
     republics,
     user?.email,
-    isFocused
+    isFocused,
   );
   const pendingCount = usePendingInvitesCount();
   const {
@@ -82,7 +82,7 @@ export function useProfileScreen() {
       logger.error(
         "User",
         "Erro ao fazer logout",
-        error instanceof Error ? error : undefined
+        error instanceof Error ? error : undefined,
       );
       toastErrors.logoutFailed(error);
     }
@@ -97,7 +97,7 @@ export function useProfileScreen() {
       if (isCompletingProfile && (!phone || !pixKey)) {
         Alert.alert(
           "Campos Obrigatórios",
-          "Por favor, preencha o telefone e a chave Pix."
+          "Por favor, preencha o telefone e a chave Pix.",
         );
         return;
       }
@@ -124,11 +124,11 @@ export function useProfileScreen() {
         logger.error(
           "User",
           "Erro ao salvar perfil",
-          error instanceof Error ? error : undefined
+          error instanceof Error ? error : undefined,
         );
       }
     },
-    [user, completeProfile, updateCurrentUser]
+    [user, completeProfile, updateCurrentUser],
   );
 
   const handleCreateRepublic = useCallback(() => {
@@ -143,7 +143,7 @@ export function useProfileScreen() {
     (id: string) => {
       router.push(`/(republics)/${id}`);
     },
-    [router]
+    [router],
   );
 
   const handleLongPressRepublic = useCallback(
@@ -152,7 +152,7 @@ export function useProfileScreen() {
       setContextMenuPosition(position);
       setContextMenuVisible(true);
     },
-    []
+    [],
   );
 
   const handleCloseContextMenu = useCallback(() => {
@@ -182,14 +182,14 @@ export function useProfileScreen() {
         logger.error(
           "Republic",
           "Erro ao atualizar república",
-          error instanceof Error ? error : undefined
+          error instanceof Error ? error : undefined,
         );
         showToast.error(
-          getErrorMessage(error, "Não foi possível atualizar a república.")
+          getErrorMessage(error, "Não foi possível atualizar a república."),
         );
       }
     },
-    [selectedRepublic, updateRepublic, handleCloseEditModal]
+    [selectedRepublic, updateRepublic, handleCloseEditModal],
   );
 
   const handleDeleteFromMenu = useCallback(() => {
@@ -205,10 +205,10 @@ export function useProfileScreen() {
         logger.error(
           "Republic",
           "Erro ao excluir república",
-          error instanceof Error ? error : undefined
+          error instanceof Error ? error : undefined,
         );
         showToast.error(
-          getErrorMessage(error, "Não foi possível excluir a república.")
+          getErrorMessage(error, "Não foi possível excluir a república."),
         );
       }
     });
@@ -231,7 +231,10 @@ export function useProfileScreen() {
     }
 
     showToast.error(
-      getErrorMessage(republicsError, "Não foi possível carregar as repúblicas.")
+      getErrorMessage(
+        republicsError,
+        "Não foi possível carregar as repúblicas.",
+      ),
     );
   }, [republicsError]);
 

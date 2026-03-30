@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 
-import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthQueries";
+import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthMutations";
 import { StatusInvite } from "@/src/features/invites/types/invite.types";
 import { getErrorMessage } from "@/src/services/httpError";
 import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
@@ -28,12 +28,12 @@ export function useInvitesScreen() {
 
   const invitesByUser = useMemo(
     () => invitesByUserData ?? [],
-    [invitesByUserData]
+    [invitesByUserData],
   );
   const pendingCount = useMemo(
     () =>
       invitesByUser.filter((i) => i.status === StatusInvite.PENDENTE).length,
-    [invitesByUser]
+    [invitesByUser],
   );
 
   const handleSignOut = useCallback(async () => {
@@ -61,7 +61,7 @@ export function useInvitesScreen() {
         console.error("Erro ao aceitar convite:", error);
       }
     },
-    [router, updateStatusMutation]
+    [router, updateStatusMutation],
   );
 
   const handleRejectInvite = useCallback(
@@ -75,7 +75,7 @@ export function useInvitesScreen() {
         console.error("Erro ao recusar convite:", error);
       }
     },
-    [updateStatusMutation]
+    [updateStatusMutation],
   );
 
   const rawError = invitesByUserError ?? updateStatusMutation.error;
@@ -86,7 +86,7 @@ export function useInvitesScreen() {
 
   const sideMenuUser = useMemo(
     () => ({ name: user?.nome ?? "Usuário", photo: user?.fotoPerfil }),
-    [user]
+    [user],
   );
 
   return {

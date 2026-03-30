@@ -2,7 +2,7 @@ import { act, renderHook } from "@testing-library/react-native";
 import { useIsFocused } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
-import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthQueries";
+import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthMutations";
 import {
   usePendingInvitesCount,
   useSendInviteMutation,
@@ -25,7 +25,7 @@ import { useProfileScreen } from "../useProfileScreen";
 
 jest.mock("@react-navigation/native", () => ({ useIsFocused: jest.fn() }));
 jest.mock("expo-router", () => ({ useRouter: jest.fn() }));
-jest.mock("@/src/features/auth/hooks/useAuthQueries", () => ({
+jest.mock("@/src/features/auth/hooks/useAuthMutations", () => ({
   useLogoutMutation: jest.fn(),
 }));
 jest.mock("@/src/features/user/hooks/useUserQueries", () => ({
@@ -204,7 +204,7 @@ describe("useProfileScreen — handleSignOut", () => {
     expect(jest.mocked(logger.error)).toHaveBeenCalledWith(
       "User",
       "Erro ao fazer logout",
-      error
+      error,
     );
     expect(jest.mocked(toastErrors.logoutFailed)).toHaveBeenCalledWith(error);
   });
@@ -221,7 +221,7 @@ describe("useProfileScreen — handleSignOut", () => {
     expect(jest.mocked(logger.error)).toHaveBeenCalledWith(
       "User",
       "Erro ao fazer logout",
-      undefined
+      undefined,
     );
   });
 });
@@ -258,7 +258,7 @@ describe("useProfileScreen — handleSaveProfile", () => {
 
     expect(alertSpy).toHaveBeenCalledWith(
       "Campos Obrigatórios",
-      expect.any(String)
+      expect.any(String),
     );
     expect(mockCompleteProfile).not.toHaveBeenCalled();
   });
@@ -280,7 +280,7 @@ describe("useProfileScreen — handleSaveProfile", () => {
         "Ana",
         "ana@pix",
         undefined,
-        "11999"
+        "11999",
       );
     });
 
@@ -301,7 +301,7 @@ describe("useProfileScreen — handleSaveProfile", () => {
         "Ana",
         "ana@pix",
         undefined,
-        "11999"
+        "11999",
       );
     });
 
@@ -323,14 +323,14 @@ describe("useProfileScreen — handleSaveProfile", () => {
         "Ana",
         "ana@pix",
         undefined,
-        "11999"
+        "11999",
       );
     });
 
     expect(jest.mocked(logger.error)).toHaveBeenCalledWith(
       "User",
       "Erro ao salvar perfil",
-      error
+      error,
     );
   });
 
@@ -343,14 +343,14 @@ describe("useProfileScreen — handleSaveProfile", () => {
         "Ana",
         "ana@pix",
         undefined,
-        "11999"
+        "11999",
       );
     });
 
     expect(jest.mocked(logger.error)).toHaveBeenCalledWith(
       "User",
       "Erro ao salvar perfil",
-      undefined
+      undefined,
     );
   });
 });
@@ -528,7 +528,7 @@ describe("useProfileScreen — handleDeleteFromMenu", () => {
 
     expect(jest.mocked(showToast.confirm)).toHaveBeenCalledWith(
       'Excluir "Alpha"?',
-      expect.any(Function)
+      expect.any(Function),
     );
   });
 
@@ -585,7 +585,7 @@ describe("useProfileScreen — efeitos", () => {
     renderHook(() => useProfileScreen());
     expect(mockRegisterRefresh).toHaveBeenCalledWith(
       "profile",
-      expect.any(Function)
+      expect.any(Function),
     );
   });
 });

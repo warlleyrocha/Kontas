@@ -2,7 +2,7 @@ import { useIsFocused } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthQueries";
+import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthMutations";
 import { useResidents } from "@/src/features/residents/hooks/useResidents";
 import { getErrorMessage } from "@/src/services/httpError";
 import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
@@ -23,10 +23,11 @@ export function useRepublicScreen(republicId: string) {
 
   const isFocused = useIsFocused();
 
-  const { data: republics = [], refetch: refetchRepublics } =
-    useRepublicsQuery({
+  const { data: republics = [], refetch: refetchRepublics } = useRepublicsQuery(
+    {
       enabled: Boolean(user?.perfilCompleto),
-    });
+    },
+  );
   const {
     data: republic = null,
     error: republicError,
@@ -59,7 +60,9 @@ export function useRepublicScreen(republicId: string) {
     logger.warn("Republic", "Não foi possível carregar república:", {
       republicId,
     });
-    showToast.error(getErrorMessage(republicError, "Erro ao carregar república"));
+    showToast.error(
+      getErrorMessage(republicError, "Erro ao carregar república"),
+    );
     router.back();
   }, [republicError, republicId, router]);
 
@@ -100,7 +103,7 @@ export function useRepublicScreen(republicId: string) {
       showToast.success(
         prev
           ? "República removida dos favoritos"
-          : "República adicionada aos favoritos"
+          : "República adicionada aos favoritos",
       );
       return !prev;
     });
@@ -114,7 +117,7 @@ export function useRepublicScreen(republicId: string) {
       logger.error(
         "Republic",
         "Erro ao fazer logout",
-        error instanceof Error ? error : undefined
+        error instanceof Error ? error : undefined,
       );
       toastErrors.logoutFailed(error);
     }
@@ -138,7 +141,7 @@ export function useRepublicScreen(republicId: string) {
           {
             republicId,
             error: getErrorMessage(error, "Erro ao carregar repúblicas"),
-          }
+          },
         );
       }
     }
@@ -159,21 +162,21 @@ export function useRepublicScreen(republicId: string) {
         logger.error(
           "Republic",
           "Erro ao atualizar república",
-          error instanceof Error ? error : undefined
+          error instanceof Error ? error : undefined,
         );
         showToast.error(
-          getErrorMessage(error, "Não foi possível atualizar a república.")
+          getErrorMessage(error, "Não foi possível atualizar a república."),
         );
       }
     },
-    [republic, updateRepublic]
+    [republic, updateRepublic],
   );
 
   const currentResident = useMemo(() => {
     if (!user?.email) return null;
     const normalizedEmail = user.email.toLowerCase();
     return residents.find(
-      (resident) => resident.email.toLowerCase() === normalizedEmail
+      (resident) => resident.email.toLowerCase() === normalizedEmail,
     );
   }, [residents, user?.email]);
 
@@ -194,7 +197,7 @@ export function useRepublicScreen(republicId: string) {
       email: user?.email,
       roleLabel,
     }),
-    [roleLabel, user?.nome, user?.fotoPerfil, user?.email]
+    [roleLabel, user?.nome, user?.fotoPerfil, user?.email],
   );
 
   return {

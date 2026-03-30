@@ -1,6 +1,6 @@
 import { act, renderHook } from "@testing-library/react-native";
 import { useRouter } from "expo-router";
-import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthQueries";
+import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthMutations";
 import { StatusInvite } from "@/src/features/invites/types/invite.types";
 import { getErrorMessage } from "@/src/services/httpError";
 import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
@@ -13,7 +13,7 @@ import {
 import { useInvitesScreen } from "../useInvitesScreen";
 
 jest.mock("expo-router", () => ({ useRouter: jest.fn() }));
-jest.mock("@/src/features/auth/hooks/useAuthQueries", () => ({
+jest.mock("@/src/features/auth/hooks/useAuthMutations", () => ({
   useLogoutMutation: jest.fn(),
 }));
 jest.mock("@/src/features/user/hooks/useUserQueries", () => ({
@@ -112,7 +112,7 @@ describe("useInvitesScreen — estado inicial", () => {
     expect(jest.mocked(useSideMenu)).toHaveBeenCalledWith(
       "invite",
       expect.any(Function),
-      { pendingInvitesCount: 2 }
+      { pendingInvitesCount: 2 },
     );
   });
 
@@ -128,7 +128,7 @@ describe("useInvitesScreen — estado inicial", () => {
 
     expect(jest.mocked(getErrorMessage)).toHaveBeenCalledWith(
       error,
-      "Não foi possível carregar os convites."
+      "Não foi possível carregar os convites.",
     );
     expect(result.current.error).toBe("Não foi possível carregar os convites.");
   });
@@ -168,7 +168,7 @@ describe("useInvitesScreen — handleSignOut", () => {
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       "Erro ao fazer logout da conta:",
-      error
+      error,
     );
     expect(jest.mocked(toastErrors.logoutFailed)).toHaveBeenCalledWith(error);
     consoleErrorSpy.mockClear();
@@ -217,7 +217,10 @@ describe("useInvitesScreen — handleAcceptInvite", () => {
       await result.current.handleAcceptInvite("inv-1", "rep-1");
     });
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith("Erro ao aceitar convite:", error);
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Erro ao aceitar convite:",
+      error,
+    );
     expect(mockRouterReplace).not.toHaveBeenCalled();
     consoleErrorSpy.mockClear();
   });
@@ -249,7 +252,10 @@ describe("useInvitesScreen — handleRejectInvite", () => {
       await result.current.handleRejectInvite("inv-1");
     });
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith("Erro ao recusar convite:", error);
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "Erro ao recusar convite:",
+      error,
+    );
     consoleErrorSpy.mockClear();
   });
 });
