@@ -9,7 +9,10 @@ import {
   useLogoutMutation,
   useUpdateUserMutation,
 } from "@/src/features/auth/hooks/useAuthQueries";
-import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
+import {
+  usePendingInvitesCount,
+  useSendInviteMutation,
+} from "@/src/features/invites/hooks/useInvitesQueries";
 import { useRepublicActions } from "@/src/features/republic/hooks/useRepublicActions";
 import { useRepublicsQuery } from "@/src/features/republic/hooks/useRepublicQueries";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
@@ -51,8 +54,15 @@ export function useProfileScreen() {
     user?.email,
     isFocused
   );
-  const { pendingCount, sendInvite, sendLoading, sendError } =
-    useInvitesContext();
+  const pendingCount = usePendingInvitesCount();
+  const {
+    mutateAsync: sendInvite,
+    isPending: sendLoading,
+    error: sendErrorRaw,
+  } = useSendInviteMutation();
+  const sendError = sendErrorRaw
+    ? getErrorMessage(sendErrorRaw, "Erro ao enviar convite.")
+    : null;
 
   const { refreshing, onRefresh, registerRefresh } = useRefresh();
 

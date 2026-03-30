@@ -2,7 +2,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useCallback, useMemo, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { AccountsTab } from "@/src/features/accounts";
-import { useInvitesByRepublicQuery } from "@/src/features/invites/contexts/InvitesContext";
+import { useInvitesByRepublicQuery } from "@/src/features/invites/hooks/useInvitesQueries";
 import { StatusInvite } from "@/src/features/invites/types/invite.types";
 import { EditRepublicModal } from "@/src/features/republic/components/EditRepublicModal";
 import { ResidentsTab } from "@/src/features/residents";

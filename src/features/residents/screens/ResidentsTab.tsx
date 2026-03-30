@@ -3,7 +3,8 @@ import { type FC, useState } from "react";
 import { FlatList, RefreshControl, Text, View } from "react-native";
 
 import { InviteModal } from "@/src/features/invites/components/InviteModal";
-import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
+import { useSendInviteMutation } from "@/src/features/invites/hooks/useInvitesQueries";
+import { getErrorMessage } from "@/src/services/httpError";
 import { ResidentCard } from "@/src/features/residents/components/ResidentCard";
 import { useTabResidents } from "@/src/features/residents/hooks/useTabResidents";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
@@ -26,7 +27,14 @@ export const ResidentsTab: FC<ResidentsTabProps> = ({
   const { copiarChavePix } = useTabResidents();
   const { refreshing, onRefresh } = useRefresh();
 
-  const { sendInvite, sendLoading, sendError } = useInvitesContext();
+  const {
+    mutateAsync: sendInvite,
+    isPending: sendLoading,
+    error: sendErrorRaw,
+  } = useSendInviteMutation();
+  const sendError = sendErrorRaw
+    ? getErrorMessage(sendErrorRaw, "Erro ao enviar convite.")
+    : null;
 
   const [modalOpen, setModalOpen] = useState(false);
 

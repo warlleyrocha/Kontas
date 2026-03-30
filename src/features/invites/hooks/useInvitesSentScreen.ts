@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { useCallback } from "react";
 
-import { useInvitesByRepublicQuery } from "@/src/features/invites/contexts/InvitesContext";
+import { useInvitesByRepublicQuery } from "@/src/features/invites/hooks/useInvitesQueries";
 import { getErrorMessage } from "@/src/services/httpError";
 
 export function useInvitesSentScreen(republicId: string) {
