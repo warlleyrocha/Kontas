@@ -1,6 +1,10 @@
 import { toUserFriendlyError } from "@/src/services/httpError";
 import { api } from "../../../services/api";
-import { UpdateUserRequest, User } from "../types/user.types";
+import {
+  CompleteProfileRequest,
+  UpdateUserRequest,
+  User,
+} from "../types/user.types";
 
 export const userService = {
   //Método para buscar dados
@@ -32,6 +36,21 @@ export const userService = {
       console.error("❌ Erro ao atualizar perfil:", error);
       throw toUserFriendlyError(error, {
         defaultMessage: "Erro ao atualizar perfil.",
+        statusMessages: {
+          400: "Dados inválidos. Verifique os campos e tente novamente.",
+          401: "Sessão expirada. Faça login novamente.",
+          500: "Erro no servidor. Tente novamente mais tarde.",
+        },
+      });
+    }
+  },
+
+  completeProfile: async (data: CompleteProfileRequest): Promise<void> => {
+    try {
+      await api.post("/auth/completar-dados", data);
+    } catch (error) {
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao completar perfil.",
         statusMessages: {
           400: "Dados inválidos. Verifique os campos e tente novamente.",
           401: "Sessão expirada. Faça login novamente.",
