@@ -1,15 +1,18 @@
 import { Redirect } from "expo-router";
-import { useAuth } from "@/src/features/auth/contexts";
+
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
+import { useRepublicsQuery } from "@/src/features/republic/hooks/useRepublicQueries";
 import LoadingScreen from "@/src/shared/components/ui/loading-screen";
 
 export default function Index() {
-  const { user, loading, republicData } = useAuth();
-  // Mostra loading enquanto verifica autenticação e dados
-  if (loading) {
+  const { user, isLoading } = useAuth();
+  const { data: republics = [], isLoading: isRepublicsLoading } =
+    useRepublicsQuery({ enabled: !!user?.perfilCompleto });
+
+  if (isLoading || (user?.perfilCompleto && isRepublicsLoading)) {
     return <LoadingScreen message="Carregando..." />;
   }
 
-  // Usuário não autenticado → vai para login
   if (!user) {
     return <Redirect href="/(auth)/login" />;
   }
@@ -18,10 +21,8 @@ export default function Index() {
     return <Redirect href="/(auth)/onboarding" />;
   }
 
-  // Já participa de uma república
-  if (republicData && Array.isArray(republicData) && republicData.length > 0) {
-    const rep = republicData[0];
-    return <Redirect href={`/(republics)/${rep.id}`} />;
+  if (republics.length > 0) {
+    return <Redirect href={`/(republics)/${republics[0].id}`} />;
   }
 
   return <Redirect href="/(userProfile)/profile" />;

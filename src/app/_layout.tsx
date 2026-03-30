@@ -1,11 +1,13 @@
 import "../../global.css";
+import { useEffect, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { wrap } from "@sentry/react-native";
 import { Stack } from "expo-router";
 import { preventAutoHideAsync } from "expo-splash-screen";
-import { wrap } from "@sentry/react-native";
 
 import { initSentry } from "@/src/lib/sentry";
 import { configureGoogleSignin } from "@/src/lib/google-signin";
-import { useAuth } from "@/src/features/auth/contexts";
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import useAppReady from "@/src/hooks/useAppReady";
 import { AppProviders } from "../providers/AppProviders";
 
@@ -17,9 +19,19 @@ configureGoogleSignin();
 preventAutoHideAsync();
 
 function RootStack() {
-  const { loading } = useAuth();
+  const { user, isLoading } = useAuth();
+  const queryClient = useQueryClient();
+  const wasAuthenticatedRef = useRef(false);
 
-  if (loading) {
+  useEffect(() => {
+    const isAuthenticated = Boolean(user);
+    if (wasAuthenticatedRef.current && !isAuthenticated) {
+      queryClient.clear();
+    }
+    wasAuthenticatedRef.current = isAuthenticated;
+  }, [user, queryClient]);
+
+  if (isLoading) {
     return <LoadingScreen />;
   }
 
