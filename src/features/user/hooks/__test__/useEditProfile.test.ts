@@ -147,8 +147,36 @@ describe("useEditProfile — handleSave", () => {
       "Ana",
       "ana@pix",
       undefined,
-      "(11) 99999-9999"
+      "(11) 99999-9999",
     );
+  });
+
+  it("mantém isUploading=true até a Promise de onSave ser concluída", async () => {
+    let resolveSave: (() => void) | undefined;
+    const onSave = jest.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveSave = resolve;
+        }),
+    );
+    const { result } = renderHook(() =>
+      useEditProfile({ ...defaultProps, onSave }),
+    );
+
+    let savePromise: Promise<void> | undefined;
+
+    await act(async () => {
+      savePromise = result.current.handleSave();
+    });
+
+    expect(result.current.isUploading).toBe(true);
+
+    await act(async () => {
+      resolveSave?.();
+      await savePromise;
+    });
+
+    expect(result.current.isUploading).toBe(false);
   });
 
   it("define isUploading=false no finally após sucesso", async () => {
@@ -180,7 +208,7 @@ describe("useEditProfile — handleSave", () => {
 
     expect(consoleErrorSpy).toHaveBeenCalledWith("Erro ao salvar:", error);
     expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
-      "Não foi possível salvar as alterações."
+      "Não foi possível salvar as alterações.",
     );
     expect(result.current.isUploading).toBe(false);
     consoleErrorSpy.mockClear();
@@ -203,7 +231,7 @@ describe("useEditProfile — selectPhoto", () => {
 
     expect(alertSpy).toHaveBeenCalledWith(
       "Permissão necessária",
-      "Precisamos de permissão para acessar suas fotos."
+      "Precisamos de permissão para acessar suas fotos.",
     );
     expect(result.current.photoUri).toBeUndefined();
   });
@@ -259,10 +287,10 @@ describe("useEditProfile — selectPhoto", () => {
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       "Erro ao selecionar imagem:",
-      error
+      error,
     );
     expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
-      "Não foi possível selecionar a imagem."
+      "Não foi possível selecionar a imagem.",
     );
     consoleErrorSpy.mockClear();
   });

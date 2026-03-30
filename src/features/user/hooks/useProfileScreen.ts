@@ -77,7 +77,6 @@ export function useProfileScreen() {
   const handleSignOut = useCallback(async () => {
     try {
       await logout();
-      router.replace("/");
     } catch (error) {
       logger.error(
         "User",
@@ -86,7 +85,7 @@ export function useProfileScreen() {
       );
       toastErrors.logoutFailed(error);
     }
-  }, [logout, router]);
+  }, [logout]);
 
   const handleSaveProfile = useCallback(
     async (name: string, pixKey?: string, photo?: string, phone?: string) => {

@@ -178,7 +178,7 @@ function getHandleSignOut(): () => Promise<void> {
 }
 
 describe("useProfileScreen — handleSignOut", () => {
-  it("chama logout e redireciona para / em caso de sucesso", async () => {
+  it("chama logout e não dispara toast de erro em caso de sucesso", async () => {
     mockLogout.mockResolvedValue(undefined);
     renderHook(() => useProfileScreen());
     const handleSignOut = getHandleSignOut();
@@ -188,7 +188,7 @@ describe("useProfileScreen — handleSignOut", () => {
     });
 
     expect(mockLogout).toHaveBeenCalled();
-    expect(mockRouter.replace).toHaveBeenCalledWith("/");
+    expect(jest.mocked(toastErrors.logoutFailed)).not.toHaveBeenCalled();
   });
 
   it("loga erro e chama toastErrors.logoutFailed ao falhar", async () => {
