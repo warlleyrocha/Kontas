@@ -38,7 +38,7 @@ export function useRepublicScreen(republicId: string) {
   const { updateRepublic, showEditModal, setShowEditModal } =
     useRepublicActions();
 
-  const { residents, fetchResidents } = useResidents();
+  const { residents, fetchResidents } = useResidents(republicId);
   const { registerRefresh } = useRefresh();
 
   const [tab, setTab] = useState<TabKey>("contas");
@@ -75,12 +75,6 @@ export function useRepublicScreen(republicId: string) {
     router.back();
   }, [isSuccess, republic, republicId, router, isFocused]);
 
-  useEffect(() => {
-    if (republic?.id) {
-      void fetchResidents(republic.id);
-    }
-  }, [republic?.id, fetchResidents]);
-
   const fetchData = useCallback(async () => {
     if (!republicId) {
       return;
@@ -88,7 +82,7 @@ export function useRepublicScreen(republicId: string) {
 
     const result = await refetchRepublic();
     if (result.data?.id) {
-      await fetchResidents(result.data.id);
+      await fetchResidents();
     }
   }, [fetchResidents, refetchRepublic, republicId]);
 

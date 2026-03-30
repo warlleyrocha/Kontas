@@ -18,8 +18,15 @@ jest.mock("@/src/services/httpError", () => ({
   toUserFriendlyError: jest.fn(),
 }));
 
+jest.mock("axios", () => ({
+  isAxiosError: jest.fn(),
+}));
+
+import { isAxiosError } from "axios";
+
 const mockApi = jest.mocked(api);
 const mockToUserFriendlyError = jest.mocked(toUserFriendlyError);
+const mockIsAxiosError = jest.mocked(isAxiosError);
 
 const mockResident: ResidentResponse = {
   id: "r-1",
@@ -40,6 +47,7 @@ const createPayload: CreateResidentRequest = {
 beforeEach(() => {
   jest.clearAllMocks();
   mockToUserFriendlyError.mockImplementation((err) => err as Error);
+  mockIsAxiosError.mockReturnValue(false);
 });
 
 // ─── createResident ───────────────────────────────────────────────────────────
@@ -86,13 +94,39 @@ describe("residentService.createResident", () => {
 // ─── getResidents ─────────────────────────────────────────────────────────────
 
 describe("residentService.getResidents", () => {
-  it("chama GET /moradores/republica/:id e retorna a lista", async () => {
+  it("chama GET /moradores/republica/:id sem signal e retorna a lista", async () => {
     mockApi.get.mockResolvedValue({ data: [mockResident] });
 
     const result = await residentService.getResidents("rep-1");
 
-    expect(mockApi.get).toHaveBeenCalledWith("/moradores/republica/rep-1");
+    expect(mockApi.get).toHaveBeenCalledWith("/moradores/republica/rep-1", {
+      signal: undefined,
+    });
     expect(result).toEqual([mockResident]);
+  });
+
+  it("passa o AbortSignal para a requisição quando fornecido", async () => {
+    mockApi.get.mockResolvedValue({ data: [mockResident] });
+    const signal = new AbortController().signal;
+
+    await residentService.getResidents("rep-1", signal);
+
+    expect(mockApi.get).toHaveBeenCalledWith("/moradores/republica/rep-1", {
+      signal,
+    });
+  });
+
+  it("relança o erro sem transformar quando a requisição for cancelada (ERR_CANCELED)", async () => {
+    const cancelError = Object.assign(new Error("canceled"), {
+      code: "ERR_CANCELED",
+    });
+    mockApi.get.mockRejectedValue(cancelError);
+    mockIsAxiosError.mockReturnValue(true);
+
+    await expect(residentService.getResidents("rep-1")).rejects.toBe(
+      cancelError
+    );
+    expect(mockToUserFriendlyError).not.toHaveBeenCalled();
   });
 
   it("chama toUserFriendlyError com as mensagens corretas ao falhar", async () => {

@@ -192,15 +192,14 @@ describe("useRepublicScreen — loadRepublic", () => {
   });
 });
 
-// ─── loadResidents effect ─────────────────────────────────────────────────────
+// ─── loadResidents ────────────────────────────────────────────────────────────
 
 describe("useRepublicScreen — loadResidents", () => {
-  it("chama fetchResidents quando republic.id é definido", async () => {
-    const { result } = renderHook(() => useRepublicScreen("rep-1"));
+  it("passa republicId para useResidents para habilitar a query automática", async () => {
+    renderHook(() => useRepublicScreen("rep-1"));
     await act(async () => {});
 
-    expect(mockFetchResidents).toHaveBeenCalledWith("rep-1");
-    expect(result.current.residents).toBeDefined();
+    expect(jest.mocked(useResidents)).toHaveBeenCalledWith("rep-1");
   });
 });
 
@@ -228,7 +227,7 @@ describe("useRepublicScreen — registerRefresh", () => {
     });
 
     expect(mockRefetchRepublic).toHaveBeenCalled();
-    expect(mockFetchResidents).toHaveBeenCalledWith("rep-1");
+    expect(mockFetchResidents).toHaveBeenCalled();
   });
 
   it("fetchData não atualiza quando retorna null", async () => {

@@ -1,316 +1,197 @@
-import { act, renderHook, waitFor } from "@testing-library/react-native";
-import { residentService } from "@/src/features/residents/services/resident.service";
+import { renderHook } from "@testing-library/react-native";
+import { useQueries } from "@tanstack/react-query";
+
 import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 import { ResidentRole } from "@/src/shared/types/resident.types";
-import { logger } from "@/src/shared/utils/logger";
+
 import { useRepublicResidents } from "./useRepublicResidents";
 
+jest.mock("@tanstack/react-query", () => ({
+  useQueries: jest.fn(),
+}));
+
 jest.mock("@/src/features/user/hooks/useUserQueries", () => ({
-  __esModule: true,
   useCurrentUserQuery: jest.fn(),
 }));
 
 jest.mock("@/src/features/residents/services/resident.service", () => ({
-  __esModule: true,
-  residentService: {
-    getResidents: jest.fn(),
-  },
+  residentService: { getResidents: jest.fn() },
 }));
 
-jest.mock("@/src/shared/utils/logger", () => ({
-  __esModule: true,
-  logger: {
-    error: jest.fn(),
-  },
+jest.mock("@/src/features/residents/hooks/resident.keys", () => ({
+  residentKeys: { byRepublic: (id: string) => ["residents", "republic", id] },
 }));
 
-const mockUseCurrentUserQuery = jest.mocked(useCurrentUserQuery);
-const mockResidentService = jest.mocked(residentService);
-const mockLogger = jest.mocked(logger);
+// ─── Fixtures ─────────────────────────────────────────────────────────────────
 
 const republics = [
   { id: "rep-1", nome: "Rep 1" },
   { id: "rep-2", nome: "Rep 2" },
 ];
 
-describe("useRepublicResidents", () => {
-  beforeEach(() => {
-    jest.restoreAllMocks();
-    jest.spyOn(console, "error").mockImplementation(() => {});
-    mockUseCurrentUserQuery.mockReturnValue({
-      data: { id: "u-1" },
-    } as never);
-    mockResidentService.getResidents.mockReset();
-    mockLogger.error.mockReset();
-  });
+const residentAdmin = {
+  id: "r-1",
+  nome: "Admin",
+  email: "admin@example.com",
+  fotoPerfil: null,
+  chavePix: null,
+  telefone: null,
+  role: ResidentRole.ADMIN,
+};
 
-  it("não carrega moradores quando o hook estiver desabilitado", async () => {
+const residentUser = {
+  id: "r-2",
+  nome: "Morador",
+  email: "user@example.com",
+  fotoPerfil: null,
+  chavePix: null,
+  telefone: null,
+  role: ResidentRole.USER,
+};
+
+// ─── Setup ────────────────────────────────────────────────────────────────────
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  jest.mocked(useCurrentUserQuery).mockReturnValue({
+    data: { id: "u-1" },
+  } as any);
+  jest.mocked(useQueries).mockReturnValue([]);
+});
+
+// ─── useRepublicResidents ─────────────────────────────────────────────────────
+
+describe("useRepublicResidents — estado inicial", () => {
+  it("retorna mapas vazios quando useQueries retorna array vazio", () => {
     const { result } = renderHook(() =>
-      useRepublicResidents(republics, "user@example.com", false)
+      useRepublicResidents([], "user@example.com")
     );
 
-    expect(mockResidentService.getResidents).not.toHaveBeenCalled();
     expect(result.current.residentsCount).toEqual({});
     expect(result.current.getResidentsCount("rep-1")).toBe(0);
     expect(result.current.getUserRole("rep-1")).toBeNull();
     expect(result.current.isAdmin("rep-1")).toBe(false);
-
-    await act(async () => {
-      await result.current.refresh();
-    });
-
-    expect(mockResidentService.getResidents).not.toHaveBeenCalled();
   });
+});
 
-  it("carrega a contagem de moradores e o papel do usuário atual", async () => {
-    mockResidentService.getResidents
-      .mockResolvedValueOnce([
-        {
-          id: "resident-1",
-          nome: "Admin",
-          email: "USER@example.com",
-          fotoPerfil: null,
-          chavePix: null,
-          telefone: null,
-          role: ResidentRole.ADMIN,
-        },
-        {
-          id: "resident-2",
-          nome: "Outro",
-          email: "other@example.com",
-          fotoPerfil: null,
-          chavePix: null,
-          telefone: null,
-          role: ResidentRole.USER,
-        },
-      ] as never)
-      .mockResolvedValueOnce([
-        {
-          id: "resident-3",
-          nome: "Morador",
-          email: "third@example.com",
-          fotoPerfil: null,
-          chavePix: null,
-          telefone: null,
-          role: ResidentRole.USER,
-        },
-      ] as never)
-      .mockResolvedValueOnce([] as never)
-      .mockResolvedValueOnce([] as never);
+describe("useRepublicResidents — contagem e roles", () => {
+  it("deriva residentsCount a partir dos dados das queries", () => {
+    jest.mocked(useQueries).mockReturnValue([
+      { data: [residentAdmin, residentUser] },
+      { data: [residentUser] },
+    ] as any);
 
     const { result } = renderHook(() =>
-      useRepublicResidents(republics, "user@example.com")
+      useRepublicResidents(republics, "admin@example.com")
     );
 
-    await waitFor(() => {
-      expect(result.current.residentsCount).toEqual({
-        "rep-1": 2,
-        "rep-2": 1,
-      });
+    expect(result.current.residentsCount).toEqual({
+      "rep-1": 2,
+      "rep-2": 1,
     });
+  });
 
-    expect(result.current.getResidentsCount("rep-1")).toBe(2);
-    expect(result.current.getResidentsCount("inexistente")).toBe(0);
+  it("retorna 0 para república cujos dados ainda não carregaram", () => {
+    jest.mocked(useQueries).mockReturnValue([
+      { data: undefined },
+    ] as any);
+
+    const { result } = renderHook(() =>
+      useRepublicResidents(republics.slice(0, 1), "user@example.com")
+    );
+
+    expect(result.current.getResidentsCount("rep-1")).toBe(0);
+  });
+
+  it("identifica o papel do usuário atual em cada república", () => {
+    jest.mocked(useQueries).mockReturnValue([
+      { data: [residentAdmin, residentUser] },
+      { data: [residentUser] },
+    ] as any);
+
+    const { result } = renderHook(() =>
+      useRepublicResidents(republics, "admin@example.com")
+    );
+
     expect(result.current.getUserRole("rep-1")).toBe(ResidentRole.ADMIN);
     expect(result.current.getUserRole("rep-2")).toBeNull();
     expect(result.current.isAdmin("rep-1")).toBe(true);
     expect(result.current.isAdmin("rep-2")).toBe(false);
-
-    await act(async () => {
-      await result.current.refresh();
-    });
-
-    expect(mockResidentService.getResidents).toHaveBeenCalledTimes(4);
   });
 
-  it("usa fallback de contagem zero quando o serviço retorna residents indefinido", async () => {
-    mockResidentService.getResidents.mockResolvedValue(undefined as never);
+  it("faz match de email case-insensitive", () => {
+    jest.mocked(useQueries).mockReturnValue([
+      { data: [{ ...residentAdmin, email: "ADMIN@EXAMPLE.COM" }] },
+    ] as any);
+
+    const { result } = renderHook(() =>
+      useRepublicResidents(republics.slice(0, 1), "admin@example.com")
+    );
+
+    expect(result.current.getUserRole("rep-1")).toBe(ResidentRole.ADMIN);
+  });
+
+  it("não preenche roles quando currentUserEmail não for informado", () => {
+    jest.mocked(useQueries).mockReturnValue([
+      { data: [residentAdmin] },
+    ] as any);
+
+    const { result } = renderHook(() =>
+      useRepublicResidents(republics.slice(0, 1))
+    );
+
+    expect(result.current.getResidentsCount("rep-1")).toBe(1);
+    expect(result.current.getUserRole("rep-1")).toBeNull();
+    expect(result.current.isAdmin("rep-1")).toBe(false);
+  });
+});
+
+describe("useRepublicResidents — enabled", () => {
+  it("passa enabled=false para as queries quando o hook estiver desabilitado", () => {
+    let capturedOptions: any;
+    jest.mocked(useQueries).mockImplementation((opts: any) => {
+      capturedOptions = opts;
+      return [];
+    });
+
+    renderHook(() =>
+      useRepublicResidents(republics.slice(0, 1), "user@example.com", false)
+    );
+
+    expect(capturedOptions.queries[0].enabled).toBe(false);
+  });
+
+  it("passa enabled=false quando não estiver autenticado", () => {
+    jest.mocked(useCurrentUserQuery).mockReturnValue({
+      data: null,
+    } as any);
+
+    let capturedOptions: any;
+    jest.mocked(useQueries).mockImplementation((opts: any) => {
+      capturedOptions = opts;
+      return [];
+    });
+
+    renderHook(() =>
+      useRepublicResidents(republics.slice(0, 1), "user@example.com")
+    );
+
+    expect(capturedOptions.queries[0].enabled).toBe(false);
+  });
+});
+
+describe("useRepublicResidents — fallback de erro", () => {
+  it("usa count=0 e role=null quando a query de uma república falha (data undefined)", () => {
+    jest.mocked(useQueries).mockReturnValue([
+      { data: undefined },
+    ] as any);
 
     const { result } = renderHook(() =>
       useRepublicResidents(republics.slice(0, 1), "user@example.com")
     );
-
-    await waitFor(() => {
-      expect(result.current.residentsCount).toEqual({ "rep-1": 0 });
-    });
 
     expect(result.current.getResidentsCount("rep-1")).toBe(0);
     expect(result.current.getUserRole("rep-1")).toBeNull();
-  });
-
-  it("zera os mapas quando não estiver autenticado ou não houver repúblicas", async () => {
-    mockResidentService.getResidents.mockResolvedValue([
-      {
-        id: "resident-1",
-        nome: "Admin",
-        email: "user@example.com",
-        fotoPerfil: null,
-        chavePix: null,
-        telefone: null,
-        role: ResidentRole.ADMIN,
-      },
-    ] as never);
-
-    const { result, rerender } = renderHook(
-      ({ list }) => useRepublicResidents(list, "user@example.com"),
-      {
-        initialProps: { list: republics.slice(0, 1) },
-      }
-    );
-
-    await waitFor(() => {
-      expect(result.current.residentsCount).toEqual({ "rep-1": 1 });
-    });
-
-    mockUseCurrentUserQuery.mockReturnValue({ data: null } as never);
-
-    rerender({ list: republics.slice(0, 1) });
-
-    await waitFor(() => {
-      expect(result.current.residentsCount).toEqual({});
-    });
-
-    expect(result.current.getUserRole("rep-1")).toBeNull();
-
-    mockUseCurrentUserQuery.mockReturnValue({
-      data: { id: "u-1" },
-    } as never);
-
-    rerender({ list: [] });
-
-    await waitFor(() => {
-      expect(result.current.residentsCount).toEqual({});
-    });
-  });
-
-  it("registra erro por república e usa fallback de count e role", async () => {
-    const error = new Error("falha ao buscar");
-
-    mockResidentService.getResidents.mockRejectedValue(error);
-
-    const { result } = renderHook(() =>
-      useRepublicResidents(republics.slice(0, 1), "user@example.com")
-    );
-
-    await waitFor(() => {
-      expect(result.current.residentsCount).toEqual({ "rep-1": 0 });
-    });
-    expect(result.current.getUserRole("rep-1")).toBeNull();
     expect(result.current.isAdmin("rep-1")).toBe(false);
-    expect(mockLogger.error).toHaveBeenCalledWith(
-      "Residents",
-      "Erro ao buscar moradores da república rep-1",
-      error
-    );
-  });
-
-  it("usa undefined no logger quando o erro por república não for instância de Error", async () => {
-    mockResidentService.getResidents.mockRejectedValue("falha em texto");
-
-    const { result } = renderHook(() =>
-      useRepublicResidents(republics.slice(0, 1), "user@example.com")
-    );
-
-    await waitFor(() => {
-      expect(result.current.residentsCount).toEqual({ "rep-1": 0 });
-    });
-
-    expect(result.current.getUserRole("rep-1")).toBeNull();
-    expect(mockLogger.error).toHaveBeenCalledWith(
-      "Residents",
-      "Erro ao buscar moradores da república rep-1",
-      undefined
-    );
-  });
-
-  it("não tenta preencher roles no catch interno quando currentUserEmail não for informado", async () => {
-    mockResidentService.getResidents.mockRejectedValue(
-      new Error("falha sem email")
-    );
-
-    const { result } = renderHook(() =>
-      useRepublicResidents(republics.slice(0, 1))
-    );
-
-    await waitFor(() => {
-      expect(result.current.residentsCount).toEqual({ "rep-1": 0 });
-    });
-
-    expect(result.current.getUserRole("rep-1")).toBeNull();
-    expect(result.current.isAdmin("rep-1")).toBe(false);
-    expect(mockLogger.error).toHaveBeenCalledWith(
-      "Residents",
-      "Erro ao buscar moradores da república rep-1",
-      expect.any(Error)
-    );
-  });
-
-  it("não preenche roles quando currentUserEmail não for informado", async () => {
-    mockResidentService.getResidents.mockResolvedValue([
-      {
-        id: "resident-1",
-        nome: "Admin",
-        email: "user@example.com",
-        fotoPerfil: null,
-        chavePix: null,
-        telefone: null,
-        role: ResidentRole.ADMIN,
-      },
-    ] as never);
-
-    const { result } = renderHook(() =>
-      useRepublicResidents(republics.slice(0, 1))
-    );
-
-    await waitFor(() => {
-      expect(result.current.residentsCount).toEqual({ "rep-1": 1 });
-    });
-    expect(result.current.getUserRole("rep-1")).toBeNull();
-    expect(result.current.isAdmin("rep-1")).toBe(false);
-  });
-
-  it("captura erro inesperado do carregamento externo", async () => {
-    const error = new Error("falha externa");
-    const promiseAllSpy = jest
-      .spyOn(Promise, "all")
-      .mockRejectedValueOnce(error);
-    const badRepublics = {
-      length: 1,
-      map: () => [],
-    } as unknown as typeof republics;
-
-    renderHook(() => useRepublicResidents(badRepublics, "user@example.com"));
-
-    await waitFor(() => {
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        "Residents",
-        "Erro inesperado ao carregar moradores",
-        error
-      );
-    });
-
-    promiseAllSpy.mockRestore();
-  });
-
-  it("usa undefined no logger quando o erro externo não for instância de Error", async () => {
-    const promiseAllSpy = jest
-      .spyOn(Promise, "all")
-      .mockRejectedValueOnce("falha externa");
-    const badRepublics = {
-      length: 1,
-      map: () => [],
-    } as unknown as typeof republics;
-
-    renderHook(() => useRepublicResidents(badRepublics, "user@example.com"));
-
-    await waitFor(() => {
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        "Residents",
-        "Erro inesperado ao carregar moradores",
-        undefined
-      );
-    });
-
-    promiseAllSpy.mockRestore();
   });
 });
