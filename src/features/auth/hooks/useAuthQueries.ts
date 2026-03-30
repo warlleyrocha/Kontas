@@ -6,15 +6,15 @@ import { deleteItemAsync, getItemAsync, setItemAsync } from "expo-secure-store";
 
 import { authService } from "@/src/features/auth/services/auth.service";
 import { userService } from "@/src/features/user/services/user.service";
-import { UpdateUserRequest } from "@/src/features/user/types/user.types";
-import {
-  getErrorMessage,
-  isUnauthorizedError,
-} from "@/src/services/httpError";
+import { getErrorMessage, isUnauthorizedError } from "@/src/services/httpError";
 import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
 
-import { CompleteProfileRequest, User } from "../types/auth.types";
+import type {
+  CompleteProfileRequest,
+  UpdateUserRequest,
+  User,
+} from "@/src/features/user/types/user.types";
 import { authKeys } from "./auth.keys";
 
 export function useAuthUserQuery() {
@@ -132,7 +132,7 @@ export function useLogoutMutation() {
       logger.error(
         "Auth",
         "Erro ao fazer logout",
-        error instanceof Error ? error : undefined
+        error instanceof Error ? error : undefined,
       );
     },
   });

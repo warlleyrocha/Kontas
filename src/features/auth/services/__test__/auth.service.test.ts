@@ -1,11 +1,9 @@
 import { toUserFriendlyError } from "@/src/services/httpError";
 import { api } from "@/src/services/api";
 import { logger } from "@/src/shared/utils/logger";
-import type {
-  AuthResponse,
-  CompleteProfileRequest,
-} from "../../types/auth.types";
+import type { AuthResponse } from "../../types/auth.types";
 import { authService } from "../auth.service";
+import { CompleteProfileRequest } from "@/src/features/user/types/user.types";
 
 jest.mock("@/src/services/api", () => ({
   api: {
@@ -109,7 +107,7 @@ describe("authService.completeProfile", () => {
     expect(mockLogger.debug).toHaveBeenCalledWith(
       "Auth",
       "Payload de completar perfil",
-      payload
+      payload,
     );
   });
 
@@ -120,7 +118,7 @@ describe("authService.completeProfile", () => {
 
     expect(mockLogger.info).toHaveBeenCalledWith(
       "Auth",
-      "Perfil completado com sucesso no backend"
+      "Perfil completado com sucesso no backend",
     );
   });
 
@@ -133,7 +131,7 @@ describe("authService.completeProfile", () => {
     expect(mockLogger.error).toHaveBeenCalledWith(
       "Auth",
       "Erro ao completar perfil",
-      error
+      error,
     );
   });
 
@@ -145,7 +143,7 @@ describe("authService.completeProfile", () => {
     expect(mockLogger.error).toHaveBeenCalledWith(
       "Auth",
       "Erro ao completar perfil",
-      undefined
+      undefined,
     );
   });
 
@@ -156,7 +154,7 @@ describe("authService.completeProfile", () => {
     mockToUserFriendlyError.mockReturnValue(friendly);
 
     await expect(authService.completeProfile(payload)).rejects.toThrow(
-      friendly
+      friendly,
     );
 
     expect(mockToUserFriendlyError).toHaveBeenCalledWith(error, {

@@ -1,11 +1,9 @@
 import { toUserFriendlyError } from "@/src/services/httpError";
 import { logger } from "@/src/shared/utils/logger";
 import { api } from "../../../services/api";
-import {
-  AuthResponse,
-  CompleteProfileRequest,
-  GoogleLoginRequest,
-} from "../types/auth.types";
+import { AuthResponse, GoogleLoginRequest } from "../types/auth.types";
+
+import { CompleteProfileRequest } from "@/src/features/user/types/user.types";
 
 export const authService = {
   // Método para login com Google
@@ -40,7 +38,7 @@ export const authService = {
       logger.error(
         "Auth",
         "Erro ao completar perfil",
-        error instanceof Error ? error : undefined
+        error instanceof Error ? error : undefined,
       );
       throw toUserFriendlyError(error, {
         defaultMessage: "Erro ao completar perfil.",
