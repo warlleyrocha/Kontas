@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import { residentService } from "@/src/features/residents/services/resident.service";
+import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 import { ResidentRole } from "@/src/shared/types/resident.types";
 import { logger } from "@/src/shared/utils/logger";
 
@@ -14,7 +14,8 @@ export function useRepublicResidents(
   currentUserEmail?: string | null,
   enabled = true
 ) {
-  const { isAuthenticated } = useAuth();
+  const { data: user = null } = useCurrentUserQuery();
+  const isAuthenticated = Boolean(user);
   const [residentsCount, setResidentsCount] = useState<Record<string, number>>(
     {}
   );

@@ -3,12 +3,7 @@ import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert } from "react-native";
 
-import { useAuth } from "@/src/features/auth/hooks/useAuth";
-import {
-  useCompleteProfileMutation,
-  useLogoutMutation,
-  useUpdateUserMutation,
-} from "@/src/features/auth/hooks/useAuthQueries";
+import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthQueries";
 import {
   usePendingInvitesCount,
   useSendInviteMutation,
@@ -17,6 +12,11 @@ import { useRepublicActions } from "@/src/features/republic/hooks/useRepublicAct
 import { useRepublicsQuery } from "@/src/features/republic/hooks/useRepublicQueries";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import { getErrorMessage } from "@/src/services/httpError";
+import {
+  useCompleteProfileMutation,
+  useCurrentUserQuery,
+  useUpdateCurrentUserMutation,
+} from "@/src/features/user/hooks/useUserQueries";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { useRepublicResidents } from "@/src/shared/hooks/useRepublicResidents";
@@ -36,10 +36,10 @@ export function useProfileScreen() {
   const router = useRouter();
   const isFocused = useIsFocused();
 
-  const { user } = useAuth();
+  const { data: user = null } = useCurrentUserQuery();
   const { mutateAsync: logout } = useLogoutMutation();
   const { mutateAsync: completeProfile } = useCompleteProfileMutation();
-  const { mutateAsync: updateUser } = useUpdateUserMutation();
+  const { mutateAsync: updateCurrentUser } = useUpdateCurrentUserMutation();
   const {
     data: republics = [],
     error: republicsError,
@@ -111,7 +111,7 @@ export function useProfileScreen() {
             fotoPerfil: photo,
           });
         } else {
-          await updateUser({
+          await updateCurrentUser({
             nome: name,
             telefone: phone,
             chavePix: pixKey,
@@ -120,21 +120,15 @@ export function useProfileScreen() {
         }
 
         setShowEditProfileModal(false);
-        showToast.success(
-          isCompletingProfile
-            ? "Perfil salvo com sucesso!"
-            : "Perfil atualizado com sucesso!"
-        );
       } catch (error) {
         logger.error(
           "User",
           "Erro ao salvar perfil",
           error instanceof Error ? error : undefined
         );
-        toastErrors.profileUpdateFailed(error);
       }
     },
-    [user, completeProfile, updateUser]
+    [user, completeProfile, updateCurrentUser]
   );
 
   const handleCreateRepublic = useCallback(() => {

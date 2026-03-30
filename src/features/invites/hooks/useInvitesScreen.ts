@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 
-import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthQueries";
 import { StatusInvite } from "@/src/features/invites/types/invite.types";
 import { getErrorMessage } from "@/src/services/httpError";
+import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
 import { toastErrors } from "@/src/shared/utils/toastMessages";
 
@@ -15,7 +15,7 @@ import {
 
 export function useInvitesScreen() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { data: user = null } = useCurrentUserQuery();
   const { mutateAsync: logout } = useLogoutMutation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 

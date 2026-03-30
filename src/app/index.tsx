@@ -1,11 +1,11 @@
 import { Redirect } from "expo-router";
 
-import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { useRepublicsQuery } from "@/src/features/republic/hooks/useRepublicQueries";
+import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 import LoadingScreen from "@/src/shared/components/ui/loading-screen";
 
 export default function Index() {
-  const { user, isLoading } = useAuth();
+  const { data: user = null, isLoading } = useCurrentUserQuery();
   const { data: republics = [], isLoading: isRepublicsLoading } =
     useRepublicsQuery({ enabled: !!user?.perfilCompleto });
 

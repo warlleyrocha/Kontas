@@ -1,20 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 
-import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { inviteService } from "@/src/features/invites/services/invite.service";
 import type {
   GetInvitesByUser,
   Invite,
-  InviteRequest,
 } from "@/src/features/invites/types/invite.types";
 import { StatusInvite } from "@/src/features/invites/types/invite.types";
+import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 
 import { inviteKeys } from "./invite.keys";
 
 function updateInviteList(
   currentInvites: Invite[] | undefined,
-  invite: Invite
+  invite: Invite,
 ) {
   const invites = currentInvites ?? [];
   const alreadyExists = invites.some((item) => item.id === invite.id);
@@ -27,7 +26,8 @@ function updateInviteList(
 }
 
 export function useInvitesByUserQuery() {
-  const { isAuthenticated } = useAuth();
+  const { data: user = null } = useCurrentUserQuery();
+  const isAuthenticated = Boolean(user);
 
   return useQuery({
     queryKey: inviteKeys.byUser(),
@@ -37,7 +37,8 @@ export function useInvitesByUserQuery() {
 }
 
 export function useInvitesByRepublicQuery(republicId: string) {
-  const { isAuthenticated } = useAuth();
+  const { data: user = null } = useCurrentUserQuery();
+  const isAuthenticated = Boolean(user);
 
   return useQuery({
     queryKey: inviteKeys.byRepublic(republicId),
@@ -57,7 +58,7 @@ export function useSendInviteMutation() {
 
       queryClient.setQueryData<Invite[]>(
         inviteKeys.byRepublic(republicId),
-        (currentInvites) => updateInviteList(currentInvites, invite)
+        (currentInvites) => updateInviteList(currentInvites, invite),
       );
     },
   });
@@ -79,8 +80,8 @@ export function useUpdateInviteStatusMutation() {
         inviteKeys.byUser(),
         (currentInvites) =>
           (currentInvites ?? []).filter(
-            (invite) => invite.id !== variables.inviteId
-          )
+            (invite) => invite.id !== variables.inviteId,
+          ),
       );
     },
   });
@@ -93,6 +94,6 @@ export function usePendingInvitesCount() {
     () =>
       (data ?? []).filter((invite) => invite.status === StatusInvite.PENDENTE)
         .length,
-    [data]
+    [data],
   );
 }

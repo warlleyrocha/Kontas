@@ -5,9 +5,9 @@ import { wrap } from "@sentry/react-native";
 import { Stack } from "expo-router";
 import { preventAutoHideAsync } from "expo-splash-screen";
 
+import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 import { initSentry } from "@/src/lib/sentry";
 import { configureGoogleSignin } from "@/src/lib/google-signin";
-import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import useAppReady from "@/src/hooks/useAppReady";
 import { AppProviders } from "../providers/AppProviders";
 
@@ -19,7 +19,7 @@ configureGoogleSignin();
 preventAutoHideAsync();
 
 function RootStack() {
-  const { user, isLoading } = useAuth();
+  const { data: user = null, isLoading } = useCurrentUserQuery();
   const queryClient = useQueryClient();
   const wasAuthenticatedRef = useRef(false);
 
