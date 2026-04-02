@@ -1,7 +1,14 @@
-import { useCallback, useEffect, useMemo, useReducer, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
-import { useAccountData } from "@/src/features/accounts/hooks/useAccountList/useAccountData";
-import { accountResidentsService } from "@/src/features/accounts/services/account-residents.service";
+import {
+  useAccountResidentsByAccountQueries,
+  useAccountsByRepublicQuery,
+  useConfirmResidentPaymentAdminMutation,
+  useRefuseResidentPaymentAdminMutation,
+} from "@/src/features/accounts/hooks/useAccountQueries";
+import { accountKeys } from "@/src/features/accounts/hooks/account.keys";
+import { accountResidentKeys } from "@/src/features/accounts/hooks/accountResident.keys";
 import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import type {
   PaymentAccount,
@@ -9,14 +16,8 @@ import type {
 } from "@/src/features/accounts/types/payments.types";
 import { getMoradorStatusVisual } from "@/src/features/accounts/utils/accountStatus.utils";
 import { getErrorMessage } from "@/src/services/httpError";
-import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 import { showToast } from "@/src/shared/utils/showToast";
-
-import {
-  paymentsInitialState,
-  paymentsReducer,
-} from "../reducer/paymentsReducer";
 
 interface UsePaymentsScreenParams {
   readonly republicId: string;
@@ -25,73 +26,66 @@ interface UsePaymentsScreenParams {
 export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
   useComponentLogger("PaymentsScreen");
 
-  const { refreshAll } = useRefresh();
-  const { error, fetchAccounts, fetchAccountResidents } = useAccountData({
-    republicId,
-  });
-
-  const [{ accounts: paymentAccounts, isLoading, isRefreshing }, dispatch] =
-    useReducer(paymentsReducer, paymentsInitialState);
-
+  const queryClient = useQueryClient();
+  const accountsQuery = useAccountsByRepublicQuery(republicId);
+  const confirmResidentMutation = useConfirmResidentPaymentAdminMutation();
+  const refuseResidentMutation = useRefuseResidentPaymentAdminMutation();
+  const accounts = accountsQuery.data ?? [];
+  const accountIds = useMemo(() => accounts.map((account) => account.id), [accounts]);
+  const residentQueries = useAccountResidentsByAccountQueries(accountIds);
   const [confirmingResidentById, setConfirmingResidentById] = useState<
     Record<string, boolean>
   >({});
-
   const [refusingResidentById, setRefusingResidentById] = useState<
     Record<string, boolean>
   >({});
-
   const [selectedStatus, setSelectedStatus] = useState<PaymentStatusFilter>(
     StatusPagamento.AGUARDANDO_CONFIRMACAO
   );
 
   const loadPayments = useCallback(
-    async (isManualRefresh = false) => {
-      dispatch({ type: isManualRefresh ? "REFRESH_START" : "LOAD_START" });
-
-      try {
-        const accounts = await fetchAccounts();
-
-        const accountsWithPayments = await Promise.all(
-          accounts.map(async (account) => {
-            const residents = await fetchAccountResidents(account.id);
-            const relevantResidents = residents.filter(
-              (resident) =>
-                getMoradorStatusVisual(resident) ===
-                  StatusPagamento.AGUARDANDO_CONFIRMACAO ||
-                getMoradorStatusVisual(resident) === StatusPagamento.PAGO
-            );
-
-            if (relevantResidents.length === 0) {
-              return null;
-            }
-
-            return {
-              ...account,
-              residents: relevantResidents,
-            };
-          })
-        );
-
-        const filteredAccounts = accountsWithPayments
-          .filter((account): account is PaymentAccount => account !== null)
-          .sort(
-            (firstAccount, secondAccount) =>
-              new Date(firstAccount.vencimento).getTime() -
-              new Date(secondAccount.vencimento).getTime()
-          );
-
-        dispatch({ type: "LOAD_SUCCESS", accounts: filteredAccounts });
-      } finally {
-        dispatch({ type: "LOAD_DONE" });
-      }
+    async (_isManualRefresh = false) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: accountKeys.byRepublic(republicId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: accountResidentKeys.all,
+        }),
+      ]);
     },
-    [fetchAccounts, fetchAccountResidents]
+    [queryClient, republicId]
   );
 
-  useEffect(() => {
-    void loadPayments();
-  }, [loadPayments]);
+  const paymentAccounts = useMemo(
+    () =>
+      accounts
+        .map((account, index) => {
+          const residents = residentQueries[index]?.data ?? [];
+          const relevantResidents = residents.filter(
+            (resident) =>
+              getMoradorStatusVisual(resident) ===
+                StatusPagamento.AGUARDANDO_CONFIRMACAO ||
+              getMoradorStatusVisual(resident) === StatusPagamento.PAGO
+          );
+
+          if (relevantResidents.length === 0) {
+            return null;
+          }
+
+          return {
+            ...account,
+            residents: relevantResidents,
+          };
+        })
+        .filter((account): account is PaymentAccount => account !== null)
+        .sort(
+          (firstAccount, secondAccount) =>
+            new Date(firstAccount.vencimento).getTime() -
+            new Date(secondAccount.vencimento).getTime()
+        ),
+    [accounts, residentQueries]
+  );
 
   const handleConfirmResidentPayment = useCallback(
     async (accountId: string, residentId: string) => {
@@ -99,33 +93,30 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
         return;
       }
 
-      setConfirmingResidentById((previousState) => ({
-        ...previousState,
+      setConfirmingResidentById((current) => ({
+        ...current,
         [residentId]: true,
       }));
 
       try {
-        await accountResidentsService.confirmarPagamentoAdmin({
-          id: residentId,
+        await confirmResidentMutation.mutateAsync({
+          accountId,
+          accountResidentId: residentId,
         });
-
-        dispatch({ type: "CONFIRM_RESIDENT", accountId, residentId });
-
-        await refreshAll();
         showToast.success("Pagamento marcado como PAGO.");
       } catch (error) {
         showToast.error(
           getErrorMessage(error, "Não foi possível atualizar o pagamento.")
         );
       } finally {
-        setConfirmingResidentById((previousState) => {
-          const nextState = { ...previousState };
+        setConfirmingResidentById((current) => {
+          const nextState = { ...current };
           delete nextState[residentId];
           return nextState;
         });
       }
     },
-    [confirmingResidentById, refreshAll]
+    [confirmResidentMutation, confirmingResidentById]
   );
 
   const handleRefuseResidentPayment = useCallback(
@@ -134,33 +125,30 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
         return;
       }
 
-      setRefusingResidentById((previousState) => ({
-        ...previousState,
+      setRefusingResidentById((current) => ({
+        ...current,
         [residentId]: true,
       }));
 
       try {
-        await accountResidentsService.recusarPagamentoAdmin({
-          id: residentId,
+        await refuseResidentMutation.mutateAsync({
+          accountId,
+          accountResidentId: residentId,
         });
-
-        dispatch({ type: "REFUSE_RESIDENT", accountId, residentId });
-
-        await refreshAll();
         showToast.success("Pagamento recusado.");
       } catch (error) {
         showToast.error(
           getErrorMessage(error, "Não foi possível recusar o pagamento.")
         );
       } finally {
-        setRefusingResidentById((previousState) => {
-          const nextState = { ...previousState };
+        setRefusingResidentById((current) => {
+          const nextState = { ...current };
           delete nextState[residentId];
           return nextState;
         });
       }
     },
-    [refusingResidentById, refreshAll]
+    [refuseResidentMutation, refusingResidentById]
   );
 
   const filteredPaymentAccounts = useMemo(
@@ -225,9 +213,15 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
   ];
 
   return {
-    error,
-    isLoading,
-    isRefreshing,
+    error: accountsQuery.error instanceof Error ? accountsQuery.error : null,
+    isLoading:
+      accountsQuery.isLoading ||
+      residentQueries.some(
+        (query) => query.isLoading || (query.isFetching && !query.data)
+      ),
+    isRefreshing:
+      accountsQuery.isRefetching ||
+      residentQueries.some((query) => query.isRefetching),
     filteredPaymentAccounts,
     confirmingResidentById,
     refusingResidentById,
