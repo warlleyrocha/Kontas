@@ -10,7 +10,7 @@ import { ResidentRole } from "@/src/shared/types/resident.types";
 export function useRepublicResidents(
   republics: RepublicResponse[],
   currentUserEmail?: string | null,
-  enabled = true
+  enabled = true,
 ) {
   const { data: user = null } = useCurrentUserQuery();
   const isAuthenticated = Boolean(user);
@@ -31,10 +31,9 @@ export function useRepublicResidents(
         republics.map((republic, index) => [
           republic.id,
           queries[index]?.data?.length ?? 0,
-        ])
+        ]),
       ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [republics, queries]
+    [republics, queries],
   );
 
   const userRolesByRepublic = useMemo(() => {
@@ -44,29 +43,28 @@ export function useRepublicResidents(
       republics.map((republic, index) => {
         const residents = queries[index]?.data ?? [];
         const match = residents.find(
-          (r) => r.email.toLowerCase() === normalizedEmail
+          (r) => r.email.toLowerCase() === normalizedEmail,
         );
         return [republic.id, match?.role ?? null];
-      })
+      }),
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [republics, queries, currentUserEmail]);
 
   const getResidentsCount = useCallback(
     (republicId: string): number => residentsCount[republicId] ?? 0,
-    [residentsCount]
+    [residentsCount],
   );
 
   const getUserRole = useCallback(
     (republicId: string): ResidentRole | null =>
       userRolesByRepublic[republicId] ?? null,
-    [userRolesByRepublic]
+    [userRolesByRepublic],
   );
 
   const isAdmin = useCallback(
     (republicId: string): boolean =>
       userRolesByRepublic[republicId] === ResidentRole.ADMIN,
-    [userRolesByRepublic]
+    [userRolesByRepublic],
   );
 
   return {
