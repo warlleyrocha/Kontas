@@ -18,7 +18,6 @@ import {
   useUpdateCurrentUserMutation,
 } from "@/src/features/user/hooks/useUserQueries";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
-import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { useRepublicResidents } from "@/src/shared/hooks/useRepublicResidents";
 import { maskPhone } from "@/src/shared/utils/inputMasks";
 import { logger } from "@/src/shared/utils/logger";
@@ -64,7 +63,7 @@ export function useProfileScreen() {
     ? getErrorMessage(sendErrorRaw, "Erro ao enviar convite.")
     : null;
 
-  const { refreshing, onRefresh, registerRefresh } = useRefresh();
+  const [refreshing, setRefreshing] = useState(false);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
@@ -237,11 +236,14 @@ export function useProfileScreen() {
     );
   }, [republicsError]);
 
-  useEffect(() => {
-    return registerRefresh("profile", async () => {
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
       await refetchRepublics();
-    });
-  }, [registerRefresh, refetchRepublics]);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refetchRepublics]);
 
   const { menuItems, footerItems } = useSideMenu("profile", handleSignOut, {
     republics,

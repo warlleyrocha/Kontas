@@ -6,7 +6,6 @@ import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthMutations";
 import { useResidents } from "@/src/features/residents/hooks/useResidents";
 import { getErrorMessage } from "@/src/services/httpError";
 import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
-import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { ResidentRole } from "@/src/shared/types/resident.types";
 import type { TabKey } from "@/src/shared/types/tabs";
 import { logger } from "@/src/shared/utils/logger";
@@ -33,13 +32,11 @@ export function useRepublicScreen(republicId: string) {
     error: republicError,
     isLoading,
     isSuccess,
-    refetch: refetchRepublic,
   } = useRepublicQuery(republicId);
   const { updateRepublic, showEditModal, setShowEditModal } =
     useRepublicActions();
 
-  const { residents, fetchResidents } = useResidents(republicId);
-  const { registerRefresh } = useRefresh();
+  const { residents } = useResidents(republicId);
 
   const [tab, setTab] = useState<TabKey>("contas");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -74,21 +71,6 @@ export function useRepublicScreen(republicId: string) {
     showToast.error("República não encontrada");
     router.back();
   }, [isSuccess, republic, republicId, router, isFocused]);
-
-  const fetchData = useCallback(async () => {
-    if (!republicId) {
-      return;
-    }
-
-    const result = await refetchRepublic();
-    if (result.data?.id) {
-      await fetchResidents();
-    }
-  }, [fetchResidents, refetchRepublic, republicId]);
-
-  useEffect(() => {
-    return registerRefresh(`republic-${republicId}`, fetchData);
-  }, [registerRefresh, republicId, fetchData]);
 
   const residentsCount = residents.length;
 

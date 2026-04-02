@@ -59,9 +59,8 @@ export function useAccountsTab({ republicId }: UseAccountsTabParams) {
   const handlePatchAndRefresh = useCallback(
     async (accountId: string, metodoPagamento: MetodoPagamento) => {
       await handlePatch(accountId, metodoPagamento);
-      await refresh();
     },
-    [handlePatch, refresh]
+    [handlePatch]
   );
 
   const hasNoAccounts =
