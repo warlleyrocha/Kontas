@@ -3,13 +3,21 @@ import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert } from "react-native";
 
-import { useAuth } from "@/src/features/auth/contexts";
-import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
+import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthMutations";
+import {
+  usePendingInvitesCount,
+  useSendInviteMutation,
+} from "@/src/features/invites/hooks/useInvitesQueries";
 import { useRepublicActions } from "@/src/features/republic/hooks/useRepublicActions";
-import { useRepublicList } from "@/src/features/republic/hooks/useRepublicList";
+import { useRepublicsQuery } from "@/src/features/republic/hooks/useRepublicQueries";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
+import { getErrorMessage } from "@/src/services/httpError";
+import {
+  useCompleteProfileMutation,
+  useCurrentUserQuery,
+  useUpdateCurrentUserMutation,
+} from "@/src/features/user/hooks/useUserQueries";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
-import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { useRepublicResidents } from "@/src/shared/hooks/useRepublicResidents";
 import { maskPhone } from "@/src/shared/utils/inputMasks";
 import { logger } from "@/src/shared/utils/logger";
@@ -27,19 +35,35 @@ export function useProfileScreen() {
   const router = useRouter();
   const isFocused = useIsFocused();
 
-  const { user, logout, completeProfile, updateUser } = useAuth();
-  const { republics, fetchRepublics } = useRepublicList();
+  const { data: user = null } = useCurrentUserQuery();
+  const { mutateAsync: logout } = useLogoutMutation();
+  const { mutateAsync: completeProfile } = useCompleteProfileMutation();
+  const { mutateAsync: updateCurrentUser } = useUpdateCurrentUserMutation();
+  const {
+    data: republics = [],
+    error: republicsError,
+    refetch: refetchRepublics,
+  } = useRepublicsQuery({
+    enabled: Boolean(user?.perfilCompleto),
+  });
   const { deleteRepublic, updateRepublic, showEditModal, setShowEditModal } =
     useRepublicActions();
   const { getResidentsCount, isAdmin } = useRepublicResidents(
     republics,
     user?.email,
-    isFocused
+    isFocused,
   );
-  const { pendingCount, sendInvite, sendLoading, sendError } =
-    useInvitesContext();
+  const pendingCount = usePendingInvitesCount();
+  const {
+    mutateAsync: sendInvite,
+    isPending: sendLoading,
+    error: sendErrorRaw,
+  } = useSendInviteMutation();
+  const sendError = sendErrorRaw
+    ? getErrorMessage(sendErrorRaw, "Erro ao enviar convite.")
+    : null;
 
-  const { refreshing, onRefresh, registerRefresh } = useRefresh();
+  const [refreshing, setRefreshing] = useState(false);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
@@ -52,16 +76,15 @@ export function useProfileScreen() {
   const handleSignOut = useCallback(async () => {
     try {
       await logout();
-      router.replace("/");
     } catch (error) {
       logger.error(
         "User",
         "Erro ao fazer logout",
-        error instanceof Error ? error : undefined
+        error instanceof Error ? error : undefined,
       );
       toastErrors.logoutFailed(error);
     }
-  }, [logout, router]);
+  }, [logout]);
 
   const handleSaveProfile = useCallback(
     async (name: string, pixKey?: string, photo?: string, phone?: string) => {
@@ -72,7 +95,7 @@ export function useProfileScreen() {
       if (isCompletingProfile && (!phone || !pixKey)) {
         Alert.alert(
           "Campos Obrigatórios",
-          "Por favor, preencha o telefone e a chave Pix."
+          "Por favor, preencha o telefone e a chave Pix.",
         );
         return;
       }
@@ -86,7 +109,7 @@ export function useProfileScreen() {
             fotoPerfil: photo,
           });
         } else {
-          await updateUser({
+          await updateCurrentUser({
             nome: name,
             telefone: phone,
             chavePix: pixKey,
@@ -95,21 +118,15 @@ export function useProfileScreen() {
         }
 
         setShowEditProfileModal(false);
-        showToast.success(
-          isCompletingProfile
-            ? "Perfil salvo com sucesso!"
-            : "Perfil atualizado com sucesso!"
-        );
       } catch (error) {
         logger.error(
           "User",
           "Erro ao salvar perfil",
-          error instanceof Error ? error : undefined
+          error instanceof Error ? error : undefined,
         );
-        toastErrors.profileUpdateFailed(error);
       }
     },
-    [user, completeProfile, updateUser]
+    [user, completeProfile, updateCurrentUser],
   );
 
   const handleCreateRepublic = useCallback(() => {
@@ -124,7 +141,7 @@ export function useProfileScreen() {
     (id: string) => {
       router.push(`/(republics)/${id}`);
     },
-    [router]
+    [router],
   );
 
   const handleLongPressRepublic = useCallback(
@@ -133,7 +150,7 @@ export function useProfileScreen() {
       setContextMenuPosition(position);
       setContextMenuVisible(true);
     },
-    []
+    [],
   );
 
   const handleCloseContextMenu = useCallback(() => {
@@ -153,14 +170,24 @@ export function useProfileScreen() {
   const handleSaveRepublicEdit = useCallback(
     async (name: string, image?: string) => {
       if (!selectedRepublic) return;
-      await updateRepublic(selectedRepublic.id, {
-        nome: name,
-        imagemRepublica: image,
-      });
-      handleCloseEditModal();
-      fetchRepublics();
+      try {
+        await updateRepublic(selectedRepublic.id, {
+          nome: name,
+          imagemRepublica: image,
+        });
+        handleCloseEditModal();
+      } catch (error) {
+        logger.error(
+          "Republic",
+          "Erro ao atualizar república",
+          error instanceof Error ? error : undefined,
+        );
+        showToast.error(
+          getErrorMessage(error, "Não foi possível atualizar a república."),
+        );
+      }
     },
-    [selectedRepublic, updateRepublic, handleCloseEditModal, fetchRepublics]
+    [selectedRepublic, updateRepublic, handleCloseEditModal],
   );
 
   const handleDeleteFromMenu = useCallback(() => {
@@ -168,13 +195,22 @@ export function useProfileScreen() {
     if (!selectedRepublic) return;
     const republicName = selectedRepublic.nome;
     const republicId = selectedRepublic.id;
-    showToast.confirm(`Excluir "${republicName}"?`, () => {
-      deleteRepublic(republicId).then(() => {
+    showToast.confirm(`Excluir "${republicName}"?`, async () => {
+      try {
+        await deleteRepublic(republicId);
         setSelectedRepublic(null);
-        fetchRepublics();
-      });
+      } catch (error) {
+        logger.error(
+          "Republic",
+          "Erro ao excluir república",
+          error instanceof Error ? error : undefined,
+        );
+        showToast.error(
+          getErrorMessage(error, "Não foi possível excluir a república."),
+        );
+      }
     });
-  }, [selectedRepublic, deleteRepublic, fetchRepublics]);
+  }, [selectedRepublic, deleteRepublic]);
 
   const [showInviteModal, setShowInviteModal] = useState(false);
 
@@ -188,13 +224,26 @@ export function useProfileScreen() {
   }, []);
 
   useEffect(() => {
-    if (!user?.perfilCompleto) return;
-    fetchRepublics();
-  }, [user?.perfilCompleto, fetchRepublics]);
+    if (!republicsError) {
+      return;
+    }
 
-  useEffect(() => {
-    return registerRefresh("profile", fetchRepublics);
-  }, [registerRefresh, fetchRepublics]);
+    showToast.error(
+      getErrorMessage(
+        republicsError,
+        "Não foi possível carregar as repúblicas.",
+      ),
+    );
+  }, [republicsError]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await refetchRepublics();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refetchRepublics]);
 
   const { menuItems, footerItems } = useSideMenu("profile", handleSignOut, {
     republics,

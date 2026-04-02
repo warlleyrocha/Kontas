@@ -1,30 +1,28 @@
-import { act, renderHook } from "@testing-library/react-native";
+import { renderHook } from "@testing-library/react-native";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "expo-router";
-import { useAuth } from "@/src/features/auth/contexts";
 import { inviteService } from "@/src/features/invites/services/invite.service";
+import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 import type {
   GetInvitesByUser,
   Invite,
 } from "@/src/features/invites/types/invite.types";
 import { StatusInvite } from "@/src/features/invites/types/invite.types";
-import { getErrorMessage } from "@/src/services/httpError";
 import {
   useInvitesByRepublicQuery,
   useInvitesByUserQuery,
-  useInvitesContext,
   usePendingInvitesCount,
   useSendInviteMutation,
   useUpdateInviteStatusMutation,
-} from "../InvitesContext";
+} from "../useInvitesQueries";
 
 jest.mock("@tanstack/react-query", () => ({
   useQuery: jest.fn(),
   useMutation: jest.fn(),
   useQueryClient: jest.fn(),
 }));
-jest.mock("expo-router", () => ({ useRouter: jest.fn() }));
-jest.mock("@/src/features/auth/contexts", () => ({ useAuth: jest.fn() }));
+jest.mock("@/src/features/user/hooks/useUserQueries", () => ({
+  useCurrentUserQuery: jest.fn(),
+}));
 jest.mock("@/src/features/invites/services/invite.service", () => ({
   inviteService: {
     getInvitesByUser: jest.fn(),
@@ -33,15 +31,11 @@ jest.mock("@/src/features/invites/services/invite.service", () => ({
     patchInviteStatus: jest.fn(),
   },
 }));
-jest.mock("@/src/services/httpError", () => ({
-  getErrorMessage: jest.fn(),
-}));
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
 const mockRefetch = jest.fn();
 const mockSetQueryData = jest.fn();
-const mockRouterReplace = jest.fn();
 
 const mockInvite: Invite = {
   id: "inv-1",
@@ -52,14 +46,11 @@ const mockInvite: Invite = {
   atualizadoEm: "2026-01-01",
 };
 
-// ─── Setup ────────────────────────────────────────────────────────────────────
-
-let consoleErrorSpy: jest.SpyInstance;
-
 beforeEach(() => {
   jest.clearAllMocks();
-  jest.mocked(useAuth).mockReturnValue({ isAuthenticated: true } as any);
-  jest.mocked(useRouter).mockReturnValue({ replace: mockRouterReplace } as any);
+  jest.mocked(useCurrentUserQuery).mockReturnValue({
+    data: { id: "u-1" },
+  } as any);
   jest
     .mocked(useQueryClient)
     .mockReturnValue({ setQueryData: mockSetQueryData } as any);
@@ -73,18 +64,6 @@ beforeEach(() => {
     isPending: false,
     error: null,
   } as any);
-  jest
-    .mocked(getErrorMessage)
-    .mockImplementation((_err, fallback) => fallback ?? "erro");
-
-  consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-});
-
-afterEach(() => {
-  // Falha o teste se houver console.error inesperado. Testes que esperam
-  // erros devem chamar consoleErrorSpy.mockClear() ao final.
-  expect(consoleErrorSpy).not.toHaveBeenCalled();
-  consoleErrorSpy.mockRestore();
 });
 
 // ─── useInvitesByUserQuery ────────────────────────────────────────────────────
@@ -105,13 +84,15 @@ describe("useInvitesByUserQuery", () => {
   });
 
   it("enabled=true quando autenticado", () => {
-    jest.mocked(useAuth).mockReturnValue({ isAuthenticated: true } as any);
+    jest.mocked(useCurrentUserQuery).mockReturnValue({
+      data: { id: "u-1" },
+    } as any);
     renderHook(() => useInvitesByUserQuery());
     expect(capturedOptions.enabled).toBe(true);
   });
 
   it("enabled=false quando não autenticado", () => {
-    jest.mocked(useAuth).mockReturnValue({ isAuthenticated: false } as any);
+    jest.mocked(useCurrentUserQuery).mockReturnValue({ data: null } as any);
     renderHook(() => useInvitesByUserQuery());
     expect(capturedOptions.enabled).toBe(false);
   });
@@ -144,19 +125,23 @@ describe("useInvitesByRepublicQuery", () => {
   });
 
   it("enabled=true quando autenticado e republicId fornecido", () => {
-    jest.mocked(useAuth).mockReturnValue({ isAuthenticated: true } as any);
+    jest.mocked(useCurrentUserQuery).mockReturnValue({
+      data: { id: "u-1" },
+    } as any);
     renderHook(() => useInvitesByRepublicQuery("rep-1"));
     expect(capturedOptions.enabled).toBe(true);
   });
 
   it("enabled=false quando não autenticado", () => {
-    jest.mocked(useAuth).mockReturnValue({ isAuthenticated: false } as any);
+    jest.mocked(useCurrentUserQuery).mockReturnValue({ data: null } as any);
     renderHook(() => useInvitesByRepublicQuery("rep-1"));
     expect(capturedOptions.enabled).toBe(false);
   });
 
   it("enabled=false quando republicId é string vazia", () => {
-    jest.mocked(useAuth).mockReturnValue({ isAuthenticated: true } as any);
+    jest.mocked(useCurrentUserQuery).mockReturnValue({
+      data: { id: "u-1" },
+    } as any);
     renderHook(() => useInvitesByRepublicQuery(""));
     expect(capturedOptions.enabled).toBe(false);
   });
@@ -357,227 +342,5 @@ describe("usePendingInvitesCount", () => {
     } as any);
     const { result } = renderHook(() => usePendingInvitesCount());
     expect(result.current).toBe(2);
-  });
-});
-
-// ─── useInvitesContext ────────────────────────────────────────────────────────
-
-const mockMutateAsyncSend = jest.fn();
-const mockMutateAsyncUpdate = jest.fn();
-
-function setupContextMocks({
-  data,
-  queryError = null as unknown,
-  updateError = null as unknown,
-  sendError = null as unknown,
-  sendPending = false,
-} = {}) {
-  const resolvedData = Object.prototype.hasOwnProperty.call(
-    arguments[0] ?? {},
-    "data"
-  )
-    ? data
-    : ([] as GetInvitesByUser[]);
-
-  jest.mocked(useQuery).mockReturnValue({
-    data: resolvedData,
-    error: queryError,
-    refetch: mockRefetch,
-  } as any);
-
-  // Diferencia as duas chamadas a useMutation pela referência do mutationFn:
-  // - useSendInviteMutation passa inviteService.sendInvite diretamente
-  // - useUpdateInviteStatusMutation passa uma arrow function inline
-  jest.mocked(useMutation).mockImplementation((options: any) => {
-    if (options.mutationFn === inviteService.sendInvite) {
-      return {
-        mutateAsync: mockMutateAsyncSend,
-        isPending: sendPending,
-        error: sendError,
-      } as any;
-    }
-    return {
-      mutateAsync: mockMutateAsyncUpdate,
-      isPending: false,
-      error: updateError,
-    } as any;
-  });
-}
-
-describe("useInvitesContext — estado inicial", () => {
-  beforeEach(() => setupContextMocks());
-
-  it("retorna invitesByUser vazio por padrão", () => {
-    const { result } = renderHook(() => useInvitesContext());
-    expect(result.current.invitesByUser).toEqual([]);
-  });
-
-  it("retorna invitesByUser vazio quando a query retorna data undefined", () => {
-    setupContextMocks({ data: undefined });
-    const { result } = renderHook(() => useInvitesContext());
-    expect(result.current.invitesByUser).toEqual([]);
-  });
-
-  it("retorna invitesByUser com os dados da query", () => {
-    const invites = [mockInvite] as unknown as GetInvitesByUser[];
-    setupContextMocks({ data: invites });
-    const { result } = renderHook(() => useInvitesContext());
-    expect(result.current.invitesByUser).toEqual(invites);
-  });
-
-  it("calcula pendingCount corretamente", () => {
-    const invites: GetInvitesByUser[] = [
-      { ...mockInvite, id: "1", status: StatusInvite.PENDENTE },
-      { ...mockInvite, id: "2", status: StatusInvite.PENDENTE },
-      { ...mockInvite, id: "3", status: StatusInvite.ACEITO },
-    ] as unknown as GetInvitesByUser[];
-    setupContextMocks({ data: invites });
-    const { result } = renderHook(() => useInvitesContext());
-    expect(result.current.pendingCount).toBe(2);
-  });
-
-  it("error é null quando não há erros", () => {
-    const { result } = renderHook(() => useInvitesContext());
-    expect(result.current.error).toBeNull();
-  });
-
-  it("error é formatado quando a query falhou", () => {
-    const error = new Error("fetch fail");
-    jest
-      .mocked(getErrorMessage)
-      .mockReturnValue("Não foi possível carregar os convites.");
-    setupContextMocks({ queryError: error });
-    const { result } = renderHook(() => useInvitesContext());
-    expect(jest.mocked(getErrorMessage)).toHaveBeenCalledWith(
-      error,
-      "Não foi possível carregar os convites."
-    );
-    expect(result.current.error).toBe("Não foi possível carregar os convites.");
-  });
-
-  it("error é formatado quando updateInviteStatus falhou", () => {
-    const error = new Error("update fail");
-    jest
-      .mocked(getErrorMessage)
-      .mockReturnValue("Não foi possível carregar os convites.");
-    setupContextMocks({ updateError: error });
-    const { result } = renderHook(() => useInvitesContext());
-    expect(result.current.error).toBe("Não foi possível carregar os convites.");
-  });
-
-  it("sendLoading reflete isPending do sendInviteMutation", () => {
-    setupContextMocks({ sendPending: true });
-    const { result } = renderHook(() => useInvitesContext());
-    expect(result.current.sendLoading).toBe(true);
-  });
-
-  it("sendError é null quando não há erro de envio", () => {
-    const { result } = renderHook(() => useInvitesContext());
-    expect(result.current.sendError).toBeNull();
-  });
-
-  it("sendError é formatado quando sendInviteMutation falhou", () => {
-    const error = new Error("send fail");
-    jest.mocked(getErrorMessage).mockReturnValue("Erro ao enviar convite.");
-    setupContextMocks({ sendError: error });
-    const { result } = renderHook(() => useInvitesContext());
-    expect(result.current.sendError).toBe("Erro ao enviar convite.");
-  });
-
-  it("expõe todas as funções esperadas", () => {
-    const { result } = renderHook(() => useInvitesContext());
-    expect(typeof result.current.fetchInvitesByUser).toBe("function");
-    expect(typeof result.current.handleAcceptInvite).toBe("function");
-    expect(typeof result.current.handleRejectInvite).toBe("function");
-    expect(typeof result.current.sendInvite).toBe("function");
-  });
-});
-
-describe("useInvitesContext — fetchInvitesByUser", () => {
-  beforeEach(() => setupContextMocks());
-
-  it("chama refetch ao ser invocado", async () => {
-    mockRefetch.mockResolvedValue(undefined);
-    const { result } = renderHook(() => useInvitesContext());
-    await act(async () => {
-      await result.current.fetchInvitesByUser();
-    });
-    expect(mockRefetch).toHaveBeenCalledTimes(1);
-  });
-});
-
-describe("useInvitesContext — handleAcceptInvite", () => {
-  beforeEach(() => setupContextMocks());
-
-  it("chama updateInviteStatus com ACEITO e navega para a república", async () => {
-    mockMutateAsyncUpdate.mockResolvedValue(undefined);
-    const { result } = renderHook(() => useInvitesContext());
-    await act(async () => {
-      await result.current.handleAcceptInvite("inv-1", "rep-1");
-    });
-    expect(mockMutateAsyncUpdate).toHaveBeenCalledWith({
-      inviteId: "inv-1",
-      status: StatusInvite.ACEITO,
-    });
-    expect(mockRouterReplace).toHaveBeenCalledWith("/(republics)/rep-1");
-  });
-
-  it("loga o erro e não navega quando updateInviteStatus falha", async () => {
-    const error = new Error("update fail");
-    mockMutateAsyncUpdate.mockRejectedValue(error);
-    const { result } = renderHook(() => useInvitesContext());
-    await act(async () => {
-      await result.current.handleAcceptInvite("inv-1", "rep-1");
-    });
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      "Erro ao aceitar convite:",
-      error
-    );
-    expect(mockRouterReplace).not.toHaveBeenCalled();
-    consoleErrorSpy.mockClear();
-  });
-});
-
-describe("useInvitesContext — handleRejectInvite", () => {
-  beforeEach(() => setupContextMocks());
-
-  it("chama updateInviteStatus com RECUSADO", async () => {
-    mockMutateAsyncUpdate.mockResolvedValue(undefined);
-    const { result } = renderHook(() => useInvitesContext());
-    await act(async () => {
-      await result.current.handleRejectInvite("inv-1");
-    });
-    expect(mockMutateAsyncUpdate).toHaveBeenCalledWith({
-      inviteId: "inv-1",
-      status: StatusInvite.RECUSADO,
-    });
-  });
-
-  it("loga o erro quando updateInviteStatus falha", async () => {
-    const error = new Error("reject fail");
-    mockMutateAsyncUpdate.mockRejectedValue(error);
-    const { result } = renderHook(() => useInvitesContext());
-    await act(async () => {
-      await result.current.handleRejectInvite("inv-1");
-    });
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      "Erro ao recusar convite:",
-      error
-    );
-    consoleErrorSpy.mockClear();
-  });
-});
-
-describe("useInvitesContext — sendInvite", () => {
-  beforeEach(() => setupContextMocks());
-
-  it("chama sendInviteAsync com o payload correto", async () => {
-    mockMutateAsyncSend.mockResolvedValue(mockInvite);
-    const { result } = renderHook(() => useInvitesContext());
-    const payload = { email: "a@b.com", republicaId: "rep-1" };
-    await act(async () => {
-      await result.current.sendInvite(payload);
-    });
-    expect(mockMutateAsyncSend).toHaveBeenCalledWith(payload);
   });
 });

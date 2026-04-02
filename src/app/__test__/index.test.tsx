@@ -1,6 +1,7 @@
 import { render } from "@testing-library/react-native";
 import { Redirect } from "expo-router";
-import { useAuth } from "@/src/features/auth/contexts";
+import { useRepublicsQuery } from "@/src/features/republic/hooks/useRepublicQueries";
+import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 import LoadingScreen from "@/src/shared/components/ui/loading-screen";
 import Index from "../index";
 
@@ -9,9 +10,14 @@ jest.mock("expo-router", () => ({
   Redirect: jest.fn(() => null),
 }));
 
-jest.mock("@/src/features/auth/contexts", () => ({
+jest.mock("@/src/features/user/hooks/useUserQueries", () => ({
   __esModule: true,
-  useAuth: jest.fn(),
+  useCurrentUserQuery: jest.fn(),
+}));
+
+jest.mock("@/src/features/republic/hooks/useRepublicQueries", () => ({
+  __esModule: true,
+  useRepublicsQuery: jest.fn(),
 }));
 
 jest.mock("@/src/shared/components/ui/loading-screen", () => ({
@@ -20,19 +26,23 @@ jest.mock("@/src/shared/components/ui/loading-screen", () => ({
 }));
 
 const mockRedirect = jest.mocked(Redirect);
-const mockUseAuth = jest.mocked(useAuth);
+const mockUseCurrentUserQuery = jest.mocked(useCurrentUserQuery);
+const mockUseRepublicsQuery = jest.mocked(useRepublicsQuery);
 const mockLoadingScreen = jest.mocked(LoadingScreen);
 
 describe("index route", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseRepublicsQuery.mockReturnValue({
+      data: [],
+      isLoading: false,
+    } as never);
   });
 
   it("renderiza loading enquanto a autenticação está carregando", () => {
-    mockUseAuth.mockReturnValue({
-      user: null,
-      loading: true,
-      republicData: undefined,
+    mockUseCurrentUserQuery.mockReturnValue({
+      data: null,
+      isLoading: true,
     } as never);
 
     render(<Index />);
@@ -46,10 +56,9 @@ describe("index route", () => {
   });
 
   it("redireciona para login quando não há usuário autenticado", () => {
-    mockUseAuth.mockReturnValue({
-      user: null,
-      loading: false,
-      republicData: undefined,
+    mockUseCurrentUserQuery.mockReturnValue({
+      data: null,
+      isLoading: false,
     } as never);
 
     render(<Index />);
@@ -61,10 +70,9 @@ describe("index route", () => {
   });
 
   it("redireciona para onboarding quando o perfil não está completo", () => {
-    mockUseAuth.mockReturnValue({
-      user: { perfilCompleto: false },
-      loading: false,
-      republicData: undefined,
+    mockUseCurrentUserQuery.mockReturnValue({
+      data: { perfilCompleto: false },
+      isLoading: false,
     } as never);
 
     render(<Index />);
@@ -76,10 +84,13 @@ describe("index route", () => {
   });
 
   it("redireciona para a república quando houver republicData", () => {
-    mockUseAuth.mockReturnValue({
-      user: { perfilCompleto: true },
-      loading: false,
-      republicData: [{ id: "rep-1" }],
+    mockUseCurrentUserQuery.mockReturnValue({
+      data: { perfilCompleto: true },
+      isLoading: false,
+    } as never);
+    mockUseRepublicsQuery.mockReturnValue({
+      data: [{ id: "rep-1" }],
+      isLoading: false,
     } as never);
 
     render(<Index />);
@@ -91,10 +102,13 @@ describe("index route", () => {
   });
 
   it("redireciona para profile quando o usuário não participa de república", () => {
-    mockUseAuth.mockReturnValue({
-      user: { perfilCompleto: true },
-      loading: false,
-      republicData: [],
+    mockUseCurrentUserQuery.mockReturnValue({
+      data: { perfilCompleto: true },
+      isLoading: false,
+    } as never);
+    mockUseRepublicsQuery.mockReturnValue({
+      data: [],
+      isLoading: false,
     } as never);
 
     render(<Index />);

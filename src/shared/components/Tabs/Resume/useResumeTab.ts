@@ -1,9 +1,14 @@
-import { useCallback, useEffect, useState } from "react";
-import { useAccountActions } from "@/src/features/accounts/hooks/useAccountActions";
-import { useAccountData } from "@/src/features/accounts/hooks/useAccountList/useAccountData";
+import { useCallback, useEffect, useId, useMemo } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+
+import {
+  useAccountsByRepublicQuery,
+  useAccountsByResidentQueries,
+} from "@/src/features/accounts/hooks/useAccountQueries";
+import { accountKeys } from "@/src/features/accounts/hooks/account.keys";
+import { accountResidentKeys } from "@/src/features/accounts/hooks/accountResident.keys";
 import {
   type Conta,
-  type ListarContasResponse,
   StatusConta,
 } from "@/src/features/accounts/types/account.types";
 import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
@@ -14,17 +19,6 @@ const STATUS_PENDENTE = [
   StatusPagamento.PENDENTE,
   StatusPagamento.AGUARDANDO_CONFIRMACAO,
 ];
-
-async function calcularDividaMorador(
-  moradorId: string,
-  fetchContasPorMorador: (id: string) => Promise<ListarContasResponse>
-): Promise<{ id: string; total: number }> {
-  const contas = await fetchContasPorMorador(moradorId);
-  const total = contas
-    .filter((c) => STATUS_PENDENTE.includes(c.status))
-    .reduce((sum, c) => sum + c.valor, 0);
-  return { id: moradorId, total };
-}
 
 interface UseResumeTabProps {
   residents: ResidentResponse[];
@@ -47,59 +41,46 @@ export function useResumeTab({
   residents,
   republicId,
 }: UseResumeTabProps): UseResumeTabReturn {
-  const { fetchContasPorMorador } = useAccountActions();
-  const { fetchAccounts } = useAccountData({ republicId });
+  const refreshRegistrationId = useId();
+  const queryClient = useQueryClient();
+  const { data: contas = [], isLoading: isLoadingContas } =
+    useAccountsByRepublicQuery(republicId);
+
+  const moradorIds = useMemo(() => residents.map((r) => r.id), [residents]);
+  const dividasQueries = useAccountsByResidentQueries(moradorIds);
   const { registerRefresh } = useRefresh();
 
-  const [contas, setContas] = useState<Conta[]>([]);
-  const [isLoadingContas, setIsLoadingContas] = useState(false);
-  const [dividas, setDividas] = useState<Record<string, number>>({});
-  const [isLoadingDividas, setIsLoadingDividas] = useState(false);
-
-  const fetchContas = useCallback(async () => {
-    setIsLoadingContas(true);
-    try {
-      const data = await fetchAccounts();
-      setContas(data);
-    } finally {
-      setIsLoadingContas(false);
-    }
-  }, [fetchAccounts]);
-
-  const fetchDividas = useCallback(async () => {
-    if (residents.length === 0) return;
-    setIsLoadingDividas(true);
-    try {
-      const results = await Promise.all(
-        residents.map((morador) =>
-          calcularDividaMorador(morador.id, fetchContasPorMorador)
-        )
-      );
-      const map: Record<string, number> = {};
-      for (const { id, total } of results) {
-        map[id] = total;
-      }
-      setDividas(map);
-    } finally {
-      setIsLoadingDividas(false);
-    }
-  }, [residents, fetchContasPorMorador]);
+  const refresh = useCallback(async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: accountKeys.byRepublic(republicId),
+      }),
+      queryClient.invalidateQueries({
+        queryKey: accountResidentKeys.residents(),
+      }),
+    ]);
+  }, [queryClient, republicId]);
 
   useEffect(() => {
-    void fetchContas();
-  }, [fetchContas]);
+    return registerRefresh(
+      `resume-${republicId}-${refreshRegistrationId}`,
+      refresh
+    );
+  }, [refresh, refreshRegistrationId, registerRefresh, republicId]);
 
-  useEffect(() => {
-    void fetchDividas();
-  }, [fetchDividas]);
+  const isLoadingDividas = dividasQueries.some((q) => q.isLoading);
 
-  const fetchAll = useCallback(async () => {
-    await Promise.all([fetchContas(), fetchDividas()]);
-  }, [fetchContas, fetchDividas]);
-
-  useEffect(() => {
-    return registerRefresh(`resume-${republicId}`, fetchAll);
-  }, [registerRefresh, republicId, fetchAll]);
+  const dividas = useMemo(() => {
+    const map: Record<string, number> = {};
+    residents.forEach((resident, i) => {
+      const data = dividasQueries[i]?.data ?? [];
+      const total = data
+        .filter((c) => STATUS_PENDENTE.includes(c.status))
+        .reduce((sum, c) => sum + c.valor, 0);
+      map[resident.id] = total;
+    });
+    return map;
+  }, [residents, dividasQueries]);
 
   const contasPagas = contas.filter((c) => c.status === StatusConta.PAGA);
   const contasPendentes = contas.filter((c) => c.status !== StatusConta.PAGA);

@@ -37,25 +37,14 @@ function createInitialFormData(): AccountFormData {
 
 export function useAccountForm({
   republicId,
-  visible,
   onClose,
 }: UseAccountFormParams) {
-  const { residents, fetchResidents } = useResidents();
+  const { residents } = useResidents(republicId);
   const [formData, setFormData] = useState<AccountFormData>(
     createInitialFormData
   );
   const [tempVencimento, setTempVencimento] = useState(formData.vencimento);
   const [showDatepicker, setShowDatepicker] = useState(false);
-
-  // Buscar moradores da API quando o componente montar
-  useEffect(() => {
-    if (!visible) return;
-
-    const loadResidents = async () => {
-      await fetchResidents(republicId);
-    };
-    void loadResidents();
-  }, [fetchResidents, republicId, visible]);
 
   // Atualizar moradoresDivisao quando residents mudar
   useEffect(() => {

@@ -2,7 +2,7 @@ import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { useRouter } from "expo-router";
 import { ActivityIndicator, TouchableOpacity } from "react-native";
-import { useAuth } from "@/src/features/auth/contexts/AuthContext";
+import { useLoginWithGoogleMutation } from "@/src/features/auth/hooks/useAuthMutations";
 import { getErrorMessage } from "@/src/services/httpError";
 import { showToast } from "@/src/shared/utils/showToast";
 import LoginScreen from "../LoginScreen";
@@ -16,8 +16,8 @@ jest.mock("@react-native-google-signin/google-signin", () => ({
 jest.mock("expo-router", () => ({ useRouter: jest.fn() }));
 jest.mock("@/assets/images/google-icon.svg", () => "GoogleIcon");
 jest.mock("@/assets/images/image-login.webp", () => 0);
-jest.mock("@/src/features/auth/contexts/AuthContext", () => ({
-  useAuth: jest.fn(),
+jest.mock("@/src/features/auth/hooks/useAuthMutations", () => ({
+  useLoginWithGoogleMutation: jest.fn(),
 }));
 jest.mock("@/src/services/httpError", () => ({
   getErrorMessage: jest.fn(),
@@ -41,8 +41,8 @@ let consoleErrorSpy: jest.SpyInstance;
 
 beforeEach(() => {
   jest.clearAllMocks();
-  jest.mocked(useAuth).mockReturnValue({
-    loginWithGoogle: mockLoginWithGoogle,
+  jest.mocked(useLoginWithGoogleMutation).mockReturnValue({
+    mutateAsync: mockLoginWithGoogle,
     error: null,
   } as any);
   jest.mocked(useRouter).mockReturnValue({
@@ -80,10 +80,10 @@ describe("LoginScreen — renderização", () => {
     expect(screen.UNSAFE_queryByType(ActivityIndicator)).toBeNull();
   });
 
-  it("exibe o erro do AuthContext quando há erro", () => {
-    jest.mocked(useAuth).mockReturnValue({
-      loginWithGoogle: mockLoginWithGoogle,
-      error: "Conta não encontrada",
+  it("exibe o erro da mutation quando há erro", () => {
+    jest.mocked(useLoginWithGoogleMutation).mockReturnValue({
+      mutateAsync: mockLoginWithGoogle,
+      error: new Error("Conta não encontrada"),
     } as any);
     render(<LoginScreen />);
     expect(screen.getByText("Conta não encontrada")).toBeTruthy();
@@ -102,7 +102,7 @@ describe("LoginScreen — estado de carregamento", () => {
     jest.mocked(GoogleSignin.hasPlayServices).mockReturnValue(
       new Promise((resolve) => {
         resolveHasPlay = resolve;
-      })
+      }),
     );
 
     render(<LoginScreen />);
@@ -135,7 +135,7 @@ describe("LoginScreen — estado de carregamento", () => {
     jest.mocked(GoogleSignin.hasPlayServices).mockReturnValue(
       new Promise((resolve) => {
         resolveHasPlay = resolve;
-      })
+      }),
     );
 
     render(<LoginScreen />);
@@ -189,7 +189,7 @@ describe("LoginScreen — fluxo de login com Google", () => {
       fireEvent.press(screen.getByText("Entrar com Google"));
     });
     expect(showToast.error).toHaveBeenCalledWith(
-      "Não foi possível obter o token do Google"
+      "Não foi possível obter o token do Google",
     );
     expect(mockRouterReplace).not.toHaveBeenCalled();
   });
@@ -214,7 +214,7 @@ describe("LoginScreen — fluxo de login com Google", () => {
     });
     expect(consoleErrorSpy).toHaveBeenCalledWith("Erro no login:", err);
     expect(showToast.error).toHaveBeenCalledWith(
-      "Erro ao fazer login com Google. Tente novamente."
+      "Erro ao fazer login com Google. Tente novamente.",
     );
     consoleErrorSpy.mockClear();
   });

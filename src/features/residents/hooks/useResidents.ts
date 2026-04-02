@@ -1,48 +1,26 @@
-import { useCallback, useState } from "react";
-import { residentService } from "@/src/features/residents/services/resident.service";
-import { getErrorMessage } from "@/src/services/httpError";
-import { ResidentResponse } from "@/src/shared/types/resident.types";
-import { showToast } from "@/src/shared/utils/showToast";
+import { useCallback } from "react";
 
-type UseResidentState = {
+import type { ResidentResponse } from "@/src/shared/types/resident.types";
+import { useResidentsByRepublicQuery } from "./useResidentQueries";
+
+type UseResidentsReturn = {
   residents: ResidentResponse[];
   isLoading: boolean;
+  fetchResidents: () => Promise<ResidentResponse[] | null>;
 };
 
-type UseResidentActions = {
-  fetchResidents: (republicId: string) => Promise<ResidentResponse[] | null>;
-  setResidents: (residents: ResidentResponse[]) => void;
-};
+export function useResidents(republicId: string): UseResidentsReturn {
+  const { data: residents = [], isFetching, refetch } =
+    useResidentsByRepublicQuery(republicId);
 
-type UseResidentReturn = UseResidentState & UseResidentActions;
-
-export function useResidents(): UseResidentReturn {
-  const [residents, setResidents] = useState<ResidentResponse[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const fetchResidents = useCallback(async (republicId: string) => {
-    setIsLoading(true);
-    try {
-      const residentsData = await residentService.getResidents(republicId);
-      setResidents(residentsData);
-      return residentsData;
-    } catch (error) {
-      console.error("Erro ao buscar moradores:", error);
-      showToast.error(
-        getErrorMessage(error, "Não foi possível carregar os moradores.")
-      );
-      return null;
-    } finally {
-      setIsLoading(false); // Adicione isso para sempre desligar o loading
-    }
-  }, []);
+  const fetchResidents = useCallback(async () => {
+    const result = await refetch();
+    return result.data ?? null;
+  }, [refetch]);
 
   return {
-    // State
     residents,
-    isLoading,
-    // Actions
+    isLoading: isFetching,
     fetchResidents,
-    setResidents,
   };
 }

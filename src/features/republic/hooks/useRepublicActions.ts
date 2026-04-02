@@ -1,43 +1,38 @@
-// hooks/useRepublicActions.ts
-
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { useRepublicList } from "@/src/features/republic/hooks/useRepublicList";
 import { showToast } from "@/src/shared/utils/showToast";
-import { republicService } from "../services/republic.service";
 import type { RepublicPost } from "../types/republic.types";
+import {
+  useCreateRepublicMutation,
+  useDeleteRepublicMutation,
+  useUpdateRepublicMutation,
+} from "./useRepublicQueries";
 
 export function useRepublicActions() {
   const router = useRouter();
-  const { setRepublics } = useRepublicList();
   const [showEditModal, setShowEditModal] = useState(false);
+  const createRepublicMutation = useCreateRepublicMutation();
+  const updateRepublicMutation = useUpdateRepublicMutation();
+  const deleteRepublicMutation = useDeleteRepublicMutation();
 
   async function createRepublic(data: RepublicPost) {
-    const republic = await republicService.createRepublic(data);
-    setRepublics((current) => {
-      if (current.some((item) => item.id === republic.id)) {
-        return current;
-      }
-      return [...current, republic];
-    });
+    const republic = await createRepublicMutation.mutateAsync(data);
     showToast.success("República criada com sucesso");
     router.replace(`/(republics)/${republic.id}`);
     return republic;
   }
 
   async function updateRepublic(id: string, data: RepublicPost) {
-    const updatedRepublic = await republicService.updateRepublic(id, data);
-    setRepublics((current) =>
-      current.map((republic) =>
-        republic.id === id ? updatedRepublic : republic
-      )
-    );
+    const updatedRepublic = await updateRepublicMutation.mutateAsync({
+      id,
+      data,
+    });
     showToast.success("República atualizada");
+    return updatedRepublic;
   }
 
   async function deleteRepublic(id: string) {
-    await republicService.deleteRepublic(id);
-    setRepublics((current) => current.filter((republic) => republic.id !== id));
+    await deleteRepublicMutation.mutateAsync(id);
     showToast.success("República removida");
   }
 

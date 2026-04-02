@@ -1,11 +1,16 @@
 import { toUserFriendlyError } from "@/src/services/httpError";
 import { api } from "@/src/services/api";
-import type { UpdateUserRequest, User } from "../../types/user.types";
+import type {
+  CompleteProfileRequest,
+  UpdateUserRequest,
+  User,
+} from "../../types/user.types";
 import { userService } from "../user.service";
 
 jest.mock("@/src/services/api", () => ({
   api: {
     get: jest.fn(),
+    post: jest.fn(),
     patch: jest.fn(),
   },
 }));
@@ -129,5 +134,52 @@ describe("userService.updateUser", () => {
     mockToUserFriendlyError.mockReturnValue(friendlyError);
 
     await expect(userService.updateUser(payload)).rejects.toBe(friendlyError);
+  });
+});
+
+// ─── completeProfile ──────────────────────────────────────────────────────────
+
+describe("userService.completeProfile", () => {
+  const payload: CompleteProfileRequest = {
+    nome: "Ana",
+    telefone: "11999999999",
+    chavePix: "ana@pix.com",
+  };
+
+  it("chama a API com o payload correto e não lança em caso de sucesso", async () => {
+    mockApi.post.mockResolvedValue({});
+
+    await expect(userService.completeProfile(payload)).resolves.toBeUndefined();
+
+    expect(mockApi.post).toHaveBeenCalledWith("/auth/completar-dados", payload);
+  });
+
+  it("chama toUserFriendlyError com as mensagens corretas ao falhar", async () => {
+    const error = new Error("falha");
+    const friendly = new Error("Erro ao completar perfil.");
+    mockApi.post.mockRejectedValue(error);
+    mockToUserFriendlyError.mockReturnValue(friendly);
+
+    await expect(userService.completeProfile(payload)).rejects.toThrow(friendly);
+
+    expect(mockToUserFriendlyError).toHaveBeenCalledWith(error, {
+      defaultMessage: "Erro ao completar perfil.",
+      statusMessages: {
+        400: "Dados inválidos. Verifique os campos e tente novamente.",
+        401: "Sessão expirada. Faça login novamente.",
+        500: "Erro no servidor. Tente novamente mais tarde.",
+      },
+    });
+  });
+
+  it("propaga o erro retornado por toUserFriendlyError", async () => {
+    const originalError = new Error("original");
+    const friendlyError = new Error("amigável");
+    mockApi.post.mockRejectedValue(originalError);
+    mockToUserFriendlyError.mockReturnValue(friendlyError);
+
+    await expect(userService.completeProfile(payload)).rejects.toBe(
+      friendlyError
+    );
   });
 });

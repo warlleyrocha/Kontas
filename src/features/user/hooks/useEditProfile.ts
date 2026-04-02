@@ -17,8 +17,8 @@ export interface EditProfileFormValues {
     name: string,
     pixKey?: string,
     photo?: string,
-    phone?: string
-  ) => void;
+    phone?: string,
+  ) => Promise<void> | void;
 }
 
 export function useEditProfile({
@@ -47,11 +47,11 @@ export function useEditProfile({
   const handleSave = async () => {
     setIsUploading(true);
     try {
-      onSave(name, pixKey, photoUri, phone);
+      await onSave(name, pixKey, photoUri, phone);
     } catch (error) {
       console.error("Erro ao salvar:", error);
       showToast.error(
-        getErrorMessage(error, "Não foi possível salvar as alterações.")
+        getErrorMessage(error, "Não foi possível salvar as alterações."),
       );
     } finally {
       setIsUploading(false);
@@ -64,7 +64,7 @@ export function useEditProfile({
       if (status !== "granted") {
         Alert.alert(
           "Permissão necessária",
-          "Precisamos de permissão para acessar suas fotos."
+          "Precisamos de permissão para acessar suas fotos.",
         );
         return;
       }
@@ -80,7 +80,7 @@ export function useEditProfile({
     } catch (error) {
       console.error("Erro ao selecionar imagem:", error);
       showToast.error(
-        getErrorMessage(error, "Não foi possível selecionar a imagem.")
+        getErrorMessage(error, "Não foi possível selecionar a imagem."),
       );
     }
   };

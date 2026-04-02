@@ -1,20 +1,19 @@
 import { act, renderHook } from "@testing-library/react-native";
 import { useRouter } from "expo-router";
-import { useRepublicList } from "@/src/features/republic/hooks/useRepublicList";
 import { showToast } from "@/src/shared/utils/showToast";
 import type {
   RepublicPost,
   RepublicResponse,
 } from "../../types/republic.types";
-import { republicService } from "../../services/republic.service";
 import { useRepublicActions } from "../useRepublicActions";
+import {
+  useCreateRepublicMutation,
+  useDeleteRepublicMutation,
+  useUpdateRepublicMutation,
+} from "../useRepublicQueries";
 
 jest.mock("expo-router", () => ({
   useRouter: jest.fn(),
-}));
-
-jest.mock("@/src/features/republic/hooks/useRepublicList", () => ({
-  useRepublicList: jest.fn(),
 }));
 
 jest.mock("@/src/shared/utils/showToast", () => ({
@@ -24,22 +23,28 @@ jest.mock("@/src/shared/utils/showToast", () => ({
   },
 }));
 
-jest.mock("../../services/republic.service", () => ({
-  republicService: {
-    createRepublic: jest.fn(),
-    updateRepublic: jest.fn(),
-    deleteRepublic: jest.fn(),
-  },
+jest.mock("../useRepublicQueries", () => ({
+  useCreateRepublicMutation: jest.fn(),
+  useUpdateRepublicMutation: jest.fn(),
+  useDeleteRepublicMutation: jest.fn(),
 }));
 
 const mockReplace = jest.fn();
-const mockSetRepublics = jest.fn();
+const mockCreateRepublic = jest.fn();
+const mockUpdateRepublic = jest.fn();
+const mockDeleteRepublic = jest.fn();
 
 beforeEach(() => {
   jest.clearAllMocks();
   jest.mocked(useRouter).mockReturnValue({ replace: mockReplace } as any);
-  jest.mocked(useRepublicList).mockReturnValue({
-    setRepublics: mockSetRepublics,
+  jest.mocked(useCreateRepublicMutation).mockReturnValue({
+    mutateAsync: mockCreateRepublic,
+  } as any);
+  jest.mocked(useUpdateRepublicMutation).mockReturnValue({
+    mutateAsync: mockUpdateRepublic,
+  } as any);
+  jest.mocked(useDeleteRepublicMutation).mockReturnValue({
+    mutateAsync: mockDeleteRepublic,
   } as any);
 });
 
@@ -70,9 +75,7 @@ describe("useRepublicActions", () => {
 
   describe("createRepublic", () => {
     it("chama republicService.createRepublic e retorna a república criada", async () => {
-      jest
-        .mocked(republicService.createRepublic)
-        .mockResolvedValue(mockRepublic);
+      mockCreateRepublic.mockResolvedValue(mockRepublic);
 
       const { result } = renderHook(() => useRepublicActions());
       let returned: RepublicResponse | undefined;
@@ -81,49 +84,12 @@ describe("useRepublicActions", () => {
         returned = await result.current.createRepublic(payload);
       });
 
-      expect(republicService.createRepublic).toHaveBeenCalledWith(payload);
+      expect(mockCreateRepublic).toHaveBeenCalledWith(payload);
       expect(returned).toEqual(mockRepublic);
     });
 
-    it("adiciona a nova república à lista via setRepublics", async () => {
-      jest
-        .mocked(republicService.createRepublic)
-        .mockResolvedValue(mockRepublic);
-
-      const { result } = renderHook(() => useRepublicActions());
-
-      await act(async () => {
-        await result.current.createRepublic(payload);
-      });
-
-      const updater = mockSetRepublics.mock.calls[0][0] as (
-        current: RepublicResponse[]
-      ) => RepublicResponse[];
-      expect(updater([])).toEqual([mockRepublic]);
-    });
-
-    it("não adiciona república duplicada à lista", async () => {
-      jest
-        .mocked(republicService.createRepublic)
-        .mockResolvedValue(mockRepublic);
-
-      const { result } = renderHook(() => useRepublicActions());
-
-      await act(async () => {
-        await result.current.createRepublic(payload);
-      });
-
-      const updater = mockSetRepublics.mock.calls[0][0] as (
-        current: RepublicResponse[]
-      ) => RepublicResponse[];
-      const existing = [mockRepublic];
-      expect(updater(existing)).toBe(existing);
-    });
-
     it("exibe toast de sucesso e navega para a república", async () => {
-      jest
-        .mocked(republicService.createRepublic)
-        .mockResolvedValue(mockRepublic);
+      mockCreateRepublic.mockResolvedValue(mockRepublic);
 
       const { result } = renderHook(() => useRepublicActions());
 
@@ -141,7 +107,7 @@ describe("useRepublicActions", () => {
   describe("updateRepublic", () => {
     it("chama republicService.updateRepublic com id e payload", async () => {
       const updated: RepublicResponse = { id: "rep-1", nome: "Nova" };
-      jest.mocked(republicService.updateRepublic).mockResolvedValue(updated);
+      mockUpdateRepublic.mockResolvedValue(updated);
 
       const { result } = renderHook(() => useRepublicActions());
 
@@ -149,30 +115,14 @@ describe("useRepublicActions", () => {
         await result.current.updateRepublic("rep-1", { nome: "Nova" });
       });
 
-      expect(republicService.updateRepublic).toHaveBeenCalledWith("rep-1", {
-        nome: "Nova",
+      expect(mockUpdateRepublic).toHaveBeenCalledWith({
+        id: "rep-1",
+        data: { nome: "Nova" },
       });
-    });
-
-    it("substitui a república na lista via setRepublics", async () => {
-      const updated: RepublicResponse = { id: "rep-1", nome: "Nova" };
-      const other: RepublicResponse = { id: "rep-2", nome: "Outra" };
-      jest.mocked(republicService.updateRepublic).mockResolvedValue(updated);
-
-      const { result } = renderHook(() => useRepublicActions());
-
-      await act(async () => {
-        await result.current.updateRepublic("rep-1", { nome: "Nova" });
-      });
-
-      const updater = mockSetRepublics.mock.calls[0][0] as (
-        current: RepublicResponse[]
-      ) => RepublicResponse[];
-      expect(updater([mockRepublic, other])).toEqual([updated, other]);
     });
 
     it("exibe toast de sucesso", async () => {
-      jest.mocked(republicService.updateRepublic).mockResolvedValue({
+      mockUpdateRepublic.mockResolvedValue({
         id: "rep-1",
         nome: "Nova",
       });
@@ -189,9 +139,7 @@ describe("useRepublicActions", () => {
 
   describe("deleteRepublic", () => {
     it("chama republicService.deleteRepublic com o id correto", async () => {
-      jest
-        .mocked(republicService.deleteRepublic)
-        .mockResolvedValue(undefined as any);
+      mockDeleteRepublic.mockResolvedValue(undefined);
 
       const { result } = renderHook(() => useRepublicActions());
 
@@ -199,31 +147,11 @@ describe("useRepublicActions", () => {
         await result.current.deleteRepublic("rep-1");
       });
 
-      expect(republicService.deleteRepublic).toHaveBeenCalledWith("rep-1");
-    });
-
-    it("remove a república da lista via setRepublics", async () => {
-      jest
-        .mocked(republicService.deleteRepublic)
-        .mockResolvedValue(undefined as any);
-      const other: RepublicResponse = { id: "rep-2", nome: "Outra" };
-
-      const { result } = renderHook(() => useRepublicActions());
-
-      await act(async () => {
-        await result.current.deleteRepublic("rep-1");
-      });
-
-      const updater = mockSetRepublics.mock.calls[0][0] as (
-        current: RepublicResponse[]
-      ) => RepublicResponse[];
-      expect(updater([mockRepublic, other])).toEqual([other]);
+      expect(mockDeleteRepublic).toHaveBeenCalledWith("rep-1");
     });
 
     it("exibe toast de sucesso", async () => {
-      jest
-        .mocked(republicService.deleteRepublic)
-        .mockResolvedValue(undefined as any);
+      mockDeleteRepublic.mockResolvedValue(undefined);
 
       const { result } = renderHook(() => useRepublicActions());
 

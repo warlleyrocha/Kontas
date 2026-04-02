@@ -5,6 +5,7 @@ import {
 } from "axios";
 
 type ApiModule = typeof import("../api");
+type AuthHeaderModule = typeof import("../authHeader");
 
 type RequestConfig = InternalAxiosRequestConfig & { _cbHalfOpen?: boolean };
 
@@ -113,15 +114,23 @@ function importApiModule(apiUrl = "https://api.example.com") {
   }
 
   let importedModule: ApiModule | undefined;
+  let importedAuthHeaderModule: AuthHeaderModule | undefined;
 
   jest.isolateModules(() => {
     importedModule = jest.requireActual("../api") as ApiModule;
+    importedAuthHeaderModule = jest.requireActual(
+      "../authHeader"
+    ) as AuthHeaderModule;
   });
 
   const api = importedModule?.api as AxiosInstance;
 
   return {
     api,
+    clearAuthorizationHeader: importedAuthHeaderModule?.clearAuthorizationHeader,
+    hasAuthorizationHeader: importedAuthHeaderModule?.hasAuthorizationHeader,
+    hydrateAuthorizationHeader: importedAuthHeaderModule?.hydrateAuthorizationHeader,
+    setAuthorizationHeader: importedAuthHeaderModule?.setAuthorizationHeader,
     secureStore,
     logger,
     ...getHandlers(api),
@@ -177,6 +186,20 @@ describe("api service", () => {
     });
   });
 
+  it("hidrata o Authorization uma vez e reutiliza nas próximas requests", async () => {
+    const { secureStore, request } = importApiModule();
+    secureStore.getItemAsync.mockResolvedValue("token-123");
+
+    const firstResult = await request.fulfilled(createConfig({ url: "/first" }));
+    const secondResult = await request.fulfilled(
+      createConfig({ url: "/second" })
+    );
+
+    expect(secureStore.getItemAsync).toHaveBeenCalledTimes(1);
+    expect(firstResult.headers.Authorization).toBe("Bearer token-123");
+    expect(secondResult.headers.Authorization).toBe("Bearer token-123");
+  });
+
   it("loga params quando não há data e não injeta Authorization sem token", async () => {
     const { secureStore, logger, request } = importApiModule();
     secureStore.getItemAsync.mockResolvedValue(null);
@@ -193,6 +216,31 @@ describe("api service", () => {
     expect(logger.debug).toHaveBeenCalledWith("API", "➡️ GET /accounts", {
       page: 2,
     });
+  });
+
+  it("permite setar e limpar o Authorization em memória sem reler o storage", async () => {
+    const {
+      clearAuthorizationHeader,
+      request,
+      secureStore,
+      setAuthorizationHeader,
+    } = importApiModule();
+
+    setAuthorizationHeader?.("token-memory");
+
+    const authorizedResult = await request.fulfilled(
+      createConfig({ url: "/memory-token" })
+    );
+
+    clearAuthorizationHeader?.();
+
+    const clearedResult = await request.fulfilled(
+      createConfig({ url: "/after-clear" })
+    );
+
+    expect(secureStore.getItemAsync).not.toHaveBeenCalled();
+    expect(authorizedResult.headers.Authorization).toBe("Bearer token-memory");
+    expect(clearedResult.headers.Authorization).toBeUndefined();
   });
 
   it("normaliza o erro do interceptor de request", async () => {
