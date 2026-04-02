@@ -3,11 +3,10 @@ import { useIsFocused } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 
 import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthMutations";
-import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import { useResidents } from "@/src/features/residents/hooks/useResidents";
-import { getErrorMessage } from "@/src/services/httpError";
+import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
-import { useRefresh } from "@/src/shared/contexts/RefreshContext";
+import { getErrorMessage } from "@/src/services/httpError";
 import {
   ResidentRole,
   type ResidentResponse,
@@ -37,9 +36,6 @@ jest.mock("@/src/features/residents/hooks/useResidents", () => ({
   useResidents: jest.fn(),
 }));
 jest.mock("@/src/services/httpError", () => ({ getErrorMessage: jest.fn() }));
-jest.mock("@/src/shared/contexts/RefreshContext", () => ({
-  useRefresh: jest.fn(),
-}));
 jest.mock("@/src/shared/utils/logger", () => ({
   logger: { warn: jest.fn(), error: jest.fn() },
 }));
@@ -69,7 +65,6 @@ const mockLogout = jest.fn();
 const mockFetchResidents = jest.fn();
 const mockUpdateRepublic = jest.fn();
 const mockSetShowEditModal = jest.fn();
-const mockRegisterRefresh = jest.fn().mockReturnValue(jest.fn());
 const mockRefetchRepublic = jest.fn();
 const mockRefetchRepublics = jest.fn();
 
@@ -110,9 +105,6 @@ function setupMocks(userOverrides = {}) {
     residents: [],
     fetchResidents: mockFetchResidents,
   } as any);
-  jest.mocked(useRefresh).mockReturnValue({
-    registerRefresh: mockRegisterRefresh,
-  } as any);
   jest
     .mocked(getErrorMessage)
     .mockImplementation((_err, fallback) => fallback ?? "erro");
@@ -122,7 +114,6 @@ function setupMocks(userOverrides = {}) {
 
 beforeEach(() => {
   jest.clearAllMocks();
-  mockRegisterRefresh.mockReturnValue(jest.fn());
   setupMocks();
   mockRefetchRepublic.mockResolvedValue({ data: mockRepublic, error: null });
   mockRefetchRepublics.mockResolvedValue({ data: [mockRepublic], error: null });
@@ -200,50 +191,6 @@ describe("useRepublicScreen — loadResidents", () => {
     await act(async () => {});
 
     expect(jest.mocked(useResidents)).toHaveBeenCalledWith("rep-1");
-  });
-});
-
-// ─── registerRefresh effect ───────────────────────────────────────────────────
-
-describe("useRepublicScreen — registerRefresh", () => {
-  it("registra fetchData com a chave republic-{id}", async () => {
-    renderHook(() => useRepublicScreen("rep-1"));
-    await act(async () => {});
-
-    expect(mockRegisterRefresh).toHaveBeenCalledWith(
-      "republic-rep-1",
-      expect.any(Function),
-    );
-  });
-
-  it("fetchData atualiza republic e moradores quando retorna dados", async () => {
-    renderHook(() => useRepublicScreen("rep-1"));
-    await act(async () => {});
-
-    const fetchData = mockRegisterRefresh.mock
-      .calls[0][1] as () => Promise<void>;
-    await act(async () => {
-      await fetchData();
-    });
-
-    expect(mockRefetchRepublic).toHaveBeenCalled();
-    expect(mockFetchResidents).toHaveBeenCalled();
-  });
-
-  it("fetchData não atualiza quando retorna null", async () => {
-    mockRefetchRepublic.mockResolvedValueOnce({ data: null, error: null });
-
-    renderHook(() => useRepublicScreen("rep-1"));
-    await act(async () => {});
-
-    mockFetchResidents.mockClear();
-    const fetchData = mockRegisterRefresh.mock
-      .calls[0][1] as () => Promise<void>;
-    await act(async () => {
-      await fetchData();
-    });
-
-    expect(mockFetchResidents).not.toHaveBeenCalled();
   });
 });
 

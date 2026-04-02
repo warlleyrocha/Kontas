@@ -1,3 +1,4 @@
+import { isAxiosError } from "axios";
 import { api } from "@/src/services/api";
 import { toUserFriendlyError } from "@/src/services/httpError";
 import {
@@ -21,8 +22,6 @@ jest.mock("@/src/services/httpError", () => ({
 jest.mock("axios", () => ({
   isAxiosError: jest.fn(),
 }));
-
-import { isAxiosError } from "axios";
 
 const mockApi = jest.mocked(api);
 const mockToUserFriendlyError = jest.mocked(toUserFriendlyError);
@@ -67,7 +66,7 @@ describe("residentService.createResident", () => {
     mockApi.post.mockRejectedValue(error);
 
     await expect(
-      residentService.createResident(createPayload)
+      residentService.createResident(createPayload),
     ).rejects.toBeDefined();
 
     expect(mockToUserFriendlyError).toHaveBeenCalledWith(error, {
@@ -86,7 +85,7 @@ describe("residentService.createResident", () => {
     mockToUserFriendlyError.mockReturnValue(friendly);
 
     await expect(residentService.createResident(createPayload)).rejects.toBe(
-      friendly
+      friendly,
     );
   });
 });
@@ -124,7 +123,7 @@ describe("residentService.getResidents", () => {
     mockIsAxiosError.mockReturnValue(true);
 
     await expect(residentService.getResidents("rep-1")).rejects.toBe(
-      cancelError
+      cancelError,
     );
     expect(mockToUserFriendlyError).not.toHaveBeenCalled();
   });

@@ -2,6 +2,7 @@ import { act, renderHook } from "@testing-library/react-native";
 import { useIsFocused } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
+
 import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthMutations";
 import {
   usePendingInvitesCount,
@@ -16,11 +17,11 @@ import {
   useUpdateCurrentUserMutation,
 } from "@/src/features/user/hooks/useUserQueries";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
-import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { useRepublicResidents } from "@/src/shared/hooks/useRepublicResidents";
 import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
 import { toastErrors } from "@/src/shared/utils/toastMessages";
+
 import { useProfileScreen } from "../useProfileScreen";
 
 jest.mock("@react-navigation/native", () => ({ useIsFocused: jest.fn() }));
@@ -45,9 +46,6 @@ jest.mock("@/src/features/republic/hooks/useRepublicQueries", () => ({
 }));
 jest.mock("@/src/shared/components/SideMenu/useSideMenu", () => ({
   useSideMenu: jest.fn(),
-}));
-jest.mock("@/src/shared/contexts/RefreshContext", () => ({
-  useRefresh: jest.fn(),
 }));
 jest.mock("@/src/shared/hooks/useRepublicResidents", () => ({
   useRepublicResidents: jest.fn(),
@@ -77,7 +75,6 @@ const mockFetchRepublics = jest.fn();
 const mockDeleteRepublic = jest.fn();
 const mockUpdateRepublic = jest.fn();
 const mockSetShowEditModal = jest.fn();
-const mockRegisterRefresh = jest.fn().mockReturnValue(jest.fn());
 const mockSendInvite = jest.fn();
 
 function setupMocks(userOverrides = {}) {
@@ -125,11 +122,6 @@ function setupMocks(userOverrides = {}) {
     isPending: false,
     error: null,
   } as any);
-  jest.mocked(useRefresh).mockReturnValue({
-    refreshing: false,
-    onRefresh: jest.fn(),
-    registerRefresh: mockRegisterRefresh,
-  } as any);
   jest.mocked(useSideMenu).mockReturnValue({
     menuItems: [],
     footerItems: [],
@@ -142,7 +134,6 @@ let alertSpy: jest.SpyInstance;
 
 beforeEach(() => {
   jest.clearAllMocks();
-  mockRegisterRefresh.mockReturnValue(jest.fn());
   setupMocks();
   alertSpy = jest.spyOn(Alert, "alert").mockImplementation(() => {});
 });
@@ -581,12 +572,18 @@ describe("useProfileScreen — efeitos", () => {
     });
   });
 
-  it("registra um callback de refetch no sistema de refresh com chave 'profile'", () => {
-    renderHook(() => useProfileScreen());
-    expect(mockRegisterRefresh).toHaveBeenCalledWith(
-      "profile",
-      expect.any(Function),
-    );
+  it("onRefresh chama refetchRepublics e controla o estado refreshing", async () => {
+    let resolve!: (v: unknown) => void;
+    mockFetchRepublics.mockReturnValue(new Promise((r) => { resolve = r; }));
+
+    const { result } = renderHook(() => useProfileScreen());
+
+    act(() => { void result.current.onRefresh(); });
+    expect(result.current.refreshing).toBe(true);
+
+    await act(async () => { resolve({}); });
+    expect(result.current.refreshing).toBe(false);
+    expect(mockFetchRepublics).toHaveBeenCalled();
   });
 });
 
