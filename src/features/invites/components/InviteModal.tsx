@@ -22,6 +22,14 @@ interface InviteModalProps {
   error: string | null;
 }
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const validateEmail = (value: string): string => {
+  if (!value.trim()) return "Email é obrigatório";
+  if (!EMAIL_REGEX.test(value.trim())) return "Formato de email inválido";
+  return "";
+};
+
 export const InviteModal: React.FC<InviteModalProps> = ({
   open,
   onClose,
@@ -31,24 +39,44 @@ export const InviteModal: React.FC<InviteModalProps> = ({
   error,
 }) => {
   const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [touched, setTouched] = useState(false);
+
+  const handleChangeEmail = (value: string) => {
+    setEmail(value);
+    if (touched) setEmailError(validateEmail(value));
+  };
+
+  const handleBlur = () => {
+    setTouched(true);
+    setEmailError(validateEmail(email));
+  };
+
+  const handleClose = () => {
+    setEmail("");
+    setEmailError("");
+    setTouched(false);
+    onClose();
+  };
 
   const handleSubmit = async () => {
-    if (!email.trim()) return;
+    setTouched(true);
+    const validationError = validateEmail(email);
+    if (validationError) {
+      setEmailError(validationError);
+      return;
+    }
 
-    await sendInvite({
-      email: email.trim(),
-      republicaId,
-    });
-
-    setEmail("");
-    onClose(); // opcional — fecha após envio
+    await sendInvite({ email: email.trim(), republicaId });
+    handleClose();
   };
+
   return (
     <Modal
       visible={open}
       animationType="slide"
       transparent
-      onRequestClose={onClose}
+      onRequestClose={handleClose}
     >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -60,7 +88,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
             <View className="mb-6 flex-row items-center justify-between">
               <Text className="text-xl font-semibold">Enviar convite</Text>
               <TouchableOpacity
-                onPress={onClose}
+                onPress={handleClose}
                 accessibilityRole="button"
                 accessibilityLabel="Fechar modal de convite"
               >
@@ -75,15 +103,26 @@ export const InviteModal: React.FC<InviteModalProps> = ({
               </Text>
               <TextInput
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={handleChangeEmail}
+                onBlur={handleBlur}
                 placeholder="Email do convidado"
                 autoCapitalize="none"
+                autoCorrect={false}
+                autoComplete="email"
+                textContentType="emailAddress"
                 keyboardType="email-address"
-                className="rounded-lg border border-gray-300 bg-white px-4 py-3"
+                returnKeyType="send"
+                onSubmitEditing={handleSubmit}
+                className={`rounded-lg border bg-white px-4 py-3 ${
+                  emailError && touched ? "border-red-400" : "border-gray-300"
+                }`}
               />
-              {error && (
-                <Text style={{ color: "red", marginBottom: 10 }}>{error}</Text>
-              )}
+              {touched && emailError ? (
+                <Text className="mt-1 text-xs text-red-500">{emailError}</Text>
+              ) : null}
+              {error ? (
+                <Text className="mt-1 text-xs text-red-500">{error}</Text>
+              ) : null}
             </View>
 
             {/* Botões */}
@@ -105,7 +144,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={onClose}
+                onPress={handleClose}
                 accessibilityRole="button"
                 accessibilityLabel="Cancelar envio de convite"
                 className="flex-1 items-center rounded-lg border border-gray-300 bg-white py-3"
