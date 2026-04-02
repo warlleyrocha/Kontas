@@ -49,7 +49,7 @@ export function AddAccountModalFormSection({
   return (
     <View>
       <View className="mb-3">
-        <Text className="mb-1 text-sm text-gray-700">Descrição</Text>
+        <Text className="mb-1 text-sm text-gray-700">Descrição *</Text>
         <TextInput
           value={descricao}
           onChangeText={onDescricaoChange}
@@ -60,7 +60,7 @@ export function AddAccountModalFormSection({
 
       <View className="mb-3 flex-col gap-3">
         <View className="flex-1">
-          <Text className="mb-1 text-sm text-gray-700">Valor Total (R$)</Text>
+          <Text className="mb-1 text-sm text-gray-700">Valor Total (R$) *</Text>
           <TextInput
             value={valorTotal}
             onChangeText={(text) => onValorTotalChange(maskCurrencyBRL(text))}
