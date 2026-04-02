@@ -1,4 +1,10 @@
-import { maskPhone, maskPhoneWrite } from "../inputMasks";
+import {
+  maskPhone,
+  maskPhoneWrite,
+  formatCurrencyBRL,
+  maskCurrencyBRL,
+  unmaskCurrencyBRL,
+} from "../inputMasks";
 
 describe("inputMasks", () => {
   describe("maskPhone", () => {
@@ -65,6 +71,45 @@ describe("inputMasks", () => {
 
     it("aplica a máscara de celular com onze dígitos e ignora excesso", () => {
       expect(maskPhoneWrite("11 98765-43210")).toBe("(11) 98765-4321");
+    });
+  });
+
+  describe("formatCurrencyBRL", () => {
+    it("formata centavos para o padrão BRL", () => {
+      expect(formatCurrencyBRL(150099)).toBe("R$\u00a01.500,99");
+    });
+
+    it("formata zero centavos", () => {
+      expect(formatCurrencyBRL(0)).toBe("R$\u00a00,00");
+    });
+
+    it("formata valores menores que um real", () => {
+      expect(formatCurrencyBRL(50)).toBe("R$\u00a00,50");
+    });
+  });
+
+  describe("maskCurrencyBRL", () => {
+    it("retorna vazio quando a string não contém dígitos", () => {
+      expect(maskCurrencyBRL("")).toBe("");
+      expect(maskCurrencyBRL("abc")).toBe("");
+    });
+
+    it("aplica máscara BRL com centavos", () => {
+      expect(maskCurrencyBRL("150099")).toBe("1.500,99");
+    });
+
+    it("aplica máscara para valores pequenos", () => {
+      expect(maskCurrencyBRL("50")).toBe("0,50");
+    });
+  });
+
+  describe("unmaskCurrencyBRL", () => {
+    it("remove a máscara e retorna valor em centavos", () => {
+      expect(unmaskCurrencyBRL("1.500,99")).toBe(150099);
+    });
+
+    it("retorna 0 para string sem dígitos", () => {
+      expect(unmaskCurrencyBRL("")).toBe(0);
     });
   });
 });

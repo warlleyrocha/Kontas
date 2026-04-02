@@ -172,4 +172,39 @@ describe("AddAccountModalResidentsSection", () => {
     expect(screen.queryByText(/Faltam/)).toBeNull();
     expect(screen.queryByText("Completo")).toBeNull();
   });
+
+  it("exibe imagem quando morador tem fotoPerfil", () => {
+    const moradoresComFoto = [
+      {
+        ...mockMoradores[0],
+        fotoPerfil: "https://example.com/foto.jpg",
+      },
+      mockMoradores[1],
+    ];
+    render(
+      <AddAccountModalResidentsSection
+        {...createProps({ moradoresDivisao: moradoresComFoto })}
+      />
+    );
+
+    // Com fotoPerfil, não deve exibir a inicial do nome como fallback
+    expect(screen.queryByText("A")).toBeNull();
+    // Bruno não tem foto, deve exibir a inicial
+    expect(screen.getByText("B")).toBeTruthy();
+  });
+
+  it("usa progressPercent 0 quando valorTotalNumerico é 0", () => {
+    render(
+      <AddAccountModalResidentsSection
+        {...createProps({
+          tipoDivisao: "custom",
+          valorTotalNumerico: 0,
+          totalDivisaoPreenchido: 0,
+          restante: 0,
+        })}
+      />
+    );
+
+    expect(screen.getByText("Completo")).toBeTruthy();
+  });
 });

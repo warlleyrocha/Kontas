@@ -1,4 +1,4 @@
-import { formatDate, formatMounthYear } from "../formats";
+import { formatDate, formatIntWithDots, formatMounthYear } from "../formats";
 
 describe("formats", () => {
   it("formata ano e mês abreviado", () => {
@@ -18,5 +18,17 @@ describe("formats", () => {
     });
 
     toLocaleDateStringSpy.mockRestore();
+  });
+
+  describe("formatIntWithDots", () => {
+    it("insere pontos de milhar em números com 4+ dígitos", () => {
+      expect(formatIntWithDots("1500")).toBe("1.500");
+      expect(formatIntWithDots("1000000")).toBe("1.000.000");
+    });
+
+    it("não insere ponto em números com até 3 dígitos", () => {
+      expect(formatIntWithDots("999")).toBe("999");
+      expect(formatIntWithDots("1")).toBe("1");
+    });
   });
 });

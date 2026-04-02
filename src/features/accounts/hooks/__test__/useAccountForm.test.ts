@@ -171,17 +171,9 @@ describe("useAccountForm — estado inicial", () => {
 });
 
 describe("useAccountForm — carregamento de moradores", () => {
-  it("chama fetchResidents com republicId quando visible=true", async () => {
-    mockFetchResidents.mockResolvedValue([]);
+  it("passa republicId para useResidents para habilitar a query automática", () => {
     renderForm({ visible: true });
-    await act(async () => {});
-    expect(mockFetchResidents).toHaveBeenCalledWith("rep-1");
-  });
-
-  it("não chama fetchResidents quando visible=false", async () => {
-    renderForm({ visible: false });
-    await act(async () => {});
-    expect(mockFetchResidents).not.toHaveBeenCalled();
+    expect(jest.mocked(useResidents)).toHaveBeenCalledWith("rep-1");
   });
 
   it("inicializa moradoresDivisao quando residents chegam (checked=true)", () => {

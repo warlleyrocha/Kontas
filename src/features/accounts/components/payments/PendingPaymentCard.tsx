@@ -13,7 +13,12 @@ import { PendingPaymentResidentCard } from "./PendingPaymentResidentCard";
 interface PendingPaymentCardProps {
   readonly account: PaymentAccount;
   readonly confirmingResidentById: Record<string, boolean>;
+  readonly refusingResidentById: Record<string, boolean>;
   readonly onConfirmResidentPayment: (
+    accountId: string,
+    residentId: string
+  ) => Promise<void> | void;
+  readonly onRefuseResidentPayment: (
     accountId: string,
     residentId: string
   ) => Promise<void> | void;
@@ -43,7 +48,9 @@ function getSectionTitle(selectedStatus: PaymentStatusFilter) {
 export function PendingPaymentCard({
   account,
   confirmingResidentById,
+  refusingResidentById,
   onConfirmResidentPayment,
+  onRefuseResidentPayment,
   selectedStatus,
 }: PendingPaymentCardProps) {
   const [expanded, setExpanded] = useState(false);
@@ -110,7 +117,9 @@ export function PendingPaymentCard({
                 accountId={account.id}
                 resident={resident}
                 isConfirming={Boolean(confirmingResidentById[resident.id])}
+                isRefusing={Boolean(refusingResidentById[resident.id])}
                 onConfirmResidentPayment={onConfirmResidentPayment}
+                onRefuseResidentPayment={onRefuseResidentPayment}
               />
             ))}
           </View>

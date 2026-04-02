@@ -1,10 +1,12 @@
 import { act, renderHook } from "@testing-library/react-native";
+import { useIsFocused } from "@react-navigation/native";
 import { useRouter } from "expo-router";
-import { useAuth } from "@/src/features/auth/contexts";
-import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
+
+import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthMutations";
 import { useResidents } from "@/src/features/residents/hooks/useResidents";
+import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
+import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 import { getErrorMessage } from "@/src/services/httpError";
-import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import {
   ResidentRole,
   type ResidentResponse,
@@ -12,21 +14,28 @@ import {
 import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
 import { toastErrors } from "@/src/shared/utils/toastMessages";
-import { useRepublicActions } from "../useRepublicActions";
-import { useRepublicList } from "../useRepublicList";
-import { mergeSavedRepublic, useRepublicScreen } from "../useRepublicScreen";
 
+import { useRepublicActions } from "../useRepublicActions";
+import { useRepublicQuery, useRepublicsQuery } from "../useRepublicQueries";
+import { useRepublicScreen } from "../useRepublicScreen";
+
+jest.mock("@react-navigation/native", () => ({ useIsFocused: jest.fn() }));
 jest.mock("expo-router", () => ({ useRouter: jest.fn() }));
-jest.mock("@/src/features/auth/contexts", () => ({ useAuth: jest.fn() }));
-jest.mock("../useRepublicList", () => ({ useRepublicList: jest.fn() }));
+jest.mock("@/src/features/auth/hooks/useAuthMutations", () => ({
+  useLogoutMutation: jest.fn(),
+}));
+jest.mock("@/src/features/user/hooks/useUserQueries", () => ({
+  useCurrentUserQuery: jest.fn(),
+}));
 jest.mock("../useRepublicActions", () => ({ useRepublicActions: jest.fn() }));
+jest.mock("../useRepublicQueries", () => ({
+  useRepublicQuery: jest.fn(),
+  useRepublicsQuery: jest.fn(),
+}));
 jest.mock("@/src/features/residents/hooks/useResidents", () => ({
   useResidents: jest.fn(),
 }));
 jest.mock("@/src/services/httpError", () => ({ getErrorMessage: jest.fn() }));
-jest.mock("@/src/shared/contexts/RefreshContext", () => ({
-  useRefresh: jest.fn(),
-}));
 jest.mock("@/src/shared/utils/logger", () => ({
   logger: { warn: jest.fn(), error: jest.fn() },
 }));
@@ -53,17 +62,17 @@ const mockResident: ResidentResponse = {
 
 const mockRouter = { replace: jest.fn(), back: jest.fn() };
 const mockLogout = jest.fn();
-const mockFetchRepublicById = jest.fn();
-const mockFetchRepublics = jest.fn();
 const mockFetchResidents = jest.fn();
 const mockUpdateRepublic = jest.fn();
 const mockSetShowEditModal = jest.fn();
-const mockRegisterRefresh = jest.fn().mockReturnValue(jest.fn());
+const mockRefetchRepublic = jest.fn();
+const mockRefetchRepublics = jest.fn();
 
 function setupMocks(userOverrides = {}) {
+  jest.mocked(useIsFocused).mockReturnValue(true);
   jest.mocked(useRouter).mockReturnValue(mockRouter as any);
-  jest.mocked(useAuth).mockReturnValue({
-    user: {
+  jest.mocked(useCurrentUserQuery).mockReturnValue({
+    data: {
       id: "u-1",
       nome: "Ana",
       email: "ana@email.com",
@@ -73,10 +82,19 @@ function setupMocks(userOverrides = {}) {
     },
     logout: mockLogout,
   } as any);
-  jest.mocked(useRepublicList).mockReturnValue({
-    republics: [mockRepublic],
-    fetchRepublics: mockFetchRepublics,
-    fetchRepublicById: mockFetchRepublicById,
+  jest.mocked(useLogoutMutation).mockReturnValue({
+    mutateAsync: mockLogout,
+  } as any);
+  jest.mocked(useRepublicsQuery).mockReturnValue({
+    data: [mockRepublic],
+    refetch: mockRefetchRepublics,
+  } as any);
+  jest.mocked(useRepublicQuery).mockReturnValue({
+    data: mockRepublic,
+    error: null,
+    isLoading: false,
+    isSuccess: true,
+    refetch: mockRefetchRepublic,
   } as any);
   jest.mocked(useRepublicActions).mockReturnValue({
     updateRepublic: mockUpdateRepublic,
@@ -87,9 +105,6 @@ function setupMocks(userOverrides = {}) {
     residents: [],
     fetchResidents: mockFetchResidents,
   } as any);
-  jest.mocked(useRefresh).mockReturnValue({
-    registerRefresh: mockRegisterRefresh,
-  } as any);
   jest
     .mocked(getErrorMessage)
     .mockImplementation((_err, fallback) => fallback ?? "erro");
@@ -97,21 +112,11 @@ function setupMocks(userOverrides = {}) {
 
 // ─── Setup ────────────────────────────────────────────────────────────────────
 
-let consoleWarnSpy: jest.SpyInstance;
-let consoleErrorSpy: jest.SpyInstance;
-
 beforeEach(() => {
   jest.clearAllMocks();
-  mockRegisterRefresh.mockReturnValue(jest.fn());
   setupMocks();
-  mockFetchRepublicById.mockResolvedValue(mockRepublic);
-  consoleWarnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
-  consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-});
-
-afterEach(() => {
-  consoleWarnSpy.mockRestore();
-  consoleErrorSpy.mockRestore();
+  mockRefetchRepublic.mockResolvedValue({ data: mockRepublic, error: null });
+  mockRefetchRepublics.mockResolvedValue({ data: [mockRepublic], error: null });
 });
 
 // ─── loadRepublic effect ──────────────────────────────────────────────────────
@@ -130,96 +135,62 @@ describe("useRepublicScreen — loadRepublic", () => {
     await act(async () => {});
 
     expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
-      "ID da república não encontrado"
+      "ID da república não encontrado",
     );
     expect(mockRouter.back).toHaveBeenCalled();
   });
 
-  it("exibe toast e volta quando fetchRepublicById retorna null", async () => {
-    mockFetchRepublicById.mockResolvedValue(null);
+  it("exibe toast e volta quando a query retorna null com sucesso", async () => {
+    jest.mocked(useRepublicQuery).mockReturnValue({
+      data: null,
+      error: null,
+      isLoading: false,
+      isSuccess: true,
+      refetch: mockRefetchRepublic,
+    } as any);
     renderHook(() => useRepublicScreen("rep-1"));
     await act(async () => {});
 
     expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
-      "República não encontrada"
+      "República não encontrada",
     );
     expect(mockRouter.back).toHaveBeenCalled();
   });
 
   it("loga warn, exibe toast e volta ao falhar", async () => {
     const error = new Error("network");
-    mockFetchRepublicById.mockRejectedValue(error);
     jest.mocked(getErrorMessage).mockReturnValue("Erro ao carregar república");
+    jest.mocked(useRepublicQuery).mockReturnValue({
+      data: null,
+      error,
+      isLoading: false,
+      isSuccess: false,
+      refetch: mockRefetchRepublic,
+    } as any);
 
     renderHook(() => useRepublicScreen("rep-1"));
     await act(async () => {});
 
-    expect(consoleWarnSpy).toHaveBeenCalledWith(
+    expect(jest.mocked(logger.warn)).toHaveBeenCalledWith(
+      "Republic",
       "Não foi possível carregar república:",
-      error
+      { republicId: "rep-1" },
     );
     expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
-      "Erro ao carregar república"
+      "Erro ao carregar república",
     );
     expect(mockRouter.back).toHaveBeenCalled();
-    consoleWarnSpy.mockClear();
   });
 });
 
-// ─── loadResidents effect ─────────────────────────────────────────────────────
+// ─── loadResidents ────────────────────────────────────────────────────────────
 
 describe("useRepublicScreen — loadResidents", () => {
-  it("chama fetchResidents quando republic.id é definido", async () => {
-    const { result } = renderHook(() => useRepublicScreen("rep-1"));
-    await act(async () => {});
-
-    expect(mockFetchResidents).toHaveBeenCalledWith("rep-1");
-    expect(result.current.residents).toBeDefined();
-  });
-});
-
-// ─── registerRefresh effect ───────────────────────────────────────────────────
-
-describe("useRepublicScreen — registerRefresh", () => {
-  it("registra fetchData com a chave republic-{id}", async () => {
+  it("passa republicId para useResidents para habilitar a query automática", async () => {
     renderHook(() => useRepublicScreen("rep-1"));
     await act(async () => {});
 
-    expect(mockRegisterRefresh).toHaveBeenCalledWith(
-      "republic-rep-1",
-      expect.any(Function)
-    );
-  });
-
-  it("fetchData atualiza republic e moradores quando retorna dados", async () => {
-    renderHook(() => useRepublicScreen("rep-1"));
-    await act(async () => {});
-
-    const fetchData = mockRegisterRefresh.mock
-      .calls[0][1] as () => Promise<void>;
-    await act(async () => {
-      await fetchData();
-    });
-
-    expect(mockFetchResidents).toHaveBeenCalledWith("rep-1");
-  });
-
-  it("fetchData não atualiza quando retorna null", async () => {
-    mockFetchRepublicById
-      .mockResolvedValueOnce(mockRepublic) // loadRepublic inicial
-      .mockResolvedValueOnce(null); // fetchData call
-
-    renderHook(() => useRepublicScreen("rep-1"));
-    await act(async () => {});
-
-    mockFetchResidents.mockClear();
-    const fetchData = mockRegisterRefresh.mock
-      .calls[0][1] as () => Promise<void>;
-    await act(async () => {
-      await fetchData();
-    });
-
-    expect(mockFetchResidents).not.toHaveBeenCalled();
+    expect(jest.mocked(useResidents)).toHaveBeenCalledWith("rep-1");
   });
 });
 
@@ -236,7 +207,7 @@ describe("useRepublicScreen — toggleFavorite", () => {
 
     expect(result.current.isFavorited).toBe(true);
     expect(jest.mocked(showToast.success)).toHaveBeenCalledWith(
-      "República adicionada aos favoritos"
+      "República adicionada aos favoritos",
     );
   });
 
@@ -253,7 +224,7 @@ describe("useRepublicScreen — toggleFavorite", () => {
 
     expect(result.current.isFavorited).toBe(false);
     expect(jest.mocked(showToast.success)).toHaveBeenLastCalledWith(
-      "República removida dos favoritos"
+      "República removida dos favoritos",
     );
   });
 });
@@ -284,12 +255,12 @@ describe("useRepublicScreen — handleSignOut", () => {
       await result.current.handleSignOut();
     });
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      "Erro ao fazer logout:",
-      error
+    expect(jest.mocked(logger.error)).toHaveBeenCalledWith(
+      "Republic",
+      "Erro ao fazer logout",
+      error,
     );
     expect(jest.mocked(toastErrors.logoutFailed)).toHaveBeenCalledWith(error);
-    consoleErrorSpy.mockClear();
   });
 });
 
@@ -304,17 +275,16 @@ describe("useRepublicScreen — handleOpenMenu", () => {
       await result.current.handleOpenMenu();
     });
 
-    expect(mockFetchRepublics).not.toHaveBeenCalled();
+    expect(mockRefetchRepublics).not.toHaveBeenCalled();
     expect(result.current.isMenuOpen).toBe(true);
   });
 
-  it("chama fetchRepublics antes de abrir o menu quando república não está na lista", async () => {
-    jest.mocked(useRepublicList).mockReturnValue({
-      republics: [],
-      fetchRepublics: mockFetchRepublics,
-      fetchRepublicById: mockFetchRepublicById,
+  it("chama refetch da lista antes de abrir o menu quando república não está na lista", async () => {
+    jest.mocked(useRepublicsQuery).mockReturnValue({
+      data: [],
+      refetch: mockRefetchRepublics,
     } as any);
-    mockFetchRepublics.mockResolvedValue(undefined);
+    mockRefetchRepublics.mockResolvedValue({ data: [], error: null });
 
     const { result } = renderHook(() => useRepublicScreen("rep-1"));
     await act(async () => {});
@@ -323,17 +293,19 @@ describe("useRepublicScreen — handleOpenMenu", () => {
       await result.current.handleOpenMenu();
     });
 
-    expect(mockFetchRepublics).toHaveBeenCalled();
+    expect(mockRefetchRepublics).toHaveBeenCalled();
     expect(result.current.isMenuOpen).toBe(true);
   });
 
-  it("loga warn e ainda abre o menu quando fetchRepublics falha", async () => {
-    jest.mocked(useRepublicList).mockReturnValue({
-      republics: [],
-      fetchRepublics: mockFetchRepublics,
-      fetchRepublicById: mockFetchRepublicById,
+  it("loga warn e ainda abre o menu quando o refetch da lista falha", async () => {
+    jest.mocked(useRepublicsQuery).mockReturnValue({
+      data: [],
+      refetch: mockRefetchRepublics,
     } as any);
-    mockFetchRepublics.mockRejectedValue(new Error("fetch fail"));
+    mockRefetchRepublics.mockResolvedValue({
+      data: [],
+      error: new Error("fetch fail"),
+    });
 
     const { result } = renderHook(() => useRepublicScreen("rep-1"));
     await act(async () => {});
@@ -350,20 +322,14 @@ describe("useRepublicScreen — handleOpenMenu", () => {
 // ─── handleSaveRepublic ───────────────────────────────────────────────────────
 
 describe("useRepublicScreen — handleSaveRepublic", () => {
-  it("mergeSavedRepublic retorna null quando o estado anterior é null", () => {
-    expect(mergeSavedRepublic(null, "Novo Nome", "img.jpg")).toBeNull();
-  });
-
-  it("mergeSavedRepublic atualiza nome e imagem quando há república anterior", () => {
-    expect(mergeSavedRepublic(mockRepublic, "Novo Nome", "img.jpg")).toEqual({
-      ...mockRepublic,
-      nome: "Novo Nome",
-      imagemRepublica: "img.jpg",
-    });
-  });
-
   it("retorna imediatamente quando republic é null", async () => {
-    mockFetchRepublicById.mockResolvedValue(null);
+    jest.mocked(useRepublicQuery).mockReturnValue({
+      data: null,
+      error: null,
+      isLoading: false,
+      isSuccess: true,
+      refetch: mockRefetchRepublic,
+    } as any);
     const { result } = renderHook(() => useRepublicScreen("rep-1"));
     await act(async () => {});
 
@@ -374,7 +340,7 @@ describe("useRepublicScreen — handleSaveRepublic", () => {
     expect(mockUpdateRepublic).not.toHaveBeenCalled();
   });
 
-  it("chama updateRepublic e atualiza republic localmente", async () => {
+  it("chama updateRepublic com o payload correto", async () => {
     mockUpdateRepublic.mockResolvedValue(undefined);
     const { result } = renderHook(() => useRepublicScreen("rep-1"));
     await act(async () => {});
@@ -387,7 +353,6 @@ describe("useRepublicScreen — handleSaveRepublic", () => {
       nome: "Novo Nome",
       imagemRepublica: "img.jpg",
     });
-    expect(result.current.republic?.nome).toBe("Novo Nome");
   });
 });
 

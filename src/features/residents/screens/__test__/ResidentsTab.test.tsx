@@ -1,9 +1,10 @@
 import { act, render, screen } from "@testing-library/react-native";
 import { PlusButton } from "@/src/shared/components/PlusButton";
 import { InviteModal } from "@/src/features/invites/components/InviteModal";
-import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
+import { useSendInviteMutation } from "@/src/features/invites/hooks/useInvitesQueries";
 import { ResidentCard } from "@/src/features/residents/components/ResidentCard";
 import { useTabResidents } from "@/src/features/residents/hooks/useTabResidents";
+import { getErrorMessage } from "@/src/services/httpError";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import {
   ResidentRole,
@@ -15,8 +16,8 @@ jest.mock("@expo/vector-icons/Feather", () => "Feather");
 jest.mock("@/src/features/invites/components/InviteModal", () => ({
   InviteModal: jest.fn(() => null),
 }));
-jest.mock("@/src/features/invites/contexts/InvitesContext", () => ({
-  useInvitesContext: jest.fn(),
+jest.mock("@/src/features/invites/hooks/useInvitesQueries", () => ({
+  useSendInviteMutation: jest.fn(),
 }));
 jest.mock("@/src/features/residents/components/ResidentCard", () => ({
   ResidentCard: jest.fn(() => null),
@@ -26,6 +27,9 @@ jest.mock("@/src/features/residents/hooks/useTabResidents", () => ({
 }));
 jest.mock("@/src/shared/contexts/RefreshContext", () => ({
   useRefresh: jest.fn(),
+}));
+jest.mock("@/src/services/httpError", () => ({
+  getErrorMessage: jest.fn(),
 }));
 jest.mock("@/src/shared/hooks/useComponentLogger", () => ({
   useComponentLogger: jest.fn(),
@@ -58,10 +62,10 @@ let consoleErrorSpy: jest.SpyInstance;
 
 beforeEach(() => {
   jest.clearAllMocks();
-  jest.mocked(useInvitesContext).mockReturnValue({
-    sendInvite: mockSendInvite,
-    sendLoading: false,
-    sendError: null,
+  jest.mocked(useSendInviteMutation).mockReturnValue({
+    mutateAsync: mockSendInvite,
+    isPending: false,
+    error: null,
   } as any);
   jest
     .mocked(useTabResidents)
@@ -69,6 +73,11 @@ beforeEach(() => {
   jest
     .mocked(useRefresh)
     .mockReturnValue({ refreshing: false, onRefresh: mockOnRefresh } as any);
+  jest
+    .mocked(getErrorMessage)
+    .mockImplementation((error) =>
+      error instanceof Error ? error.message : "Erro ao enviar convite."
+    );
   consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 });
 
@@ -162,10 +171,10 @@ describe("ResidentsTab — modal de convite", () => {
   });
 
   it("passa sendInvite, loading e error do contexto ao InviteModal", () => {
-    jest.mocked(useInvitesContext).mockReturnValue({
-      sendInvite: mockSendInvite,
-      sendLoading: true,
-      sendError: "Erro de envio",
+    jest.mocked(useSendInviteMutation).mockReturnValue({
+      mutateAsync: mockSendInvite,
+      isPending: true,
+      error: new Error("Erro de envio"),
     } as any);
     render(<ResidentsTab residents={[]} republicId="rep-1" />);
     const props = jest.mocked(InviteModal).mock.calls[0][0] as any;

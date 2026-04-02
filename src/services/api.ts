@@ -1,9 +1,12 @@
-import { getItemAsync } from "expo-secure-store";
 import axios, {
   AxiosError,
   type InternalAxiosRequestConfig,
   isAxiosError,
 } from "axios";
+import {
+  getAuthorizationHeader,
+  hydrateAuthorizationHeader,
+} from "@/src/services/authHeader";
 import { logger } from "@/src/shared/utils/logger";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -21,6 +24,8 @@ export const api = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+const AUTHORIZATION_HEADER_KEY = "Authorization";
 
 type CircuitState = "CLOSED" | "OPEN" | "HALF_OPEN";
 
@@ -131,11 +136,11 @@ api.interceptors.request.use(
 
     typedConfig._cbHalfOpen = halfOpen;
 
-    const token = await getItemAsync("token");
-    if (token) {
-      if (config.headers) {
-        config.headers["Authorization"] = `Bearer ${token}`;
-      }
+    await hydrateAuthorizationHeader();
+
+    const authorizationHeader = getAuthorizationHeader();
+    if (authorizationHeader && config.headers) {
+      config.headers[AUTHORIZATION_HEADER_KEY] = authorizationHeader;
     }
 
     logger.debug(

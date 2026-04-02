@@ -290,6 +290,57 @@ describe("accountResidentsService.confirmarPagamentoAdmin", () => {
   });
 });
 
+// ─── recusarPagamentoAdmin ───────────────────────────────────────────────────
+
+describe("accountResidentsService.recusarPagamentoAdmin", () => {
+  it("chama PATCH /contas-moradores/:id/recusar, loga e retorna response.data", async () => {
+    mockApi.patch.mockResolvedValue({ data: mockContaMorador });
+
+    const result = await accountResidentsService.recusarPagamentoAdmin({
+      id: "cm-1",
+    });
+
+    expect(mockApi.patch).toHaveBeenCalledWith(
+      "/contas-moradores/cm-1/recusar"
+    );
+    expect(mockLogger.info).toHaveBeenCalledWith(
+      "AccountResidents",
+      "Pagamento da conta cm-1 recusado pelo ADMIN"
+    );
+    expect(result).toEqual(mockContaMorador);
+  });
+
+  it("chama toUserFriendlyError com as mensagens corretas ao falhar", async () => {
+    const error = new Error("fail");
+    mockApi.patch.mockRejectedValue(error);
+
+    await expect(
+      accountResidentsService.recusarPagamentoAdmin({ id: "cm-1" })
+    ).rejects.toBeDefined();
+
+    expect(mockToUserFriendlyError).toHaveBeenCalledWith(error, {
+      defaultMessage: "Erro ao confirmar pagamento.",
+      statusMessages: {
+        401: "Não autenticado.",
+        403: "Apenas ADMIN pode recusar pagamentos.",
+        404: "Registro não encontrado.",
+        409: "Pagamento não está aguardando confirmação.",
+        500: "Erro interno do servidor.",
+      },
+    });
+  });
+
+  it("propaga o erro retornado por toUserFriendlyError", async () => {
+    const friendly = new Error("amigável");
+    mockApi.patch.mockRejectedValue(new Error("original"));
+    mockToUserFriendlyError.mockReturnValue(friendly);
+
+    await expect(
+      accountResidentsService.recusarPagamentoAdmin({ id: "cm-1" })
+    ).rejects.toBe(friendly);
+  });
+});
+
 // ─── atualizarVisibilidadeAdmin ───────────────────────────────────────────────
 
 describe("accountResidentsService.atualizarVisibilidadeAdmin", () => {

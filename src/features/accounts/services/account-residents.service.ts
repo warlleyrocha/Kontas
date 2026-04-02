@@ -134,6 +134,32 @@ export const accountResidentsService = {
     }
   },
 
+  recusarPagamentoAdmin: async ({
+    id,
+  }: ContaMoradorIdParams): Promise<ContaMorador> => {
+    try {
+      const response = await api.patch<ContaMorador>(
+        `/contas-moradores/${id}/recusar`
+      );
+      logger.info(
+        "AccountResidents",
+        `Pagamento da conta ${id} recusado pelo ADMIN`
+      );
+      return response.data;
+    } catch (error) {
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao confirmar pagamento.",
+        statusMessages: {
+          401: "Não autenticado.",
+          403: "Apenas ADMIN pode recusar pagamentos.",
+          404: "Registro não encontrado.",
+          409: "Pagamento não está aguardando confirmação.",
+          500: "Erro interno do servidor.",
+        },
+      });
+    }
+  },
+
   atualizarVisibilidadeAdmin: async ({
     id,
     visivel,

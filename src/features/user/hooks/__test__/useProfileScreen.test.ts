@@ -2,36 +2,50 @@ import { act, renderHook } from "@testing-library/react-native";
 import { useIsFocused } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { Alert } from "react-native";
-import { useAuth } from "@/src/features/auth/contexts";
-import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
+
+import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthMutations";
+import {
+  usePendingInvitesCount,
+  useSendInviteMutation,
+} from "@/src/features/invites/hooks/useInvitesQueries";
 import { useRepublicActions } from "@/src/features/republic/hooks/useRepublicActions";
-import { useRepublicList } from "@/src/features/republic/hooks/useRepublicList";
+import { useRepublicsQuery } from "@/src/features/republic/hooks/useRepublicQueries";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
+import {
+  useCompleteProfileMutation,
+  useCurrentUserQuery,
+  useUpdateCurrentUserMutation,
+} from "@/src/features/user/hooks/useUserQueries";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
-import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { useRepublicResidents } from "@/src/shared/hooks/useRepublicResidents";
 import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
 import { toastErrors } from "@/src/shared/utils/toastMessages";
+
 import { useProfileScreen } from "../useProfileScreen";
 
 jest.mock("@react-navigation/native", () => ({ useIsFocused: jest.fn() }));
 jest.mock("expo-router", () => ({ useRouter: jest.fn() }));
-jest.mock("@/src/features/auth/contexts", () => ({ useAuth: jest.fn() }));
-jest.mock("@/src/features/invites/contexts/InvitesContext", () => ({
-  useInvitesContext: jest.fn(),
+jest.mock("@/src/features/auth/hooks/useAuthMutations", () => ({
+  useLogoutMutation: jest.fn(),
+}));
+jest.mock("@/src/features/user/hooks/useUserQueries", () => ({
+  useCompleteProfileMutation: jest.fn(),
+  useCurrentUserQuery: jest.fn(),
+  useUpdateCurrentUserMutation: jest.fn(),
+}));
+jest.mock("@/src/features/invites/hooks/useInvitesQueries", () => ({
+  usePendingInvitesCount: jest.fn(),
+  useSendInviteMutation: jest.fn(),
 }));
 jest.mock("@/src/features/republic/hooks/useRepublicActions", () => ({
   useRepublicActions: jest.fn(),
 }));
-jest.mock("@/src/features/republic/hooks/useRepublicList", () => ({
-  useRepublicList: jest.fn(),
+jest.mock("@/src/features/republic/hooks/useRepublicQueries", () => ({
+  useRepublicsQuery: jest.fn(),
 }));
 jest.mock("@/src/shared/components/SideMenu/useSideMenu", () => ({
   useSideMenu: jest.fn(),
-}));
-jest.mock("@/src/shared/contexts/RefreshContext", () => ({
-  useRefresh: jest.fn(),
 }));
 jest.mock("@/src/shared/hooks/useRepublicResidents", () => ({
   useRepublicResidents: jest.fn(),
@@ -61,14 +75,13 @@ const mockFetchRepublics = jest.fn();
 const mockDeleteRepublic = jest.fn();
 const mockUpdateRepublic = jest.fn();
 const mockSetShowEditModal = jest.fn();
-const mockRegisterRefresh = jest.fn().mockReturnValue(jest.fn());
 const mockSendInvite = jest.fn();
 
 function setupMocks(userOverrides = {}) {
   jest.mocked(useIsFocused).mockReturnValue(true);
   jest.mocked(useRouter).mockReturnValue(mockRouter as any);
-  jest.mocked(useAuth).mockReturnValue({
-    user: {
+  jest.mocked(useCurrentUserQuery).mockReturnValue({
+    data: {
       id: "u-1",
       nome: "Ana",
       email: "ana@email.com",
@@ -78,13 +91,20 @@ function setupMocks(userOverrides = {}) {
       fotoPerfil: null,
       ...userOverrides,
     },
-    logout: mockLogout,
-    completeProfile: mockCompleteProfile,
-    updateUser: mockUpdateUser,
   } as any);
-  jest.mocked(useRepublicList).mockReturnValue({
-    republics: [mockRepublic],
-    fetchRepublics: mockFetchRepublics,
+  jest.mocked(useLogoutMutation).mockReturnValue({
+    mutateAsync: mockLogout,
+  } as any);
+  jest.mocked(useCompleteProfileMutation).mockReturnValue({
+    mutateAsync: mockCompleteProfile,
+  } as any);
+  jest.mocked(useUpdateCurrentUserMutation).mockReturnValue({
+    mutateAsync: mockUpdateUser,
+  } as any);
+  jest.mocked(useRepublicsQuery).mockReturnValue({
+    data: [mockRepublic],
+    error: null,
+    refetch: mockFetchRepublics,
   } as any);
   jest.mocked(useRepublicActions).mockReturnValue({
     deleteRepublic: mockDeleteRepublic,
@@ -96,16 +116,11 @@ function setupMocks(userOverrides = {}) {
     getResidentsCount: jest.fn().mockReturnValue(0),
     isAdmin: jest.fn().mockReturnValue(false),
   } as any);
-  jest.mocked(useInvitesContext).mockReturnValue({
-    pendingCount: 0,
-    sendInvite: mockSendInvite,
-    sendLoading: false,
-    sendError: null,
-  } as any);
-  jest.mocked(useRefresh).mockReturnValue({
-    refreshing: false,
-    onRefresh: jest.fn(),
-    registerRefresh: mockRegisterRefresh,
+  jest.mocked(usePendingInvitesCount).mockReturnValue(0);
+  jest.mocked(useSendInviteMutation).mockReturnValue({
+    mutateAsync: mockSendInvite,
+    isPending: false,
+    error: null,
   } as any);
   jest.mocked(useSideMenu).mockReturnValue({
     menuItems: [],
@@ -119,7 +134,6 @@ let alertSpy: jest.SpyInstance;
 
 beforeEach(() => {
   jest.clearAllMocks();
-  mockRegisterRefresh.mockReturnValue(jest.fn());
   setupMocks();
   alertSpy = jest.spyOn(Alert, "alert").mockImplementation(() => {});
 });
@@ -155,7 +169,7 @@ function getHandleSignOut(): () => Promise<void> {
 }
 
 describe("useProfileScreen — handleSignOut", () => {
-  it("chama logout e redireciona para / em caso de sucesso", async () => {
+  it("chama logout e não dispara toast de erro em caso de sucesso", async () => {
     mockLogout.mockResolvedValue(undefined);
     renderHook(() => useProfileScreen());
     const handleSignOut = getHandleSignOut();
@@ -165,7 +179,7 @@ describe("useProfileScreen — handleSignOut", () => {
     });
 
     expect(mockLogout).toHaveBeenCalled();
-    expect(mockRouter.replace).toHaveBeenCalledWith("/");
+    expect(jest.mocked(toastErrors.logoutFailed)).not.toHaveBeenCalled();
   });
 
   it("loga erro e chama toastErrors.logoutFailed ao falhar", async () => {
@@ -181,7 +195,7 @@ describe("useProfileScreen — handleSignOut", () => {
     expect(jest.mocked(logger.error)).toHaveBeenCalledWith(
       "User",
       "Erro ao fazer logout",
-      error
+      error,
     );
     expect(jest.mocked(toastErrors.logoutFailed)).toHaveBeenCalledWith(error);
   });
@@ -198,7 +212,7 @@ describe("useProfileScreen — handleSignOut", () => {
     expect(jest.mocked(logger.error)).toHaveBeenCalledWith(
       "User",
       "Erro ao fazer logout",
-      undefined
+      undefined,
     );
   });
 });
@@ -207,12 +221,7 @@ describe("useProfileScreen — handleSignOut", () => {
 
 describe("useProfileScreen — handleSaveProfile", () => {
   it("retorna imediatamente quando user é null", async () => {
-    jest.mocked(useAuth).mockReturnValue({
-      user: null,
-      logout: mockLogout,
-      completeProfile: mockCompleteProfile,
-      updateUser: mockUpdateUser,
-    } as any);
+    jest.mocked(useCurrentUserQuery).mockReturnValue({ data: null } as any);
     const { result } = renderHook(() => useProfileScreen());
 
     await act(async () => {
@@ -224,16 +233,13 @@ describe("useProfileScreen — handleSaveProfile", () => {
   });
 
   it("exibe Alert quando perfil incompleto e phone ou pixKey estão ausentes", async () => {
-    jest.mocked(useAuth).mockReturnValue({
-      user: {
+    jest.mocked(useCurrentUserQuery).mockReturnValue({
+      data: {
         id: "u-1",
         nome: "Ana",
         email: "ana@email.com",
         perfilCompleto: false,
       },
-      logout: mockLogout,
-      completeProfile: mockCompleteProfile,
-      updateUser: mockUpdateUser,
     } as any);
     const { result } = renderHook(() => useProfileScreen());
 
@@ -243,23 +249,20 @@ describe("useProfileScreen — handleSaveProfile", () => {
 
     expect(alertSpy).toHaveBeenCalledWith(
       "Campos Obrigatórios",
-      expect.any(String)
+      expect.any(String),
     );
     expect(mockCompleteProfile).not.toHaveBeenCalled();
   });
 
   it("chama completeProfile quando o perfil está incompleto e todos os campos preenchidos", async () => {
     mockCompleteProfile.mockResolvedValue(undefined);
-    jest.mocked(useAuth).mockReturnValue({
-      user: {
+    jest.mocked(useCurrentUserQuery).mockReturnValue({
+      data: {
         id: "u-1",
         nome: "Ana",
         email: "ana@email.com",
         perfilCompleto: false,
       },
-      logout: mockLogout,
-      completeProfile: mockCompleteProfile,
-      updateUser: mockUpdateUser,
     } as any);
     const { result } = renderHook(() => useProfileScreen());
 
@@ -268,7 +271,7 @@ describe("useProfileScreen — handleSaveProfile", () => {
         "Ana",
         "ana@pix",
         undefined,
-        "11999"
+        "11999",
       );
     });
 
@@ -278,9 +281,6 @@ describe("useProfileScreen — handleSaveProfile", () => {
       chavePix: "ana@pix",
       fotoPerfil: undefined,
     });
-    expect(jest.mocked(showToast.success)).toHaveBeenCalledWith(
-      "Perfil salvo com sucesso!"
-    );
   });
 
   it("chama updateUser quando o perfil já está completo", async () => {
@@ -292,7 +292,7 @@ describe("useProfileScreen — handleSaveProfile", () => {
         "Ana",
         "ana@pix",
         undefined,
-        "11999"
+        "11999",
       );
     });
 
@@ -302,12 +302,9 @@ describe("useProfileScreen — handleSaveProfile", () => {
       chavePix: "ana@pix",
       fotoPerfil: undefined,
     });
-    expect(jest.mocked(showToast.success)).toHaveBeenCalledWith(
-      "Perfil atualizado com sucesso!"
-    );
   });
 
-  it("loga erro e chama toastErrors.profileUpdateFailed ao falhar", async () => {
+  it("loga erro ao falhar", async () => {
     const error = new Error("save fail");
     mockUpdateUser.mockRejectedValue(error);
     const { result } = renderHook(() => useProfileScreen());
@@ -317,17 +314,14 @@ describe("useProfileScreen — handleSaveProfile", () => {
         "Ana",
         "ana@pix",
         undefined,
-        "11999"
+        "11999",
       );
     });
 
     expect(jest.mocked(logger.error)).toHaveBeenCalledWith(
       "User",
       "Erro ao salvar perfil",
-      error
-    );
-    expect(jest.mocked(toastErrors.profileUpdateFailed)).toHaveBeenCalledWith(
-      error
+      error,
     );
   });
 
@@ -340,17 +334,14 @@ describe("useProfileScreen — handleSaveProfile", () => {
         "Ana",
         "ana@pix",
         undefined,
-        "11999"
+        "11999",
       );
     });
 
     expect(jest.mocked(logger.error)).toHaveBeenCalledWith(
       "User",
       "Erro ao salvar perfil",
-      undefined
-    );
-    expect(jest.mocked(toastErrors.profileUpdateFailed)).toHaveBeenCalledWith(
-      "save fail"
+      undefined,
     );
   });
 });
@@ -475,7 +466,7 @@ describe("useProfileScreen — handleSaveRepublicEdit", () => {
     expect(mockUpdateRepublic).not.toHaveBeenCalled();
   });
 
-  it("chama updateRepublic, fecha o modal e refaz fetch quando selectedRepublic está definida", async () => {
+  it("chama updateRepublic e fecha o modal quando selectedRepublic está definida", async () => {
     mockUpdateRepublic.mockResolvedValue(undefined);
     const { result } = renderHook(() => useProfileScreen());
 
@@ -496,7 +487,7 @@ describe("useProfileScreen — handleSaveRepublicEdit", () => {
       nome: "Novo Nome",
       imagemRepublica: "img.jpg",
     });
-    expect(mockFetchRepublics).toHaveBeenCalled();
+    expect(mockFetchRepublics).not.toHaveBeenCalled();
   });
 });
 
@@ -528,11 +519,11 @@ describe("useProfileScreen — handleDeleteFromMenu", () => {
 
     expect(jest.mocked(showToast.confirm)).toHaveBeenCalledWith(
       'Excluir "Alpha"?',
-      expect.any(Function)
+      expect.any(Function),
     );
   });
 
-  it("chama deleteRepublic e refaz fetch ao confirmar exclusão", async () => {
+  it("chama deleteRepublic ao confirmar exclusão", async () => {
     mockDeleteRepublic.mockResolvedValue(undefined);
     jest.mocked(showToast.confirm).mockImplementation((_msg, cb) => cb());
 
@@ -552,42 +543,47 @@ describe("useProfileScreen — handleDeleteFromMenu", () => {
 
     expect(mockDeleteRepublic).toHaveBeenCalledWith("rep-1");
     await act(async () => {});
-    expect(mockFetchRepublics).toHaveBeenCalled();
+    expect(mockFetchRepublics).not.toHaveBeenCalled();
   });
 });
 
 // ─── efeitos ──────────────────────────────────────────────────────────────────
 
 describe("useProfileScreen — efeitos", () => {
-  it("chama fetchRepublics quando perfilCompleto é true", () => {
+  it("não força refetch inicial quando perfilCompleto é true", () => {
     renderHook(() => useProfileScreen());
-    expect(mockFetchRepublics).toHaveBeenCalled();
+    expect(mockFetchRepublics).not.toHaveBeenCalled();
   });
 
-  it("não chama fetchRepublics quando perfilCompleto é false", () => {
-    jest.mocked(useAuth).mockReturnValue({
-      user: {
+  it("configura a query com enabled=false quando perfilCompleto é false", () => {
+    jest.mocked(useCurrentUserQuery).mockReturnValue({
+      data: {
         id: "u-1",
         nome: "Ana",
         email: "ana@email.com",
         perfilCompleto: false,
       },
-      logout: mockLogout,
-      completeProfile: mockCompleteProfile,
-      updateUser: mockUpdateUser,
     } as any);
 
     renderHook(() => useProfileScreen());
 
-    expect(mockFetchRepublics).not.toHaveBeenCalled();
+    expect(jest.mocked(useRepublicsQuery)).toHaveBeenCalledWith({
+      enabled: false,
+    });
   });
 
-  it("registra fetchRepublics no sistema de refresh com chave 'profile'", () => {
-    renderHook(() => useProfileScreen());
-    expect(mockRegisterRefresh).toHaveBeenCalledWith(
-      "profile",
-      mockFetchRepublics
-    );
+  it("onRefresh chama refetchRepublics e controla o estado refreshing", async () => {
+    let resolve!: (v: unknown) => void;
+    mockFetchRepublics.mockReturnValue(new Promise((r) => { resolve = r; }));
+
+    const { result } = renderHook(() => useProfileScreen());
+
+    act(() => { void result.current.onRefresh(); });
+    expect(result.current.refreshing).toBe(true);
+
+    await act(async () => { resolve({}); });
+    expect(result.current.refreshing).toBe(false);
+    expect(mockFetchRepublics).toHaveBeenCalled();
   });
 });
 
@@ -595,12 +591,7 @@ describe("useProfileScreen — efeitos", () => {
 
 describe("useProfileScreen — sideMenuUser", () => {
   it("retorna null quando user é null", () => {
-    jest.mocked(useAuth).mockReturnValue({
-      user: null,
-      logout: mockLogout,
-      completeProfile: mockCompleteProfile,
-      updateUser: mockUpdateUser,
-    } as any);
+    jest.mocked(useCurrentUserQuery).mockReturnValue({ data: null } as any);
 
     const { result } = renderHook(() => useProfileScreen());
     expect(result.current.sideMenuUser).toBeNull();
