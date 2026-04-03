@@ -16,6 +16,7 @@ import {
 } from "@/src/features/auth/constants/slides";
 import { useOnboardingAnimation } from "@/src/features/auth/hooks/useOnboardingAnimation";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Onboarding() {
   useComponentLogger("OnboardingScreen");
@@ -72,7 +73,7 @@ export default function Onboarding() {
       />
 
       {/* Footer */}
-      <View className="px-6 pb-10">
+      <SafeAreaView className="px-6 pb-12">
         <RenderDots
           slides={slides}
           scrollX={scrollX}
@@ -89,7 +90,7 @@ export default function Onboarding() {
           scrollX={scrollX}
           width={width}
         />
-      </View>
+      </SafeAreaView>
     </View>
   );
 }
