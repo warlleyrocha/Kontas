@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { maskPhoneWrite } from "@/src/shared/utils/inputMasks";
+import { maskPhoneWrite, maskPixKeyWrite } from "@/src/shared/utils/inputMasks";
 import {
   EditProfileFormValues,
   useEditProfile,
@@ -51,6 +51,31 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
     onClose,
     onSave,
   });
+
+  function getPixKeyMaxLength(value: string): number {
+    if (value.includes("@")) return 77; // e-mail (RFC 5321)
+    if (value.startsWith("+")) return 19; // +55 (11) 99999-9999
+    if (/[a-zA-Z]/.test(value)) return 36; // UUID chave aleatória
+    const digits = value.replace(/\D/g, "");
+    return digits.length <= 11 ? 14 : 18; // CPF (14 c/ máscara) ou CNPJ (18)
+  }
+
+  function getPixKeyboardType(
+    value: string,
+  ): "default" | "email-address" | "phone-pad" | "number-pad" {
+    if (value.includes("@") || /[a-zA-Z]/.test(value)) return "default";
+    if (value.startsWith("+")) return "phone-pad";
+    return "number-pad"; // CPF / CNPJ
+  }
+
+  function getPixKeyType(value: string): string {
+    if (!value) return "";
+    if (value.includes("@")) return "E-mail";
+    if (value.startsWith("+")) return "Telefone";
+    if (/[a-zA-Z]/.test(value)) return "Chave aleatória";
+    const digits = value.replace(/\D/g, "");
+    return digits.length <= 11 ? "CPF" : "CNPJ";
+  }
   return (
     <Modal visible={visible} animationType="slide" transparent>
       <KeyboardAvoidingView
@@ -122,11 +147,20 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
               </Text>
               <TextInput
                 value={pixKey}
-                onChangeText={setPixKey}
-                placeholder="Sua chave Pix"
+                maxLength={getPixKeyMaxLength(pixKey)}
+                onChangeText={(t) => setPixKey(maskPixKeyWrite(t))}
+                placeholder="CPF, CNPJ, telefone, e-mail ou chave aleatória"
+                keyboardType={getPixKeyboardType(pixKey)}
+                autoCapitalize="none"
+                autoCorrect={false}
                 className="rounded-lg border border-gray-300 bg-white px-4 py-3"
                 editable={!isUploading}
               />
+              {pixKey ? (
+                <Text className="mt-1 text-xs text-teal">
+                  {getPixKeyType(pixKey)}
+                </Text>
+              ) : null}
             </View>
 
             {/* Botões de Ação */}

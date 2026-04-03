@@ -82,3 +82,46 @@ export function unmaskCurrencyBRL(masked: string): number {
   const digits = masked.replace(/\D/g, "");
   return parseInt(digits, 10) || 0;
 }
+
+// ─── Pix ─────────────────────────────────────────────────────────────────────
+
+export function maskPixKeyWrite(value: string): string {
+  // E-mail → sem máscara
+  if (value.includes("@")) return value;
+
+  // Chave aleatória: contém letras → sem máscara
+  if (/[a-zA-Z]/.test(value)) return value;
+
+  const digits = value.replace(/\D/g, "");
+
+  // Telefone: usuário digitou "+" explicitamente
+  if (value.startsWith("+")) {
+    // Reaproveita maskPhoneWrite para os dígitos após o DDI +55
+    const localDigits = digits.startsWith("55") ? digits.slice(2) : digits;
+    return `+55 ${maskPhoneWrite(localDigits)}`;
+  }
+
+  // Só dígitos → CPF (≤11) ou CNPJ (>11)
+  if (digits.length <= 11) return maskCPF(digits);
+  return maskCNPJ(digits);
+}
+
+// ─── Helpers CPF / CNPJ ──────────────────────────────────────────────────────
+
+function maskCPF(digits: string): string {
+  const d = digits.slice(0, 11);
+  if (d.length <= 3) return d;
+  if (d.length <= 6) return `${d.slice(0, 3)}.${d.slice(3)}`;
+  if (d.length <= 9) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`;
+  return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`;
+}
+
+function maskCNPJ(digits: string): string {
+  const d = digits.slice(0, 14);
+  if (d.length <= 2) return d;
+  if (d.length <= 5) return `${d.slice(0, 2)}.${d.slice(2)}`;
+  if (d.length <= 8) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5)}`;
+  if (d.length <= 12)
+    return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8)}`;
+  return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8, 12)}-${d.slice(12)}`;
+}
