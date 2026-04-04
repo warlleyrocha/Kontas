@@ -36,6 +36,7 @@ interface AccountCardProps {
     metodoPagamento: MetodoPagamento,
   ) => Promise<void> | void;
   onCopyPix?: (conta: Conta) => boolean | Promise<boolean>;
+  readonly hasError?: boolean;
 }
 
 export const AccountCard = ({
@@ -51,6 +52,7 @@ export const AccountCard = ({
   onConfirmResidentPayment,
   onPatch,
   onCopyPix,
+  hasError,
 }: AccountCardProps) => {
   const cardRef = useRef<View>(null);
   const [isPatching, setIsPatching] = useState(false);
@@ -187,6 +189,7 @@ export const AccountCard = ({
                   updatingResidentById={updatingResidentById}
                   currentResidentId={currentResidentId}
                   onConfirmResidentPayment={onConfirmResidentPayment}
+                  hasError={hasError}
                 />
               </View>
             )}
