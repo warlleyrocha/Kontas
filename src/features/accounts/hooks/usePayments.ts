@@ -38,7 +38,7 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
     () => accounts.map((account) => account.id),
     [accounts],
   );
-  const residentQueries = useAccountResidentsByAccountQueries(accountIds);
+  const residentQueries = useAccountResidentsByAccountQueries(republicId, accountIds);
   const [confirmingResidentById, setConfirmingResidentById] = useState<
     Record<string, boolean>
   >({});
@@ -56,7 +56,7 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
           queryKey: accountKeys.byRepublic(republicId),
         }),
         queryClient.invalidateQueries({
-          queryKey: accountResidentKeys.all,
+          queryKey: accountResidentKeys.byRepublic(republicId),
         }),
       ]);
     },

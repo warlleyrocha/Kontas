@@ -26,7 +26,7 @@ export function useAccountList({ republicId }: UseAccountListProps) {
   const confirmResidentPaymentMutation = useConfirmResidentPaymentMutation();
   const contas = useMemo(() => accountsQuery.data ?? [], [accountsQuery.data]);
   const accountIds = useMemo(() => contas.map((conta) => conta.id), [contas]);
-  const residentQueries = useAccountResidentsByAccountQueries(accountIds);
+  const residentQueries = useAccountResidentsByAccountQueries(republicId, accountIds);
   const [updatingResidentById, setUpdatingResidentById] = useState<
     Record<string, boolean>
   >({});
@@ -51,7 +51,7 @@ export function useAccountList({ republicId }: UseAccountListProps) {
         queryKey: accountKeys.byRepublic(republicId),
       }),
       queryClient.invalidateQueries({
-        queryKey: accountResidentKeys.all,
+        queryKey: accountResidentKeys.byRepublic(republicId),
       }),
     ]);
   }, [queryClient, republicId]);

@@ -47,7 +47,7 @@ export function useResumeTab({
     useAccountsByRepublicQuery(republicId);
 
   const moradorIds = useMemo(() => residents.map((r) => r.id), [residents]);
-  const dividasQueries = useAccountsByResidentQueries(moradorIds);
+  const dividasQueries = useAccountsByResidentQueries(republicId, moradorIds);
   const { registerRefresh } = useRefresh();
 
   const refresh = useCallback(async () => {
@@ -56,7 +56,7 @@ export function useResumeTab({
         queryKey: accountKeys.byRepublic(republicId),
       }),
       queryClient.invalidateQueries({
-        queryKey: accountResidentKeys.residents(),
+        queryKey: accountResidentKeys.byRepublic(republicId),
       }),
     ]);
   }, [queryClient, republicId]);
