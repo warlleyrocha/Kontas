@@ -35,7 +35,7 @@ export function AccountContextMenu({
     >
       {(handleClose) => (
         <>
-          {/* Editar */}
+          {/* Editar 
           <TouchableOpacity
             onPress={() => handleClose(onEdit)}
             activeOpacity={0.7}
@@ -54,6 +54,7 @@ export function AccountContextMenu({
               />
             </View>
           </TouchableOpacity>
+          */}
 
           {/* Deletar — visível apenas para admins */}
           {isAdmin && (

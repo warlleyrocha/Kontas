@@ -1,34 +1,34 @@
 export const slides = [
   {
     id: "1",
-    title: "Gerencie suas Contas",
-    description: "Controle todas as despesas da república em um só lugar",
+    title: "Crie sua república",
+    description: "Cadastre sua república e organize as despesas da casa.",
     image:
-      "https://images.unsplash.com/photo-1763729714062-5f97ce629106?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmaW5hbmNlJTIwbWFuYWdlbWVudCUyMGJpbGxzfGVufDF8fHx8MTc2Njg1MzE4M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "https://images.unsplash.com/photo-1709080381729-965c62ab0471?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzaGFyZWQlMjBob3VzZSUyMGV4cGVuc2VzJTIwbWFuYWdlbWVudHxlbnwxfHx8fDE3NzUxNzM0NTV8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     color: "#337176",
   },
   {
     id: "2",
-    title: "Divida as Despesas",
-    description: "Calcule automaticamente quanto cada morador deve pagar",
+    title: "Convide os Moradores",
+    description: "Adicione pessoas da casa para dividir as despesas.",
     image:
-      "https://images.unsplash.com/photo-1590625848451-07c54b56a680?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzcGxpdCUyMHBheW1lbnQlMjBtb25leXxlbnwxfHx8fDE3NjY4NTMxODN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "https://images.unsplash.com/photo-1661006117166-6227bfc9c8b0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyb29tbWF0ZXMlMjB0b2dldGhlciUyMGFwYXJ0bWVudHxlbnwxfHx8fDE3NzUxNzM0NTV8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     color: "#C87223",
   },
   {
     id: "3",
-    title: "Acompanhe Pagamentos",
-    description: "Veja quem já pagou e quem ainda está devendo",
+    title: "Divida as Despesas",
+    description: "Calcule automaticamente quanto cada morador deve pagar.",
     image:
-      "https://images.unsplash.com/photo-1757301714935-c8127a21abc6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwYXltZW50JTIwY2hlY2tsaXN0JTIwdHJhY2tpbmd8ZW58MXx8fHwxNzY2ODUzMTg0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "https://images.unsplash.com/photo-1649209979970-f01d950cc5ed?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjYWxjdWxhdG9yJTIwYmlsbCUyMHNwbGl0dGluZ3xlbnwxfHx8fDE3NzUxNzM0NTV8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     color: "#1A4045",
   },
   {
     id: "4",
-    title: "Notificações",
-    description: "Receba lembretes de contas a vencer e pagamentos pendentes",
+    title: "Acompanhe os Pagamentos",
+    description: "Veja quem já pagou e quem ainda está devendo.",
     image:
-      "https://images.unsplash.com/photo-1610270197941-925ce9015c40?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxub3RpZmljYXRpb24lMjByZW1pbmRlciUyMGFsZXJ0fGVufDF8fHx8MTc2Njg1MzE4NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "https://images.unsplash.com/photo-1631540700964-6e292543024c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwYXltZW50JTIwc3RhdHVzJTIwY2hlY2tsaXN0fGVufDF8fHx8MTc3NTE3MzQ1Nnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     color: "#C87223",
   },
 ];

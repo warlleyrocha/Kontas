@@ -1,13 +1,13 @@
 <h1 align="center">Kontas</h1>
 
 <p align="center">
-  <img src="https://img.shields.io/static/v1?label=React%20Native&message=0.81&color=61DAFB&style=for-the-badge&logo=react"/>
+  <img src="https://img.shields.io/static/v1?label=React%20Native&message=0.81.5&color=61DAFB&style=for-the-badge&logo=react"/>
   <img src="https://img.shields.io/static/v1?label=Expo&message=SDK%2054&color=000020&style=for-the-badge&logo=expo"/>
   <img src="https://img.shields.io/static/v1?label=TypeScript&message=5.9&color=3178C6&style=for-the-badge&logo=typescript"/>
-  <img src="https://img.shields.io/static/v1?label=Expo%20Router&message=6&color=000020&style=for-the-badge&logo=expo"/>
-  <img src="https://img.shields.io/static/v1?label=React%20Query&message=5&color=FF4154&style=for-the-badge&logo=reactquery"/>
+  <img src="https://img.shields.io/static/v1?label=Expo%20Router&message=6.0&color=000020&style=for-the-badge&logo=expo"/>
+  <img src="https://img.shields.io/static/v1?label=React%20Query&message=5.90&color=FF4154&style=for-the-badge&logo=reactquery"/>
   <img src="https://img.shields.io/static/v1?label=NativeWind&message=4&color=38BDF8&style=for-the-badge&logo=tailwindcss"/>
-  <img src="https://img.shields.io/static/v1?label=Sentry&message=7&color=362D59&style=for-the-badge&logo=sentry"/>
+  <img src="https://img.shields.io/static/v1?label=Sentry&message=7.2&color=362D59&style=for-the-badge&logo=sentry"/>
   <img src="https://img.shields.io/static/v1?label=SonarQube&message=10&color=4E9BCD&style=for-the-badge&logo=sonarqube"/>
 </p>
 
@@ -113,6 +113,10 @@
 
 :heavy_check_mark: Associação de moradores às contas
 
+:heavy_check_mark: Divisão igualitária ou com valores customizados por morador
+
+:heavy_check_mark: Cálculo automático de distribuição igualitária com valores customizados que respeitam o total
+
 :heavy_check_mark: Filtro por mês de referência
 
 :heavy_check_mark: Separação entre contas pendentes e pagas
@@ -124,6 +128,10 @@
 :heavy_check_mark: Remoção de contas com restrição por perfil (`ADMIN`)
 
 :heavy_check_mark: Marcação e remoção de contas (com undo)
+
+:heavy_check_mark: Restauração de contas deletadas (undo estendido)
+
+:heavy_check_mark: Seleção de método de pagamento (PIX, Cartão, Dinheiro) na criação da conta
 
 ### Controle Financeiro
 
@@ -182,12 +190,29 @@ src/
 │
 └── shared/
     ├── components/               # ScreenLayout, SideMenu, ContextMenu, Tabs, error boundaries, UI base
+    │   └── ui/                   # Componentes base: Button, Input, LoadingScreen, EmptyState, etc.
     ├── constants/                # Conteúdo legal, configurações de feedback de cópia Pix
     ├── contexts/                 # RefreshContext para coordenação global de recargas
     ├── hooks/                    # Hooks compartilhados (useCopyFeedback, useComponentLogger, etc.)
     ├── types/                    # Tipos globais (Resident, Resume, assets)
     └── utils/                    # Formatação (BRL), máscaras (moeda, telefone), logger, toasts
 ```
+
+### Componentes compartilhados (`src/shared/components/`)
+
+O projeto conta com uma biblioteca de componentes reutilizáveis:
+
+| Componente              | Descrição                                      |
+| ---------------------- | ---------------------------------------------- |
+| `ScreenLayout`         | Layout padrão de tela com header configurável   |
+| `ContextMenu`          | Menu contextual com posicionamento dinâmico    |
+| `Tabs`                | Navegação por abas com indicador animado        |
+| `ErrorBoundary`       | Captura e tratamento de erros por rota         |
+| `LoadingScreen`       | Tela de carregamento com mensagem               |
+| `EmptyState`          | Estado vazio com ícone e mensagem               |
+| `NextButton`          | Botão primário com ações next/cancel           |
+| `Header`              | Header padrão com título e ações opcionais      |
+| `Toast`               | Notificações via Sonner Native                 |
 
 Cada feature segue a mesma estrutura interna:
 
@@ -389,15 +414,11 @@ npm run sonar:scan
 
 ## Pontos de atenção
 
-:memo: A UI do modal de conta já oferece "Valores customizados", mas o payload atual só envia `moradorIds` e `valorTotal`.
+:memo: A rota `/(auth)/checkEmail` existe como tela isolada, mas não participa do fluxo principal de autenticação.
 
-:memo: O menu contextual da conta já existe, mas a ação de edição ainda não foi implementada no frontend.
+:memo: O menu contextual da conta possui a ação de edição comentada aguardando implementação do endpoint de atualização.
 
-:memo: A rota `/(auth)/checkEmail` existe como tela isolada, mas não participa do fluxo principal.
-
-:memo: O redirecionamento automático de `/` para uma república ainda depende do cache local `republic-data`; sem esse cache, o usuário cai em `/(userProfile)/profile`.
-
-:memo: O repositório já possui suítes de teste versionadas; para CI e cobertura, prefira `npm run test:coverage`, já que `npm test` roda em modo watch.
+:memo: Para CI e cobertura de testes, prefira `npm run test:coverage`, já que `npm test` roda em modo watch.
 
 ---
 
@@ -411,20 +432,26 @@ npm run sonar:scan
 
 ## Tecnologias utilizadas :books:
 
-| Tecnologia                                                                     | Uso                                 |
-| ------------------------------------------------------------------------------ | ----------------------------------- |
-| [Expo](https://expo.dev/)                                                      | Plataforma de build e runtime       |
-| [React Native](https://reactnative.dev/)                                       | Framework mobile                    |
-| [TypeScript](https://www.typescriptlang.org/)                                  | Tipagem estática                    |
-| [Expo Router](https://expo.github.io/router/)                                  | Navegação file-based                |
-| [NativeWind](https://www.nativewind.dev/)                                      | Tailwind CSS para React Native      |
-| [React Query](https://tanstack.com/query)                                      | Gerenciamento de estado do servidor |
-| [Axios](https://axios-http.com/)                                               | Cliente HTTP com interceptors       |
-| [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/) | Animações nativas                   |
-| [Google Sign-In](https://github.com/react-native-google-signin/google-signin)  | Autenticação OAuth                  |
-| [Expo SecureStore](https://docs.expo.dev/versions/latest/sdk/securestore/)     | Armazenamento seguro de credenciais |
-| [Sentry](https://sentry.io/)                                                   | Rastreamento de erros               |
-| [EAS](https://expo.dev/eas)                                                    | Build e distribuição                |
+| Tecnologia                                                                     | Uso                                    |
+| ------------------------------------------------------------------------------ | -------------------------------------- |
+| [Expo](https://expo.dev/)                                                      | Plataforma de build e runtime          |
+| [React Native](https://reactnative.dev/)                                       | Framework mobile                       |
+| [TypeScript](https://www.typescriptlang.org/)                                  | Tipagem estática                       |
+| [Expo Router](https://expo.github.io/router/)                                  | Navegação file-based                   |
+| [NativeWind](https://www.nativewind.dev/)                                      | Tailwind CSS para React Native         |
+| [React Query](https://tanstack.com/query)                                      | Gerenciamento de estado do servidor    |
+| [Axios](https://axios-http.com/)                                               | Cliente HTTP com interceptors          |
+| [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/) | Animações nativas                      |
+| [Google Sign-In](https://github.com/react-native-google-signin/google-signin)  | Autenticação OAuth                     |
+| [Expo SecureStore](https://docs.expo.dev/versions/latest/sdk/securestore/)     | Armazenamento seguro de credenciais    |
+| [Sentry](https://sentry.io/)                                                   | Rastreamento de erros                  |
+| [EAS](https://expo.dev/eas)                                                    | Build e distribuição                   |
+| [Sonner Native](https://github.com/nickmanggei/sonner-native)                 | Toasts e notificações                  |
+| [Expo Haptics](https://docs.expo.dev/versions/latest/sdk/haptics/)             | Feedback tátil                         |
+| [Expo Image Picker](https://docs.expo.dev/versions/latest/sdk/imagepicker/)   | Seleção de imagens da galeria           |
+| [Expo Clipboard](https://docs.expo.dev/versions/latest/sdk/clipboard/)         | Cópia para área de transferência       |
+| [Biome](https://biomejs.dev/)                                                  | Lint e formatação de código            |
+| [Jest](https://jestjs.io/)                                                     | Testes unitários e de integração      |
 
 ---
 
