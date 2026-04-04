@@ -96,7 +96,9 @@ export function useCreateAccountMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: CriarContaComMoradoresRequest): Promise<Conta> => {
+    mutationFn: async (
+      data: CriarContaComMoradoresRequest
+    ): Promise<Conta & { moradorIds: string[] }> => {
       const { moradorIds, ...contaPayload } = data;
       const conta = await accountService.criarConta(contaPayload);
 
@@ -108,10 +110,20 @@ export function useCreateAccountMutation() {
         });
       }
 
-      return conta;
+      return { ...conta, moradorIds };
     },
-    onSuccess: async (conta) => {
-      await invalidateAccountFeatureQueries(queryClient, conta.republicaId);
+    onSuccess: async ({ republicaId, moradorIds, id: contaId }) => {
+      await Promise.all([
+        invalidateAccountFeatureQueries(queryClient, republicaId),
+        queryClient.invalidateQueries({
+          queryKey: accountResidentKeys.byAccount(contaId),
+        }),
+        ...moradorIds.map((moradorId) =>
+          queryClient.invalidateQueries({
+            queryKey: accountResidentKeys.byResident(moradorId),
+          })
+        ),
+      ]);
     },
   });
 }
