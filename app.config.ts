@@ -57,9 +57,9 @@ import { version } from "./package.json";
 })();
 
 // EAS Project Info
-const EAS_PROJECT_ID = "04e033a1-b0fb-4572-9158-cfefac3041cf";
+const EAS_PROJECT_ID = "024de3bb-27e4-4a7c-ac6f-e32a95eaa23a";
 const PROJECT_SLUG = "kontas";
-const OWNER = "warlleyrocha";
+const OWNER = "kontas";
 
 // App production config
 const APP_NAME = "Kontas";
@@ -165,7 +165,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
 // Configuração dinâmica baseada no ambiente
 export const getDynamicAppConfig = (
-  environment: "development" | "preview" | "production"
+  environment: "development" | "preview" | "production",
 ) => {
   if (environment === "production") {
     return {
