@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -7,13 +6,11 @@ import { deleteItemAsync, setItemAsync } from "expo-secure-store";
 import { authService } from "@/src/features/auth/services/auth.service";
 import { userKeys } from "@/src/features/user/hooks/user.keys";
 import {
-  AUTH_TOKEN_STORAGE_KEY,
   clearAuthorizationHeader,
   setAuthorizationHeader,
 } from "@/src/services/authHeader";
+import { AUTH_TOKEN_STORAGE_KEY, APP_USER_STORAGE_KEY, REPUBLIC_DATA_STORAGE_KEY } from "@/src/services/storageKeys";
 import { logger } from "@/src/shared/utils/logger";
-
-const APP_USER_STORAGE_KEY = "@app:user";
 
 export function useLoginWithGoogleMutation() {
   const queryClient = useQueryClient();
@@ -21,12 +18,21 @@ export function useLoginWithGoogleMutation() {
   return useMutation({
     mutationFn: (token: string) => authService.googleLogin(token),
     onSuccess: async (data) => {
-      await Promise.all([
-        setItemAsync(AUTH_TOKEN_STORAGE_KEY, data.token),
-        AsyncStorage.setItem(APP_USER_STORAGE_KEY, JSON.stringify(data.user)),
-      ]);
+      // Token: crítico — deve ser persistido antes de continuar
+      await setItemAsync(AUTH_TOKEN_STORAGE_KEY, data.token);
       setAuthorizationHeader(data.token);
       queryClient.setQueryData(userKeys.current(), data.user);
+
+      // User cache: fire-and-forget — React Query é a fonte de verdade em runtime
+      setItemAsync(APP_USER_STORAGE_KEY, JSON.stringify(data.user))
+        .catch((err) =>
+          logger.error(
+            "Auth",
+            "Falha ao persistir user no SecureStore após login",
+            err instanceof Error ? err : undefined,
+          ),
+        );
+
       logger.info("Auth", "Login bem-sucedido");
     },
   });
@@ -39,11 +45,13 @@ export function useLogoutMutation() {
     mutationFn: async () => {
       clearAuthorizationHeader();
       await queryClient.cancelQueries();
-      await Promise.allSettled([
-        deleteItemAsync(AUTH_TOKEN_STORAGE_KEY),
-        AsyncStorage.multiRemove([APP_USER_STORAGE_KEY, "republic-data"]),
-        GoogleSignin.signOut(),
-      ]);
+
+      // Deletes devem ser bloqueantes: se falharem, dados do usuário
+      // anterior podem persistir e hidratar incorretamente no próximo boot.
+      await deleteItemAsync(AUTH_TOKEN_STORAGE_KEY);
+      await deleteItemAsync(APP_USER_STORAGE_KEY);
+      await deleteItemAsync(REPUBLIC_DATA_STORAGE_KEY);
+      await GoogleSignin.signOut();
     },
     onSuccess: () => {
       queryClient.clear();

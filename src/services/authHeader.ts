@@ -1,6 +1,6 @@
 import { getItemAsync } from "expo-secure-store";
 
-export const AUTH_TOKEN_STORAGE_KEY = "token";
+import { AUTH_TOKEN_STORAGE_KEY } from "./storageKeys";
 
 let authorizationHeader: string | null = null;
 let authorizationHeaderHydrationPromise: Promise<void> | null = null;
