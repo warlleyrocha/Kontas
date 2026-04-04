@@ -2,6 +2,7 @@ import {
   useMutation,
   useQueries,
   useQuery,
+  keepPreviousData,
   useQueryClient,
 } from "@tanstack/react-query";
 
@@ -13,10 +14,25 @@ import type {
   CriarContaComMoradoresRequest,
   MarcarContaPaga,
 } from "../types/account.types";
+import type { ContaMorador } from "../types/accountResidents.types";
 import { accountKeys } from "./account.keys";
 import { accountResidentKeys } from "./accountResident.keys";
 
 const ACCOUNT_QUERY_STALE_TIME_MS = 60_000;
+
+interface AccountResidentsQueryResult {
+  data: ContaMorador[][];
+  isLoading: boolean;
+  isFetching: boolean;
+  errors: (Error | null)[];
+}
+
+interface AccountsByResidentQueryResult {
+  data: ContaMorador[][];
+  isLoading: boolean;
+  isFetching: boolean;
+  errors: (Error | null)[];
+}
 
 function findAccountInCache(
   queryClient: ReturnType<typeof useQueryClient>,
@@ -63,6 +79,7 @@ export function useAccountsByRepublicQuery(republicId: string) {
     queryFn: () => accountService.listarContasPorRepublica(republicId),
     enabled: isAuthenticated && Boolean(republicId),
     staleTime: ACCOUNT_QUERY_STALE_TIME_MS,
+    placeholderData: keepPreviousData,
   });
 }
 
@@ -75,7 +92,14 @@ export function useAccountResidentsByAccountQueries(accountIds: string[]) {
       queryFn: () => accountResidentsService.listarContasMoradores(accountId),
       enabled: isAuthenticated && Boolean(accountId),
       staleTime: ACCOUNT_QUERY_STALE_TIME_MS,
+      placeholderData: keepPreviousData,
     })),
+    combine: (results): AccountResidentsQueryResult => ({
+      data: results.map((r) => r.data ?? []),
+      isLoading: results.some((r) => r.isLoading),
+      isFetching: results.some((r) => r.isFetching),
+      errors: results.map((r) => r.error),
+    }),
   });
 }
 
@@ -88,7 +112,14 @@ export function useAccountsByResidentQueries(moradorIds: string[]) {
       queryFn: () => accountResidentsService.listarContasPorMorador(moradorId),
       enabled: isAuthenticated && Boolean(moradorId),
       staleTime: ACCOUNT_QUERY_STALE_TIME_MS,
+      placeholderData: keepPreviousData,
     })),
+    combine: (results): AccountsByResidentQueryResult => ({
+      data: results.map((r) => r.data ?? []),
+      isLoading: results.some((r) => r.isLoading),
+      isFetching: results.some((r) => r.isFetching),
+      errors: results.map((r) => r.error),
+    }),
   });
 }
 

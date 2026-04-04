@@ -67,7 +67,7 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
     () =>
       accounts
         .map((account, index) => {
-          const residents = residentQueries[index]?.data ?? [];
+          const residents = residentQueries.data[index] ?? [];
           const relevantResidents = residents.filter(
             (resident) =>
               getMoradorStatusVisual(resident) ===
@@ -90,7 +90,7 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
             new Date(firstAccount.vencimento).getTime() -
             new Date(secondAccount.vencimento).getTime(),
         ),
-    [accounts, residentQueries],
+    [accounts, residentQueries.data],
   );
 
   const handleConfirmResidentPayment = useCallback(
@@ -222,12 +222,10 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
     error: accountsQuery.error instanceof Error ? accountsQuery.error : null,
     isLoading:
       accountsQuery.isLoading ||
-      residentQueries.some(
-        (query) => query.isLoading || (query.isFetching && !query.data),
-      ),
+      (residentQueries.isLoading && residentQueries.data.length === 0),
     isRefreshing:
       accountsQuery.isRefetching ||
-      residentQueries.some((query) => query.isRefetching),
+      (residentQueries.isFetching && residentQueries.data.length > 0),
     filteredPaymentAccounts,
     confirmingResidentById,
     refusingResidentById,

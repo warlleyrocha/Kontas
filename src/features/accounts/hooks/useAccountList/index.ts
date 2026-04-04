@@ -70,24 +70,24 @@ export function useAccountList({ republicId }: UseAccountListProps) {
       Object.fromEntries(
         accountIds.map((accountId, index) => [
           accountId,
-          residentQueries[index]?.data ?? [],
+          residentQueries.data[index] ?? [],
         ]),
       ),
-    [accountIds, residentQueries],
+    [accountIds, residentQueries.data],
   );
 
   const loadingResidentsById = useMemo(
     () =>
       Object.fromEntries(
         accountIds.map((accountId, index) => {
-          const query = residentQueries[index];
+          const queryData = residentQueries.data[index];
           return [
             accountId,
-            Boolean(query?.isLoading || (query?.isFetching && !query?.data)),
+            Boolean(residentQueries.isLoading || (!queryData && !residentQueries.errors[index])),
           ];
         }),
       ),
-    [accountIds, residentQueries],
+    [accountIds, residentQueries.data, residentQueries.isLoading, residentQueries.errors],
   );
 
   const errorResidentsById = useMemo(
@@ -96,11 +96,11 @@ export function useAccountList({ republicId }: UseAccountListProps) {
         accountIds
           .map((accountId, index) => [
             accountId,
-            Boolean(residentQueries[index]?.error),
+            Boolean(residentQueries.errors[index]),
           ])
           .filter(([, hasError]) => hasError),
       ),
-    [accountIds, residentQueries],
+    [accountIds, residentQueries.errors],
   );
 
   const confirmResidentPayment = useCallback(
