@@ -6,9 +6,8 @@ import {
 } from "@tanstack/react-query";
 
 import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
-
-import { accountResidentsService } from "../services/account-residents.service";
 import { accountService } from "../services/account.service";
+import { accountResidentsService } from "../services/account-residents.service";
 import type {
   Conta,
   CriarContaComMoradoresRequest,
@@ -19,13 +18,33 @@ import { accountResidentKeys } from "./accountResident.keys";
 
 const ACCOUNT_QUERY_STALE_TIME_MS = 60_000;
 
+function findAccountInCache(
+  queryClient: ReturnType<typeof useQueryClient>,
+  accountId: string
+): string | undefined {
+  const queries = queryClient.getQueriesData<Conta[]>({
+    queryKey: accountKeys.all,
+  });
+
+  for (const [, data] of queries) {
+    const account = (data ?? []).find((a) => a.id === accountId);
+    if (account) {
+      return account.republicaId;
+    }
+  }
+
+  return undefined;
+}
+
 async function invalidateAccountFeatureQueries(
   queryClient: ReturnType<typeof useQueryClient>,
   republicId?: string
 ) {
   await Promise.all([
     republicId
-      ? queryClient.invalidateQueries({ queryKey: accountKeys.byRepublic(republicId) })
+      ? queryClient.invalidateQueries({
+          queryKey: accountKeys.byRepublic(republicId),
+        })
       : queryClient.invalidateQueries({ queryKey: accountKeys.all }),
     queryClient.invalidateQueries({ queryKey: accountResidentKeys.all }),
   ]);
@@ -102,13 +121,7 @@ export function useDeleteAccountMutation() {
 
   return useMutation({
     mutationFn: async (accountId: string) => {
-      const cachedAccounts =
-        queryClient.getQueriesData<Conta[]>({ queryKey: accountKeys.all });
-
-      const republicId =
-        cachedAccounts.find(([, accounts]) =>
-          (accounts ?? []).some((account) => account.id === accountId)
-        )?.[1]?.find((account) => account.id === accountId)?.republicaId;
+      const republicId = findAccountInCache(queryClient, accountId);
 
       await accountService.removerConta({ id: accountId });
 
@@ -125,13 +138,7 @@ export function useRestoreAccountMutation() {
 
   return useMutation({
     mutationFn: async (accountId: string) => {
-      const cachedAccounts =
-        queryClient.getQueriesData<Conta[]>({ queryKey: accountKeys.all });
-
-      const republicId =
-        cachedAccounts.find(([, accounts]) =>
-          (accounts ?? []).some((account) => account.id === accountId)
-        )?.[1]?.find((account) => account.id === accountId)?.republicaId;
+      const republicId = findAccountInCache(queryClient, accountId);
 
       await accountService.restaurarConta(accountId);
 
@@ -154,13 +161,7 @@ export function usePayAccountMutation() {
       accountId: string;
       metodoPagamento: MarcarContaPaga["metodoPagamento"];
     }) => {
-      const cachedAccounts =
-        queryClient.getQueriesData<Conta[]>({ queryKey: accountKeys.all });
-
-      const republicId =
-        cachedAccounts.find(([, accounts]) =>
-          (accounts ?? []).some((account) => account.id === accountId)
-        )?.[1]?.find((account) => account.id === accountId)?.republicaId;
+      const republicId = findAccountInCache(queryClient, accountId);
 
       await accountService.pagarConta({
         id: accountId,
