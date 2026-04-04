@@ -135,7 +135,7 @@ describe("useRepublicScreen — loadRepublic", () => {
     await act(async () => {});
 
     expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
-      "ID da república não encontrado",
+      "ID da república não encontrado"
     );
     expect(mockRouter.back).toHaveBeenCalled();
   });
@@ -152,7 +152,7 @@ describe("useRepublicScreen — loadRepublic", () => {
     await act(async () => {});
 
     expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
-      "República não encontrada",
+      "República não encontrada"
     );
     expect(mockRouter.back).toHaveBeenCalled();
   });
@@ -174,10 +174,10 @@ describe("useRepublicScreen — loadRepublic", () => {
     expect(jest.mocked(logger.warn)).toHaveBeenCalledWith(
       "Republic",
       "Não foi possível carregar república:",
-      { republicId: "rep-1" },
+      { republicId: "rep-1" }
     );
     expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
-      "Erro ao carregar república",
+      "Erro ao carregar república"
     );
     expect(mockRouter.back).toHaveBeenCalled();
   });
@@ -207,7 +207,7 @@ describe("useRepublicScreen — toggleFavorite", () => {
 
     expect(result.current.isFavorited).toBe(true);
     expect(jest.mocked(showToast.success)).toHaveBeenCalledWith(
-      "República adicionada aos favoritos",
+      "República adicionada aos favoritos"
     );
   });
 
@@ -224,7 +224,7 @@ describe("useRepublicScreen — toggleFavorite", () => {
 
     expect(result.current.isFavorited).toBe(false);
     expect(jest.mocked(showToast.success)).toHaveBeenLastCalledWith(
-      "República removida dos favoritos",
+      "República removida dos favoritos"
     );
   });
 });
@@ -258,7 +258,7 @@ describe("useRepublicScreen — handleSignOut", () => {
     expect(jest.mocked(logger.error)).toHaveBeenCalledWith(
       "Republic",
       "Erro ao fazer logout",
-      error,
+      error
     );
     expect(jest.mocked(toastErrors.logoutFailed)).toHaveBeenCalledWith(error);
   });

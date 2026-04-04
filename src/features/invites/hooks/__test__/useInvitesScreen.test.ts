@@ -112,7 +112,7 @@ describe("useInvitesScreen — estado inicial", () => {
     expect(jest.mocked(useSideMenu)).toHaveBeenCalledWith(
       "invite",
       expect.any(Function),
-      { pendingInvitesCount: 2 },
+      { pendingInvitesCount: 2 }
     );
   });
 
@@ -128,7 +128,7 @@ describe("useInvitesScreen — estado inicial", () => {
 
     expect(jest.mocked(getErrorMessage)).toHaveBeenCalledWith(
       error,
-      "Não foi possível carregar os convites.",
+      "Não foi possível carregar os convites."
     );
     expect(result.current.error).toBe("Não foi possível carregar os convites.");
   });
@@ -168,7 +168,7 @@ describe("useInvitesScreen — handleSignOut", () => {
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       "Erro ao fazer logout da conta:",
-      error,
+      error
     );
     expect(jest.mocked(toastErrors.logoutFailed)).toHaveBeenCalledWith(error);
     consoleErrorSpy.mockClear();
@@ -219,7 +219,7 @@ describe("useInvitesScreen — handleAcceptInvite", () => {
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       "Erro ao aceitar convite:",
-      error,
+      error
     );
     expect(mockRouterReplace).not.toHaveBeenCalled();
     consoleErrorSpy.mockClear();
@@ -254,7 +254,7 @@ describe("useInvitesScreen — handleRejectInvite", () => {
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       "Erro ao recusar convite:",
-      error,
+      error
     );
     consoleErrorSpy.mockClear();
   });

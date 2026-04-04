@@ -1,5 +1,6 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import React from "react";
 import { act, renderHook } from "@testing-library/react-native";
-import * as React from "react";
 
 import { getErrorMessage } from "@/src/services/httpError";
 import { toast } from "@/src/shared/components/ui/sonner";
@@ -53,6 +54,7 @@ jest.mock("../../services/account.service", () => ({
     removerConta: jest.fn(),
     restaurarConta: jest.fn(),
     pagarConta: jest.fn(),
+    listarContasPorRepublica: jest.fn(),
   },
 }));
 
@@ -61,7 +63,14 @@ jest.mock("../../services/account-residents.service", () => ({
   accountResidentsService: {
     vincularMoradores: jest.fn(),
     listarContasPorMorador: jest.fn(),
+    confirmarPagamentoMorador: jest.fn(),
+    confirmarPagamentoAdmin: jest.fn(),
+    recusarPagamentoAdmin: jest.fn(),
   },
+}));
+
+jest.mock("@/src/features/auth/hooks/useAuth", () => ({
+  useAuth: jest.fn(() => ({ isAuthenticated: true, user: null })),
 }));
 
 const mockGetErrorMessage = jest.mocked(getErrorMessage);
@@ -85,6 +94,17 @@ function createPayload(
     ...overrides,
   };
 }
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    mutations: { retry: false },
+    queries: { retry: false },
+  },
+});
+
+const wrapper = ({ children }: { children: React.ReactNode }) => (
+  <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+);
 
 function loadUseAccountActionsWithPendingRefs({
   accountId = "pending-account",
@@ -114,6 +134,11 @@ function loadUseAccountActionsWithPendingRefs({
     | typeof import("../../services/account.service").accountService
     | undefined;
 
+  const stubMutation = {
+    isPending: false,
+    mutateAsync: jest.fn(),
+  };
+
   jest.isolateModules(() => {
     jest.doMock("react", () => ({
       ...React,
@@ -121,6 +146,13 @@ function loadUseAccountActionsWithPendingRefs({
         .fn()
         .mockReturnValueOnce({ current: pendingDeleteTimeouts })
         .mockReturnValueOnce({ current: pendingDeleteToastIds }),
+    }));
+
+    jest.doMock("../../hooks/useAccountQueries", () => ({
+      useCreateAccountMutation: () => stubMutation,
+      useDeleteAccountMutation: () => stubMutation,
+      useRestoreAccountMutation: () => stubMutation,
+      usePayAccountMutation: () => stubMutation,
     }));
 
     isolatedUseAccountActions = jest.requireActual(
@@ -136,6 +168,7 @@ function loadUseAccountActionsWithPendingRefs({
   });
 
   jest.dontMock("react");
+  jest.dontMock("../../hooks/useAccountQueries");
 
   return {
     useAccountActions: isolatedUseAccountActions!,
@@ -152,6 +185,7 @@ function loadUseAccountActionsWithPendingRefs({
 describe("useAccountActions", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    queryClient.clear();
     jest.useFakeTimers();
     mockGetErrorMessage.mockReturnValue("erro tratado");
   });
@@ -162,7 +196,7 @@ describe("useAccountActions", () => {
   });
 
   it("retorna os estados iniciais e permite abrir o modal", () => {
-    const { result } = renderHook(() => useAccountActions());
+    const { result } = renderHook(() => useAccountActions(), { wrapper });
 
     expect(result.current.showAccountModal).toBe(false);
     expect(result.current.isSubmitting).toBe(false);
@@ -177,13 +211,12 @@ describe("useAccountActions", () => {
   });
 
   it("submete uma conta sem moradores vinculados", async () => {
-    const onRefresh = jest.fn();
     const payload = createPayload();
     mockAccountService.criarConta.mockResolvedValue({
       id: "account-1",
     } as never);
 
-    const { result } = renderHook(() => useAccountActions({ onRefresh }));
+    const { result } = renderHook(() => useAccountActions(), { wrapper });
 
     act(() => {
       result.current.setShowAccountModal(true);
@@ -211,9 +244,7 @@ describe("useAccountActions", () => {
     ).not.toHaveBeenCalled();
     expect(result.current.showAccountModal).toBe(false);
     expect(result.current.isSubmitting).toBe(false);
-    expect(onRefresh).toHaveBeenCalledTimes(1);
 
-    // Toast é chamado via setTimeout(300ms)
     act(() => {
       jest.advanceTimersByTime(300);
     });
@@ -234,7 +265,7 @@ describe("useAccountActions", () => {
       [] as never
     );
 
-    const { result } = renderHook(() => useAccountActions());
+    const { result } = renderHook(() => useAccountActions(), { wrapper });
 
     await act(async () => {
       await result.current.handleSubmit(payload);
@@ -248,12 +279,11 @@ describe("useAccountActions", () => {
   });
 
   it("exibe erro ao falhar no submit", async () => {
-    const onRefresh = jest.fn();
     const error = new Error("falha no submit");
     mockGetErrorMessage.mockReturnValue("nao foi possivel criar");
     mockAccountService.criarConta.mockRejectedValue(error);
 
-    const { result } = renderHook(() => useAccountActions({ onRefresh }));
+    const { result } = renderHook(() => useAccountActions(), { wrapper });
 
     await act(async () => {
       await result.current.handleSubmit(createPayload());
@@ -264,15 +294,13 @@ describe("useAccountActions", () => {
       "Não foi possível criar a conta."
     );
     expect(mockShowToast.error).toHaveBeenCalledWith("nao foi possivel criar");
-    expect(onRefresh).not.toHaveBeenCalled();
     expect(result.current.isSubmitting).toBe(false);
   });
 
   it("remove a conta imediatamente", async () => {
-    const onRefresh = jest.fn();
     mockAccountService.removerConta.mockResolvedValue(undefined);
 
-    const { result } = renderHook(() => useAccountActions({ onRefresh }));
+    const { result } = renderHook(() => useAccountActions(), { wrapper });
 
     await act(async () => {
       await result.current.handleDelete("account-2");
@@ -284,17 +312,15 @@ describe("useAccountActions", () => {
     expect(mockShowToast.success).toHaveBeenCalledWith(
       "Conta removida com sucesso."
     );
-    expect(onRefresh).toHaveBeenCalledTimes(1);
     expect(result.current.isDeleting).toBe(false);
   });
 
   it("exibe erro ao falhar na remoção", async () => {
-    const onRefresh = jest.fn();
     const error = new Error("falha ao remover");
     mockGetErrorMessage.mockReturnValue("nao removeu");
     mockAccountService.removerConta.mockRejectedValue(error);
 
-    const { result } = renderHook(() => useAccountActions({ onRefresh }));
+    const { result } = renderHook(() => useAccountActions(), { wrapper });
 
     await act(async () => {
       await result.current.handleDelete("account-3");
@@ -305,15 +331,13 @@ describe("useAccountActions", () => {
       "Não foi possível remover a conta."
     );
     expect(mockShowToast.error).toHaveBeenCalledWith("nao removeu");
-    expect(onRefresh).not.toHaveBeenCalled();
     expect(result.current.isDeleting).toBe(false);
   });
 
   it("recupera a conta quando não há remoção pendente", async () => {
-    const onRefresh = jest.fn();
     mockAccountService.restaurarConta.mockResolvedValue(undefined);
 
-    const { result } = renderHook(() => useAccountActions({ onRefresh }));
+    const { result } = renderHook(() => useAccountActions(), { wrapper });
 
     await act(async () => {
       await result.current.handleRecovery("account-4");
@@ -323,7 +347,6 @@ describe("useAccountActions", () => {
     expect(mockShowToast.success).toHaveBeenCalledWith(
       "Conta recuperada com sucesso."
     );
-    expect(onRefresh).toHaveBeenCalledTimes(1);
     expect(result.current.isDeleting).toBe(false);
   });
 
@@ -362,7 +385,7 @@ describe("useAccountActions", () => {
     mockGetErrorMessage.mockReturnValue("nao recuperou");
     mockAccountService.restaurarConta.mockRejectedValue(error);
 
-    const { result } = renderHook(() => useAccountActions());
+    const { result } = renderHook(() => useAccountActions(), { wrapper });
 
     await act(async () => {
       await result.current.handleRecovery("account-5");
@@ -379,7 +402,7 @@ describe("useAccountActions", () => {
   it("marca a conta como paga com sucesso", async () => {
     mockAccountService.pagarConta.mockResolvedValue(undefined);
 
-    const { result } = renderHook(() => useAccountActions());
+    const { result } = renderHook(() => useAccountActions(), { wrapper });
 
     await act(async () => {
       await result.current.handlePatch("account-6", MetodoPagamento.CARTAO);
@@ -398,7 +421,7 @@ describe("useAccountActions", () => {
   it("exibe erro inesperado ao falhar ao marcar a conta como paga", async () => {
     mockAccountService.pagarConta.mockRejectedValue("erro desconhecido");
 
-    const { result } = renderHook(() => useAccountActions());
+    const { result } = renderHook(() => useAccountActions(), { wrapper });
 
     await act(async () => {
       await result.current.handlePatch("account-7", MetodoPagamento.DINHEIRO);
@@ -413,7 +436,7 @@ describe("useAccountActions", () => {
       new Error("falha no pagamento")
     );
 
-    const { result } = renderHook(() => useAccountActions());
+    const { result } = renderHook(() => useAccountActions(), { wrapper });
 
     await act(async () => {
       await result.current.handlePatch("account-10", MetodoPagamento.PIX);
@@ -422,32 +445,10 @@ describe("useAccountActions", () => {
     expect(mockShowToast.error).toHaveBeenCalledWith("falha no pagamento");
   });
 
-  it("busca contas por morador", async () => {
-    const contas = [
-      {
-        id: "resident-account-1",
-        contaId: "account-1",
-      },
-    ];
-    mockAccountResidentsService.listarContasPorMorador.mockResolvedValue(
-      contas as never
-    );
-
-    const { result } = renderHook(() => useAccountActions());
-
-    let response;
-    await act(async () => {
-      response = await result.current.fetchContasPorMorador("resident-9");
-    });
-
-    expect(
-      mockAccountResidentsService.listarContasPorMorador
-    ).toHaveBeenCalledWith("resident-9");
-    expect(response).toEqual(contas);
-  });
-
   it("não dispara dismiss ao desmontar sem toasts pendentes", async () => {
-    const { result, unmount } = renderHook(() => useAccountActions());
+    const { result, unmount } = renderHook(() => useAccountActions(), {
+      wrapper,
+    });
 
     await act(async () => {
       await result.current.handleDelete("account-8");
@@ -487,7 +488,6 @@ describe("useAccountActions", () => {
       pendingDeleteToastIds,
     } = loadUseAccountActionsWithPendingRefs();
 
-    // Remove o toastId do map para simular cenário sem toast pendente
     pendingDeleteToastIds.delete(accountId);
 
     const { result } = renderHook(() => isolatedUseAccountActions());

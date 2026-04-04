@@ -1,4 +1,4 @@
-const { version } = require("../package.json");
+import { version } from "../package.json";
 
 const ORIGINAL_ENV = { ...process.env };
 const CONTROLLED_ENV_KEYS = [
@@ -24,15 +24,24 @@ function restoreControlledEnv() {
   }
 }
 
+interface ImportFreshAppConfigOptions {
+  env?: Record<string, string | undefined>;
+  envContent?: string;
+  envFileExists?: boolean;
+  readFileError?: Error;
+}
+
 function importFreshAppConfig({
   env = {},
   envContent = "",
   envFileExists = false,
   readFileError,
-} = {}) {
+}: ImportFreshAppConfigOptions = {}) {
   jest.resetModules();
 
-  restoreControlledEnv();
+  for (const key of CONTROLLED_ENV_KEYS) {
+    delete process.env[key];
+  }
 
   for (const [key, value] of Object.entries(env)) {
     if (value === undefined) {
@@ -61,20 +70,21 @@ function importFreshAppConfig({
     ...fsMock,
   }));
 
-  let appConfigModule;
+  let appConfigModule: Record<string, unknown> | undefined;
   jest.isolateModules(() => {
-    appConfigModule = require("../app.config");
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    appConfigModule = require("../app.config") as Record<string, unknown>; // biome-ignore lint/style/noCommonJs: jest.isolateModules requer require
   });
 
   return {
     fsMock,
-    appConfigModule,
+    appConfigModule: appConfigModule as Record<string, unknown>,
   };
 }
 
 describe("app.config.ts", () => {
-  let consoleLogSpy;
-  let consoleWarnSpy;
+  let consoleLogSpy: jest.SpyInstance;
+  let consoleWarnSpy: jest.SpyInstance;
 
   beforeEach(() => {
     consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {});
@@ -184,7 +194,9 @@ describe("app.config.ts", () => {
 
   it("retorna a configuração dinâmica correta para production, preview e development", () => {
     const { appConfigModule } = importFreshAppConfig();
-    const { getDynamicAppConfig } = appConfigModule;
+    const { getDynamicAppConfig } = appConfigModule as {
+      getDynamicAppConfig: (env: string) => Record<string, string>;
+    };
 
     expect(getDynamicAppConfig("production")).toEqual({
       name: "Kontas",
@@ -210,7 +222,9 @@ describe("app.config.ts", () => {
 
   it("monta o Expo config completo usando development por padrão", () => {
     const { appConfigModule } = importFreshAppConfig();
-    const createConfig = appConfigModule.default;
+    const createConfig = (
+      appConfigModule as { default: (ctx: unknown) => Record<string, unknown> }
+    ).default;
 
     const result = createConfig({
       config: {
@@ -233,9 +247,9 @@ describe("app.config.ts", () => {
           policy: "appVersion",
         },
         updates: {
-          url: "https://u.expo.dev/04e033a1-b0fb-4572-9158-cfefac3041cf",
+          url: "https://u.expo.dev/024de3bb-27e4-4a7c-ac6f-e32a95eaa23a",
         },
-        owner: "warlleyrocha",
+        owner: "kontas",
       })
     );
 
@@ -304,7 +318,7 @@ describe("app.config.ts", () => {
     expect(result.extra).toEqual({
       router: {},
       eas: {
-        projectId: "04e033a1-b0fb-4572-9158-cfefac3041cf",
+        projectId: "024de3bb-27e4-4a7c-ac6f-e32a95eaa23a",
       },
     });
   });

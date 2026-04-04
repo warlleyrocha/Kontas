@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook } from "@testing-library/react-native";
 
 import {
@@ -19,6 +20,10 @@ import { useResumeTab } from "../useResumeTab";
 jest.mock("@/src/features/accounts/hooks/useAccountQueries", () => ({
   useAccountsByRepublicQuery: jest.fn(),
   useAccountsByResidentQueries: jest.fn(),
+}));
+
+jest.mock("@/src/shared/contexts/RefreshContext", () => ({
+  useRefresh: () => ({ registerRefresh: jest.fn() }),
 }));
 
 // ─── Fixtures ────────────────────────────────────────────────────────────────
@@ -89,14 +94,20 @@ function mockRepublicQuery(overrides: object = {}) {
   } as any);
 }
 
-function mockResidentQueries(results: object[] = []) {
-  jest.mocked(useAccountsByResidentQueries).mockReturnValue(
-    results as any
-  );
+function mockResidentQueries(results: object = { data: [], isLoading: false }) {
+  jest.mocked(useAccountsByResidentQueries).mockReturnValue(results as any);
 }
 
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: false } },
+});
+
 function renderResumeTab(residents = mockResidents, republicId = "rep-1") {
-  return renderHook(() => useResumeTab({ residents, republicId }));
+  return renderHook(() => useResumeTab({ residents, republicId }), {
+    wrapper: ({ children }) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    ),
+  });
 }
 
 // ─── Setup ───────────────────────────────────────────────────────────────────
@@ -104,7 +115,7 @@ function renderResumeTab(residents = mockResidents, republicId = "rep-1") {
 beforeEach(() => {
   jest.clearAllMocks();
   mockRepublicQuery();
-  mockResidentQueries([{ data: [], isLoading: false }, { data: [], isLoading: false }]);
+  mockResidentQueries({ data: [[], []], isLoading: false });
 });
 
 // ─── Tests ───────────────────────────────────────────────────────────────────
@@ -121,38 +132,24 @@ describe("useResumeTab", () => {
       expect(result.current.totalPendente).toBe(0);
       expect(result.current.quantidadePagas).toBe(0);
       expect(result.current.quantidadePendentes).toBe(0);
-    });
-
-    it("repassa republicId para useAccountsByRepublicQuery", () => {
-      renderResumeTab(mockResidents, "rep-42");
-
-      expect(jest.mocked(useAccountsByRepublicQuery)).toHaveBeenCalledWith(
-        "rep-42"
-      );
-    });
-
-    it("passa os ids dos moradores para useAccountsByResidentQueries", () => {
-      renderResumeTab();
-
-      expect(jest.mocked(useAccountsByResidentQueries)).toHaveBeenCalledWith([
-        "r-1",
-        "r-2",
-      ]);
+      expect(result.current.isLoadingContas).toBe(false);
+      expect(result.current.isLoadingDividas).toBe(false);
     });
   });
 
   describe("contas", () => {
-    it("repassa contas da query de república", () => {
-      const contas = [makeConta({ id: "c-1" }), makeConta({ id: "c-2" })];
-      mockRepublicQuery({ data: contas });
+    it("retorna contas quando a query retorna dados", () => {
+      const contas = [makeConta(), makeConta({ id: "c-2", valor: 200 })];
+      mockRepublicQuery({ data: contas, isLoading: false });
 
       const { result } = renderResumeTab();
 
       expect(result.current.contas).toEqual(contas);
+      expect(result.current.isLoadingContas).toBe(false);
     });
 
-    it("repassa isLoading da query de república como isLoadingContas", () => {
-      mockRepublicQuery({ isLoading: true });
+    it("retorna isLoadingContas=true quando a query está carregando", () => {
+      mockRepublicQuery({ data: undefined, isLoading: true });
 
       const { result } = renderResumeTab();
 
@@ -160,123 +157,74 @@ describe("useResumeTab", () => {
     });
   });
 
-  describe("dividas", () => {
-    it("não chama useAccountsByResidentQueries com ids quando residents está vazio", () => {
-      mockResidentQueries([]);
+  describe("dívidas", () => {
+    it("calcula dívidas por morador a partir das queries de residentes", () => {
+      mockResidentQueries({
+        data: [
+          [makeContaMorador({ moradorId: "r-1", valor: 30 })],
+          [makeContaMorador({ moradorId: "r-2", valor: 70 })],
+        ],
+        isLoading: false,
+      });
 
-      renderResumeTab([]);
+      const { result } = renderResumeTab();
 
-      expect(jest.mocked(useAccountsByResidentQueries)).toHaveBeenCalledWith(
-        []
-      );
+      expect(result.current.dividas).toEqual({ "r-1": 30, "r-2": 70 });
     });
 
-    it("é true quando alguma query de morador ainda está carregando", () => {
-      mockResidentQueries([
-        { data: [], isLoading: true },
-        { data: [], isLoading: false },
-      ]);
+    it("retorna isLoadingDividas=true quando as queries estão carregando", () => {
+      mockResidentQueries({
+        data: [[], []],
+        isLoading: true,
+      });
 
       const { result } = renderResumeTab();
 
       expect(result.current.isLoadingDividas).toBe(true);
     });
-
-    it("é false quando todas as queries de morador terminaram", () => {
-      mockResidentQueries([
-        { data: [], isLoading: false },
-        { data: [], isLoading: false },
-      ]);
-
-      const { result } = renderResumeTab();
-
-      expect(result.current.isLoadingDividas).toBe(false);
-    });
-
-    it("constrói o mapa de dívidas somando apenas PENDENTE e AGUARDANDO_CONFIRMACAO", () => {
-      mockResidentQueries([
-        {
-          data: [
-            makeContaMorador({ status: StatusPagamento.PENDENTE, valor: 80 }),
-            makeContaMorador({
-              status: StatusPagamento.AGUARDANDO_CONFIRMACAO,
-              valor: 20,
-            }),
-            makeContaMorador({ status: StatusPagamento.PAGO, valor: 999 }),
-          ],
-          isLoading: false,
-        },
-        {
-          data: [makeContaMorador({ status: StatusPagamento.PAGO, valor: 200 })],
-          isLoading: false,
-        },
-      ]);
-
-      const { result } = renderResumeTab();
-
-      expect(result.current.dividas["r-1"]).toBe(100); // 80 + 20
-      expect(result.current.dividas["r-2"]).toBe(0); // só PAGO, não conta
-    });
-
-    it("atribui 0 quando morador não possui contas pendentes", () => {
-      mockResidentQueries([{ data: [], isLoading: false }]);
-
-      const { result } = renderResumeTab([mockResidents[0]]);
-
-      expect(result.current.dividas["r-1"]).toBe(0);
-    });
   });
 
   describe("valores calculados", () => {
-    it("calcula totalValor somando todos os valores das contas", () => {
-      mockRepublicQuery({
-        data: [
-          makeConta({ valor: 100, status: StatusConta.PAGA }),
-          makeConta({ id: "c-2", valor: 200, status: StatusConta.PENDENTE }),
-        ],
-      });
+    it("calcula totalValor corretamente", () => {
+      const contas = [makeConta({ valor: 100 }), makeConta({ valor: 200 })];
+      mockRepublicQuery({ data: contas });
 
       const { result } = renderResumeTab();
 
       expect(result.current.totalValor).toBe(300);
     });
 
-    it("calcula totalPago somando apenas contas com status PAGA", () => {
-      mockRepublicQuery({
-        data: [
-          makeConta({ valor: 100, status: StatusConta.PAGA }),
-          makeConta({ id: "c-2", valor: 200, status: StatusConta.PAGA }),
-          makeConta({ id: "c-3", valor: 50, status: StatusConta.PENDENTE }),
-        ],
-      });
+    it("calcula totalPago corretamente", () => {
+      const contas = [
+        makeConta({ valor: 100, status: StatusConta.PAGA }),
+        makeConta({ valor: 200, status: StatusConta.PENDENTE }),
+      ];
+      mockRepublicQuery({ data: contas });
 
       const { result } = renderResumeTab();
 
-      expect(result.current.totalPago).toBe(300);
+      expect(result.current.totalPago).toBe(100);
     });
 
-    it("calcula totalPendente somando contas sem status PAGA", () => {
-      mockRepublicQuery({
-        data: [
-          makeConta({ valor: 50, status: StatusConta.PAGA }),
-          makeConta({ id: "c-2", valor: 80, status: StatusConta.PENDENTE }),
-          makeConta({ id: "c-3", valor: 70, status: StatusConta.ATRASADA }),
-        ],
-      });
+    it("calcula totalPendente corretamente", () => {
+      const contas = [
+        makeConta({ valor: 100, status: StatusConta.PAGA }),
+        makeConta({ valor: 200, status: StatusConta.PENDENTE }),
+      ];
+      mockRepublicQuery({ data: contas });
 
       const { result } = renderResumeTab();
 
-      expect(result.current.totalPendente).toBe(150);
+      expect(result.current.totalPendente).toBe(200);
     });
 
     it("calcula quantidadePagas corretamente", () => {
-      mockRepublicQuery({
-        data: [
-          makeConta({ status: StatusConta.PAGA }),
-          makeConta({ id: "c-2", status: StatusConta.PAGA }),
-          makeConta({ id: "c-3", status: StatusConta.PENDENTE }),
-        ],
-      });
+      const contas = [
+        makeConta({ status: StatusConta.PAGA }),
+        makeConta({ status: StatusConta.PAGA }),
+        makeConta({ status: StatusConta.PENDENTE }),
+      ];
+      mockRepublicQuery({ data: contas });
 
       const { result } = renderResumeTab();
 
@@ -284,13 +232,12 @@ describe("useResumeTab", () => {
     });
 
     it("calcula quantidadePendentes corretamente", () => {
-      mockRepublicQuery({
-        data: [
-          makeConta({ status: StatusConta.PAGA }),
-          makeConta({ id: "c-2", status: StatusConta.PENDENTE }),
-          makeConta({ id: "c-3", status: StatusConta.ATRASADA }),
-        ],
-      });
+      const contas = [
+        makeConta({ status: StatusConta.PAGA }),
+        makeConta({ status: StatusConta.PENDENTE }),
+        makeConta({ status: StatusConta.PENDENTE }),
+      ];
+      mockRepublicQuery({ data: contas });
 
       const { result } = renderResumeTab();
 

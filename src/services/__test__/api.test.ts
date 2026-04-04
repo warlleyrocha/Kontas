@@ -127,9 +127,11 @@ function importApiModule(apiUrl = "https://api.example.com") {
 
   return {
     api,
-    clearAuthorizationHeader: importedAuthHeaderModule?.clearAuthorizationHeader,
+    clearAuthorizationHeader:
+      importedAuthHeaderModule?.clearAuthorizationHeader,
     hasAuthorizationHeader: importedAuthHeaderModule?.hasAuthorizationHeader,
-    hydrateAuthorizationHeader: importedAuthHeaderModule?.hydrateAuthorizationHeader,
+    hydrateAuthorizationHeader:
+      importedAuthHeaderModule?.hydrateAuthorizationHeader,
     setAuthorizationHeader: importedAuthHeaderModule?.setAuthorizationHeader,
     secureStore,
     logger,
@@ -178,7 +180,7 @@ describe("api service", () => {
 
     const result = await request.fulfilled(config);
 
-    expect(secureStore.getItemAsync).toHaveBeenCalledWith("token");
+    expect(secureStore.getItemAsync).toHaveBeenCalledWith("auth_token");
     expect(result.headers.Authorization).toBe("Bearer token-123");
     expect((result as RequestConfig)._cbHalfOpen).toBe(false);
     expect(logger.debug).toHaveBeenCalledWith("API", "➡️ POST /payments", {
@@ -190,7 +192,9 @@ describe("api service", () => {
     const { secureStore, request } = importApiModule();
     secureStore.getItemAsync.mockResolvedValue("token-123");
 
-    const firstResult = await request.fulfilled(createConfig({ url: "/first" }));
+    const firstResult = await request.fulfilled(
+      createConfig({ url: "/first" })
+    );
     const secondResult = await request.fulfilled(
       createConfig({ url: "/second" })
     );

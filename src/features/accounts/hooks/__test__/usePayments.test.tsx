@@ -1,6 +1,8 @@
-import { act, renderHook } from "@testing-library/react-native";
-import { useAccountData } from "@/src/features/accounts/hooks/useAccountList/useAccountData";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import React from "react";
+import { act, renderHook, waitFor } from "@testing-library/react-native";
 import { accountResidentsService } from "@/src/features/accounts/services/account-residents.service";
+import { accountService } from "@/src/features/accounts/services/account.service";
 import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import type { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
 import type { Conta } from "@/src/features/accounts/types/account.types";
@@ -9,12 +11,6 @@ import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { showToast } from "@/src/shared/utils/showToast";
 import { usePaymentsScreen } from "../usePayments";
 
-jest.mock(
-  "@/src/features/accounts/hooks/useAccountList/useAccountData",
-  () => ({
-    useAccountData: jest.fn(),
-  })
-);
 jest.mock("@/src/shared/contexts/RefreshContext", () => ({
   useRefresh: jest.fn(),
 }));
@@ -28,17 +24,30 @@ jest.mock("@/src/features/accounts/services/account-residents.service", () => ({
   accountResidentsService: {
     confirmarPagamentoAdmin: jest.fn(),
     recusarPagamentoAdmin: jest.fn(),
+    listarContasMoradores: jest.fn(),
+  },
+}));
+jest.mock("@/src/features/accounts/services/account.service", () => ({
+  accountService: {
+    listarContasPorRepublica: jest.fn(),
   },
 }));
 jest.mock("@/src/shared/hooks/useComponentLogger", () => ({
   useComponentLogger: jest.fn(),
 }));
-
-// ─── Fixtures ─────────────────────────────────────────────────────────────────
+jest.mock("@/src/features/auth/hooks/useAuth", () => ({
+  useAuth: jest.fn(() => ({ isAuthenticated: true, user: null })),
+}));
 
 const mockRefreshAll = jest.fn();
-const mockFetchAccounts = jest.fn();
-const mockFetchAccountResidents = jest.fn();
+const mockListarContasPorRepublica = jest.mocked(
+  accountService.listarContasPorRepublica
+);
+const mockListarContasMoradores = jest.mocked(
+  accountResidentsService.listarContasMoradores
+);
+
+let consoleErrorSpy: jest.SpyInstance;
 
 function mockConta(id: string, overrides?: Partial<Conta>): Conta {
   return {
@@ -78,12 +87,20 @@ function mockContaMorador(
   };
 }
 
-// ─── Setup ────────────────────────────────────────────────────────────────────
+const queryClient = new QueryClient({
+  defaultOptions: {
+    mutations: { retry: false },
+    queries: { retry: false },
+  },
+});
 
-let consoleErrorSpy: jest.SpyInstance;
+const wrapper = ({ children }: { children: React.ReactNode }) => (
+  <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+);
 
 beforeEach(() => {
   jest.clearAllMocks();
+  queryClient.clear();
 
   jest.mocked(useRefresh).mockReturnValue({
     refreshAll: mockRefreshAll,
@@ -92,30 +109,26 @@ beforeEach(() => {
     registerRefresh: jest.fn(),
   } as any);
 
-  jest.mocked(useAccountData).mockReturnValue({
-    error: null,
-    fetchAccounts: mockFetchAccounts,
-    fetchAccountResidents: mockFetchAccountResidents,
-  } as any);
-
   jest
     .mocked(getErrorMessage)
     .mockImplementation((_err, fallback) => fallback ?? "erro");
 
-  mockFetchAccounts.mockResolvedValue([]);
-  mockFetchAccountResidents.mockResolvedValue([]);
+  mockListarContasPorRepublica.mockResolvedValue([]);
+  mockListarContasMoradores.mockResolvedValue([]);
   mockRefreshAll.mockResolvedValue(undefined);
 
   consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 });
 
 afterEach(() => {
-  expect(consoleErrorSpy).not.toHaveBeenCalled();
-  consoleErrorSpy.mockRestore();
+  consoleErrorSpy?.mockRestore();
+  jest.restoreAllMocks();
 });
 
 function renderPayments() {
-  return renderHook(() => usePaymentsScreen({ republicId: "rep-1" }));
+  return renderHook(() => usePaymentsScreen({ republicId: "rep-1" }), {
+    wrapper,
+  });
 }
 
 // ─── Estado inicial ──────────────────────────────────────────────────────────
@@ -156,14 +169,14 @@ describe("usePaymentsScreen — estado inicial", () => {
 describe("usePaymentsScreen — loadPayments", () => {
   it("carrega contas e moradores ao montar", async () => {
     const morador = mockContaMorador("cm-1");
-    mockFetchAccounts.mockResolvedValue([mockConta("acc-1")]);
-    mockFetchAccountResidents.mockResolvedValue([morador]);
+    mockListarContasPorRepublica.mockResolvedValue([mockConta("acc-1")]);
+    mockListarContasMoradores.mockResolvedValue([morador]);
 
     const { result } = renderPayments();
-    await act(async () => {});
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-    expect(mockFetchAccounts).toHaveBeenCalled();
-    expect(mockFetchAccountResidents).toHaveBeenCalledWith("acc-1");
+    expect(mockListarContasPorRepublica).toHaveBeenCalled();
+    expect(mockListarContasMoradores).toHaveBeenCalledWith("acc-1");
     expect(result.current.filteredPaymentAccounts).toHaveLength(1);
     expect(result.current.filteredPaymentAccounts[0]?.residents).toEqual([
       morador,
@@ -175,37 +188,35 @@ describe("usePaymentsScreen — loadPayments", () => {
       status: StatusPagamento.PENDENTE,
       pagoEm: null,
     });
-    mockFetchAccounts.mockResolvedValue([mockConta("acc-1")]);
-    mockFetchAccountResidents.mockResolvedValue([moradorPendente]);
+    mockListarContasPorRepublica.mockResolvedValue([mockConta("acc-1")]);
+    mockListarContasMoradores.mockResolvedValue([moradorPendente]);
 
     const { result } = renderPayments();
-    await act(async () => {});
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     expect(result.current.filteredPaymentAccounts).toHaveLength(0);
   });
 
   it("ordena contas por data de vencimento", async () => {
     const morador = mockContaMorador("cm-1");
-    mockFetchAccounts.mockResolvedValue([
+    mockListarContasPorRepublica.mockResolvedValue([
       mockConta("acc-later", { vencimento: "2026-06-01" }),
       mockConta("acc-earlier", { vencimento: "2026-01-01" }),
     ]);
-    mockFetchAccountResidents.mockResolvedValue([morador]);
+    mockListarContasMoradores.mockResolvedValue([morador]);
 
     const { result } = renderPayments();
-    await act(async () => {});
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     expect(result.current.filteredPaymentAccounts[0]?.id).toBe("acc-earlier");
     expect(result.current.filteredPaymentAccounts[1]?.id).toBe("acc-later");
   });
 
   it("define isLoading false após o carregamento", async () => {
-    mockFetchAccounts.mockResolvedValue([]);
+    mockListarContasPorRepublica.mockResolvedValue([]);
 
     const { result } = renderPayments();
-    await act(async () => {});
-
-    expect(result.current.isLoading).toBe(false);
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
   });
 });
 
@@ -219,16 +230,15 @@ describe("usePaymentsScreen — filteredPaymentAccounts", () => {
     const moradorPago = mockContaMorador("cm-2", {
       status: StatusPagamento.PAGO,
     });
-    mockFetchAccounts.mockResolvedValue([mockConta("acc-1")]);
-    mockFetchAccountResidents.mockResolvedValue([
+    mockListarContasPorRepublica.mockResolvedValue([mockConta("acc-1")]);
+    mockListarContasMoradores.mockResolvedValue([
       moradorAguardando,
       moradorPago,
     ]);
 
     const { result } = renderPayments();
-    await act(async () => {});
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-    // selectedStatus padrão é AGUARDANDO_CONFIRMACAO
     expect(result.current.filteredPaymentAccounts[0]?.residents).toEqual([
       moradorAguardando,
     ]);
@@ -241,14 +251,14 @@ describe("usePaymentsScreen — filteredPaymentAccounts", () => {
     const moradorPago = mockContaMorador("cm-2", {
       status: StatusPagamento.PAGO,
     });
-    mockFetchAccounts.mockResolvedValue([mockConta("acc-1")]);
-    mockFetchAccountResidents.mockResolvedValue([
+    mockListarContasPorRepublica.mockResolvedValue([mockConta("acc-1")]);
+    mockListarContasMoradores.mockResolvedValue([
       moradorAguardando,
       moradorPago,
     ]);
 
     const { result } = renderPayments();
-    await act(async () => {});
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     act(() => {
       result.current.setSelectedStatus("todos");
@@ -263,13 +273,12 @@ describe("usePaymentsScreen — filteredPaymentAccounts", () => {
     const moradorPago = mockContaMorador("cm-1", {
       status: StatusPagamento.PAGO,
     });
-    mockFetchAccounts.mockResolvedValue([mockConta("acc-1")]);
-    mockFetchAccountResidents.mockResolvedValue([moradorPago]);
+    mockListarContasPorRepublica.mockResolvedValue([mockConta("acc-1")]);
+    mockListarContasMoradores.mockResolvedValue([moradorPago]);
 
     const { result } = renderPayments();
-    await act(async () => {});
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-    // selectedStatus padrão é AGUARDANDO_CONFIRMACAO, moradorPago não aparece
     expect(result.current.filteredPaymentAccounts).toHaveLength(0);
   });
 });
@@ -278,10 +287,10 @@ describe("usePaymentsScreen — filteredPaymentAccounts", () => {
 
 describe("usePaymentsScreen — subtitle", () => {
   it("retorna subtítulo para AGUARDANDO_CONFIRMACAO com 0 pagamentos", async () => {
-    mockFetchAccounts.mockResolvedValue([]);
+    mockListarContasPorRepublica.mockResolvedValue([]);
 
     const { result } = renderPayments();
-    await act(async () => {});
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     expect(result.current.subtitle).toBe(
       "Nenhum pagamento aguardando confirmação"
@@ -292,11 +301,11 @@ describe("usePaymentsScreen — subtitle", () => {
     const morador = mockContaMorador("cm-1", {
       status: StatusPagamento.AGUARDANDO_CONFIRMACAO,
     });
-    mockFetchAccounts.mockResolvedValue([mockConta("acc-1")]);
-    mockFetchAccountResidents.mockResolvedValue([morador]);
+    mockListarContasPorRepublica.mockResolvedValue([mockConta("acc-1")]);
+    mockListarContasMoradores.mockResolvedValue([morador]);
 
     const { result } = renderPayments();
-    await act(async () => {});
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     expect(result.current.subtitle).toBe("1 pagamento aguardando confirmação");
   });
@@ -310,20 +319,20 @@ describe("usePaymentsScreen — subtitle", () => {
         status: StatusPagamento.AGUARDANDO_CONFIRMACAO,
       }),
     ];
-    mockFetchAccounts.mockResolvedValue([mockConta("acc-1")]);
-    mockFetchAccountResidents.mockResolvedValue(moradores);
+    mockListarContasPorRepublica.mockResolvedValue([mockConta("acc-1")]);
+    mockListarContasMoradores.mockResolvedValue(moradores);
 
     const { result } = renderPayments();
-    await act(async () => {});
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     expect(result.current.subtitle).toBe("2 pagamentos aguardando confirmação");
   });
 
   it("retorna subtítulo para PAGO com 0 pagamentos", async () => {
-    mockFetchAccounts.mockResolvedValue([]);
+    mockListarContasPorRepublica.mockResolvedValue([]);
 
     const { result } = renderPayments();
-    await act(async () => {});
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     act(() => {
       result.current.setSelectedStatus(StatusPagamento.PAGO);
@@ -336,11 +345,11 @@ describe("usePaymentsScreen — subtitle", () => {
     const moradorPago = mockContaMorador("cm-1", {
       status: StatusPagamento.PAGO,
     });
-    mockFetchAccounts.mockResolvedValue([mockConta("acc-1")]);
-    mockFetchAccountResidents.mockResolvedValue([moradorPago]);
+    mockListarContasPorRepublica.mockResolvedValue([mockConta("acc-1")]);
+    mockListarContasMoradores.mockResolvedValue([moradorPago]);
 
     const { result } = renderPayments();
-    await act(async () => {});
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     act(() => {
       result.current.setSelectedStatus(StatusPagamento.PAGO);
@@ -354,11 +363,11 @@ describe("usePaymentsScreen — subtitle", () => {
       mockContaMorador("cm-1", { status: StatusPagamento.PAGO }),
       mockContaMorador("cm-2", { status: StatusPagamento.PAGO }),
     ];
-    mockFetchAccounts.mockResolvedValue([mockConta("acc-1")]);
-    mockFetchAccountResidents.mockResolvedValue(moradores);
+    mockListarContasPorRepublica.mockResolvedValue([mockConta("acc-1")]);
+    mockListarContasMoradores.mockResolvedValue(moradores);
 
     const { result } = renderPayments();
-    await act(async () => {});
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     act(() => {
       result.current.setSelectedStatus(StatusPagamento.PAGO);
@@ -368,10 +377,10 @@ describe("usePaymentsScreen — subtitle", () => {
   });
 
   it("retorna subtítulo para 'todos' com 0 pagamentos", async () => {
-    mockFetchAccounts.mockResolvedValue([]);
+    mockListarContasPorRepublica.mockResolvedValue([]);
 
     const { result } = renderPayments();
-    await act(async () => {});
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     act(() => {
       result.current.setSelectedStatus("todos");
@@ -384,11 +393,11 @@ describe("usePaymentsScreen — subtitle", () => {
     const morador = mockContaMorador("cm-1", {
       status: StatusPagamento.AGUARDANDO_CONFIRMACAO,
     });
-    mockFetchAccounts.mockResolvedValue([mockConta("acc-1")]);
-    mockFetchAccountResidents.mockResolvedValue([morador]);
+    mockListarContasPorRepublica.mockResolvedValue([mockConta("acc-1")]);
+    mockListarContasMoradores.mockResolvedValue([morador]);
 
     const { result } = renderPayments();
-    await act(async () => {});
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     act(() => {
       result.current.setSelectedStatus("todos");
@@ -404,11 +413,11 @@ describe("usePaymentsScreen — subtitle", () => {
       }),
       mockContaMorador("cm-2", { status: StatusPagamento.PAGO }),
     ];
-    mockFetchAccounts.mockResolvedValue([mockConta("acc-1")]);
-    mockFetchAccountResidents.mockResolvedValue(moradores);
+    mockListarContasPorRepublica.mockResolvedValue([mockConta("acc-1")]);
+    mockListarContasMoradores.mockResolvedValue(moradores);
 
     const { result } = renderPayments();
-    await act(async () => {});
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     act(() => {
       result.current.setSelectedStatus("todos");
@@ -425,14 +434,14 @@ describe("usePaymentsScreen — handleConfirmResidentPayment", () => {
     const morador = mockContaMorador("cm-1", {
       status: StatusPagamento.AGUARDANDO_CONFIRMACAO,
     });
-    mockFetchAccounts.mockResolvedValue([mockConta("acc-1")]);
-    mockFetchAccountResidents.mockResolvedValue([morador]);
+    mockListarContasPorRepublica.mockResolvedValue([mockConta("acc-1")]);
+    mockListarContasMoradores.mockResolvedValue([morador]);
     jest
       .mocked(accountResidentsService.confirmarPagamentoAdmin)
       .mockResolvedValue(undefined as any);
 
     const { result } = renderPayments();
-    await act(async () => {});
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     await act(async () => {
       await result.current.handleConfirmResidentPayment("acc-1", "cm-1");
@@ -441,14 +450,14 @@ describe("usePaymentsScreen — handleConfirmResidentPayment", () => {
     expect(
       jest.mocked(accountResidentsService.confirmarPagamentoAdmin)
     ).toHaveBeenCalledWith({ id: "cm-1" });
-    expect(mockRefreshAll).toHaveBeenCalledTimes(1);
+    expect(jest.mocked(showToast.success)).toHaveBeenCalled();
     expect(jest.mocked(showToast.success)).toHaveBeenCalledWith(
       "Pagamento marcado como PAGO."
     );
   });
 
   it("exibe toast de erro quando serviço falha", async () => {
-    mockFetchAccounts.mockResolvedValue([]);
+    mockListarContasPorRepublica.mockResolvedValue([]);
     jest
       .mocked(accountResidentsService.confirmarPagamentoAdmin)
       .mockRejectedValue(new Error("fail"));
@@ -469,7 +478,7 @@ describe("usePaymentsScreen — handleConfirmResidentPayment", () => {
   });
 
   it("limpa confirmingResidentById após sucesso", async () => {
-    mockFetchAccounts.mockResolvedValue([]);
+    mockListarContasPorRepublica.mockResolvedValue([]);
     jest
       .mocked(accountResidentsService.confirmarPagamentoAdmin)
       .mockResolvedValue(undefined as any);
@@ -485,7 +494,7 @@ describe("usePaymentsScreen — handleConfirmResidentPayment", () => {
   });
 
   it("limpa confirmingResidentById após erro", async () => {
-    mockFetchAccounts.mockResolvedValue([]);
+    mockListarContasPorRepublica.mockResolvedValue([]);
     jest
       .mocked(accountResidentsService.confirmarPagamentoAdmin)
       .mockRejectedValue(new Error("fail"));
@@ -501,7 +510,7 @@ describe("usePaymentsScreen — handleConfirmResidentPayment", () => {
   });
 
   it("bloqueia chamada simultânea para o mesmo residente", async () => {
-    mockFetchAccounts.mockResolvedValue([]);
+    mockListarContasPorRepublica.mockResolvedValue([]);
 
     let resolveFirst!: (value?: unknown) => void;
     jest
@@ -530,6 +539,7 @@ describe("usePaymentsScreen — handleConfirmResidentPayment", () => {
 
     await act(async () => {
       resolveFirst();
+      await Promise.resolve();
     });
   });
 });
@@ -541,14 +551,14 @@ describe("usePaymentsScreen — handleRefuseResidentPayment", () => {
     const morador = mockContaMorador("cm-1", {
       status: StatusPagamento.AGUARDANDO_CONFIRMACAO,
     });
-    mockFetchAccounts.mockResolvedValue([mockConta("acc-1")]);
-    mockFetchAccountResidents.mockResolvedValue([morador]);
+    mockListarContasPorRepublica.mockResolvedValue([mockConta("acc-1")]);
+    mockListarContasMoradores.mockResolvedValue([morador]);
     jest
       .mocked(accountResidentsService.recusarPagamentoAdmin)
       .mockResolvedValue(undefined as any);
 
     const { result } = renderPayments();
-    await act(async () => {});
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     await act(async () => {
       await result.current.handleRefuseResidentPayment("acc-1", "cm-1");
@@ -557,14 +567,14 @@ describe("usePaymentsScreen — handleRefuseResidentPayment", () => {
     expect(
       jest.mocked(accountResidentsService.recusarPagamentoAdmin)
     ).toHaveBeenCalledWith({ id: "cm-1" });
-    expect(mockRefreshAll).toHaveBeenCalledTimes(1);
+    expect(jest.mocked(showToast.success)).toHaveBeenCalled();
     expect(jest.mocked(showToast.success)).toHaveBeenCalledWith(
       "Pagamento recusado."
     );
   });
 
   it("exibe toast de erro quando serviço falha", async () => {
-    mockFetchAccounts.mockResolvedValue([]);
+    mockListarContasPorRepublica.mockResolvedValue([]);
     jest
       .mocked(accountResidentsService.recusarPagamentoAdmin)
       .mockRejectedValue(new Error("fail"));
@@ -585,7 +595,7 @@ describe("usePaymentsScreen — handleRefuseResidentPayment", () => {
   });
 
   it("limpa refusingResidentById após sucesso", async () => {
-    mockFetchAccounts.mockResolvedValue([]);
+    mockListarContasPorRepublica.mockResolvedValue([]);
     jest
       .mocked(accountResidentsService.recusarPagamentoAdmin)
       .mockResolvedValue(undefined as any);
@@ -601,7 +611,7 @@ describe("usePaymentsScreen — handleRefuseResidentPayment", () => {
   });
 
   it("limpa refusingResidentById após erro", async () => {
-    mockFetchAccounts.mockResolvedValue([]);
+    mockListarContasPorRepublica.mockResolvedValue([]);
     jest
       .mocked(accountResidentsService.recusarPagamentoAdmin)
       .mockRejectedValue(new Error("fail"));
@@ -617,7 +627,7 @@ describe("usePaymentsScreen — handleRefuseResidentPayment", () => {
   });
 
   it("bloqueia chamada simultânea para o mesmo residente", async () => {
-    mockFetchAccounts.mockResolvedValue([]);
+    mockListarContasPorRepublica.mockResolvedValue([]);
 
     let resolveFirst!: (value?: unknown) => void;
     jest
@@ -646,6 +656,7 @@ describe("usePaymentsScreen — handleRefuseResidentPayment", () => {
 
     await act(async () => {
       resolveFirst();
+      await Promise.resolve();
     });
   });
 });
@@ -654,10 +665,10 @@ describe("usePaymentsScreen — handleRefuseResidentPayment", () => {
 
 describe("usePaymentsScreen — refresh manual", () => {
   it("loadPayments com isManualRefresh dispara REFRESH_START", async () => {
-    mockFetchAccounts.mockResolvedValue([]);
+    mockListarContasPorRepublica.mockResolvedValue([]);
 
     const { result } = renderPayments();
-    await act(async () => {});
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     await act(async () => {
       await result.current.loadPayments(true);

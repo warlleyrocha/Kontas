@@ -42,11 +42,6 @@ describe("AccountContextMenu", () => {
     render(<AccountContextMenu {...createProps()} />);
   });
 
-  it('exibe o botão "Editar conta"', () => {
-    render(<AccountContextMenu {...createProps()} />);
-    expect(screen.getByText("Editar conta")).toBeTruthy();
-  });
-
   it('não exibe "Deletar conta" para não-admin', () => {
     render(<AccountContextMenu {...createProps()} />);
     expect(screen.queryByText("Deletar conta")).toBeNull();
@@ -55,15 +50,6 @@ describe("AccountContextMenu", () => {
   it('exibe "Deletar conta" quando isAdmin é true', () => {
     render(<AccountContextMenu {...createProps({ isAdmin: true })} />);
     expect(screen.getByText("Deletar conta")).toBeTruthy();
-  });
-
-  it("chama onEdit ao pressionar Editar conta", () => {
-    const props = createProps();
-    render(<AccountContextMenu {...props} />);
-
-    fireEvent.press(screen.getByRole("button", { name: "Editar conta" }));
-
-    expect(props.onEdit).toHaveBeenCalledTimes(1);
   });
 
   it("chama onDelete ao pressionar Deletar conta", () => {
