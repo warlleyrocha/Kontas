@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 
 import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 import { residentService } from "../services/resident.service";
@@ -13,5 +13,6 @@ export function useResidentsByRepublicQuery(republicId: string) {
     queryFn: ({ signal }) => residentService.getResidents(republicId, signal),
     enabled: isAuthenticated && Boolean(republicId),
     staleTime: 60_000,
+    placeholderData: keepPreviousData,
   });
 }

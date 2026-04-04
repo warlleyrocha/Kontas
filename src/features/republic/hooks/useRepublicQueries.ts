@@ -1,6 +1,7 @@
 import {
   useMutation,
   useQuery,
+  keepPreviousData,
   useQueryClient,
 } from "@tanstack/react-query";
 
@@ -72,6 +73,7 @@ export function useRepublicQuery(
     enabled:
       isAuthenticated && Boolean(republicId) && (options.enabled ?? true),
     staleTime: 60_000,
+    placeholderData: keepPreviousData,
   });
 }
 

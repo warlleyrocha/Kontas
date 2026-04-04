@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { useMemo } from "react";
 
 import { inviteService } from "@/src/features/invites/services/invite.service";
@@ -45,6 +45,7 @@ export function useInvitesByRepublicQuery(republicId: string) {
     queryFn: ({ signal }) =>
       inviteService.getInvitesByRepublicId(republicId, signal),
     enabled: isAuthenticated && Boolean(republicId),
+    placeholderData: keepPreviousData,
   });
 }
 
