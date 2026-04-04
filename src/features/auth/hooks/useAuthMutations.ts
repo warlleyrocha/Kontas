@@ -9,7 +9,11 @@ import {
   clearAuthorizationHeader,
   setAuthorizationHeader,
 } from "@/src/services/authHeader";
-import { AUTH_TOKEN_STORAGE_KEY, APP_USER_STORAGE_KEY, REPUBLIC_DATA_STORAGE_KEY } from "@/src/services/storageKeys";
+import {
+  AUTH_TOKEN_STORAGE_KEY,
+  APP_USER_STORAGE_KEY,
+  REPUBLIC_DATA_STORAGE_KEY,
+} from "@/src/services/storageKeys";
 import { logger } from "@/src/shared/utils/logger";
 
 export function useLoginWithGoogleMutation() {
@@ -24,14 +28,14 @@ export function useLoginWithGoogleMutation() {
       queryClient.setQueryData(userKeys.current(), data.user);
 
       // User cache: fire-and-forget — React Query é a fonte de verdade em runtime
-      setItemAsync(APP_USER_STORAGE_KEY, JSON.stringify(data.user))
-        .catch((err) =>
+      setItemAsync(APP_USER_STORAGE_KEY, JSON.stringify(data.user)).catch(
+        (err) =>
           logger.error(
             "Auth",
             "Falha ao persistir user no SecureStore após login",
-            err instanceof Error ? err : undefined,
-          ),
-        );
+            err instanceof Error ? err : undefined
+          )
+      );
 
       logger.info("Auth", "Login bem-sucedido");
     },
@@ -62,7 +66,7 @@ export function useLogoutMutation() {
       logger.error(
         "Auth",
         "Erro ao fazer logout",
-        error instanceof Error ? error : undefined,
+        error instanceof Error ? error : undefined
       );
     },
   });

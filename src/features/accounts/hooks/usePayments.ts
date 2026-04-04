@@ -32,13 +32,16 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
   const refuseResidentMutation = useRefuseResidentPaymentAdminMutation();
   const accounts = useMemo(
     () => accountsQuery.data ?? [],
-    [accountsQuery.data],
+    [accountsQuery.data]
   );
   const accountIds = useMemo(
     () => accounts.map((account) => account.id),
-    [accounts],
+    [accounts]
   );
-  const residentQueries = useAccountResidentsByAccountQueries(republicId, accountIds);
+  const residentQueries = useAccountResidentsByAccountQueries(
+    republicId,
+    accountIds
+  );
   const [confirmingResidentById, setConfirmingResidentById] = useState<
     Record<string, boolean>
   >({});
@@ -46,7 +49,7 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
     Record<string, boolean>
   >({});
   const [selectedStatus, setSelectedStatus] = useState<PaymentStatusFilter>(
-    StatusPagamento.AGUARDANDO_CONFIRMACAO,
+    StatusPagamento.AGUARDANDO_CONFIRMACAO
   );
 
   const loadPayments = useCallback(
@@ -60,7 +63,7 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
         }),
       ]);
     },
-    [queryClient, republicId],
+    [queryClient, republicId]
   );
 
   const paymentAccounts = useMemo(
@@ -72,7 +75,7 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
             (resident) =>
               getMoradorStatusVisual(resident) ===
                 StatusPagamento.AGUARDANDO_CONFIRMACAO ||
-              getMoradorStatusVisual(resident) === StatusPagamento.PAGO,
+              getMoradorStatusVisual(resident) === StatusPagamento.PAGO
           );
 
           if (relevantResidents.length === 0) {
@@ -88,9 +91,9 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
         .sort(
           (firstAccount, secondAccount) =>
             new Date(firstAccount.vencimento).getTime() -
-            new Date(secondAccount.vencimento).getTime(),
+            new Date(secondAccount.vencimento).getTime()
         ),
-    [accounts, residentQueries.data],
+    [accounts, residentQueries.data]
   );
 
   const handleConfirmResidentPayment = useCallback(
@@ -112,7 +115,7 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
         showToast.success("Pagamento marcado como PAGO.");
       } catch (error) {
         showToast.error(
-          getErrorMessage(error, "Não foi possível atualizar o pagamento."),
+          getErrorMessage(error, "Não foi possível atualizar o pagamento.")
         );
       } finally {
         setConfirmingResidentById((current) => {
@@ -122,7 +125,7 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
         });
       }
     },
-    [confirmResidentMutation, confirmingResidentById],
+    [confirmResidentMutation, confirmingResidentById]
   );
 
   const handleRefuseResidentPayment = useCallback(
@@ -144,7 +147,7 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
         showToast.success("Pagamento recusado.");
       } catch (error) {
         showToast.error(
-          getErrorMessage(error, "Não foi possível recusar o pagamento."),
+          getErrorMessage(error, "Não foi possível recusar o pagamento.")
         );
       } finally {
         setRefusingResidentById((current) => {
@@ -154,7 +157,7 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
         });
       }
     },
-    [refuseResidentMutation, refusingResidentById],
+    [refuseResidentMutation, refusingResidentById]
   );
 
   const filteredPaymentAccounts = useMemo(
@@ -166,7 +169,7 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
           }
 
           const filteredResidents = account.residents.filter(
-            (resident) => getMoradorStatusVisual(resident) === selectedStatus,
+            (resident) => getMoradorStatusVisual(resident) === selectedStatus
           );
 
           if (filteredResidents.length === 0) {
@@ -179,16 +182,16 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
           };
         })
         .filter((account): account is PaymentAccount => account !== null),
-    [paymentAccounts, selectedStatus],
+    [paymentAccounts, selectedStatus]
   );
 
   const filteredResidentsCount = useMemo(
     () =>
       filteredPaymentAccounts.reduce(
         (total, account) => total + account.residents.length,
-        0,
+        0
       ),
-    [filteredPaymentAccounts],
+    [filteredPaymentAccounts]
   );
 
   const subtitle = useMemo(() => {

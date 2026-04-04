@@ -16,7 +16,7 @@ interface RepublicResidentsQueryResult {
 export function useRepublicResidents(
   republics: RepublicResponse[],
   currentUserEmail?: string | null,
-  enabled = true,
+  enabled = true
 ) {
   const { isAuthenticated } = useAuth();
 
@@ -40,9 +40,9 @@ export function useRepublicResidents(
         republics.map((republic, index) => [
           republic.id,
           queries.data[index]?.length ?? 0,
-        ]),
+        ])
       ),
-    [republics, queries.data],
+    [republics, queries.data]
   );
 
   const userRolesByRepublic = useMemo(() => {
@@ -52,28 +52,28 @@ export function useRepublicResidents(
       republics.map((republic, index) => {
         const residents = queries.data[index] ?? [];
         const match = residents.find(
-          (r) => r.email.toLowerCase() === normalizedEmail,
+          (r) => r.email.toLowerCase() === normalizedEmail
         );
         return [republic.id, match?.role ?? null];
-      }),
+      })
     );
   }, [republics, queries.data, currentUserEmail]);
 
   const getResidentsCount = useCallback(
     (republicId: string): number => residentsCount[republicId] ?? 0,
-    [residentsCount],
+    [residentsCount]
   );
 
   const getUserRole = useCallback(
     (republicId: string): ResidentRole | null =>
       userRolesByRepublic[republicId] ?? null,
-    [userRolesByRepublic],
+    [userRolesByRepublic]
   );
 
   const isAdmin = useCallback(
     (republicId: string): boolean =>
       userRolesByRepublic[republicId] === ResidentRole.ADMIN,
-    [userRolesByRepublic],
+    [userRolesByRepublic]
   );
 
   return {

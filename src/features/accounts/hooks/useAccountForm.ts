@@ -35,10 +35,7 @@ function createInitialFormData(): AccountFormData {
   };
 }
 
-export function useAccountForm({
-  republicId,
-  onClose,
-}: UseAccountFormParams) {
+export function useAccountForm({ republicId, onClose }: UseAccountFormParams) {
   const { residents } = useResidents(republicId);
   const [formData, setFormData] = useState<AccountFormData>(
     createInitialFormData

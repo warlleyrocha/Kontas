@@ -29,11 +29,11 @@ interface AccountCardProps {
   onLongPress?: (position: CardPosition) => void;
   onConfirmResidentPayment?: (
     accountId: string,
-    accountResidentId: string,
+    accountResidentId: string
   ) => Promise<void> | void;
   onPatch?: (
     accountId: string,
-    metodoPagamento: MetodoPagamento,
+    metodoPagamento: MetodoPagamento
   ) => Promise<void> | void;
   onCopyPix?: (conta: Conta) => boolean | Promise<boolean>;
   readonly hasError?: boolean;
@@ -59,7 +59,7 @@ export const AccountCard = ({
 
   const { handleCopy: handleCopyPix, copyFeedback } = useCopyFeedback(
     () => onCopyPix?.(conta) ?? false,
-    accountCopyFeedback,
+    accountCopyFeedback
   );
 
   const vencimento = parseContaVencimento(conta.vencimento);

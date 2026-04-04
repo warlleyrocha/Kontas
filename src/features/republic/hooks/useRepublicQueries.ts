@@ -9,10 +9,7 @@ import { AppError } from "@/src/services/httpError";
 import { useAuth } from "@/src/features/auth/hooks/useAuth";
 
 import { republicService } from "../services/republic.service";
-import type {
-  RepublicPost,
-  RepublicResponse,
-} from "../types/republic.types";
+import type { RepublicPost, RepublicResponse } from "../types/republic.types";
 import { republicKeys } from "./republic.keys";
 
 interface RepublicQueryOptions {

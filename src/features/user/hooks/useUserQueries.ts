@@ -7,7 +7,10 @@ import {
   hydrateAuthorizationHeader,
 } from "@/src/services/authHeader";
 import { getErrorMessage, isUnauthorizedError } from "@/src/services/httpError";
-import { AUTH_TOKEN_STORAGE_KEY, APP_USER_STORAGE_KEY } from "@/src/services/storageKeys";
+import {
+  AUTH_TOKEN_STORAGE_KEY,
+  APP_USER_STORAGE_KEY,
+} from "@/src/services/storageKeys";
 import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
 
@@ -22,13 +25,12 @@ import { userKeys } from "./user.keys";
 function persistUserSecureStore(user: User): void {
   // Fire-and-forget: o SecureStore é fallback de persistência entre sessões.
   // O React Query é a fonte de verdade em runtime.
-  setItemAsync(APP_USER_STORAGE_KEY, JSON.stringify(user)).catch(
-    (err) =>
-      logger.error(
-        "User",
-        "Falha ao persistir user no SecureStore",
-        err instanceof Error ? err : undefined,
-      ),
+  setItemAsync(APP_USER_STORAGE_KEY, JSON.stringify(user)).catch((err) =>
+    logger.error(
+      "User",
+      "Falha ao persistir user no SecureStore",
+      err instanceof Error ? err : undefined
+    )
   );
 }
 
