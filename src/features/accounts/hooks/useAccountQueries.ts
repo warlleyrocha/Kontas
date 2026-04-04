@@ -125,9 +125,6 @@ export function useCreateAccountMutation() {
         ),
       ]);
     },
-    onError: async () => {
-      await invalidateAccountFeatureQueries(queryClient);
-    },
   });
 }
 
@@ -145,9 +142,6 @@ export function useDeleteAccountMutation() {
     onSuccess: async ({ republicId }) => {
       await invalidateAccountFeatureQueries(queryClient, republicId);
     },
-    onError: async () => {
-      await invalidateAccountFeatureQueries(queryClient);
-    },
   });
 }
 
@@ -164,9 +158,6 @@ export function useRestoreAccountMutation() {
     },
     onSuccess: async ({ republicId }) => {
       await invalidateAccountFeatureQueries(queryClient, republicId);
-    },
-    onError: async () => {
-      await invalidateAccountFeatureQueries(queryClient);
     },
   });
 }
@@ -194,9 +185,6 @@ export function usePayAccountMutation() {
     onSuccess: async ({ republicId }) => {
       await invalidateAccountFeatureQueries(queryClient, republicId);
     },
-    onError: async () => {
-      await invalidateAccountFeatureQueries(queryClient);
-    },
   });
 }
 
@@ -215,9 +203,6 @@ export function useConfirmResidentPaymentMutation() {
       });
     },
     onSuccess: async () => {
-      await invalidateAccountFeatureQueries(queryClient);
-    },
-    onError: async () => {
       await invalidateAccountFeatureQueries(queryClient);
     },
   });
@@ -240,9 +225,6 @@ export function useConfirmResidentPaymentAdminMutation() {
     onSuccess: async () => {
       await invalidateAccountFeatureQueries(queryClient);
     },
-    onError: async () => {
-      await invalidateAccountFeatureQueries(queryClient);
-    },
   });
 }
 
@@ -261,9 +243,6 @@ export function useRefuseResidentPaymentAdminMutation() {
       });
     },
     onSuccess: async () => {
-      await invalidateAccountFeatureQueries(queryClient);
-    },
-    onError: async () => {
       await invalidateAccountFeatureQueries(queryClient);
     },
   });
