@@ -148,18 +148,8 @@ export function useCreateAccountMutation() {
 
       return { ...conta, moradorIds };
     },
-    onSuccess: async ({ republicaId, moradorIds, id: contaId }) => {
-      await Promise.all([
-        invalidateAccountFeatureQueries(queryClient, republicaId),
-        queryClient.invalidateQueries({
-          queryKey: accountResidentKeys.byAccount(republicaId, contaId),
-        }),
-        ...moradorIds.map((moradorId) =>
-          queryClient.invalidateQueries({
-            queryKey: accountResidentKeys.byResident(republicaId, moradorId),
-          })
-        ),
-      ]);
+    onSuccess: async ({ republicaId }) => {
+      await invalidateAccountFeatureQueries(queryClient, republicaId);
     },
   });
 }
@@ -227,19 +217,15 @@ export function usePayAccountMutation() {
 export function useConfirmResidentPaymentMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async ({
-      accountId,
-      accountResidentId,
-    }: {
-      accountId: string;
-      accountResidentId: string;
-    }) => {
+  return useMutation<
+    void,
+    unknown,
+    { accountId: string; accountResidentId: string }
+  >({
+    mutationFn: async ({ accountResidentId }) => {
       await accountResidentsService.confirmarPagamentoMorador({
         id: accountResidentId,
       });
-
-      return { accountId };
     },
     onSuccess: async (_data, { accountId }) => {
       const republicId = findAccountInCache(queryClient, accountId);
@@ -251,14 +237,12 @@ export function useConfirmResidentPaymentMutation() {
 export function useConfirmResidentPaymentAdminMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async ({
-      accountId,
-      accountResidentId,
-    }: {
-      accountId: string;
-      accountResidentId: string;
-    }) => {
+  return useMutation<
+    ContaMorador,
+    unknown,
+    { accountId: string; accountResidentId: string }
+  >({
+    mutationFn: async ({ accountResidentId }) => {
       return accountResidentsService.confirmarPagamentoAdmin({
         id: accountResidentId,
       });
@@ -273,14 +257,12 @@ export function useConfirmResidentPaymentAdminMutation() {
 export function useRefuseResidentPaymentAdminMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async ({
-      accountId,
-      accountResidentId,
-    }: {
-      accountId: string;
-      accountResidentId: string;
-    }) => {
+  return useMutation<
+    ContaMorador,
+    unknown,
+    { accountId: string; accountResidentId: string }
+  >({
+    mutationFn: async ({ accountResidentId }) => {
       return accountResidentsService.recusarPagamentoAdmin({
         id: accountResidentId,
       });
