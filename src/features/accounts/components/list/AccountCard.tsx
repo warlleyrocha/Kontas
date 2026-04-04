@@ -29,11 +29,11 @@ interface AccountCardProps {
   onLongPress?: (position: CardPosition) => void;
   onConfirmResidentPayment?: (
     accountId: string,
-    accountResidentId: string
+    accountResidentId: string,
   ) => Promise<void> | void;
   onPatch?: (
     accountId: string,
-    metodoPagamento: MetodoPagamento
+    metodoPagamento: MetodoPagamento,
   ) => Promise<void> | void;
   onCopyPix?: (conta: Conta) => boolean | Promise<boolean>;
 }
@@ -57,7 +57,7 @@ export const AccountCard = ({
 
   const { handleCopy: handleCopyPix, copyFeedback } = useCopyFeedback(
     () => onCopyPix?.(conta) ?? false,
-    accountCopyFeedback
+    accountCopyFeedback,
   );
 
   const vencimento = parseContaVencimento(conta.vencimento);
@@ -108,7 +108,7 @@ export const AccountCard = ({
           {/* HEADER: Status + Descrição + Valor */}
           <View className="flex-row items-center justify-between border-b border-gray-100 px-4 py-3">
             <TouchableOpacity
-              className="flex-1 flex-row items-center gap-2"
+              className="flex-row items-center gap-2"
               disabled={paga || isPatching}
               onPress={async (e) => {
                 e.stopPropagation();
@@ -121,7 +121,7 @@ export const AccountCard = ({
                 isLoading={isPatching}
               />
               <Text
-                className={`flex-1 text-base font-semibold ${
+                className={`text-base font-semibold ${
                   paga ? "text-gray-400 line-through" : "text-gray-800"
                 }`}
               >
