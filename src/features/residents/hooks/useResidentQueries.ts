@@ -1,12 +1,11 @@
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 
-import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { residentService } from "../services/resident.service";
 import { residentKeys } from "./resident.keys";
 
 export function useResidentsByRepublicQuery(republicId: string) {
-  const { data: user = null } = useCurrentUserQuery();
-  const isAuthenticated = Boolean(user);
+  const { isAuthenticated } = useAuth();
 
   return useQuery({
     queryKey: residentKeys.byRepublic(republicId),

@@ -6,7 +6,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
-import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { accountService } from "../services/account.service";
 import { accountResidentsService } from "../services/account-residents.service";
 import type {
@@ -66,13 +66,9 @@ async function invalidateAccountFeatureQueries(
   ]);
 }
 
-function useIsAuthenticated() {
-  const { data: user = null } = useCurrentUserQuery();
-  return Boolean(user);
-}
 
 export function useAccountsByRepublicQuery(republicId: string) {
-  const isAuthenticated = useIsAuthenticated();
+  const { isAuthenticated } = useAuth();
 
   return useQuery({
     queryKey: accountKeys.byRepublic(republicId),
@@ -84,7 +80,7 @@ export function useAccountsByRepublicQuery(republicId: string) {
 }
 
 export function useAccountResidentsByAccountQueries(accountIds: string[]) {
-  const isAuthenticated = useIsAuthenticated();
+  const { isAuthenticated } = useAuth();
 
   return useQueries({
     queries: accountIds.map((accountId) => ({
@@ -104,7 +100,7 @@ export function useAccountResidentsByAccountQueries(accountIds: string[]) {
 }
 
 export function useAccountsByResidentQueries(moradorIds: string[]) {
-  const isAuthenticated = useIsAuthenticated();
+  const { isAuthenticated } = useAuth();
 
   return useQueries({
     queries: moradorIds.map((moradorId) => ({

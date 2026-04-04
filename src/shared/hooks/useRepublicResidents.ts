@@ -1,19 +1,24 @@
 import { useQueries } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import { residentKeys } from "@/src/features/residents/hooks/resident.keys";
 import { residentService } from "@/src/features/residents/services/resident.service";
-import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
+import type { ResidentResponse } from "@/src/shared/types/resident.types";
 import { ResidentRole } from "@/src/shared/types/resident.types";
+
+interface RepublicResidentsQueryResult {
+  data: ResidentResponse[][];
+  isLoading: boolean;
+}
 
 export function useRepublicResidents(
   republics: RepublicResponse[],
   currentUserEmail?: string | null,
   enabled = true,
 ) {
-  const { data: user = null } = useCurrentUserQuery();
-  const isAuthenticated = Boolean(user);
+  const { isAuthenticated } = useAuth();
 
   const queries = useQueries({
     queries: republics.map((republic) => ({
@@ -23,6 +28,10 @@ export function useRepublicResidents(
       enabled: isAuthenticated && enabled,
       staleTime: 60_000,
     })),
+    combine: (results): RepublicResidentsQueryResult => ({
+      data: results.map((r) => r.data ?? []),
+      isLoading: results.some((r) => r.isLoading),
+    }),
   });
 
   const residentsCount = useMemo(
@@ -30,10 +39,10 @@ export function useRepublicResidents(
       Object.fromEntries(
         republics.map((republic, index) => [
           republic.id,
-          queries[index]?.data?.length ?? 0,
+          queries.data[index]?.length ?? 0,
         ]),
       ),
-    [republics, queries],
+    [republics, queries.data],
   );
 
   const userRolesByRepublic = useMemo(() => {
@@ -41,14 +50,14 @@ export function useRepublicResidents(
     const normalizedEmail = currentUserEmail.toLowerCase();
     return Object.fromEntries(
       republics.map((republic, index) => {
-        const residents = queries[index]?.data ?? [];
+        const residents = queries.data[index] ?? [];
         const match = residents.find(
           (r) => r.email.toLowerCase() === normalizedEmail,
         );
         return [republic.id, match?.role ?? null];
       }),
     );
-  }, [republics, queries, currentUserEmail]);
+  }, [republics, queries.data, currentUserEmail]);
 
   const getResidentsCount = useCallback(
     (republicId: string): number => residentsCount[republicId] ?? 0,

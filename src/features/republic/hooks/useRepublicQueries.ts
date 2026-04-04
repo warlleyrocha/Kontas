@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-query";
 
 import { AppError } from "@/src/services/httpError";
-import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
 
 import { republicService } from "../services/republic.service";
 import type {
@@ -39,8 +39,7 @@ function updateRepublicInList(
 }
 
 export function useRepublicsQuery(options: RepublicQueryOptions = {}) {
-  const { data: user = null } = useCurrentUserQuery();
-  const isAuthenticated = Boolean(user);
+  const { isAuthenticated } = useAuth();
 
   return useQuery({
     queryKey: republicKeys.list(),
@@ -54,8 +53,7 @@ export function useRepublicQuery(
   republicId: string,
   options: RepublicQueryOptions = {}
 ) {
-  const { data: user = null } = useCurrentUserQuery();
-  const isAuthenticated = Boolean(user);
+  const { isAuthenticated } = useAuth();
 
   return useQuery<RepublicResponse | null>({
     queryKey: republicKeys.detail(republicId),

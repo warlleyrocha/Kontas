@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { useMemo } from "react";
 
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { inviteService } from "@/src/features/invites/services/invite.service";
 import type {
   GetInvitesByUser,
   Invite,
 } from "@/src/features/invites/types/invite.types";
 import { StatusInvite } from "@/src/features/invites/types/invite.types";
-import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 
 import { inviteKeys } from "./invite.keys";
 
@@ -26,8 +26,7 @@ function updateInviteList(
 }
 
 export function useInvitesByUserQuery() {
-  const { data: user = null } = useCurrentUserQuery();
-  const isAuthenticated = Boolean(user);
+  const { isAuthenticated } = useAuth();
 
   return useQuery({
     queryKey: inviteKeys.byUser(),
@@ -37,8 +36,7 @@ export function useInvitesByUserQuery() {
 }
 
 export function useInvitesByRepublicQuery(republicId: string) {
-  const { data: user = null } = useCurrentUserQuery();
-  const isAuthenticated = Boolean(user);
+  const { isAuthenticated } = useAuth();
 
   return useQuery({
     queryKey: inviteKeys.byRepublic(republicId),
