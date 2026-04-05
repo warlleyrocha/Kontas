@@ -2,6 +2,7 @@ import { useQueries } from "@tanstack/react-query";
 import { renderHook } from "@testing-library/react-native";
 
 import { useAuth } from "@/src/features/auth/hooks/useAuth";
+import { residentService } from "@/src/features/residents/services/resident.service";
 import { ResidentRole } from "@/src/shared/types/resident.types";
 
 import { useRepublicResidents } from "./useRepublicResidents";
@@ -50,6 +51,8 @@ const residentUser = {
 };
 
 // ─── Setup ────────────────────────────────────────────────────────────────────
+
+const mockGetResidents = jest.mocked(residentService.getResidents);
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -185,6 +188,78 @@ describe("useRepublicResidents — enabled", () => {
     );
 
     expect(capturedOptions.queries[0].enabled).toBe(false);
+  });
+});
+
+describe("useRepublicResidents — query config", () => {
+  it("passa staleTime=60000 para as queries", () => {
+    let capturedOptions: any;
+    jest.mocked(useQueries).mockImplementation((opts: any) => {
+      capturedOptions = opts;
+      return { data: [], isLoading: false };
+    });
+
+    renderHook(() =>
+      useRepublicResidents(republics.slice(0, 1), "user@example.com"),
+    );
+
+    expect(capturedOptions.queries[0].staleTime).toBe(60_000);
+  });
+
+  it("queryFn chama residentService.getResidents com republicId e signal", async () => {
+    let capturedOptions: any;
+    jest.mocked(useQueries).mockImplementation((opts: any) => {
+      capturedOptions = opts;
+      return { data: [], isLoading: false };
+    });
+
+    renderHook(() =>
+      useRepublicResidents(republics.slice(0, 1), "user@example.com"),
+    );
+
+    const signal = new AbortController().signal;
+    await capturedOptions.queries[0].queryFn({ signal });
+
+    expect(mockGetResidents).toHaveBeenCalledWith("rep-1", signal);
+  });
+
+  it("combine mapeia data com fallback [] e isLoading corretamente", () => {
+    let capturedOptions: any;
+    jest.mocked(useQueries).mockImplementation((opts: any) => {
+      capturedOptions = opts;
+      return { data: [], isLoading: false };
+    });
+
+    renderHook(() =>
+      useRepublicResidents(republics, "user@example.com"),
+    );
+
+    const combined = capturedOptions.combine([
+      { data: [residentAdmin], isLoading: true },
+      { data: undefined, isLoading: false },
+    ]);
+
+    expect(combined.data).toEqual([[residentAdmin], []]);
+    expect(combined.isLoading).toBe(true);
+  });
+
+  it("combine retorna isLoading=false quando todas as queries carregaram", () => {
+    let capturedOptions: any;
+    jest.mocked(useQueries).mockImplementation((opts: any) => {
+      capturedOptions = opts;
+      return { data: [], isLoading: false };
+    });
+
+    renderHook(() =>
+      useRepublicResidents(republics, "user@example.com"),
+    );
+
+    const combined = capturedOptions.combine([
+      { data: [residentAdmin], isLoading: false },
+      { data: [residentUser], isLoading: false },
+    ]);
+
+    expect(combined.isLoading).toBe(false);
   });
 });
 

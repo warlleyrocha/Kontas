@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { renderHook } from "@testing-library/react-native";
+import { act, renderHook } from "@testing-library/react-native";
 
 import {
   useAccountsByRepublicQuery,
@@ -22,8 +22,10 @@ jest.mock("@/src/features/accounts/hooks/useAccountQueries", () => ({
   useAccountsByResidentQueries: jest.fn(),
 }));
 
+const mockRegisterRefresh = jest.fn<void, [key: string, fn: () => void | Promise<void>]>(() => {});
+
 jest.mock("@/src/shared/contexts/RefreshContext", () => ({
-  useRefresh: () => ({ registerRefresh: jest.fn() }),
+  useRefresh: () => ({ registerRefresh: mockRegisterRefresh }),
 }));
 
 // ─── Fixtures ────────────────────────────────────────────────────────────────
@@ -182,6 +184,20 @@ describe("useResumeTab", () => {
 
       expect(result.current.isLoadingDividas).toBe(true);
     });
+
+    it("usa fallback [] quando dividasQueries.data[i] é undefined", () => {
+      mockResidentQueries({
+        data: [
+          [makeContaMorador({ moradorId: "r-1", valor: 30 })],
+          undefined,
+        ],
+        isLoading: false,
+      } as any);
+
+      const { result } = renderResumeTab();
+
+      expect(result.current.dividas).toEqual({ "r-1": 30, "r-2": 0 });
+    });
   });
 
   describe("valores calculados", () => {
@@ -242,6 +258,41 @@ describe("useResumeTab", () => {
       const { result } = renderResumeTab();
 
       expect(result.current.quantidadePendentes).toBe(2);
+    });
+  });
+
+  describe("refresh", () => {
+    it("registra refresh com chave contendo resume e republicId", () => {
+      renderResumeTab();
+
+      expect(mockRegisterRefresh).toHaveBeenCalledWith(
+        expect.stringContaining("resume-rep-1-"),
+        expect.any(Function),
+      );
+    });
+
+    it("invalida as queries de contas e residentes ao chamar refresh", async () => {
+      const invalidateSpy = jest.spyOn(queryClient, "invalidateQueries");
+
+      renderResumeTab();
+
+      const refreshFn = mockRegisterRefresh.mock.lastCall![1]!;
+
+      await act(async () => {
+        await refreshFn();
+      });
+
+      expect(invalidateSpy).toHaveBeenCalledTimes(2);
+      expect(invalidateSpy).toHaveBeenNthCalledWith(1, {
+        queryKey: expect.arrayContaining(["accounts", "republic", "rep-1"]),
+      });
+      expect(invalidateSpy).toHaveBeenNthCalledWith(2, {
+        queryKey: expect.arrayContaining([
+          "accountResidents",
+          "republic",
+          "rep-1",
+        ]),
+      });
     });
   });
 });
