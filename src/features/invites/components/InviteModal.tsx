@@ -22,7 +22,7 @@ interface InviteModalProps {
   error: string | null;
 }
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@.]+\.[^\s@]+$/;
 
 const validateEmail = (value: string): string => {
   if (!value.trim()) return "Email é obrigatório";

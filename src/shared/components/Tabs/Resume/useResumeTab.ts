@@ -47,7 +47,7 @@ export function useResumeTab({
     useAccountsByRepublicQuery(republicId);
 
   const moradorIds = useMemo(() => residents.map((r) => r.id), [residents]);
-  const dividasQueries = useAccountsByResidentQueries(moradorIds);
+  const dividasQueries = useAccountsByResidentQueries(republicId, moradorIds);
   const { registerRefresh } = useRefresh();
 
   const refresh = useCallback(async () => {
@@ -56,7 +56,7 @@ export function useResumeTab({
         queryKey: accountKeys.byRepublic(republicId),
       }),
       queryClient.invalidateQueries({
-        queryKey: accountResidentKeys.residents(),
+        queryKey: accountResidentKeys.byRepublic(republicId),
       }),
     ]);
   }, [queryClient, republicId]);
@@ -68,19 +68,19 @@ export function useResumeTab({
     );
   }, [refresh, refreshRegistrationId, registerRefresh, republicId]);
 
-  const isLoadingDividas = dividasQueries.some((q) => q.isLoading);
+  const isLoadingDividas = dividasQueries.isLoading;
 
   const dividas = useMemo(() => {
     const map: Record<string, number> = {};
     residents.forEach((resident, i) => {
-      const data = dividasQueries[i]?.data ?? [];
+      const data = dividasQueries.data[i] ?? [];
       const total = data
         .filter((c) => STATUS_PENDENTE.includes(c.status))
         .reduce((sum, c) => sum + c.valor, 0);
       map[resident.id] = total;
     });
     return map;
-  }, [residents, dividasQueries]);
+  }, [residents, dividasQueries.data]);
 
   const contasPagas = contas.filter((c) => c.status === StatusConta.PAGA);
   const contasPendentes = contas.filter((c) => c.status !== StatusConta.PAGA);

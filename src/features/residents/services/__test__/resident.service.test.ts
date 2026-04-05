@@ -66,7 +66,7 @@ describe("residentService.createResident", () => {
     mockApi.post.mockRejectedValue(error);
 
     await expect(
-      residentService.createResident(createPayload),
+      residentService.createResident(createPayload)
     ).rejects.toBeDefined();
 
     expect(mockToUserFriendlyError).toHaveBeenCalledWith(error, {
@@ -85,7 +85,7 @@ describe("residentService.createResident", () => {
     mockToUserFriendlyError.mockReturnValue(friendly);
 
     await expect(residentService.createResident(createPayload)).rejects.toBe(
-      friendly,
+      friendly
     );
   });
 });
@@ -123,7 +123,7 @@ describe("residentService.getResidents", () => {
     mockIsAxiosError.mockReturnValue(true);
 
     await expect(residentService.getResidents("rep-1")).rejects.toBe(
-      cancelError,
+      cancelError
     );
     expect(mockToUserFriendlyError).not.toHaveBeenCalled();
   });

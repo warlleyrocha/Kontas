@@ -91,7 +91,9 @@ describe("EditProfileModal", () => {
     render(<EditProfileModal {...createProps()} />);
 
     fireEvent.changeText(
-      screen.getByPlaceholderText("Sua chave Pix"),
+      screen.getByPlaceholderText(
+        "CPF, CNPJ, telefone, e-mail ou chave aleatória"
+      ),
       "nova-chave"
     );
 

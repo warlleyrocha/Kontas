@@ -195,7 +195,7 @@ describe("useProfileScreen — handleSignOut", () => {
     expect(jest.mocked(logger.error)).toHaveBeenCalledWith(
       "User",
       "Erro ao fazer logout",
-      error,
+      error
     );
     expect(jest.mocked(toastErrors.logoutFailed)).toHaveBeenCalledWith(error);
   });
@@ -212,7 +212,7 @@ describe("useProfileScreen — handleSignOut", () => {
     expect(jest.mocked(logger.error)).toHaveBeenCalledWith(
       "User",
       "Erro ao fazer logout",
-      undefined,
+      undefined
     );
   });
 });
@@ -249,7 +249,7 @@ describe("useProfileScreen — handleSaveProfile", () => {
 
     expect(alertSpy).toHaveBeenCalledWith(
       "Campos Obrigatórios",
-      expect.any(String),
+      expect.any(String)
     );
     expect(mockCompleteProfile).not.toHaveBeenCalled();
   });
@@ -271,7 +271,7 @@ describe("useProfileScreen — handleSaveProfile", () => {
         "Ana",
         "ana@pix",
         undefined,
-        "11999",
+        "11999"
       );
     });
 
@@ -292,7 +292,7 @@ describe("useProfileScreen — handleSaveProfile", () => {
         "Ana",
         "ana@pix",
         undefined,
-        "11999",
+        "11999"
       );
     });
 
@@ -314,14 +314,14 @@ describe("useProfileScreen — handleSaveProfile", () => {
         "Ana",
         "ana@pix",
         undefined,
-        "11999",
+        "11999"
       );
     });
 
     expect(jest.mocked(logger.error)).toHaveBeenCalledWith(
       "User",
       "Erro ao salvar perfil",
-      error,
+      error
     );
   });
 
@@ -334,14 +334,14 @@ describe("useProfileScreen — handleSaveProfile", () => {
         "Ana",
         "ana@pix",
         undefined,
-        "11999",
+        "11999"
       );
     });
 
     expect(jest.mocked(logger.error)).toHaveBeenCalledWith(
       "User",
       "Erro ao salvar perfil",
-      undefined,
+      undefined
     );
   });
 });
@@ -519,7 +519,7 @@ describe("useProfileScreen — handleDeleteFromMenu", () => {
 
     expect(jest.mocked(showToast.confirm)).toHaveBeenCalledWith(
       'Excluir "Alpha"?',
-      expect.any(Function),
+      expect.any(Function)
     );
   });
 
@@ -574,14 +574,22 @@ describe("useProfileScreen — efeitos", () => {
 
   it("onRefresh chama refetchRepublics e controla o estado refreshing", async () => {
     let resolve!: (v: unknown) => void;
-    mockFetchRepublics.mockReturnValue(new Promise((r) => { resolve = r; }));
+    mockFetchRepublics.mockReturnValue(
+      new Promise((r) => {
+        resolve = r;
+      })
+    );
 
     const { result } = renderHook(() => useProfileScreen());
 
-    act(() => { void result.current.onRefresh(); });
+    act(() => {
+      void result.current.onRefresh();
+    });
     expect(result.current.refreshing).toBe(true);
 
-    await act(async () => { resolve({}); });
+    await act(async () => {
+      resolve({});
+    });
     expect(result.current.refreshing).toBe(false);
     expect(mockFetchRepublics).toHaveBeenCalled();
   });

@@ -26,7 +26,10 @@ export function useAccountList({ republicId }: UseAccountListProps) {
   const confirmResidentPaymentMutation = useConfirmResidentPaymentMutation();
   const contas = useMemo(() => accountsQuery.data ?? [], [accountsQuery.data]);
   const accountIds = useMemo(() => contas.map((conta) => conta.id), [contas]);
-  const residentQueries = useAccountResidentsByAccountQueries(accountIds);
+  const residentQueries = useAccountResidentsByAccountQueries(
+    republicId,
+    accountIds
+  );
   const [updatingResidentById, setUpdatingResidentById] = useState<
     Record<string, boolean>
   >({});
@@ -51,7 +54,7 @@ export function useAccountList({ republicId }: UseAccountListProps) {
         queryKey: accountKeys.byRepublic(republicId),
       }),
       queryClient.invalidateQueries({
-        queryKey: accountResidentKeys.all,
+        queryKey: accountResidentKeys.byRepublic(republicId),
       }),
     ]);
   }, [queryClient, republicId]);
@@ -61,7 +64,7 @@ export function useAccountList({ republicId }: UseAccountListProps) {
   useEffect(() => {
     return registerRefresh(
       `accounts-${republicId}-${refreshRegistrationId}`,
-      refresh,
+      refresh
     );
   }, [refresh, refreshRegistrationId, registerRefresh, republicId]);
 
@@ -70,24 +73,32 @@ export function useAccountList({ republicId }: UseAccountListProps) {
       Object.fromEntries(
         accountIds.map((accountId, index) => [
           accountId,
-          residentQueries[index]?.data ?? [],
-        ]),
+          residentQueries.data[index] ?? [],
+        ])
       ),
-    [accountIds, residentQueries],
+    [accountIds, residentQueries.data]
   );
 
   const loadingResidentsById = useMemo(
     () =>
       Object.fromEntries(
         accountIds.map((accountId, index) => {
-          const query = residentQueries[index];
+          const queryData = residentQueries.data[index];
           return [
             accountId,
-            Boolean(query?.isLoading || (query?.isFetching && !query?.data)),
+            Boolean(
+              residentQueries.isLoading ||
+                (!queryData && !residentQueries.errors[index])
+            ),
           ];
-        }),
+        })
       ),
-    [accountIds, residentQueries],
+    [
+      accountIds,
+      residentQueries.data,
+      residentQueries.isLoading,
+      residentQueries.errors,
+    ]
   );
 
   const errorResidentsById = useMemo(
@@ -96,11 +107,11 @@ export function useAccountList({ republicId }: UseAccountListProps) {
         accountIds
           .map((accountId, index) => [
             accountId,
-            Boolean(residentQueries[index]?.error),
+            Boolean(residentQueries.errors[index]),
           ])
-          .filter(([, hasError]) => hasError),
+          .filter(([, hasError]) => hasError)
       ),
-    [accountIds, residentQueries],
+    [accountIds, residentQueries.errors]
   );
 
   const confirmResidentPayment = useCallback(
@@ -124,8 +135,8 @@ export function useAccountList({ republicId }: UseAccountListProps) {
         showToast.error(
           getErrorMessage(
             error,
-            "Não foi possível confirmar pagamento do morador.",
-          ),
+            "Não foi possível confirmar pagamento do morador."
+          )
         );
       } finally {
         setUpdatingResidentById((current) => {
@@ -135,7 +146,7 @@ export function useAccountList({ republicId }: UseAccountListProps) {
         });
       }
     },
-    [confirmResidentPaymentMutation, updatingResidentById],
+    [confirmResidentPaymentMutation, updatingResidentById]
   );
 
   return {

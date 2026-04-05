@@ -61,7 +61,7 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
   }
 
   function getPixKeyboardType(
-    value: string,
+    value: string
   ): "default" | "email-address" | "phone-pad" | "number-pad" {
     if (value.includes("@") || /[a-zA-Z]/.test(value)) return "default";
     if (value.startsWith("+")) return "phone-pad";

@@ -36,6 +36,7 @@ interface AccountCardProps {
     metodoPagamento: MetodoPagamento
   ) => Promise<void> | void;
   onCopyPix?: (conta: Conta) => boolean | Promise<boolean>;
+  readonly hasError?: boolean;
 }
 
 export const AccountCard = ({
@@ -51,6 +52,7 @@ export const AccountCard = ({
   onConfirmResidentPayment,
   onPatch,
   onCopyPix,
+  hasError,
 }: AccountCardProps) => {
   const cardRef = useRef<View>(null);
   const [isPatching, setIsPatching] = useState(false);
@@ -108,7 +110,7 @@ export const AccountCard = ({
           {/* HEADER: Status + Descrição + Valor */}
           <View className="flex-row items-center justify-between border-b border-gray-100 px-4 py-3">
             <TouchableOpacity
-              className="flex-1 flex-row items-center gap-2"
+              className="flex-row items-center gap-2"
               disabled={paga || isPatching}
               onPress={async (e) => {
                 e.stopPropagation();
@@ -121,7 +123,7 @@ export const AccountCard = ({
                 isLoading={isPatching}
               />
               <Text
-                className={`flex-1 text-base font-semibold ${
+                className={`text-base font-semibold ${
                   paga ? "text-gray-400 line-through" : "text-gray-800"
                 }`}
               >
@@ -187,6 +189,7 @@ export const AccountCard = ({
                   updatingResidentById={updatingResidentById}
                   currentResidentId={currentResidentId}
                   onConfirmResidentPayment={onConfirmResidentPayment}
+                  hasError={hasError}
                 />
               </View>
             )}

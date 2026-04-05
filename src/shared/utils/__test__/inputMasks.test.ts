@@ -1,8 +1,9 @@
 import {
-  maskPhone,
-  maskPhoneWrite,
   formatCurrencyBRL,
   maskCurrencyBRL,
+  maskPhone,
+  maskPhoneWrite,
+  maskPixKeyWrite,
   unmaskCurrencyBRL,
 } from "../inputMasks";
 
@@ -110,6 +111,81 @@ describe("inputMasks", () => {
 
     it("retorna 0 para string sem dígitos", () => {
       expect(unmaskCurrencyBRL("")).toBe(0);
+    });
+  });
+
+  // ─── Pix ──────────────────────────────────────────────────────────────────────
+
+  describe("maskPixKeyWrite", () => {
+    it("retorna o valor sem máscara quando contém @ (e-mail)", () => {
+      expect(maskPixKeyWrite("email@example.com")).toBe("email@example.com");
+    });
+
+    it("retorna o valor sem máscara quando contém letras (chave aleatória)", () => {
+      expect(maskPixKeyWrite("a1b2c3d4-e5f6")).toBe("a1b2c3d4-e5f6");
+    });
+
+    it("aplica máscara de telefone quando inicia com + e DDI 55", () => {
+      expect(maskPixKeyWrite("+5511987654321")).toBe("+55 (11) 98765-4321");
+    });
+
+    it("aplica máscara de telefone quando inicia com + sem DDI 55", () => {
+      expect(maskPixKeyWrite("+11987654321")).toBe("+55 (11) 98765-4321");
+    });
+
+    it("aplica máscara de CPF quando só dígitos e ≤ 11", () => {
+      expect(maskPixKeyWrite("12345678901")).toBe("123.456.789-01");
+    });
+
+    it("aplica máscara de CNPJ quando só dígitos e > 11", () => {
+      expect(maskPixKeyWrite("12345678000195")).toBe("12.345.678/0001-95");
+    });
+
+    it("remove caracteres não numéricos antes de formatar CPF", () => {
+      expect(maskPixKeyWrite("123.456.789-01")).toBe("123.456.789-01");
+    });
+
+    it("remove caracteres não numéricos antes de formatar CNPJ", () => {
+      expect(maskPixKeyWrite("12.345.678/0001-95")).toBe("12.345.678/0001-95");
+    });
+  });
+
+  describe("maskCPF — tamanhos parciais via maskPixKeyWrite", () => {
+    it("retorna dígitos crus quando ≤ 3", () => {
+      expect(maskPixKeyWrite("1")).toBe("1");
+      expect(maskPixKeyWrite("12")).toBe("12");
+      expect(maskPixKeyWrite("123")).toBe("123");
+    });
+
+    it("aplica primeiro ponto quando 4-6 dígitos", () => {
+      expect(maskPixKeyWrite("1234")).toBe("123.4");
+      expect(maskPixKeyWrite("12345")).toBe("123.45");
+      expect(maskPixKeyWrite("123456")).toBe("123.456");
+    });
+
+    it("aplica segundo ponto quando 7-9 dígitos", () => {
+      expect(maskPixKeyWrite("1234567")).toBe("123.456.7");
+      expect(maskPixKeyWrite("12345678")).toBe("123.456.78");
+      expect(maskPixKeyWrite("123456789")).toBe("123.456.789");
+    });
+
+    it("aplica hífen quando 10-11 dígitos", () => {
+      expect(maskPixKeyWrite("1234567890")).toBe("123.456.789-0");
+      expect(maskPixKeyWrite("12345678901")).toBe("123.456.789-01");
+    });
+  });
+
+  describe("maskCNPJ — tamanhos parciais via maskPixKeyWrite", () => {
+    it("formata CNPJ com 12 dígitos (barra sem hífen)", () => {
+      expect(maskPixKeyWrite("123456780001")).toBe("12.345.678/0001");
+    });
+
+    it("formata CNPJ com 13 dígitos (barra com 1 dígito do hífen)", () => {
+      expect(maskPixKeyWrite("1234567800019")).toBe("12.345.678/0001-9");
+    });
+
+    it("formata CNPJ completo com 14 dígitos", () => {
+      expect(maskPixKeyWrite("12345678000195")).toBe("12.345.678/0001-95");
     });
   });
 });

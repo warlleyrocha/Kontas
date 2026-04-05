@@ -10,8 +10,11 @@ type UseResidentsReturn = {
 };
 
 export function useResidents(republicId: string): UseResidentsReturn {
-  const { data: residents = [], isFetching, refetch } =
-    useResidentsByRepublicQuery(republicId);
+  const {
+    data: residents = [],
+    isFetching,
+    refetch,
+  } = useResidentsByRepublicQuery(republicId);
 
   const fetchResidents = useCallback(async () => {
     const result = await refetch();

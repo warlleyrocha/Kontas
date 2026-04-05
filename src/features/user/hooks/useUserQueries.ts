@@ -1,14 +1,16 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { deleteItemAsync, getItemAsync, setItemAsync } from "expo-secure-store";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { deleteItemAsync } from "expo-secure-store";
 
 import {
-  AUTH_TOKEN_STORAGE_KEY,
   clearAuthorizationHeader,
   hasAuthorizationHeader,
   hydrateAuthorizationHeader,
 } from "@/src/services/authHeader";
 import { getErrorMessage, isUnauthorizedError } from "@/src/services/httpError";
+import {
+  AUTH_TOKEN_STORAGE_KEY,
+  APP_USER_STORAGE_KEY,
+} from "@/src/services/storageKeys";
 import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
 
@@ -20,7 +22,17 @@ import type {
 } from "../types/user.types";
 import { userKeys } from "./user.keys";
 
-const APP_USER_STORAGE_KEY = "@app:user";
+function persistUserSecureStore(user: User): void {
+  // Fire-and-forget: o SecureStore é fallback de persistência entre sessões.
+  // O React Query é a fonte de verdade em runtime.
+  setItemAsync(APP_USER_STORAGE_KEY, JSON.stringify(user)).catch((err) =>
+    logger.error(
+      "User",
+      "Falha ao persistir user no SecureStore",
+      err instanceof Error ? err : undefined
+    )
+  );
+}
 
 export function useCurrentUserQuery() {
   const queryClient = useQueryClient();
@@ -37,7 +49,7 @@ export function useCurrentUserQuery() {
 
       try {
         const user = await userService.fetchUser();
-        await AsyncStorage.setItem(APP_USER_STORAGE_KEY, JSON.stringify(user));
+        persistUserSecureStore(user);
         logger.info("User", "Usuário autenticado e sincronizado");
         return user;
       } catch (error) {
@@ -47,18 +59,23 @@ export function useCurrentUserQuery() {
           await queryClient.cancelQueries();
           await Promise.all([
             deleteItemAsync(AUTH_TOKEN_STORAGE_KEY),
-            AsyncStorage.removeItem(APP_USER_STORAGE_KEY),
+            deleteItemAsync(APP_USER_STORAGE_KEY),
           ]);
           return null;
         }
 
-        const cachedUser = await AsyncStorage.getItem(APP_USER_STORAGE_KEY);
-        if (cachedUser) {
-          const message = getErrorMessage(error, "Erro ao validar sessão");
-          logger.warn("User", "Falha transitória ao validar sessão", {
-            message,
-          });
-          return JSON.parse(cachedUser) as User;
+        try {
+          const cachedUser = await getItemAsync(APP_USER_STORAGE_KEY);
+          if (cachedUser) {
+            const message = getErrorMessage(error, "Erro ao validar sessão");
+            logger.warn("User", "Falha transitória ao validar sessão", {
+              message,
+            });
+            return JSON.parse(cachedUser) as User;
+          }
+        } catch {
+          // Cache corrompido — limpa para evitar reutilização
+          await deleteItemAsync(APP_USER_STORAGE_KEY);
         }
 
         throw error;
@@ -95,7 +112,7 @@ export function useUpdateCurrentUserMutation() {
     mutationFn: (data: UpdateUserRequest) => userService.updateUser(data),
     onSuccess: async (user) => {
       queryClient.setQueryData(userKeys.current(), user);
-      await AsyncStorage.setItem(APP_USER_STORAGE_KEY, JSON.stringify(user));
+      persistUserSecureStore(user);
       showToast.success("Perfil atualizado com sucesso!");
       logger.info("User", "Usuário atualizado com sucesso");
     },

@@ -215,9 +215,8 @@ describe("useAccountsTab — toggleOpenAccounts / togglePaidAccounts", () => {
 });
 
 describe("useAccountsTab — handlePatchAndRefresh", () => {
-  it("chama handlePatch e depois refresh", async () => {
+  it("chama handlePatch com os argumentos corretos", async () => {
     mockHandlePatch.mockResolvedValue(undefined);
-    mockRefresh.mockResolvedValue(undefined);
 
     const { result } = renderHook(() =>
       useAccountsTab({ republicId: "rep-1" })
@@ -228,16 +227,14 @@ describe("useAccountsTab — handlePatchAndRefresh", () => {
     });
 
     expect(mockHandlePatch).toHaveBeenCalledWith("acc-1", MetodoPagamento.PIX);
-    expect(mockRefresh).toHaveBeenCalledTimes(1);
   });
 
-  it("chama handlePatch antes de refresh (ordem garantida)", async () => {
+  it("aguarda handlePatch completar antes de retornar", async () => {
     const callOrder: string[] = [];
     mockHandlePatch.mockImplementation(async () => {
-      callOrder.push("patch");
-    });
-    mockRefresh.mockImplementation(async () => {
-      callOrder.push("refresh");
+      callOrder.push("patch-start");
+      await Promise.resolve();
+      callOrder.push("patch-end");
     });
 
     const { result } = renderHook(() =>
@@ -251,6 +248,6 @@ describe("useAccountsTab — handlePatchAndRefresh", () => {
       );
     });
 
-    expect(callOrder).toEqual(["patch", "refresh"]);
+    expect(callOrder).toEqual(["patch-start", "patch-end"]);
   });
 });

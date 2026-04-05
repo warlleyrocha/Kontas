@@ -1,7 +1,8 @@
-import { renderHook } from "@testing-library/react-native";
 import { useQueries } from "@tanstack/react-query";
+import { renderHook } from "@testing-library/react-native";
 
-import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
+import { residentService } from "@/src/features/residents/services/resident.service";
 import { ResidentRole } from "@/src/shared/types/resident.types";
 
 import { useRepublicResidents } from "./useRepublicResidents";
@@ -10,8 +11,8 @@ jest.mock("@tanstack/react-query", () => ({
   useQueries: jest.fn(),
 }));
 
-jest.mock("@/src/features/user/hooks/useUserQueries", () => ({
-  useCurrentUserQuery: jest.fn(),
+jest.mock("@/src/features/auth/hooks/useAuth", () => ({
+  useAuth: jest.fn(),
 }));
 
 jest.mock("@/src/features/residents/services/resident.service", () => ({
@@ -51,12 +52,18 @@ const residentUser = {
 
 // ─── Setup ────────────────────────────────────────────────────────────────────
 
+const mockGetResidents = jest.mocked(residentService.getResidents);
+
 beforeEach(() => {
   jest.clearAllMocks();
-  jest.mocked(useCurrentUserQuery).mockReturnValue({
-    data: { id: "u-1" },
+  jest.mocked(useAuth).mockReturnValue({
+    user: { id: "u-1" },
+    isAuthenticated: true,
   } as any);
-  jest.mocked(useQueries).mockReturnValue([]);
+  jest.mocked(useQueries).mockReturnValue({
+    data: [],
+    isLoading: false,
+  });
 });
 
 // ─── useRepublicResidents ─────────────────────────────────────────────────────
@@ -64,7 +71,7 @@ beforeEach(() => {
 describe("useRepublicResidents — estado inicial", () => {
   it("retorna mapas vazios quando useQueries retorna array vazio", () => {
     const { result } = renderHook(() =>
-      useRepublicResidents([], "user@example.com")
+      useRepublicResidents([], "user@example.com"),
     );
 
     expect(result.current.residentsCount).toEqual({});
@@ -76,13 +83,13 @@ describe("useRepublicResidents — estado inicial", () => {
 
 describe("useRepublicResidents — contagem e roles", () => {
   it("deriva residentsCount a partir dos dados das queries", () => {
-    jest.mocked(useQueries).mockReturnValue([
-      { data: [residentAdmin, residentUser] },
-      { data: [residentUser] },
-    ] as any);
+    jest.mocked(useQueries).mockReturnValue({
+      data: [[residentAdmin, residentUser], [residentUser]],
+      isLoading: false,
+    } as any);
 
     const { result } = renderHook(() =>
-      useRepublicResidents(republics, "admin@example.com")
+      useRepublicResidents(republics, "admin@example.com"),
     );
 
     expect(result.current.residentsCount).toEqual({
@@ -92,25 +99,26 @@ describe("useRepublicResidents — contagem e roles", () => {
   });
 
   it("retorna 0 para república cujos dados ainda não carregaram", () => {
-    jest.mocked(useQueries).mockReturnValue([
-      { data: undefined },
-    ] as any);
+    jest.mocked(useQueries).mockReturnValue({
+      data: [[]],
+      isLoading: false,
+    } as any);
 
     const { result } = renderHook(() =>
-      useRepublicResidents(republics.slice(0, 1), "user@example.com")
+      useRepublicResidents(republics.slice(0, 1), "user@example.com"),
     );
 
     expect(result.current.getResidentsCount("rep-1")).toBe(0);
   });
 
   it("identifica o papel do usuário atual em cada república", () => {
-    jest.mocked(useQueries).mockReturnValue([
-      { data: [residentAdmin, residentUser] },
-      { data: [residentUser] },
-    ] as any);
+    jest.mocked(useQueries).mockReturnValue({
+      data: [[residentAdmin, residentUser], [residentUser]],
+      isLoading: false,
+    } as any);
 
     const { result } = renderHook(() =>
-      useRepublicResidents(republics, "admin@example.com")
+      useRepublicResidents(republics, "admin@example.com"),
     );
 
     expect(result.current.getUserRole("rep-1")).toBe(ResidentRole.ADMIN);
@@ -120,24 +128,26 @@ describe("useRepublicResidents — contagem e roles", () => {
   });
 
   it("faz match de email case-insensitive", () => {
-    jest.mocked(useQueries).mockReturnValue([
-      { data: [{ ...residentAdmin, email: "ADMIN@EXAMPLE.COM" }] },
-    ] as any);
+    jest.mocked(useQueries).mockReturnValue({
+      data: [[{ ...residentAdmin, email: "ADMIN@EXAMPLE.COM" }]],
+      isLoading: false,
+    } as any);
 
     const { result } = renderHook(() =>
-      useRepublicResidents(republics.slice(0, 1), "admin@example.com")
+      useRepublicResidents(republics.slice(0, 1), "admin@example.com"),
     );
 
     expect(result.current.getUserRole("rep-1")).toBe(ResidentRole.ADMIN);
   });
 
   it("não preenche roles quando currentUserEmail não for informado", () => {
-    jest.mocked(useQueries).mockReturnValue([
-      { data: [residentAdmin] },
-    ] as any);
+    jest.mocked(useQueries).mockReturnValue({
+      data: [[residentAdmin]],
+      isLoading: false,
+    } as any);
 
     const { result } = renderHook(() =>
-      useRepublicResidents(republics.slice(0, 1))
+      useRepublicResidents(republics.slice(0, 1)),
     );
 
     expect(result.current.getResidentsCount("rep-1")).toBe(1);
@@ -151,43 +161,117 @@ describe("useRepublicResidents — enabled", () => {
     let capturedOptions: any;
     jest.mocked(useQueries).mockImplementation((opts: any) => {
       capturedOptions = opts;
-      return [];
+      return { data: [], isLoading: false };
     });
 
     renderHook(() =>
-      useRepublicResidents(republics.slice(0, 1), "user@example.com", false)
+      useRepublicResidents(republics.slice(0, 1), "user@example.com", false),
     );
 
     expect(capturedOptions.queries[0].enabled).toBe(false);
   });
 
   it("passa enabled=false quando não estiver autenticado", () => {
-    jest.mocked(useCurrentUserQuery).mockReturnValue({
-      data: null,
+    jest.mocked(useAuth).mockReturnValue({
+      user: null,
+      isAuthenticated: false,
     } as any);
 
     let capturedOptions: any;
     jest.mocked(useQueries).mockImplementation((opts: any) => {
       capturedOptions = opts;
-      return [];
+      return { data: [], isLoading: false };
     });
 
     renderHook(() =>
-      useRepublicResidents(republics.slice(0, 1), "user@example.com")
+      useRepublicResidents(republics.slice(0, 1), "user@example.com"),
     );
 
     expect(capturedOptions.queries[0].enabled).toBe(false);
   });
 });
 
+describe("useRepublicResidents — query config", () => {
+  it("passa staleTime=60000 para as queries", () => {
+    let capturedOptions: any;
+    jest.mocked(useQueries).mockImplementation((opts: any) => {
+      capturedOptions = opts;
+      return { data: [], isLoading: false };
+    });
+
+    renderHook(() =>
+      useRepublicResidents(republics.slice(0, 1), "user@example.com"),
+    );
+
+    expect(capturedOptions.queries[0].staleTime).toBe(60_000);
+  });
+
+  it("queryFn chama residentService.getResidents com republicId e signal", async () => {
+    let capturedOptions: any;
+    jest.mocked(useQueries).mockImplementation((opts: any) => {
+      capturedOptions = opts;
+      return { data: [], isLoading: false };
+    });
+
+    renderHook(() =>
+      useRepublicResidents(republics.slice(0, 1), "user@example.com"),
+    );
+
+    const signal = new AbortController().signal;
+    await capturedOptions.queries[0].queryFn({ signal });
+
+    expect(mockGetResidents).toHaveBeenCalledWith("rep-1", signal);
+  });
+
+  it("combine mapeia data com fallback [] e isLoading corretamente", () => {
+    let capturedOptions: any;
+    jest.mocked(useQueries).mockImplementation((opts: any) => {
+      capturedOptions = opts;
+      return { data: [], isLoading: false };
+    });
+
+    renderHook(() =>
+      useRepublicResidents(republics, "user@example.com"),
+    );
+
+    const combined = capturedOptions.combine([
+      { data: [residentAdmin], isLoading: true },
+      { data: undefined, isLoading: false },
+    ]);
+
+    expect(combined.data).toEqual([[residentAdmin], []]);
+    expect(combined.isLoading).toBe(true);
+  });
+
+  it("combine retorna isLoading=false quando todas as queries carregaram", () => {
+    let capturedOptions: any;
+    jest.mocked(useQueries).mockImplementation((opts: any) => {
+      capturedOptions = opts;
+      return { data: [], isLoading: false };
+    });
+
+    renderHook(() =>
+      useRepublicResidents(republics, "user@example.com"),
+    );
+
+    const combined = capturedOptions.combine([
+      { data: [residentAdmin], isLoading: false },
+      { data: [residentUser], isLoading: false },
+    ]);
+
+    expect(combined.isLoading).toBe(false);
+  });
+});
+
 describe("useRepublicResidents — fallback de erro", () => {
   it("usa count=0 e role=null quando a query de uma república falha (data undefined)", () => {
-    jest.mocked(useQueries).mockReturnValue([
-      { data: undefined },
-    ] as any);
+    jest.mocked(useQueries).mockReturnValue({
+      data: [[]],
+      isLoading: false,
+    } as any);
 
     const { result } = renderHook(() =>
-      useRepublicResidents(republics.slice(0, 1), "user@example.com")
+      useRepublicResidents(republics.slice(0, 1), "user@example.com"),
     );
 
     expect(result.current.getResidentsCount("rep-1")).toBe(0);

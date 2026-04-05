@@ -2,22 +2,55 @@ import {
   useMutation,
   useQueries,
   useQuery,
+  keepPreviousData,
   useQueryClient,
 } from "@tanstack/react-query";
 
-import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
-
-import { accountResidentsService } from "../services/account-residents.service";
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { accountService } from "../services/account.service";
+import { accountResidentsService } from "../services/account-residents.service";
 import type {
   Conta,
   CriarContaComMoradoresRequest,
   MarcarContaPaga,
 } from "../types/account.types";
+import type { ContaMorador } from "../types/accountResidents.types";
 import { accountKeys } from "./account.keys";
 import { accountResidentKeys } from "./accountResident.keys";
 
 const ACCOUNT_QUERY_STALE_TIME_MS = 60_000;
+
+interface AccountResidentsQueryResult {
+  data: ContaMorador[][];
+  isLoading: boolean;
+  isFetching: boolean;
+  errors: (Error | null)[];
+}
+
+interface AccountsByResidentQueryResult {
+  data: ContaMorador[][];
+  isLoading: boolean;
+  isFetching: boolean;
+  errors: (Error | null)[];
+}
+
+function findAccountInCache(
+  queryClient: ReturnType<typeof useQueryClient>,
+  accountId: string
+): string | undefined {
+  const queries = queryClient.getQueriesData<Conta[]>({
+    queryKey: accountKeys.all,
+  });
+
+  for (const [, data] of queries) {
+    const account = (data ?? []).find((a) => a.id === accountId);
+    if (account) {
+      return account.republicaId;
+    }
+  }
+
+  return undefined;
+}
 
 async function invalidateAccountFeatureQueries(
   queryClient: ReturnType<typeof useQueryClient>,
@@ -25,51 +58,73 @@ async function invalidateAccountFeatureQueries(
 ) {
   await Promise.all([
     republicId
-      ? queryClient.invalidateQueries({ queryKey: accountKeys.byRepublic(republicId) })
+      ? queryClient.invalidateQueries({
+          queryKey: accountKeys.byRepublic(republicId),
+        })
       : queryClient.invalidateQueries({ queryKey: accountKeys.all }),
-    queryClient.invalidateQueries({ queryKey: accountResidentKeys.all }),
+    republicId
+      ? queryClient.invalidateQueries({
+          queryKey: accountResidentKeys.byRepublic(republicId),
+        })
+      : queryClient.invalidateQueries({ queryKey: accountResidentKeys.all }),
   ]);
 }
 
-function useIsAuthenticated() {
-  const { data: user = null } = useCurrentUserQuery();
-  return Boolean(user);
-}
-
 export function useAccountsByRepublicQuery(republicId: string) {
-  const isAuthenticated = useIsAuthenticated();
+  const { isAuthenticated } = useAuth();
 
   return useQuery({
     queryKey: accountKeys.byRepublic(republicId),
     queryFn: () => accountService.listarContasPorRepublica(republicId),
     enabled: isAuthenticated && Boolean(republicId),
     staleTime: ACCOUNT_QUERY_STALE_TIME_MS,
+    placeholderData: keepPreviousData,
   });
 }
 
-export function useAccountResidentsByAccountQueries(accountIds: string[]) {
-  const isAuthenticated = useIsAuthenticated();
+export function useAccountResidentsByAccountQueries(
+  republicId: string,
+  accountIds: string[]
+) {
+  const { isAuthenticated } = useAuth();
 
   return useQueries({
     queries: accountIds.map((accountId) => ({
-      queryKey: accountResidentKeys.byAccount(accountId),
+      queryKey: accountResidentKeys.byAccount(republicId, accountId),
       queryFn: () => accountResidentsService.listarContasMoradores(accountId),
       enabled: isAuthenticated && Boolean(accountId),
       staleTime: ACCOUNT_QUERY_STALE_TIME_MS,
+      placeholderData: keepPreviousData,
     })),
+    combine: (results): AccountResidentsQueryResult => ({
+      data: results.map((r) => r.data ?? []),
+      isLoading: results.some((r) => r.isLoading),
+      isFetching: results.some((r) => r.isFetching),
+      errors: results.map((r) => r.error),
+    }),
   });
 }
 
-export function useAccountsByResidentQueries(moradorIds: string[]) {
-  const isAuthenticated = useIsAuthenticated();
+export function useAccountsByResidentQueries(
+  republicId: string,
+  moradorIds: string[]
+) {
+  const { isAuthenticated } = useAuth();
 
   return useQueries({
     queries: moradorIds.map((moradorId) => ({
-      queryKey: accountResidentKeys.byResident(moradorId),
+      queryKey: accountResidentKeys.byResident(republicId, moradorId),
       queryFn: () => accountResidentsService.listarContasPorMorador(moradorId),
       enabled: isAuthenticated && Boolean(moradorId),
       staleTime: ACCOUNT_QUERY_STALE_TIME_MS,
+      placeholderData: keepPreviousData,
     })),
+    combine: (results): AccountsByResidentQueryResult => ({
+      data: results.map((r) => r.data ?? []),
+      isLoading: results.some((r) => r.isLoading),
+      isFetching: results.some((r) => r.isFetching),
+      errors: results.map((r) => r.error),
+    }),
   });
 }
 
@@ -77,7 +132,9 @@ export function useCreateAccountMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data: CriarContaComMoradoresRequest): Promise<Conta> => {
+    mutationFn: async (
+      data: CriarContaComMoradoresRequest
+    ): Promise<Conta & { moradorIds: string[] }> => {
       const { moradorIds, ...contaPayload } = data;
       const conta = await accountService.criarConta(contaPayload);
 
@@ -89,10 +146,10 @@ export function useCreateAccountMutation() {
         });
       }
 
-      return conta;
+      return { ...conta, moradorIds };
     },
-    onSuccess: async (conta) => {
-      await invalidateAccountFeatureQueries(queryClient, conta.republicaId);
+    onSuccess: async ({ republicaId }) => {
+      await invalidateAccountFeatureQueries(queryClient, republicaId);
     },
   });
 }
@@ -102,13 +159,7 @@ export function useDeleteAccountMutation() {
 
   return useMutation({
     mutationFn: async (accountId: string) => {
-      const cachedAccounts =
-        queryClient.getQueriesData<Conta[]>({ queryKey: accountKeys.all });
-
-      const republicId =
-        cachedAccounts.find(([, accounts]) =>
-          (accounts ?? []).some((account) => account.id === accountId)
-        )?.[1]?.find((account) => account.id === accountId)?.republicaId;
+      const republicId = findAccountInCache(queryClient, accountId);
 
       await accountService.removerConta({ id: accountId });
 
@@ -125,13 +176,7 @@ export function useRestoreAccountMutation() {
 
   return useMutation({
     mutationFn: async (accountId: string) => {
-      const cachedAccounts =
-        queryClient.getQueriesData<Conta[]>({ queryKey: accountKeys.all });
-
-      const republicId =
-        cachedAccounts.find(([, accounts]) =>
-          (accounts ?? []).some((account) => account.id === accountId)
-        )?.[1]?.find((account) => account.id === accountId)?.republicaId;
+      const republicId = findAccountInCache(queryClient, accountId);
 
       await accountService.restaurarConta(accountId);
 
@@ -154,13 +199,7 @@ export function usePayAccountMutation() {
       accountId: string;
       metodoPagamento: MarcarContaPaga["metodoPagamento"];
     }) => {
-      const cachedAccounts =
-        queryClient.getQueriesData<Conta[]>({ queryKey: accountKeys.all });
-
-      const republicId =
-        cachedAccounts.find(([, accounts]) =>
-          (accounts ?? []).some((account) => account.id === accountId)
-        )?.[1]?.find((account) => account.id === accountId)?.republicaId;
+      const republicId = findAccountInCache(queryClient, accountId);
 
       await accountService.pagarConta({
         id: accountId,
@@ -178,19 +217,19 @@ export function usePayAccountMutation() {
 export function useConfirmResidentPaymentMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async ({
-      accountResidentId,
-    }: {
-      accountId: string;
-      accountResidentId: string;
-    }) => {
+  return useMutation<
+    void,
+    unknown,
+    { accountId: string; accountResidentId: string }
+  >({
+    mutationFn: async ({ accountResidentId }) => {
       await accountResidentsService.confirmarPagamentoMorador({
         id: accountResidentId,
       });
     },
-    onSuccess: async () => {
-      await invalidateAccountFeatureQueries(queryClient);
+    onSuccess: async (_data, { accountId }) => {
+      const republicId = findAccountInCache(queryClient, accountId);
+      await invalidateAccountFeatureQueries(queryClient, republicId);
     },
   });
 }
@@ -198,19 +237,19 @@ export function useConfirmResidentPaymentMutation() {
 export function useConfirmResidentPaymentAdminMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async ({
-      accountResidentId,
-    }: {
-      accountId: string;
-      accountResidentId: string;
-    }) => {
+  return useMutation<
+    ContaMorador,
+    unknown,
+    { accountId: string; accountResidentId: string }
+  >({
+    mutationFn: async ({ accountResidentId }) => {
       return accountResidentsService.confirmarPagamentoAdmin({
         id: accountResidentId,
       });
     },
-    onSuccess: async () => {
-      await invalidateAccountFeatureQueries(queryClient);
+    onSuccess: async (_data, { accountId }) => {
+      const republicId = findAccountInCache(queryClient, accountId);
+      await invalidateAccountFeatureQueries(queryClient, republicId);
     },
   });
 }
@@ -218,19 +257,19 @@ export function useConfirmResidentPaymentAdminMutation() {
 export function useRefuseResidentPaymentAdminMutation() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async ({
-      accountResidentId,
-    }: {
-      accountId: string;
-      accountResidentId: string;
-    }) => {
+  return useMutation<
+    ContaMorador,
+    unknown,
+    { accountId: string; accountResidentId: string }
+  >({
+    mutationFn: async ({ accountResidentId }) => {
       return accountResidentsService.recusarPagamentoAdmin({
         id: accountResidentId,
       });
     },
-    onSuccess: async () => {
-      await invalidateAccountFeatureQueries(queryClient);
+    onSuccess: async (_data, { accountId }) => {
+      const republicId = findAccountInCache(queryClient, accountId);
+      await invalidateAccountFeatureQueries(queryClient, republicId);
     },
   });
 }

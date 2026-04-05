@@ -160,7 +160,9 @@ describe("userService.completeProfile", () => {
     mockApi.post.mockRejectedValue(error);
     mockToUserFriendlyError.mockReturnValue(friendly);
 
-    await expect(userService.completeProfile(payload)).rejects.toThrow(friendly);
+    await expect(userService.completeProfile(payload)).rejects.toThrow(
+      friendly
+    );
 
     expect(mockToUserFriendlyError).toHaveBeenCalledWith(error, {
       defaultMessage: "Erro ao completar perfil.",
