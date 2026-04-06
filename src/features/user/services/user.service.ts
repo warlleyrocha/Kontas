@@ -1,3 +1,4 @@
+import { logger } from "@/src/shared/utils/logger";
 import { toUserFriendlyError } from "@/src/services/httpError";
 import { api } from "../../../services/api";
 import {
@@ -33,7 +34,11 @@ export const userService = {
 
       return response.data;
     } catch (error) {
-      console.error("❌ Erro ao atualizar perfil:", error);
+      logger.error(
+        "User",
+        "Erro ao atualizar perfil",
+        error instanceof Error ? error : undefined
+      );
       throw toUserFriendlyError(error, {
         defaultMessage: "Erro ao atualizar perfil.",
         statusMessages: {

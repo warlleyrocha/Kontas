@@ -6,6 +6,7 @@ import {
 import { useEffect, useState } from "react";
 import { Alert } from "react-native";
 import { getErrorMessage } from "@/src/services/httpError";
+import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
 
 interface UseEditRepublicModalParams {
@@ -80,7 +81,7 @@ export default function useEditRepublicModal({
         setImagemUri(result.assets[0].uri);
       }
     } catch (error) {
-      console.error("Erro ao selecionar imagem:", error);
+      logger.error("Republic", "Erro ao selecionar imagem", error);
       showToast.error(
         getErrorMessage(error, "Não foi possível selecionar a imagem.")
       );
