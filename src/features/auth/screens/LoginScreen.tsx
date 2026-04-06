@@ -17,6 +17,7 @@ import { useLoginWithGoogleMutation } from "@/src/features/auth/hooks/useAuthMut
 import { getErrorMessage } from "@/src/services/httpError";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 import { showToast } from "@/src/shared/utils/showToast";
+import { logger } from "@/src/shared/utils/logger";
 
 type GoogleSignInResult = Awaited<ReturnType<typeof GoogleSignin.signIn>>;
 
@@ -53,12 +54,12 @@ export default function LoginScreen() {
         }
       }
     } catch (error) {
-      console.error("Erro no login:", error);
+      logger.error("Login", "Erro no login:", error);
       showToast.error(
         getErrorMessage(
           error,
-          "Erro ao fazer login com Google. Tente novamente."
-        )
+          "Erro ao fazer login com Google. Tente novamente.",
+        ),
       );
     }
 
