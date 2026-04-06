@@ -115,7 +115,7 @@ export default function useEditRepublicModal({
         onClose();
       }
     } catch (error) {
-      console.error("Erro ao salvar dados da república:", error);
+      logger.error("Republic", "Erro ao salvar dados da república:", error);
       showToast.error(
         getErrorMessage(error, "Não foi possível salvar as alterações.")
       );
