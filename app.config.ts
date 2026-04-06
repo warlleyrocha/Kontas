@@ -132,8 +132,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       [
         "@react-native-google-signin/google-signin",
         {
-          iosUrlScheme:
-            "com.googleusercontent.apps.475215012202-oq93e4s85f7uuhfji6k2nkhdb7i2dfm3",
+          iosUrlScheme: `com.googleusercontent.apps.${process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID?.split(".")[0]}`,
         },
       ],
       [
@@ -165,7 +164,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
 // Configuração dinâmica baseada no ambiente
 export const getDynamicAppConfig = (
-  environment: "development" | "preview" | "production"
+  environment: "development" | "preview" | "production",
 ) => {
   if (environment === "production") {
     return {
