@@ -26,8 +26,11 @@ export function useLoginWithGoogleMutation() {
       await setItemAsync(AUTH_TOKEN_STORAGE_KEY, data.token);
       setAuthorizationHeader(data.token);
       queryClient.setQueryData(userKeys.current(), data.user);
+      queryClient.setQueryData(userKeys.cached(), data.user);
 
-      // User cache: fire-and-forget — React Query é a fonte de verdade em runtime
+      // User cache: fire-and-forget — serve só como persistência auxiliar.
+      // O estado autenticado em runtime deve vir da sessão validada pelo
+      // useCurrentUserQuery.
       setItemAsync(APP_USER_STORAGE_KEY, JSON.stringify(data.user)).catch(
         (err) =>
           logger.error(

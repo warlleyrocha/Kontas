@@ -51,6 +51,7 @@ export function useRepublicQuery(
   options: RepublicQueryOptions = {}
 ) {
   const { isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
 
   return useQuery<RepublicResponse | null>({
     queryKey: republicKeys.detail(republicId),
@@ -68,6 +69,15 @@ export function useRepublicQuery(
     enabled:
       isAuthenticated && Boolean(republicId) && (options.enabled ?? true),
     staleTime: 60_000,
+    initialData: () => {
+      const republics = queryClient.getQueryData<RepublicResponse[]>(
+        republicKeys.list()
+      );
+
+      return republics?.find((item) => item.id === republicId);
+    },
+    initialDataUpdatedAt: () =>
+      queryClient.getQueryState(republicKeys.list())?.dataUpdatedAt,
     placeholderData: keepPreviousData,
   });
 }

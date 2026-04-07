@@ -1,8 +1,9 @@
-import { type ErrorBoundaryProps, Stack } from "expo-router";
+import type { ErrorBoundaryProps } from "expo-router";
+import { ProtectedStackLayout } from "@/src/shared/components/ProtectedStackLayout";
 import { RouteErrorFallback } from "@/src/shared/components/error-boundary/RouteErrorFallback";
 
 export default function UserProfileLayout() {
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return <ProtectedStackLayout />;
 }
 
 export function ErrorBoundary(props: ErrorBoundaryProps) {

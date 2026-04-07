@@ -1,23 +1,70 @@
 import { Redirect } from "expo-router";
 
+import { useAuthSession } from "@/src/features/auth/hooks/useAuth";
 import { useRepublicsQuery } from "@/src/features/republic/hooks/useRepublicQueries";
-import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 import LoadingScreen from "@/src/shared/components/ui/loading-screen";
+import SessionErrorScreen from "@/src/shared/components/ui/session-error-screen";
 
 export default function Index() {
-  const { data: user = null, isLoading } = useCurrentUserQuery();
-  const { data: republics = [], isLoading: isRepublicsLoading } =
-    useRepublicsQuery({ enabled: !!user?.perfilCompleto });
+  const {
+    authenticatedUser,
+    cachedUser,
+    isLoading,
+    isError,
+    refetch: refetchSession,
+  } = useAuthSession();
+  const {
+    data: republics = [],
+    isLoading: isRepublicsLoading,
+    isError: isRepublicsError,
+    refetch: refetchRepublics,
+  } = useRepublicsQuery({ enabled: !!authenticatedUser?.perfilCompleto });
 
-  if (isLoading || (user?.perfilCompleto && isRepublicsLoading)) {
-    return <LoadingScreen message="Carregando..." />;
+  if (isLoading || (authenticatedUser?.perfilCompleto && isRepublicsLoading)) {
+    return (
+      <LoadingScreen
+        message={
+          cachedUser?.nome
+            ? `Carregando dados de ${cachedUser.nome}...`
+            : "Carregando seus dados..."
+        }
+      />
+    );
   }
 
-  if (!user) {
+  if (isError) {
+    return (
+      <SessionErrorScreen
+        title="Sessão indisponível"
+        message={
+          cachedUser?.nome
+            ? `Não foi possível validar a sessão de ${cachedUser.nome}. Verifique sua conexão e tente novamente.`
+            : "Não foi possível validar sua sessão. Verifique sua conexão e tente novamente."
+        }
+        onRetry={() => {
+          void refetchSession();
+        }}
+      />
+    );
+  }
+
+  if (isRepublicsError) {
+    return (
+      <SessionErrorScreen
+        title="Não foi possível carregar seus dados"
+        message="Verifique sua conexão e tente carregar novamente."
+        onRetry={() => {
+          void refetchRepublics();
+        }}
+      />
+    );
+  }
+
+  if (!authenticatedUser) {
     return <Redirect href="/(auth)/login" />;
   }
 
-  if (!user.perfilCompleto) {
+  if (!authenticatedUser.perfilCompleto) {
     return <Redirect href="/(auth)/onboarding" />;
   }
 
