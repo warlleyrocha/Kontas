@@ -28,7 +28,7 @@
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg)"
     ],
     "setupFiles": [
-      "<rootDir>/src/services/__test__/setup/jest.setup.ts",
+      "<rootDir>/src/test/jest.setup.ts",
       "react-native-reanimated/mock"
     ],
     "coverageReporters": ["lcov", "text"],
