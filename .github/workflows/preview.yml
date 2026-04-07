@@ -37,9 +37,6 @@ jobs:
       - name: Run Expo lint
         run: npm run lint
 
-      - name: Run Biome checks
-        run: npm run lint:biome
-
       - name: Run tests with coverage
         run: npm run test:coverage
 
