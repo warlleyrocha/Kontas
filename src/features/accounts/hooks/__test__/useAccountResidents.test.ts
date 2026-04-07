@@ -1,10 +1,10 @@
 import { act, renderHook } from "@testing-library/react-native";
+import { accountResidentsService } from "@/src/features/accounts/services/account-residents.service";
 import { getErrorMessage } from "@/src/services/httpError";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { showToast } from "@/src/shared/utils/showToast";
-import { accountResidentsService } from "@/src/features/accounts/services/account-residents.service";
-import type { ContaMorador } from "../../types/accountResidents.types";
 import type { Conta } from "../../types/account.types";
+import type { ContaMorador } from "../../types/accountResidents.types";
 import { useAccountResidents } from "../useAccountResidents";
 
 jest.mock("@/src/shared/contexts/RefreshContext", () => ({

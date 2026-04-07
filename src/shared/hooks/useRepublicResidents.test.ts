@@ -71,7 +71,7 @@ beforeEach(() => {
 describe("useRepublicResidents — estado inicial", () => {
   it("retorna mapas vazios quando useQueries retorna array vazio", () => {
     const { result } = renderHook(() =>
-      useRepublicResidents([], "user@example.com"),
+      useRepublicResidents([], "user@example.com")
     );
 
     expect(result.current.residentsCount).toEqual({});
@@ -89,7 +89,7 @@ describe("useRepublicResidents — contagem e roles", () => {
     } as any);
 
     const { result } = renderHook(() =>
-      useRepublicResidents(republics, "admin@example.com"),
+      useRepublicResidents(republics, "admin@example.com")
     );
 
     expect(result.current.residentsCount).toEqual({
@@ -105,7 +105,7 @@ describe("useRepublicResidents — contagem e roles", () => {
     } as any);
 
     const { result } = renderHook(() =>
-      useRepublicResidents(republics.slice(0, 1), "user@example.com"),
+      useRepublicResidents(republics.slice(0, 1), "user@example.com")
     );
 
     expect(result.current.getResidentsCount("rep-1")).toBe(0);
@@ -118,7 +118,7 @@ describe("useRepublicResidents — contagem e roles", () => {
     } as any);
 
     const { result } = renderHook(() =>
-      useRepublicResidents(republics, "admin@example.com"),
+      useRepublicResidents(republics, "admin@example.com")
     );
 
     expect(result.current.getUserRole("rep-1")).toBe(ResidentRole.ADMIN);
@@ -134,7 +134,7 @@ describe("useRepublicResidents — contagem e roles", () => {
     } as any);
 
     const { result } = renderHook(() =>
-      useRepublicResidents(republics.slice(0, 1), "admin@example.com"),
+      useRepublicResidents(republics.slice(0, 1), "admin@example.com")
     );
 
     expect(result.current.getUserRole("rep-1")).toBe(ResidentRole.ADMIN);
@@ -147,7 +147,7 @@ describe("useRepublicResidents — contagem e roles", () => {
     } as any);
 
     const { result } = renderHook(() =>
-      useRepublicResidents(republics.slice(0, 1)),
+      useRepublicResidents(republics.slice(0, 1))
     );
 
     expect(result.current.getResidentsCount("rep-1")).toBe(1);
@@ -165,7 +165,7 @@ describe("useRepublicResidents — enabled", () => {
     });
 
     renderHook(() =>
-      useRepublicResidents(republics.slice(0, 1), "user@example.com", false),
+      useRepublicResidents(republics.slice(0, 1), "user@example.com", false)
     );
 
     expect(capturedOptions.queries[0].enabled).toBe(false);
@@ -184,7 +184,7 @@ describe("useRepublicResidents — enabled", () => {
     });
 
     renderHook(() =>
-      useRepublicResidents(republics.slice(0, 1), "user@example.com"),
+      useRepublicResidents(republics.slice(0, 1), "user@example.com")
     );
 
     expect(capturedOptions.queries[0].enabled).toBe(false);
@@ -200,7 +200,7 @@ describe("useRepublicResidents — query config", () => {
     });
 
     renderHook(() =>
-      useRepublicResidents(republics.slice(0, 1), "user@example.com"),
+      useRepublicResidents(republics.slice(0, 1), "user@example.com")
     );
 
     expect(capturedOptions.queries[0].staleTime).toBe(60_000);
@@ -214,7 +214,7 @@ describe("useRepublicResidents — query config", () => {
     });
 
     renderHook(() =>
-      useRepublicResidents(republics.slice(0, 1), "user@example.com"),
+      useRepublicResidents(republics.slice(0, 1), "user@example.com")
     );
 
     const signal = new AbortController().signal;
@@ -230,9 +230,7 @@ describe("useRepublicResidents — query config", () => {
       return { data: [], isLoading: false };
     });
 
-    renderHook(() =>
-      useRepublicResidents(republics, "user@example.com"),
-    );
+    renderHook(() => useRepublicResidents(republics, "user@example.com"));
 
     const combined = capturedOptions.combine([
       { data: [residentAdmin], isLoading: true },
@@ -250,9 +248,7 @@ describe("useRepublicResidents — query config", () => {
       return { data: [], isLoading: false };
     });
 
-    renderHook(() =>
-      useRepublicResidents(republics, "user@example.com"),
-    );
+    renderHook(() => useRepublicResidents(republics, "user@example.com"));
 
     const combined = capturedOptions.combine([
       { data: [residentAdmin], isLoading: false },
@@ -271,7 +267,7 @@ describe("useRepublicResidents — fallback de erro", () => {
     } as any);
 
     const { result } = renderHook(() =>
-      useRepublicResidents(republics.slice(0, 1), "user@example.com"),
+      useRepublicResidents(republics.slice(0, 1), "user@example.com")
     );
 
     expect(result.current.getResidentsCount("rep-1")).toBe(0);

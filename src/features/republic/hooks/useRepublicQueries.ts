@@ -1,12 +1,11 @@
 import {
+  keepPreviousData,
   useMutation,
   useQuery,
-  keepPreviousData,
   useQueryClient,
 } from "@tanstack/react-query";
-
-import { AppError } from "@/src/services/httpError";
 import { useAuth } from "@/src/features/auth/hooks/useAuth";
+import { AppError } from "@/src/services/httpError";
 
 import { republicService } from "../services/republic.service";
 import type { RepublicPost, RepublicResponse } from "../types/republic.types";

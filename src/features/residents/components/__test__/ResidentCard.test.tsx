@@ -3,8 +3,8 @@ import { Image, Linking } from "react-native";
 
 import { useResidentCard } from "@/src/features/residents/hooks/useResidentCard";
 import {
-  ResidentRole,
   type ResidentResponse,
+  ResidentRole,
 } from "@/src/shared/types/resident.types";
 
 import { ResidentCard } from "../ResidentCard";

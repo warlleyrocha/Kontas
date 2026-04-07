@@ -4,9 +4,9 @@ import {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import type { ResidentResponse } from "@/src/shared/types/resident.types";
-import { useCopyFeedback } from "@/src/shared/hooks/useCopyFeedback";
 import { residentCopyFeedback } from "@/src/shared/constants/pixCopyFeedback";
+import { useCopyFeedback } from "@/src/shared/hooks/useCopyFeedback";
+import type { ResidentResponse } from "@/src/shared/types/resident.types";
 
 export function useResidentCard(
   morador: ResidentResponse,

@@ -2,9 +2,9 @@ import { isAxiosError } from "axios";
 import { api } from "@/src/services/api";
 import { toUserFriendlyError } from "@/src/services/httpError";
 import {
-  ResidentRole,
   type CreateResidentRequest,
   type ResidentResponse,
+  ResidentRole,
 } from "@/src/shared/types/resident.types";
 import { residentService } from "../resident.service";
 

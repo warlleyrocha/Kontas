@@ -6,12 +6,12 @@ import {
   useAccountsByResidentQueries,
 } from "@/src/features/accounts/hooks/useAccountQueries";
 import {
-  StatusConta,
   type Conta,
+  StatusConta,
 } from "@/src/features/accounts/types/account.types";
 import {
-  StatusPagamento,
   type ContaMorador,
+  StatusPagamento,
 } from "@/src/features/accounts/types/accountResidents.types";
 import type { ResidentResponse } from "@/src/shared/types/resident.types";
 
@@ -22,7 +22,10 @@ jest.mock("@/src/features/accounts/hooks/useAccountQueries", () => ({
   useAccountsByResidentQueries: jest.fn(),
 }));
 
-const mockRegisterRefresh = jest.fn<void, [key: string, fn: () => void | Promise<void>]>(() => {});
+const mockRegisterRefresh = jest.fn<
+  void,
+  [key: string, fn: () => void | Promise<void>]
+>(() => {});
 
 jest.mock("@/src/shared/contexts/RefreshContext", () => ({
   useRefresh: () => ({ registerRefresh: mockRegisterRefresh }),
@@ -187,10 +190,7 @@ describe("useResumeTab", () => {
 
     it("usa fallback [] quando dividasQueries.data[i] é undefined", () => {
       mockResidentQueries({
-        data: [
-          [makeContaMorador({ moradorId: "r-1", valor: 30 })],
-          undefined,
-        ],
+        data: [[makeContaMorador({ moradorId: "r-1", valor: 30 })], undefined],
         isLoading: false,
       } as any);
 
@@ -267,7 +267,7 @@ describe("useResumeTab", () => {
 
       expect(mockRegisterRefresh).toHaveBeenCalledWith(
         expect.stringContaining("resume-rep-1-"),
-        expect.any(Function),
+        expect.any(Function)
       );
     });
 

@@ -2,8 +2,8 @@ import { act, fireEvent, render, screen } from "@testing-library/react-native";
 
 import {
   AccountSection,
-  PlusButton,
   AddAccountModal,
+  PlusButton,
 } from "@/src/features/accounts/components";
 import { AccountContextMenu } from "@/src/features/accounts/components/AccountContextMenu";
 import { useAccountsTab } from "@/src/features/accounts/hooks/useAccountsTab";

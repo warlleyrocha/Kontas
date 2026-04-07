@@ -1,10 +1,10 @@
-import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import type { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
+import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import type { PaymentAccount } from "@/src/features/accounts/types/payments.types";
 import {
+  type PaymentsState,
   paymentsInitialState,
   paymentsReducer,
-  type PaymentsState,
 } from "../paymentsReducer";
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────

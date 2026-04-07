@@ -2,10 +2,10 @@ import { render } from "@testing-library/react-native";
 import type { ErrorBoundaryProps } from "expo-router";
 import { Redirect, Stack } from "expo-router";
 import { useProtectedSession } from "@/src/features/auth/hooks/useAuth";
-import UserProfileLayout, { ErrorBoundary } from "../_layout";
 import { RouteErrorFallback } from "@/src/shared/components/error-boundary/RouteErrorFallback";
 import LoadingScreen from "@/src/shared/components/ui/loading-screen";
 import SessionErrorScreen from "@/src/shared/components/ui/session-error-screen";
+import UserProfileLayout, { ErrorBoundary } from "../_layout";
 
 jest.mock("expo-router", () => ({
   __esModule: true,

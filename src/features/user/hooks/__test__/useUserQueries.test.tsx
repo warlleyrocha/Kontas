@@ -1,19 +1,18 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react-native";
-import React from "react";
 import * as SecureStore from "expo-secure-store";
-
-import {
-  useCurrentUserQuery,
-  useCompleteProfileMutation,
-  useUpdateCurrentUserMutation,
-} from "../useUserQueries";
-import type { User } from "../../types/user.types";
-import { userService } from "../../services/user.service";
+import React from "react";
 import * as authHeader from "@/src/services/authHeader";
 import * as httpError from "@/src/services/httpError";
 import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
+import { userService } from "../../services/user.service";
+import type { User } from "../../types/user.types";
+import {
+  useCompleteProfileMutation,
+  useCurrentUserQuery,
+  useUpdateCurrentUserMutation,
+} from "../useUserQueries";
 
 // ─── Mocks ────────────────────────────────────────────────────────────────────
 
@@ -100,9 +99,7 @@ function createQueryClient() {
 function setupWrapper(queryClient: QueryClient) {
   return function Wrapper({ children }: { children: React.ReactNode }) {
     return (
-      <QueryClientProvider client={queryClient}>
-        {children}
-      </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     );
   };
 }
@@ -120,7 +117,9 @@ beforeEach(() => {
   mockCompleteProfile.mockResolvedValue(undefined);
   mockUpdateUser.mockResolvedValue(mockUser);
   mockIsUnauthorized.mockReturnValue(false);
-  mockGetErrorMessage.mockImplementation((_err, fallback) => fallback ?? "erro");
+  mockGetErrorMessage.mockImplementation(
+    (_err, fallback) => fallback ?? "erro"
+  );
   jest.spyOn(console, "error").mockImplementation(() => {});
 });
 
@@ -142,7 +141,7 @@ describe("useCurrentUserQuery", () => {
     await waitFor(() => expect(result.current.data).toBeNull());
     expect(mockLoggerWarn).toHaveBeenCalledWith(
       "User",
-      "Nenhum token encontrado",
+      "Nenhum token encontrado"
     );
   });
 
@@ -158,7 +157,7 @@ describe("useCurrentUserQuery", () => {
     expect(mockSetItemAsync).toHaveBeenCalled();
     expect(mockLoggerInfo).toHaveBeenCalledWith(
       "User",
-      "Usuário autenticado e sincronizado",
+      "Usuário autenticado e sincronizado"
     );
   });
 
@@ -177,7 +176,7 @@ describe("useCurrentUserQuery", () => {
       expect(mockDeleteItemAsync).toHaveBeenCalledTimes(2);
       expect(mockLoggerWarn).toHaveBeenCalledWith(
         "User",
-        "Token inválido ou expirado",
+        "Token inválido ou expirado"
       );
     });
 
@@ -199,7 +198,7 @@ describe("useCurrentUserQuery", () => {
     expect(mockLoggerWarn).toHaveBeenCalledWith(
       "User",
       "Falha transitória ao validar sessão",
-      expect.objectContaining({ message: "Erro ao validar sessão" }),
+      expect.objectContaining({ message: "Erro ao validar sessão" })
     );
     expect(result.current.data).toBeUndefined();
     expect(mockGetItemAsync).not.toHaveBeenCalled();
@@ -232,16 +231,20 @@ describe("useCompleteProfileMutation", () => {
       wrapper: setupWrapper(qc),
     });
 
-    await result.current.mutateAsync({ nome: "Ana Completa", telefone: "+5511999999999", chavePix: "pix@email.com" });
+    await result.current.mutateAsync({
+      nome: "Ana Completa",
+      telefone: "+5511999999999",
+      chavePix: "pix@email.com",
+    });
 
     await waitFor(() => {
       expect(mockShowToastSuccess).toHaveBeenCalledWith(
-        "Perfil salvo com sucesso!",
+        "Perfil salvo com sucesso!"
       );
     });
     expect(mockLoggerInfo).toHaveBeenCalledWith(
       "User",
-      "Perfil completado e sincronizado",
+      "Perfil completado e sincronizado"
     );
   });
 
@@ -253,15 +256,23 @@ describe("useCompleteProfileMutation", () => {
       wrapper: setupWrapper(qc),
     });
 
-    await result.current.mutateAsync({ nome: "Ana", telefone: "+5511999999999", chavePix: "pix@email.com" }).catch(() => {});
+    await result.current
+      .mutateAsync({
+        nome: "Ana",
+        telefone: "+5511999999999",
+        chavePix: "pix@email.com",
+      })
+      .catch(() => {});
 
     await waitFor(() => {
-      expect(mockShowToastError).toHaveBeenCalledWith("Erro ao completar perfil");
+      expect(mockShowToastError).toHaveBeenCalledWith(
+        "Erro ao completar perfil"
+      );
     });
     expect(mockLoggerError).toHaveBeenCalledWith(
       "User",
       "Erro ao completar perfil",
-      expect.any(Error),
+      expect.any(Error)
     );
   });
 });
@@ -280,13 +291,13 @@ describe("useUpdateCurrentUserMutation", () => {
 
     await waitFor(() => {
       expect(mockShowToastSuccess).toHaveBeenCalledWith(
-        "Perfil atualizado com sucesso!",
+        "Perfil atualizado com sucesso!"
       );
     });
     expect(mockSetItemAsync).toHaveBeenCalled();
     expect(mockLoggerInfo).toHaveBeenCalledWith(
       "User",
-      "Usuário atualizado com sucesso",
+      "Usuário atualizado com sucesso"
     );
   });
 
@@ -302,13 +313,13 @@ describe("useUpdateCurrentUserMutation", () => {
 
     await waitFor(() => {
       expect(mockShowToastError).toHaveBeenCalledWith(
-        "Erro ao atualizar o perfil",
+        "Erro ao atualizar o perfil"
       );
     });
     expect(mockLoggerError).toHaveBeenCalledWith(
       "User",
       "Erro ao atualizar perfil",
-      expect.any(Error),
+      expect.any(Error)
     );
   });
 });

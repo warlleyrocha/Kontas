@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react-native";
 import { EmptyState } from "@/src/shared/components/EmptyState";
-import { StatusInvite, type Invite } from "../../types/invite.types";
+import { type Invite, StatusInvite } from "../../types/invite.types";
 import { InvitesSentContent } from "../InvitesSentContent";
 
 jest.mock("@expo/vector-icons/Ionicons", () => "Ionicons");

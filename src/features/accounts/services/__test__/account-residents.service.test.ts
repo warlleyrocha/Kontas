@@ -2,8 +2,8 @@ import { api } from "@/src/services/api";
 import { toUserFriendlyError } from "@/src/services/httpError";
 import { logger } from "@/src/shared/utils/logger";
 import {
-  StatusPagamento,
   type ContaMorador,
+  StatusPagamento,
 } from "../../types/accountResidents.types";
 import { accountResidentsService } from "../account-residents.service";
 

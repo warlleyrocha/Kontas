@@ -4,12 +4,11 @@ import { Stack } from "expo-router";
 import { preventAutoHideAsync } from "expo-splash-screen";
 
 import { useSessionLifecycle } from "@/src/features/auth/hooks/useAuth";
-import { initSentry } from "@/src/lib/sentry";
-import { configureGoogleSignin } from "@/src/lib/google-signin";
 import useAppReady from "@/src/hooks/useAppReady";
-import { AppProviders } from "../providers/AppProviders";
-
+import { configureGoogleSignin } from "@/src/lib/google-signin";
+import { initSentry } from "@/src/lib/sentry";
 import { Toaster } from "@/src/shared/components/ui/sonner";
+import { AppProviders } from "../providers/AppProviders";
 
 initSentry();
 configureGoogleSignin();

@@ -64,7 +64,7 @@ export function useAccountData({
           err,
           "Não foi possível carregar os moradores da conta."
         );
-      logger.error("Accounts", "Erro ao buscar moradores da conta", err);
+        logger.error("Accounts", "Erro ao buscar moradores da conta", err);
         showToast.error(message);
         return [];
       }

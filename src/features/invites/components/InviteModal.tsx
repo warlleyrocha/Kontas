@@ -1,6 +1,5 @@
 import Feather from "@expo/vector-icons/Feather";
 import React, { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -11,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import type { InviteRequest } from "@/src/features/invites/types/invite.types";
 
 interface InviteModalProps {

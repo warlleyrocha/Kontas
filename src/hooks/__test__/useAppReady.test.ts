@@ -1,8 +1,8 @@
 import { renderHook, waitFor } from "@testing-library/react-native";
 import { hideAsync } from "expo-splash-screen";
+import * as authHeader from "@/src/services/authHeader";
 import useAppFonts from "../useAppFonts";
 import useAppReady from "../useAppReady";
-import * as authHeader from "@/src/services/authHeader";
 
 jest.mock("expo-splash-screen", () => ({
   __esModule: true,

@@ -1,5 +1,5 @@
-import { deleteItemAsync, getItemAsync, setItemAsync } from "expo-secure-store";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { deleteItemAsync, getItemAsync, setItemAsync } from "expo-secure-store";
 
 import {
   clearAuthorizationHeader,
@@ -8,8 +8,8 @@ import {
 } from "@/src/services/authHeader";
 import { getErrorMessage, isUnauthorizedError } from "@/src/services/httpError";
 import {
-  AUTH_TOKEN_STORAGE_KEY,
   APP_USER_STORAGE_KEY,
+  AUTH_TOKEN_STORAGE_KEY,
 } from "@/src/services/storageKeys";
 import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";

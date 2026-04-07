@@ -7,6 +7,7 @@ import {
   View,
 } from "react-native";
 import Animated from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
 import OnboardingButtons from "@/src/features/auth/components/onboarding/OnboardingButtons";
 import RenderDots from "@/src/features/auth/components/onboarding/RenderDots";
 import RenderSlide from "@/src/features/auth/components/onboarding/RenderSlide";
@@ -16,7 +17,6 @@ import {
 } from "@/src/features/auth/constants/slides";
 import { useOnboardingAnimation } from "@/src/features/auth/hooks/useOnboardingAnimation";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Onboarding() {
   useComponentLogger("OnboardingScreen");

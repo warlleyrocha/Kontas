@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react-native";
-import { AccountResidentsContent } from "../AccountResidentsContent";
 import type { ContaMorador } from "../../../types/accountResidents.types";
 import { StatusPagamento } from "../../../types/accountResidents.types";
+import { AccountResidentsContent } from "../AccountResidentsContent";
 
 jest.mock("../AccountResidentRow", () => ({
   AccountResidentRow: ({ morador }: { morador: ContaMorador }) => {

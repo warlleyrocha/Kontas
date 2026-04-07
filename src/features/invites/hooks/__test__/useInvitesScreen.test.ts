@@ -2,8 +2,8 @@ import { act, renderHook } from "@testing-library/react-native";
 import { useRouter } from "expo-router";
 import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthMutations";
 import { StatusInvite } from "@/src/features/invites/types/invite.types";
-import { getErrorMessage } from "@/src/services/httpError";
 import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
+import { getErrorMessage } from "@/src/services/httpError";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
 import { toastErrors } from "@/src/shared/utils/toastMessages";
 import {

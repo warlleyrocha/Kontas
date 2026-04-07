@@ -1,4 +1,4 @@
-import { act, render, screen, fireEvent } from "@testing-library/react-native";
+import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { Image } from "react-native";
 import { InviteModal } from "@/src/features/invites/components/InviteModal";
 import { EditRepublicModal } from "@/src/features/republic/components/EditRepublicModal";

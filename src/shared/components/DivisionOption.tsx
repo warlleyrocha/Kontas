@@ -1,4 +1,4 @@
-import { TouchableOpacity, Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 
 interface DivisionOptionProps {
   readonly selected: boolean;

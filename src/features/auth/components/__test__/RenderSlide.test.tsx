@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react-native";
 import type { SharedValue } from "react-native-reanimated";
-import RenderSlide from "../onboarding/RenderSlide";
 import type { OnboardingSlide } from "../../constants/slides";
+import RenderSlide from "../onboarding/RenderSlide";
 
 jest.mock("expo-linear-gradient", () => ({
   LinearGradient: () => null,

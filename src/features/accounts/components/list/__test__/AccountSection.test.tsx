@@ -1,12 +1,11 @@
 import { fireEvent, render, screen } from "@testing-library/react-native";
 import { TouchableOpacity } from "react-native";
-
-import { AccountSection } from "../AccountSection";
 import {
+  type Conta,
   MetodoPagamento,
   StatusConta,
-  type Conta,
 } from "../../../types/account.types";
+import { AccountSection } from "../AccountSection";
 
 jest.mock("@expo/vector-icons/MaterialCommunityIcons", () => ({
   __esModule: true,

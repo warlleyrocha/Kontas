@@ -1,9 +1,10 @@
 // src/providers/AppProviders.tsx
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { GlobalErrorBoundary } from "@/src/shared/components/error-boundary/GlobalErrorBoundary";
+
 import { QueryClientProvider } from "@tanstack/react-query";
-import { RefreshProvider } from "@/src/shared/contexts/RefreshContext";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { queryClient } from "@/src/services/queryClient";
+import { GlobalErrorBoundary } from "@/src/shared/components/error-boundary/GlobalErrorBoundary";
+import { RefreshProvider } from "@/src/shared/contexts/RefreshContext";
 
 export function AppProviders({
   children,

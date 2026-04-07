@@ -1,12 +1,11 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { TouchableOpacity, View } from "react-native";
-
-import { AccountCard } from "../AccountCard";
 import {
+  type Conta,
   MetodoPagamento,
   StatusConta,
-  type Conta,
 } from "../../../types/account.types";
+import { AccountCard } from "../AccountCard";
 
 jest.mock("@expo/vector-icons/Feather", () => ({
   __esModule: true,

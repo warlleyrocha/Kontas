@@ -1,6 +1,6 @@
 import type { ErrorBoundaryProps } from "expo-router";
-import { ProtectedStackLayout } from "@/src/shared/components/ProtectedStackLayout";
 import { RouteErrorFallback } from "@/src/shared/components/error-boundary/RouteErrorFallback";
+import { ProtectedStackLayout } from "@/src/shared/components/ProtectedStackLayout";
 
 export default function UserProfileLayout() {
   return <ProtectedStackLayout />;

@@ -1,14 +1,13 @@
-import { useCallback, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-
+import { useCallback, useMemo, useState } from "react";
+import { accountKeys } from "@/src/features/accounts/hooks/account.keys";
+import { accountResidentKeys } from "@/src/features/accounts/hooks/accountResident.keys";
 import {
   useAccountResidentsByAccountQueries,
   useAccountsByRepublicQuery,
   useConfirmResidentPaymentAdminMutation,
   useRefuseResidentPaymentAdminMutation,
 } from "@/src/features/accounts/hooks/useAccountQueries";
-import { accountKeys } from "@/src/features/accounts/hooks/account.keys";
-import { accountResidentKeys } from "@/src/features/accounts/hooks/accountResident.keys";
 import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import type {
   PaymentAccount,

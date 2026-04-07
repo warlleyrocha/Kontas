@@ -1,6 +1,6 @@
 import { Text, View } from "react-native";
-import { formatBRL } from "@/src/shared/utils/formats";
 import type { ResidentResponse } from "@/src/shared/types/resident.types";
+import { formatBRL } from "@/src/shared/utils/formats";
 
 interface MoradorRowProps {
   morador: ResidentResponse;

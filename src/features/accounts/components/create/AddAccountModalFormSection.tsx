@@ -8,8 +8,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { MetodoPagamento } from "../../types/account.types";
 import { maskCurrencyBRL } from "@/src/shared/utils/inputMasks";
+import { MetodoPagamento } from "../../types/account.types";
 
 const paymentMethodLabels: Record<MetodoPagamento, string> = {
   [MetodoPagamento.PIX]: "PIX",

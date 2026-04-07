@@ -1,11 +1,11 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import React from "react";
 import { act, renderHook, waitFor } from "@testing-library/react-native";
-import { accountResidentsService } from "@/src/features/accounts/services/account-residents.service";
+import React from "react";
 import { accountService } from "@/src/features/accounts/services/account.service";
-import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
-import type { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
+import { accountResidentsService } from "@/src/features/accounts/services/account-residents.service";
 import type { Conta } from "@/src/features/accounts/types/account.types";
+import type { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
+import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import { getErrorMessage } from "@/src/services/httpError";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { showToast } from "@/src/shared/utils/showToast";

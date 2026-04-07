@@ -3,8 +3,8 @@ import { ScrollView } from "react-native";
 import { StatusConta } from "@/src/features/accounts/types/account.types";
 import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import type { PaymentAccount } from "@/src/features/accounts/types/payments.types";
-import { PendingPaymentsList } from "../PendingPaymentsList";
 import { PendingPaymentCard } from "../PendingPaymentCard";
+import { PendingPaymentsList } from "../PendingPaymentsList";
 
 jest.mock("../PendingPaymentCard", () => ({
   __esModule: true,

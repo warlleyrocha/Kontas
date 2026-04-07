@@ -1,6 +1,5 @@
 import Feather from "@expo/vector-icons/Feather";
 import type { FC } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Image,
   KeyboardAvoidingView,
@@ -11,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import useEditRepublicModal from "@/src/features/republic/hooks/useEditRepublicModal";
 
 interface EditRepublicModalProps {

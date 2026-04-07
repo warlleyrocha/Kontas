@@ -1,5 +1,5 @@
-import { logger } from "@/src/shared/utils/logger";
 import { toUserFriendlyError } from "@/src/services/httpError";
+import { logger } from "@/src/shared/utils/logger";
 import { api } from "../../../services/api";
 import {
   CompleteProfileRequest,

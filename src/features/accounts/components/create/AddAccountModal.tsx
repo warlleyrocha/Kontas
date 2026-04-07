@@ -8,20 +8,20 @@ import {
   Text,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { NextButton } from "@/src/shared/components/NextButton";
+import { formatBRL } from "@/src/shared/utils/formats";
 import { useAccountForm } from "../../hooks/useAccountForm";
 import {
   type CriarContaComMoradoresRequest,
   MetodoPagamento,
   StatusConta,
 } from "../../types/account.types";
-import { NextButton } from "@/src/shared/components/NextButton";
-import { formatBRL } from "@/src/shared/utils/formats";
 import { parseCurrencyValue } from "../../utils/accountForm.utils";
 import { AddAccountModalActions } from "./AddAccountModalActions";
 import { AddAccountModalFormSection } from "./AddAccountModalFormSection";
 import { AddAccountModalHeader } from "./AddAccountModalHeader";
 import { AddAccountModalResidentsSection } from "./AddAccountModalResidentsSection";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 interface AddAccountModalProps {
   readonly visible: boolean;

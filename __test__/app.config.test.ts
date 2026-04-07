@@ -73,8 +73,8 @@ function importFreshAppConfig({
 
   let appConfigModule: Record<string, unknown> | undefined;
   jest.isolateModules(() => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    appConfigModule = require("../app.config") as Record<string, unknown>; // biome-ignore lint/style/noCommonJs: jest.isolateModules requer require
+    // biome-ignore lint/style/noCommonJs: jest.isolateModules requer require
+    appConfigModule = require("../app.config") as Record<string, unknown>;
   });
 
   return {

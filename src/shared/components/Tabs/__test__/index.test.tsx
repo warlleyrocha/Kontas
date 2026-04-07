@@ -1,5 +1,5 @@
-import { fireEvent, render, screen } from "@testing-library/react-native";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { fireEvent, render, screen } from "@testing-library/react-native";
 import Tabs from "../index";
 
 jest.mock("@expo/vector-icons/MaterialCommunityIcons", () => ({

@@ -1,11 +1,11 @@
+import { wrap } from "@sentry/react-native";
 import { render } from "@testing-library/react-native";
 import { Stack } from "expo-router";
 import { preventAutoHideAsync } from "expo-splash-screen";
-import { wrap } from "@sentry/react-native";
 import { useSessionLifecycle } from "@/src/features/auth/hooks/useAuth";
+import useAppReady from "@/src/hooks/useAppReady";
 import { configureGoogleSignin } from "@/src/lib/google-signin";
 import { initSentry } from "@/src/lib/sentry";
-import useAppReady from "@/src/hooks/useAppReady";
 import { Toaster } from "@/src/shared/components/ui/sonner";
 import { AppProviders } from "../../providers/AppProviders";
 import AppLayout from "../_layout";
@@ -106,11 +106,11 @@ describe("_layout render", () => {
       expect.objectContaining({
         screenOptions: { headerShown: false },
       }),
-      undefined,
+      undefined
     );
     expect(mockToaster).toHaveBeenCalledWith(
       expect.objectContaining({ position: "bottom-center" }),
-      undefined,
+      undefined
     );
   });
 });

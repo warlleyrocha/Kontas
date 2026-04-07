@@ -45,10 +45,10 @@ jest.mock("@/src/shared/contexts/RefreshContext", () => ({
 }));
 
 const mockListarContasPorRepublica = jest.mocked(
-  accountService.listarContasPorRepublica,
+  accountService.listarContasPorRepublica
 );
 const mockListarContasMoradores = jest.mocked(
-  accountResidentsService.listarContasMoradores,
+  accountResidentsService.listarContasMoradores
 );
 const mockUseRefresh = jest.mocked(useRefresh);
 
@@ -105,7 +105,7 @@ describe("useAccountList — estado retornado", () => {
   it("expõe loading e error de useAccountData", async () => {
     const { result } = renderHook(
       () => useAccountList({ republicId: "rep-1" }),
-      { wrapper },
+      { wrapper }
     );
 
     expect(result.current.loading).toBe(true);
@@ -118,7 +118,7 @@ describe("useAccountList — estado retornado", () => {
   it("expõe os filtros de useAccountFilters", async () => {
     const { result } = renderHook(
       () => useAccountList({ republicId: "rep-1" }),
-      { wrapper },
+      { wrapper }
     );
 
     await act(async () => {});
@@ -134,7 +134,7 @@ describe("useAccountList — estado retornado", () => {
   it("expõe contasOrdenadas e mesesDisponiveis de useAccountDerivedData", async () => {
     const { result } = renderHook(
       () => useAccountList({ republicId: "rep-1" }),
-      { wrapper },
+      { wrapper }
     );
 
     await act(async () => {});
@@ -149,7 +149,7 @@ describe("useAccountList — estado retornado", () => {
   it("expõe accountResidentsById e confirmResidentPayment de useAccountResidents", async () => {
     const { result } = renderHook(
       () => useAccountList({ republicId: "rep-1" }),
-      { wrapper },
+      { wrapper }
     );
 
     await act(async () => {});
@@ -188,7 +188,7 @@ describe("useAccountList — refresh automático ao montar", () => {
 
     renderHook(() => useAccountList({ republicId: "rep-1" }), { wrapper });
     await waitFor(() =>
-      expect(mockListarContasMoradores).toHaveBeenCalledWith("acc-1"),
+      expect(mockListarContasMoradores).toHaveBeenCalledWith("acc-1")
     );
   });
 });
@@ -208,7 +208,7 @@ describe("useAccountList — registro no RefreshContext", () => {
 
     expect(mockRegisterRefresh).toHaveBeenCalledWith(
       expect.stringContaining("accounts-rep-99-"),
-      expect.any(Function),
+      expect.any(Function)
     );
   });
 
@@ -251,7 +251,7 @@ describe("useAccountList — refresh público", () => {
 
     const { result } = renderHook(
       () => useAccountList({ republicId: "rep-1" }),
-      { wrapper },
+      { wrapper }
     );
     await act(async () => {});
 

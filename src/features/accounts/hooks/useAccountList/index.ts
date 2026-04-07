@@ -1,17 +1,16 @@
-import { useCallback, useEffect, useId, useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useId, useMemo, useState } from "react";
 
 import { getErrorMessage } from "@/src/services/httpError";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { showToast } from "@/src/shared/utils/showToast";
-
+import { accountKeys } from "../account.keys";
+import { accountResidentKeys } from "../accountResident.keys";
 import {
   useAccountResidentsByAccountQueries,
   useAccountsByRepublicQuery,
   useConfirmResidentPaymentMutation,
 } from "../useAccountQueries";
-import { accountKeys } from "../account.keys";
-import { accountResidentKeys } from "../accountResident.keys";
 import { useAccountDerivedData } from "./useAccountDerivedData";
 import { useAccountFilters } from "./useAccountFilters";
 

@@ -10,8 +10,8 @@ import {
   setAuthorizationHeader,
 } from "@/src/services/authHeader";
 import {
-  AUTH_TOKEN_STORAGE_KEY,
   APP_USER_STORAGE_KEY,
+  AUTH_TOKEN_STORAGE_KEY,
   REPUBLIC_DATA_STORAGE_KEY,
 } from "@/src/services/storageKeys";
 import { logger } from "@/src/shared/utils/logger";

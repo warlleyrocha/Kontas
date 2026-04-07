@@ -1,10 +1,10 @@
-import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "expo-router";
+import { useCallback, useMemo, useState } from "react";
 
 import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthMutations";
 import { StatusInvite } from "@/src/features/invites/types/invite.types";
-import { getErrorMessage } from "@/src/services/httpError";
 import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
+import { getErrorMessage } from "@/src/services/httpError";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
 import { logger } from "@/src/shared/utils/logger";
 import { toastErrors } from "@/src/shared/utils/toastMessages";
@@ -59,7 +59,7 @@ export function useInvitesScreen() {
         });
         router.replace(`/(republics)/${republicaId}`);
       } catch (error) {
-      logger.error("Invites", "Erro ao aceitar convite", error);
+        logger.error("Invites", "Erro ao aceitar convite", error);
       }
     },
     [router, updateStatusMutation]
@@ -73,7 +73,7 @@ export function useInvitesScreen() {
           status: StatusInvite.RECUSADO,
         });
       } catch (error) {
-      logger.error("Invites", "Erro ao recusar convite", error);
+        logger.error("Invites", "Erro ao recusar convite", error);
       }
     },
     [updateStatusMutation]

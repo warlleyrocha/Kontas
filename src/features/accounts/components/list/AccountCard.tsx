@@ -2,10 +2,10 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useRef, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import { formatBRL } from "@/src/shared/utils/formats";
 import { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
-import { useCopyFeedback } from "@/src/shared/hooks/useCopyFeedback";
 import { accountCopyFeedback } from "@/src/shared/constants/pixCopyFeedback";
+import { useCopyFeedback } from "@/src/shared/hooks/useCopyFeedback";
+import { formatBRL } from "@/src/shared/utils/formats";
 import { Conta, MetodoPagamento, StatusConta } from "../../types/account.types";
 import {
   getContaStatusIcon,

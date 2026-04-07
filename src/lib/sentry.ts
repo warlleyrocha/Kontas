@@ -1,10 +1,10 @@
+import type { EventHint } from "@sentry/core";
+import type { ErrorEvent } from "@sentry/react-native";
 import {
   feedbackIntegration,
   init,
   mobileReplayIntegration,
 } from "@sentry/react-native";
-import type { ErrorEvent } from "@sentry/react-native";
-import type { EventHint } from "@sentry/core";
 
 const SENSITIVE_KEYS = [
   "token",

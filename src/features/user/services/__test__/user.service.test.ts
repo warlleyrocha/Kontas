@@ -1,5 +1,5 @@
-import { toUserFriendlyError } from "@/src/services/httpError";
 import { api } from "@/src/services/api";
+import { toUserFriendlyError } from "@/src/services/httpError";
 import type {
   CompleteProfileRequest,
   UpdateUserRequest,

@@ -1,9 +1,9 @@
+import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { InviteModal } from "../InviteModal";
 
 jest.mock("@expo/vector-icons/Feather", () => "Feather");

@@ -3,14 +3,18 @@ jest.mock("expo-secure-store", () => ({
 }));
 
 function loadAuthHeaderModule() {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { getItemAsync } = require("expo-secure-store");
+
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const authHeader = require("../authHeader") as typeof import("../authHeader");
+
   return {
-    getAuthorizationHeader: require("../authHeader").getAuthorizationHeader,
-    hasAuthorizationHeader: require("../authHeader").hasAuthorizationHeader,
-    hydrateAuthorizationHeader:
-      require("../authHeader").hydrateAuthorizationHeader,
-    setAuthorizationHeader: require("../authHeader").setAuthorizationHeader,
-    clearAuthorizationHeader: require("../authHeader").clearAuthorizationHeader,
+    getAuthorizationHeader: authHeader.getAuthorizationHeader,
+    hasAuthorizationHeader: authHeader.hasAuthorizationHeader,
+    hydrateAuthorizationHeader: authHeader.hydrateAuthorizationHeader,
+    setAuthorizationHeader: authHeader.setAuthorizationHeader,
+    clearAuthorizationHeader: authHeader.clearAuthorizationHeader,
     mockGetItemAsync: jest.mocked(getItemAsync),
   };
 }
@@ -89,8 +93,12 @@ describe("authHeader", () => {
 
   describe("hydrateAuthorizationHeader", () => {
     it("lê o token do SecureStore e aplica no header", async () => {
-      const { getAuthorizationHeader, hasAuthorizationHeader, hydrateAuthorizationHeader, mockGetItemAsync } =
-        loadAuthHeaderModule();
+      const {
+        getAuthorizationHeader,
+        hasAuthorizationHeader,
+        hydrateAuthorizationHeader,
+        mockGetItemAsync,
+      } = loadAuthHeaderModule();
 
       mockGetItemAsync.mockResolvedValue("stored-token");
 
@@ -101,8 +109,11 @@ describe("authHeader", () => {
     });
 
     it("não faz nada quando já foi hidratado", async () => {
-      const { getAuthorizationHeader, hydrateAuthorizationHeader, mockGetItemAsync } =
-        loadAuthHeaderModule();
+      const {
+        getAuthorizationHeader,
+        hydrateAuthorizationHeader,
+        mockGetItemAsync,
+      } = loadAuthHeaderModule();
 
       mockGetItemAsync.mockResolvedValue("first-token");
 

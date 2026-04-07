@@ -4,12 +4,12 @@ import {
   ContaMorador,
   StatusPagamento,
 } from "@/src/features/accounts/types/accountResidents.types";
+import { formatBRL } from "@/src/shared/utils/formats";
 import {
   getMoradorStatusBadge,
   getMoradorStatusIcon,
   getMoradorStatusVisual,
 } from "../../utils/accountStatus.utils";
-import { formatBRL } from "@/src/shared/utils/formats";
 import { AccountStatusIcon } from "../shared/AccountStatusIcon";
 
 interface AccountResidentRowProps {

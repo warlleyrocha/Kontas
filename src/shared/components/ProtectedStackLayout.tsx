@@ -5,13 +5,8 @@ import LoadingScreen from "@/src/shared/components/ui/loading-screen";
 import SessionErrorScreen from "@/src/shared/components/ui/session-error-screen";
 
 export function ProtectedStackLayout() {
-  const {
-    authenticatedUser,
-    cachedUser,
-    isLoading,
-    isError,
-    refetch,
-  } = useProtectedSession();
+  const { authenticatedUser, cachedUser, isLoading, isError, refetch } =
+    useProtectedSession();
 
   if (isLoading) {
     return (

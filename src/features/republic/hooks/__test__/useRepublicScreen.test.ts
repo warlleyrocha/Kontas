@@ -1,15 +1,15 @@
-import { act, renderHook } from "@testing-library/react-native";
 import { useIsFocused } from "@react-navigation/native";
+import { act, renderHook } from "@testing-library/react-native";
 import { useRouter } from "expo-router";
 
 import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthMutations";
-import { useResidents } from "@/src/features/residents/hooks/useResidents";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
+import { useResidents } from "@/src/features/residents/hooks/useResidents";
 import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 import { getErrorMessage } from "@/src/services/httpError";
 import {
-  ResidentRole,
   type ResidentResponse,
+  ResidentRole,
 } from "@/src/shared/types/resident.types";
 import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";

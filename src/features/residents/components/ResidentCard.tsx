@@ -2,10 +2,10 @@ import { Feather, FontAwesome } from "@expo/vector-icons";
 import type { FC } from "react";
 import { Image, Linking, Text, TouchableOpacity, View } from "react-native";
 import Animated from "react-native-reanimated";
+import PixIcon from "@/assets/icons/pix-icon.svg";
 import { useResidentCard } from "@/src/features/residents/hooks/useResidentCard";
 import type { ResidentResponse } from "@/src/shared/types/resident.types";
 import { getInitials } from "@/src/shared/utils/getInitials";
-import PixIcon from "@/assets/icons/pix-icon.svg";
 
 interface ResidentCardProps {
   morador: ResidentResponse;

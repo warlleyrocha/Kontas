@@ -4,13 +4,13 @@ import { FlatList, RefreshControl, Text, View } from "react-native";
 
 import { InviteModal } from "@/src/features/invites/components/InviteModal";
 import { useSendInviteMutation } from "@/src/features/invites/hooks/useInvitesQueries";
-import { getErrorMessage } from "@/src/services/httpError";
 import { ResidentCard } from "@/src/features/residents/components/ResidentCard";
 import { useTabResidents } from "@/src/features/residents/hooks/useTabResidents";
+import { getErrorMessage } from "@/src/services/httpError";
+import { PlusButton } from "@/src/shared/components/PlusButton";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
 import type { ResidentResponse } from "@/src/shared/types/resident.types";
-import { PlusButton } from "@/src/shared/components/PlusButton";
 
 interface ResidentsTabProps {
   residents: ResidentResponse[];

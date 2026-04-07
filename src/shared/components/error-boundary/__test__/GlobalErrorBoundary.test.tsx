@@ -1,6 +1,6 @@
+import { captureException } from "@sentry/react-native";
 import { fireEvent, render, screen } from "@testing-library/react-native";
 import { Text } from "react-native";
-import { captureException } from "@sentry/react-native";
 import { GlobalErrorBoundary } from "../GlobalErrorBoundary";
 
 jest.mock("@sentry/react-native", () => ({
