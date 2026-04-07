@@ -30,6 +30,9 @@ const mockUser: User = {
   perfilCompleto: true,
 };
 
+const serializeError = (error: Error) =>
+  JSON.stringify(error, Object.getOwnPropertyNames(error), 2);
+
 beforeEach(() => {
   jest.clearAllMocks();
   jest.spyOn(console, "error").mockImplementation(() => {});
@@ -104,8 +107,9 @@ describe("userService.updateUser", () => {
     await expect(userService.updateUser(payload)).rejects.toBeDefined();
 
     expect(console.error).toHaveBeenCalledWith(
-      "❌ Erro ao atualizar perfil:",
-      error
+      "[ERROR][User]",
+      "Erro ao atualizar perfil",
+      serializeError(error)
     );
   });
 

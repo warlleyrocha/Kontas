@@ -40,6 +40,9 @@ const mockRefetch = jest.fn();
 const mockMutateAsync = jest.fn();
 const mockRouterReplace = jest.fn();
 
+const serializeError = (error: Error) =>
+  JSON.stringify(error, Object.getOwnPropertyNames(error), 2);
+
 function setupMocks(userOverrides = {}) {
   jest.mocked(useRouter).mockReturnValue({ replace: mockRouterReplace } as any);
   jest.mocked(useCurrentUserQuery).mockReturnValue({
@@ -167,8 +170,9 @@ describe("useInvitesScreen — handleSignOut", () => {
     });
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      "Erro ao fazer logout da conta:",
-      error
+      "[ERROR][Invites]",
+      "Erro ao fazer logout",
+      serializeError(error)
     );
     expect(jest.mocked(toastErrors.logoutFailed)).toHaveBeenCalledWith(error);
     consoleErrorSpy.mockClear();
@@ -218,8 +222,9 @@ describe("useInvitesScreen — handleAcceptInvite", () => {
     });
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      "Erro ao aceitar convite:",
-      error
+      "[ERROR][Invites]",
+      "Erro ao aceitar convite",
+      serializeError(error)
     );
     expect(mockRouterReplace).not.toHaveBeenCalled();
     consoleErrorSpy.mockClear();
@@ -253,8 +258,9 @@ describe("useInvitesScreen — handleRejectInvite", () => {
     });
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      "Erro ao recusar convite:",
-      error
+      "[ERROR][Invites]",
+      "Erro ao recusar convite",
+      serializeError(error)
     );
     consoleErrorSpy.mockClear();
   });

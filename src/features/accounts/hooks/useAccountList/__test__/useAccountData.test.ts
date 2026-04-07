@@ -51,6 +51,9 @@ const mockContaMorador: ContaMorador = {
   atualizadoEm: "2026-01-01",
 };
 
+const serializeError = (error: Error) =>
+  JSON.stringify(error, Object.getOwnPropertyNames(error), 2);
+
 // ─── Setup ────────────────────────────────────────────────────────────────────
 
 let consoleErrorSpy: jest.SpyInstance;
@@ -327,7 +330,11 @@ describe("useAccountData — fetchAccounts (falha)", () => {
       await result.current.fetchAccounts();
     });
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith("Erro ao buscar contas:", err);
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "[ERROR][Accounts]",
+      "Erro ao buscar contas",
+      serializeError(err)
+    );
     consoleErrorSpy.mockClear();
   });
 });
@@ -421,8 +428,9 @@ describe("useAccountData — fetchAccountResidents (falha)", () => {
     });
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      "Erro ao buscar moradores da conta:",
-      err
+      "[ERROR][Accounts]",
+      "Erro ao buscar moradores da conta",
+      serializeError(err)
     );
     consoleErrorSpy.mockClear();
   });
