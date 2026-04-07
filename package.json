@@ -11,6 +11,7 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint:biome": "biome check .",
+    "fix:biome": "biome check --write .",
     "format": "biome format --write .",
     "lint": "expo lint",
     "test": "jest --watchAll",
