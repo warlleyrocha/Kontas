@@ -184,7 +184,7 @@ describe("useCurrentUserQuery", () => {
     expect(result.current.data ?? null).toBeNull();
   });
 
-  it("retorna dados do cache do SecureStore em caso de erro transitório", async () => {
+  it("não autentica a sessão com cache local em caso de erro transitório", async () => {
     const transientError = new Error("Network error");
     mockFetchUser.mockRejectedValue(transientError);
     mockIsUnauthorized.mockReturnValue(false);
@@ -195,15 +195,17 @@ describe("useCurrentUserQuery", () => {
       wrapper: setupWrapper(qc),
     });
 
-    await waitFor(() => expect(result.current.data).toEqual(mockUser));
+    await waitFor(() => expect(result.current.isError).toBe(true));
     expect(mockLoggerWarn).toHaveBeenCalledWith(
       "User",
       "Falha transitória ao validar sessão",
       expect.objectContaining({ message: "Erro ao validar sessão" }),
     );
+    expect(result.current.data).toBeUndefined();
+    expect(mockGetItemAsync).not.toHaveBeenCalled();
   });
 
-  it("limpa cache corrompido e re-lança erro quando JSON.parse falha", async () => {
+  it("re-lança o erro transitório sem tentar ler cache local", async () => {
     const transientError = new Error("Network error");
     mockFetchUser.mockRejectedValue(transientError);
     mockIsUnauthorized.mockReturnValue(false);
@@ -215,9 +217,8 @@ describe("useCurrentUserQuery", () => {
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
-    expect(mockDeleteItemAsync).toHaveBeenCalledWith(
-      "app_user",
-    );
+    expect(mockGetItemAsync).not.toHaveBeenCalled();
+    expect(mockDeleteItemAsync).not.toHaveBeenCalledWith("app_user");
   });
 });
 
