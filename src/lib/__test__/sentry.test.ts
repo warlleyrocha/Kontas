@@ -38,15 +38,20 @@ describe("initSentry", () => {
     initSentry();
 
     expect(mockMobileReplayIntegration).toHaveBeenCalledTimes(1);
+    expect(mockMobileReplayIntegration).toHaveBeenCalledWith({
+      maskAllText: true,
+      maskAllImages: true,
+    });
     expect(mockFeedbackIntegration).toHaveBeenCalledTimes(1);
     expect(mockInit).toHaveBeenCalledTimes(1);
     expect(mockInit).toHaveBeenCalledWith({
       dsn: MOCK_DSN,
-      sendDefaultPii: true,
+      sendDefaultPii: false,
       enableLogs: true,
-      replaysSessionSampleRate: 0.1,
-      replaysOnErrorSampleRate: 1,
+      replaysSessionSampleRate: 0,
+      replaysOnErrorSampleRate: 0.5,
       integrations: [{ name: "mobile-replay" }, { name: "feedback" }],
+      beforeSend: expect.any(Function),
     });
   });
 
