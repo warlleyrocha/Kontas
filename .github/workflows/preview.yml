@@ -4,10 +4,75 @@ on:
   push:
     branches:
       - develop
+  pull_request:
+    branches:
+      - develop
+    types:
+      - opened
+      - reopened
+      - ready_for_review
+
+concurrency:
+  group: preview-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build:
-    name: EAS Preview Build
+  quality:
+    if: github.event_name == 'pull_request' && !github.event.pull_request.draft
+    name: PR Quality Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Expo lint
+        run: npm run lint
+
+      - name: Run Biome checks
+        run: npm run lint:biome
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
+
+  preview-pr:
+    if: github.event_name == 'pull_request' && !github.event.pull_request.draft
+    name: EAS Preview Build (PR)
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build preview (Android)
+        run: eas build --profile preview --platform android --non-interactive
+
+  preview-develop:
+    if: github.event_name == 'push'
+    name: EAS Preview Build (develop)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
