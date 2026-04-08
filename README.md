@@ -456,7 +456,7 @@ npm run sonar:scan
 
 ---
 
-## Desenvolvedor:
+## Desenvolvedor
 
 | [<img src="https://github.com/warlleyrocha.png" width=115><br><sub>Warlley Rocha</sub>](https://github.com/warlleyrocha) |
 | :----------------------------------------------------------------------------------------------------------------------: |
