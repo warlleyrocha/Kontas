@@ -106,7 +106,7 @@ jobs:
 
           echo "$BUILD"
 
-          BUILD_URL=$(echo $BUILD | jq -r '.[0].buildUrl')
+          BUILD_URL=$(echo $BUILD | jq -r '.[0].buildDetailsPageUrl')
           echo "BUILD_URL=$BUILD_URL" >> $GITHUB_ENV
 
       - name: Comment build link
