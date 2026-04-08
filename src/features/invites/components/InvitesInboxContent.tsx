@@ -1,10 +1,10 @@
-import type { GetInvitesByUser } from "../types/invite.types";
+import type { Invite } from "../types/invite.types";
 import InviteCardMe from "./InviteCardMe";
 import { InviteListContentBase } from "./InviteListContentBase";
 
 interface InvitesInboxContentProps {
   readonly error: string | null;
-  readonly invites: GetInvitesByUser[];
+  readonly invites: Invite[];
   readonly onRetry: () => void;
   readonly onEmptyStatePress: () => void;
   readonly onAcceptInvite: (inviteId: string, republicId: string) => void;
