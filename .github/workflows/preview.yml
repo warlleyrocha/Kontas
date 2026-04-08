@@ -26,6 +26,8 @@ jobs:
 
   quality:
     name: Code Quality
+    if: github.event.action != 'ready_for_review'
+
     runs-on: ubuntu-latest
 
     steps:
@@ -90,7 +92,7 @@ jobs:
           eas-version: latest
 
       - name: Validate project
-        run: npx expo doctor
+        run: npx expo-doctor
 
       - name: Build Android Preview
         id: build
