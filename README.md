@@ -333,6 +333,7 @@ npm run ios
 | `npm run web`           | Servidor web com Metro                              |
 | `npm run lint`          | Executa o ESLint                                    |
 | `npm run lint:biome`    | Executa o Biome em modo de verificação              |
+| `npm run fix:biome`     | Corrige verificações do Biome                       | 
 | `npm run format`        | Formata o código com Biome                          |
 | `npm test`              | Roda o Jest em modo watch                           |
 | `npm run test:coverage` | Gera cobertura de testes                            |
