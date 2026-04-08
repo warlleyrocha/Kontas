@@ -1,12 +1,11 @@
-import { useCallback, useEffect, useId, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-
+import { useCallback, useEffect, useId, useMemo } from "react";
+import { accountKeys } from "@/src/features/accounts/hooks/account.keys";
+import { accountResidentKeys } from "@/src/features/accounts/hooks/accountResident.keys";
 import {
   useAccountsByRepublicQuery,
   useAccountsByResidentQueries,
 } from "@/src/features/accounts/hooks/useAccountQueries";
-import { accountKeys } from "@/src/features/accounts/hooks/account.keys";
-import { accountResidentKeys } from "@/src/features/accounts/hooks/accountResident.keys";
 import {
   type Conta,
   StatusConta,

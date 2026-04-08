@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import React from "react";
 import { act, renderHook } from "@testing-library/react-native";
+import React from "react";
 
 import { getErrorMessage } from "@/src/services/httpError";
 import { toast } from "@/src/shared/components/ui/sonner";
@@ -11,9 +11,9 @@ import { useAccountActions } from "../../hooks/useAccountActions";
 import { accountService } from "../../services/account.service";
 import { accountResidentsService } from "../../services/account-residents.service";
 import {
+  type CriarContaComMoradoresRequest,
   MetodoPagamento,
   StatusConta,
-  type CriarContaComMoradoresRequest,
 } from "../../types/account.types";
 
 jest.mock("@/src/services/httpError", () => ({

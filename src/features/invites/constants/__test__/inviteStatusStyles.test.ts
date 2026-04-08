@@ -1,7 +1,7 @@
 import { StatusInvite } from "@/src/features/invites/types/invite.types";
 import {
-  INVITE_STATUS_STYLES,
   getInviteStatusStyle,
+  INVITE_STATUS_STYLES,
 } from "../inviteStatusStyles";
 
 // ─── INVITE_STATUS_STYLES ─────────────────────────────────────────────────────

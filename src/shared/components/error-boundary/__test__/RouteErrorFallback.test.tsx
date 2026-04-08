@@ -1,5 +1,5 @@
-import { fireEvent, render, screen } from "@testing-library/react-native";
 import { captureException } from "@sentry/react-native";
+import { fireEvent, render, screen } from "@testing-library/react-native";
 import { RouteErrorFallback } from "../RouteErrorFallback";
 
 jest.mock("@sentry/react-native", () => ({

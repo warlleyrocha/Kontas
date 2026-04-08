@@ -1,8 +1,8 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { Platform } from "react-native";
-import AddAccountModal from "../AddAccountModal";
 import { useAccountForm } from "../../../hooks/useAccountForm";
 import { MetodoPagamento, StatusConta } from "../../../types/account.types";
+import AddAccountModal from "../AddAccountModal";
 
 jest.mock("@expo/vector-icons/Feather", () => ({
   __esModule: true,

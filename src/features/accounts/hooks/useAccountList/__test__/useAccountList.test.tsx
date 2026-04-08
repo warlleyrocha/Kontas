@@ -45,10 +45,10 @@ jest.mock("@/src/shared/contexts/RefreshContext", () => ({
 }));
 
 const mockListarContasPorRepublica = jest.mocked(
-  accountService.listarContasPorRepublica,
+  accountService.listarContasPorRepublica
 );
 const mockListarContasMoradores = jest.mocked(
-  accountResidentsService.listarContasMoradores,
+  accountResidentsService.listarContasMoradores
 );
 const mockUseRefresh = jest.mocked(useRefresh);
 
@@ -105,7 +105,7 @@ describe("useAccountList — estado retornado", () => {
   it("expõe loading e error de useAccountData", async () => {
     const { result } = renderHook(
       () => useAccountList({ republicId: "rep-1" }),
-      { wrapper },
+      { wrapper }
     );
 
     expect(result.current.loading).toBe(true);
@@ -118,7 +118,7 @@ describe("useAccountList — estado retornado", () => {
   it("expõe os filtros de useAccountFilters", async () => {
     const { result } = renderHook(
       () => useAccountList({ republicId: "rep-1" }),
-      { wrapper },
+      { wrapper }
     );
 
     await act(async () => {});
@@ -134,7 +134,7 @@ describe("useAccountList — estado retornado", () => {
   it("expõe contasOrdenadas e mesesDisponiveis de useAccountDerivedData", async () => {
     const { result } = renderHook(
       () => useAccountList({ republicId: "rep-1" }),
-      { wrapper },
+      { wrapper }
     );
 
     await act(async () => {});
@@ -149,7 +149,7 @@ describe("useAccountList — estado retornado", () => {
   it("expõe accountResidentsById e confirmResidentPayment de useAccountResidents", async () => {
     const { result } = renderHook(
       () => useAccountList({ republicId: "rep-1" }),
-      { wrapper },
+      { wrapper }
     );
 
     await act(async () => {});
@@ -188,7 +188,7 @@ describe("useAccountList — refresh automático ao montar", () => {
 
     renderHook(() => useAccountList({ republicId: "rep-1" }), { wrapper });
     await waitFor(() =>
-      expect(mockListarContasMoradores).toHaveBeenCalledWith("acc-1"),
+      expect(mockListarContasMoradores).toHaveBeenCalledWith("acc-1")
     );
   });
 });
@@ -208,7 +208,7 @@ describe("useAccountList — registro no RefreshContext", () => {
 
     expect(mockRegisterRefresh).toHaveBeenCalledWith(
       expect.stringContaining("accounts-rep-99-"),
-      expect.any(Function),
+      expect.any(Function)
     );
   });
 
@@ -231,38 +231,42 @@ describe("useAccountList — registro no RefreshContext", () => {
 
 describe("useAccountList — refresh público", () => {
   it("refresh chama fetchAccounts e depois loadResidents", async () => {
-    const contas = [
-      {
-        id: "acc-1",
-        descricao: "Conta 1",
-        valor: 100,
-        vencimento: "2026-03-20",
-        status: "PENDENTE" as any,
-        republicaId: "rep-1",
-        criadoPorId: "u-1",
-        criadoPorNome: "Admin",
-        metodoPagamento: null,
-        pago: false,
-        criadoEm: "2026-01-01",
-        atualizadoEm: "2026-01-01",
-      },
-    ];
-    mockListarContasPorRepublica.mockResolvedValue(contas);
+  const contas = [
+    {
+      id: "acc-1",
+      descricao: "Conta 1",
+      valor: 100,
+      vencimento: "2026-03-20",
+      status: "PENDENTE" as any,
+      republicaId: "rep-1",
+      criadoPorId: "u-1",
+      criadoPorNome: "Admin",
+      metodoPagamento: null,
+      pago: false,
+      criadoEm: "2026-01-01",
+      atualizadoEm: "2026-01-01",
+    },
+  ];
 
-    const { result } = renderHook(
-      () => useAccountList({ republicId: "rep-1" }),
-      { wrapper },
-    );
-    await act(async () => {});
+  mockListarContasPorRepublica.mockResolvedValue(contas);
 
-    mockListarContasPorRepublica.mockClear();
-    mockListarContasMoradores.mockClear();
+  const { result } = renderHook(
+    () => useAccountList({ republicId: "rep-1" }),
+    { wrapper }
+  );
 
-    await act(async () => {
-      await result.current.refresh();
-    });
+  await act(async () => {});
 
+  mockListarContasPorRepublica.mockClear();
+  mockListarContasMoradores.mockClear();
+
+  await act(async () => {
+    await result.current.refresh();
+  });
+
+  await waitFor(() => {
     expect(mockListarContasPorRepublica).toHaveBeenCalledTimes(1);
     expect(mockListarContasMoradores).toHaveBeenCalledWith("acc-1");
   });
+});
 });

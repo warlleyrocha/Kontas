@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { TouchableOpacity } from "react-native";
-import { StatusPagamento } from "../../../types/accountResidents.types";
 import type { ContaMorador } from "../../../types/accountResidents.types";
+import { StatusPagamento } from "../../../types/accountResidents.types";
 import { AccountResidentRow } from "../AccountResidentRow";
 
 jest.mock("../../shared/AccountStatusIcon", () => ({

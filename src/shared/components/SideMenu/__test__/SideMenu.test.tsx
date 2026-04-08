@@ -1,8 +1,8 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import React from "react";
-import { Image } from "react-native";
 import * as RN from "react-native";
-import { SideMenu, MenuButton } from "../index";
+import { Image } from "react-native";
+import { MenuButton, SideMenu } from "../index";
 
 jest.mock("react-native-reanimated", () =>
   jest.requireActual("react-native-reanimated/mock")

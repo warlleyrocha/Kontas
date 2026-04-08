@@ -1,14 +1,14 @@
 import { act, render, screen } from "@testing-library/react-native";
-import { PlusButton } from "@/src/shared/components/PlusButton";
 import { InviteModal } from "@/src/features/invites/components/InviteModal";
 import { useSendInviteMutation } from "@/src/features/invites/hooks/useInvitesQueries";
 import { ResidentCard } from "@/src/features/residents/components/ResidentCard";
 import { useTabResidents } from "@/src/features/residents/hooks/useTabResidents";
 import { getErrorMessage } from "@/src/services/httpError";
+import { PlusButton } from "@/src/shared/components/PlusButton";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import {
-  ResidentRole,
   type ResidentResponse,
+  ResidentRole,
 } from "@/src/shared/types/resident.types";
 import { ResidentsTab } from "../ResidentsTab";
 

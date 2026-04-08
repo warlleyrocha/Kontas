@@ -1,7 +1,7 @@
 import { renderHook } from "@testing-library/react-native";
 import {
-  StatusConta,
   type Conta,
+  StatusConta,
 } from "@/src/features/accounts/types/account.types";
 import { useAccountDerivedData } from "../useAccountDerivedData";
 

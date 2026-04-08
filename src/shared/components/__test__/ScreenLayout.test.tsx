@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react-native";
-import { Text } from "react-native";
 import { useRouter } from "expo-router";
+import { Text } from "react-native";
 import { ScreenLayout } from "../ScreenLayout";
 
 jest.mock("expo-router", () => ({

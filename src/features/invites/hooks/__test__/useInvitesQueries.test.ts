@@ -1,12 +1,12 @@
-import { renderHook } from "@testing-library/react-native";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { renderHook } from "@testing-library/react-native";
 import { inviteService } from "@/src/features/invites/services/invite.service";
-import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 import type {
   GetInvitesByUser,
   Invite,
 } from "@/src/features/invites/types/invite.types";
 import { StatusInvite } from "@/src/features/invites/types/invite.types";
+import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 import {
   useInvitesByRepublicQuery,
   useInvitesByUserQuery,

@@ -2,14 +2,13 @@ import Feather from "@expo/vector-icons/Feather";
 import { Text, View } from "react-native";
 
 import DivisionOption from "@/src/shared/components/DivisionOption";
-import ResidentRow from "./AddAccountModalResidentRow";
+import { formatBRL } from "@/src/shared/utils/formats";
 
 import type {
   MoradorDivisao,
   TipoDivisao,
 } from "../../types/accountForm.types";
-
-import { formatBRL } from "@/src/shared/utils/formats";
+import ResidentRow from "./AddAccountModalResidentRow";
 
 interface AddAccountModalResidentsSectionProps {
   readonly tipoDivisao: TipoDivisao;

@@ -11,12 +11,12 @@ import {
 import { useRepublicActions } from "@/src/features/republic/hooks/useRepublicActions";
 import { useRepublicsQuery } from "@/src/features/republic/hooks/useRepublicQueries";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
-import { getErrorMessage } from "@/src/services/httpError";
 import {
   useCompleteProfileMutation,
   useCurrentUserQuery,
   useUpdateCurrentUserMutation,
 } from "@/src/features/user/hooks/useUserQueries";
+import { getErrorMessage } from "@/src/services/httpError";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
 import { useRepublicResidents } from "@/src/shared/hooks/useRepublicResidents";
 import { maskPhone } from "@/src/shared/utils/inputMasks";

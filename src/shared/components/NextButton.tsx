@@ -1,5 +1,5 @@
-import { Text, TouchableOpacity, View } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
+import { Text, TouchableOpacity, View } from "react-native";
 
 interface NextButtonProps {
   readonly onNext: () => Promise<void> | void;

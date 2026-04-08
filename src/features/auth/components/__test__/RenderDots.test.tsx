@@ -1,8 +1,8 @@
 import { render } from "@testing-library/react-native";
 import { View } from "react-native";
 import type { SharedValue } from "react-native-reanimated";
-import RenderDots from "../onboarding/RenderDots";
 import type { OnboardingSlide } from "../../constants/slides";
+import RenderDots from "../onboarding/RenderDots";
 
 const mockSlides: OnboardingSlide[] = [
   {

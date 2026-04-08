@@ -17,6 +17,10 @@ if (!API_URL) {
   );
 }
 
+if (!__DEV__ && !API_URL.startsWith("https://")) {
+  throw new Error("EXPO_PUBLIC_API_URL deve usar HTTPS em produção.");
+}
+
 export const api = axios.create({
   baseURL: API_URL,
   timeout: 10000,

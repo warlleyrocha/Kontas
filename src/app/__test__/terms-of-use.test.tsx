@@ -1,10 +1,9 @@
 import { render } from "@testing-library/react-native";
 import type { ErrorBoundaryProps } from "expo-router";
-
-import TermsOfUseRoute, { ErrorBoundary } from "../terms-of-use";
 import { LegalScreen } from "@/src/features/legal/screens/LegalScreen";
 import { RouteErrorFallback } from "@/src/shared/components/error-boundary/RouteErrorFallback";
 import { termsOfUse } from "@/src/shared/constants/legalContent";
+import TermsOfUseRoute, { ErrorBoundary } from "../terms-of-use";
 
 jest.mock("@/src/features/legal/screens/LegalScreen", () => ({
   __esModule: true,

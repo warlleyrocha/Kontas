@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react-native";
 import { Image } from "react-native";
-import { RepublicHeader } from "../RepublicHeader";
 import type { RepublicResponse } from "../../types/republic.types";
+import { RepublicHeader } from "../RepublicHeader";
 
 jest.mock("@expo/vector-icons/Feather", () => ({
   __esModule: true,

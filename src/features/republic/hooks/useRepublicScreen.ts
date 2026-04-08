@@ -4,8 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthMutations";
 import { useResidents } from "@/src/features/residents/hooks/useResidents";
-import { getErrorMessage } from "@/src/services/httpError";
 import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
+import { getErrorMessage } from "@/src/services/httpError";
 import { ResidentRole } from "@/src/shared/types/resident.types";
 import type { TabKey } from "@/src/shared/types/tabs";
 import { logger } from "@/src/shared/utils/logger";

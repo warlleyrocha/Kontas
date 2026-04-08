@@ -1,6 +1,6 @@
-import { useState } from "react";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -16,6 +16,7 @@ import ImageLogin from "@/assets/images/image-login.webp";
 import { useLoginWithGoogleMutation } from "@/src/features/auth/hooks/useAuthMutations";
 import { getErrorMessage } from "@/src/services/httpError";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
+import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
 
 type GoogleSignInResult = Awaited<ReturnType<typeof GoogleSignin.signIn>>;
@@ -53,7 +54,7 @@ export default function LoginScreen() {
         }
       }
     } catch (error) {
-      console.error("Erro no login:", error);
+      logger.error("Login", "Erro no login:", error);
       showToast.error(
         getErrorMessage(
           error,

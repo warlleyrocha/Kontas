@@ -8,6 +8,7 @@ const CONTROLLED_ENV_KEYS = [
   "REACT_NATIVE_PACKAGER_HOSTNAME",
   "RCT_METRO_PORT",
   "EXPO_PUBLIC_API_URL",
+  "EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID",
   "EXISTING_KEY",
   "QUOTED_SINGLE",
   "QUOTED_DOUBLE",
@@ -72,8 +73,8 @@ function importFreshAppConfig({
 
   let appConfigModule: Record<string, unknown> | undefined;
   jest.isolateModules(() => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    appConfigModule = require("../app.config") as Record<string, unknown>; // biome-ignore lint/style/noCommonJs: jest.isolateModules requer require
+    // biome-ignore lint/style/noCommonJs: jest.isolateModules requer require
+    appConfigModule = require("../app.config") as Record<string, unknown>;
   });
 
   return {
@@ -221,7 +222,12 @@ describe("app.config.ts", () => {
   });
 
   it("monta o Expo config completo usando development por padrão", () => {
-    const { appConfigModule } = importFreshAppConfig();
+    const { appConfigModule } = importFreshAppConfig({
+      env: {
+        EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID:
+          "475215012202-oq93e4s85f7uuhfji6k2nkhdb7i2dfm3.apps.googleusercontent.com",
+      },
+    });
     const createConfig = (
       appConfigModule as { default: (ctx: unknown) => Record<string, unknown> }
     ).default;

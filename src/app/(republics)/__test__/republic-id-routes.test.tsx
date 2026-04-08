@@ -1,9 +1,9 @@
 import { render } from "@testing-library/react-native";
 import type { ErrorBoundaryProps } from "expo-router";
 import { Redirect, useLocalSearchParams } from "expo-router";
-import { RepublicScreen } from "@/src/features/republic";
-import { InvitesSentScreen } from "@/src/features/invites";
 import PaymentsScreen from "@/src/features/accounts/screens/PaymentsScreen";
+import { InvitesSentScreen } from "@/src/features/invites";
+import { RepublicScreen } from "@/src/features/republic";
 import { RouteErrorFallback } from "@/src/shared/components/error-boundary/RouteErrorFallback";
 import RepublicRoute from "../[id]/index";
 import InvitesSentRoute, {

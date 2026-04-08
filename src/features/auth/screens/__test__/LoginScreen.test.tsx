@@ -35,6 +35,9 @@ const mockLoginWithGoogle = jest.fn();
 const mockRouterReplace = jest.fn();
 const mockRouterPush = jest.fn();
 
+const serializeError = (error: Error) =>
+  JSON.stringify(error, Object.getOwnPropertyNames(error), 2);
+
 // ─── Setup ────────────────────────────────────────────────────────────────────
 
 let consoleErrorSpy: jest.SpyInstance;
@@ -212,7 +215,11 @@ describe("LoginScreen — fluxo de login com Google", () => {
     await act(async () => {
       fireEvent.press(screen.getByText("Entrar com Google"));
     });
-    expect(consoleErrorSpy).toHaveBeenCalledWith("Erro no login:", err);
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "[ERROR][Login]",
+      "Erro no login:",
+      serializeError(err)
+    );
     expect(showToast.error).toHaveBeenCalledWith(
       "Erro ao fazer login com Google. Tente novamente."
     );

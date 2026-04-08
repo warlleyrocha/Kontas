@@ -1,16 +1,14 @@
-import { View, Text, TextInput, Image, TouchableOpacity } from "react-native";
+import Feather from "@expo/vector-icons/Feather";
+import { Image, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { formatBRL } from "@/src/shared/utils/formats";
 import {
   maskCurrencyBRL,
   unmaskCurrencyBRL,
 } from "@/src/shared/utils/inputMasks";
-import { formatBRL } from "@/src/shared/utils/formats";
-
 import type {
   MoradorDivisao,
   TipoDivisao,
 } from "../../types/accountForm.types";
-
-import Feather from "@expo/vector-icons/Feather";
 
 interface ResidentRowProps {
   readonly morador: MoradorDivisao;

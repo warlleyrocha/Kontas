@@ -1,4 +1,4 @@
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { residentService } from "../services/resident.service";

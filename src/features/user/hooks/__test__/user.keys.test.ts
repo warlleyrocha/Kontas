@@ -8,4 +8,8 @@ describe("userKeys", () => {
   it("gera a chave current como ['user', 'current']", () => {
     expect(userKeys.current()).toEqual(["user", "current"]);
   });
+
+  it("gera a chave cached como ['user', 'cached']", () => {
+    expect(userKeys.cached()).toEqual(["user", "cached"]);
+  });
 });

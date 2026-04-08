@@ -5,6 +5,7 @@ import { accountService } from "@/src/features/accounts/services/account.service
 import type { Conta } from "@/src/features/accounts/types/account.types";
 import type { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
 import { getErrorMessage } from "@/src/services/httpError";
+import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
 import { accountResidentsService } from "../../services/account-residents.service";
 
@@ -44,7 +45,7 @@ export function useAccountData({
         err,
         "Não foi possível carregar as contas."
       );
-      console.error("Erro ao buscar contas:", err);
+      logger.error("Accounts", "Erro ao buscar contas", err);
       showToast.error(message);
       setError(err instanceof Error ? err : new Error(message));
       setContas([]);
@@ -63,7 +64,7 @@ export function useAccountData({
           err,
           "Não foi possível carregar os moradores da conta."
         );
-        console.error("Erro ao buscar moradores da conta:", err);
+        logger.error("Accounts", "Erro ao buscar moradores da conta", err);
         showToast.error(message);
         return [];
       }

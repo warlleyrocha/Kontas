@@ -32,6 +32,9 @@ const defaultProps = {
   onSave: jest.fn(),
 };
 
+const serializeError = (error: Error) =>
+  JSON.stringify(error, Object.getOwnPropertyNames(error), 2);
+
 // ─── Setup ────────────────────────────────────────────────────────────────────
 
 let consoleErrorSpy: jest.SpyInstance;
@@ -206,7 +209,11 @@ describe("useEditProfile — handleSave", () => {
       await result.current.handleSave();
     });
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith("Erro ao salvar:", error);
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      "[ERROR][Profile]",
+      "Erro ao salvar perfil",
+      serializeError(error)
+    );
     expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
       "Não foi possível salvar as alterações."
     );
@@ -286,8 +293,9 @@ describe("useEditProfile — selectPhoto", () => {
     });
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      "Erro ao selecionar imagem:",
-      error
+      "[ERROR][Profile]",
+      "Erro ao selecionar imagem",
+      serializeError(error)
     );
     expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
       "Não foi possível selecionar a imagem."

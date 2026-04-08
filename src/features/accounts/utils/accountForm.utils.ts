@@ -1,5 +1,5 @@
-import type { MoradorDivisao, TipoDivisao } from "../types/accountForm.types";
 import { formatBRL } from "@/src/shared/utils/formats";
+import type { MoradorDivisao, TipoDivisao } from "../types/accountForm.types";
 
 export function parseCurrencyValue(value: string): number {
   const normalized = value.replace(/\./g, "").replace(",", ".").trim();

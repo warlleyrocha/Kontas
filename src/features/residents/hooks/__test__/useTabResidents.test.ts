@@ -1,8 +1,8 @@
 import { act, renderHook } from "@testing-library/react-native";
 import { setStringAsync } from "expo-clipboard";
 import {
-  ResidentRole,
   type ResidentResponse,
+  ResidentRole,
 } from "@/src/shared/types/resident.types";
 import { showToast } from "@/src/shared/utils/showToast";
 import { useTabResidents } from "../useTabResidents";

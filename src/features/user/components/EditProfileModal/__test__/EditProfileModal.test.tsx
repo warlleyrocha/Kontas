@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react-native";
 import { Platform } from "react-native";
-import { EditProfileModal } from "../index";
 import { useEditProfile } from "../../../hooks/useEditProfile";
+import { EditProfileModal } from "../index";
 
 jest.mock("@expo/vector-icons/Feather", () => ({
   __esModule: true,

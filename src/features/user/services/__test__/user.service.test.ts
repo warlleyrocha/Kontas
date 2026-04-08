@@ -1,5 +1,5 @@
-import { toUserFriendlyError } from "@/src/services/httpError";
 import { api } from "@/src/services/api";
+import { toUserFriendlyError } from "@/src/services/httpError";
 import type {
   CompleteProfileRequest,
   UpdateUserRequest,
@@ -29,6 +29,9 @@ const mockUser: User = {
   fotoPerfil: null,
   perfilCompleto: true,
 };
+
+const serializeError = (error: Error) =>
+  JSON.stringify(error, Object.getOwnPropertyNames(error), 2);
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -104,8 +107,9 @@ describe("userService.updateUser", () => {
     await expect(userService.updateUser(payload)).rejects.toBeDefined();
 
     expect(console.error).toHaveBeenCalledWith(
-      "❌ Erro ao atualizar perfil:",
-      error
+      "[ERROR][User]",
+      "Erro ao atualizar perfil",
+      serializeError(error)
     );
   });
 

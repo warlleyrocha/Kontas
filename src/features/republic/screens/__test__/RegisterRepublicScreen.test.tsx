@@ -1,4 +1,4 @@
-import { act, render, screen, fireEvent } from "@testing-library/react-native";
+import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { KeyboardAvoidingView, Platform } from "react-native";
 import { useRepublicActions } from "@/src/features/republic/hooks/useRepublicActions";
 import { useRepublicForm } from "@/src/features/republic/hooks/useRepublicForm";

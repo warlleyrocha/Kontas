@@ -90,7 +90,6 @@ describe("logger", () => {
       category: "Auth",
       message: "mensagem warn",
       level: "warning",
-      data: { step: "x" },
     });
     expect(errorSpy).toHaveBeenCalledWith(
       "[ERROR][Auth]",
@@ -104,7 +103,7 @@ describe("logger", () => {
       "mensagem trace"
     );
     expect(mockSetTag).toHaveBeenCalledWith("module", "Auth");
-    expect(mockSetExtra).toHaveBeenCalledWith("context", { requestId: "1" });
+    expect(mockSetExtra).not.toHaveBeenCalled();
     expect(mockCaptureException).toHaveBeenCalledWith(error);
     expect(infoSpy).toHaveBeenNthCalledWith(
       2,
@@ -140,7 +139,6 @@ describe("logger", () => {
       category: "API",
       message: "warn",
       level: "warning",
-      data: undefined,
     });
     expect(mockSetTag).toHaveBeenCalledWith("module", "API");
     expect(mockSetExtra).not.toHaveBeenCalled();
@@ -184,7 +182,6 @@ describe("logger", () => {
       category: "Billing",
       message: "warn sem data",
       level: "warning",
-      data: undefined,
     });
     expect(errorSpy).toHaveBeenNthCalledWith(
       1,

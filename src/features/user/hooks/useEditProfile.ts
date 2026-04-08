@@ -5,6 +5,7 @@ import {
 import { useState } from "react";
 import { Alert } from "react-native";
 import { getErrorMessage } from "@/src/services/httpError";
+import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
 
 export interface EditProfileFormValues {
@@ -49,7 +50,7 @@ export function useEditProfile({
     try {
       await onSave(name, pixKey, photoUri, phone);
     } catch (error) {
-      console.error("Erro ao salvar:", error);
+      logger.error("Profile", "Erro ao salvar perfil", error);
       showToast.error(
         getErrorMessage(error, "Não foi possível salvar as alterações.")
       );
@@ -78,7 +79,7 @@ export function useEditProfile({
         setPhotoUri(result.assets[0].uri);
       }
     } catch (error) {
-      console.error("Erro ao selecionar imagem:", error);
+      logger.error("Profile", "Erro ao selecionar imagem", error);
       showToast.error(
         getErrorMessage(error, "Não foi possível selecionar a imagem.")
       );

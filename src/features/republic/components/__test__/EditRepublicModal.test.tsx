@@ -5,10 +5,10 @@ import {
   Platform,
   TouchableOpacity,
 } from "react-native";
-import { EditRepublicModal } from "../EditRepublicModal";
 import useEditRepublicModal, {
   type UseEditRepublicModalReturn,
 } from "../../hooks/useEditRepublicModal";
+import { EditRepublicModal } from "../EditRepublicModal";
 
 jest.mock("@expo/vector-icons/Feather", () => ({
   __esModule: true,

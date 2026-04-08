@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
 import { act, renderHook, waitFor } from "@testing-library/react-native";
+import type { ReactNode } from "react";
 import { RefreshProvider, useRefresh } from "./RefreshContext";
 
 function createWrapper() {

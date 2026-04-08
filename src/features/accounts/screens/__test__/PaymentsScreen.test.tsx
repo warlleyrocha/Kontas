@@ -1,6 +1,4 @@
 import { fireEvent, render, screen } from "@testing-library/react-native";
-import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
-import type { PaymentAccount } from "@/src/features/accounts/types/payments.types";
 import {
   PaymentsEmptyState,
   PaymentsErrorState,
@@ -8,6 +6,8 @@ import {
   PendingPaymentsList,
 } from "@/src/features/accounts/components/payments";
 import { usePaymentsScreen } from "@/src/features/accounts/hooks/usePayments";
+import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
+import type { PaymentAccount } from "@/src/features/accounts/types/payments.types";
 import PaymentsScreen from "../PaymentsScreen";
 
 jest.mock("@/src/features/accounts/components/payments", () => ({

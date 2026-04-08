@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react-native";
 import type { SharedValue } from "react-native-reanimated";
-import OnboardingButtons from "../onboarding/OnboardingButtons";
 import type { OnboardingSlide } from "../../constants/slides";
+import OnboardingButtons from "../onboarding/OnboardingButtons";
 
 const mockSlides: OnboardingSlide[] = [
   {

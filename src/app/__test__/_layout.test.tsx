@@ -1,15 +1,13 @@
+import { wrap } from "@sentry/react-native";
 import { render } from "@testing-library/react-native";
-import { useQueryClient } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { preventAutoHideAsync } from "expo-splash-screen";
-import { wrap } from "@sentry/react-native";
-import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
+import { useSessionLifecycle } from "@/src/features/auth/hooks/useAuth";
+import useAppReady from "@/src/hooks/useAppReady";
 import { configureGoogleSignin } from "@/src/lib/google-signin";
 import { initSentry } from "@/src/lib/sentry";
-import useAppReady from "@/src/hooks/useAppReady";
 import { Toaster } from "@/src/shared/components/ui/sonner";
 import { AppProviders } from "../../providers/AppProviders";
-import LoadingScreen from "@/src/shared/components/ui/loading-screen";
 import AppLayout from "../_layout";
 
 jest.mock("../../../global.css", () => ({}));
@@ -22,11 +20,6 @@ jest.mock("expo-router", () => ({
 jest.mock("expo-splash-screen", () => ({
   __esModule: true,
   preventAutoHideAsync: jest.fn(),
-}));
-
-jest.mock("@tanstack/react-query", () => ({
-  __esModule: true,
-  useQueryClient: jest.fn(),
 }));
 
 jest.mock("@sentry/react-native", () => ({
@@ -44,24 +37,19 @@ jest.mock("@/src/lib/google-signin", () => ({
   configureGoogleSignin: jest.fn(),
 }));
 
-jest.mock("@/src/features/user/hooks/useUserQueries", () => ({
-  __esModule: true,
-  useCurrentUserQuery: jest.fn(),
-}));
-
 jest.mock("@/src/hooks/useAppReady", () => ({
   __esModule: true,
   default: jest.fn(),
 }));
 
+jest.mock("@/src/features/auth/hooks/useAuth", () => ({
+  __esModule: true,
+  useSessionLifecycle: jest.fn(),
+}));
+
 jest.mock("../../providers/AppProviders", () => ({
   __esModule: true,
   AppProviders: jest.fn(({ children }) => children),
-}));
-
-jest.mock("@/src/shared/components/ui/loading-screen", () => ({
-  __esModule: true,
-  default: jest.fn(() => null),
 }));
 
 jest.mock("@/src/shared/components/ui/sonner", () => ({
@@ -76,14 +64,12 @@ jest.mock("@/src/shared/components/ui/sonner", () => ({
 const mockStack = jest.mocked(Stack);
 const mockPreventAutoHideAsync = jest.mocked(preventAutoHideAsync);
 const mockWrap = jest.mocked(wrap);
-const mockUseCurrentUserQuery = jest.mocked(useCurrentUserQuery);
-const mockUseQueryClient = jest.mocked(useQueryClient);
 const mockConfigureGoogleSignin = jest.mocked(configureGoogleSignin);
 const mockInitSentry = jest.mocked(initSentry);
 const mockUseAppReady = jest.mocked(useAppReady);
+const mockUseSessionLifecycle = jest.mocked(useSessionLifecycle);
 const mockToaster = jest.mocked(Toaster);
 const mockAppProviders = jest.mocked(AppProviders);
-const mockLoadingScreen = jest.mocked(LoadingScreen);
 
 describe("_layout module", () => {
   it("executa o bootstrap do app ao carregar o módulo", () => {
@@ -98,11 +84,6 @@ describe("_layout render", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseAppReady.mockReturnValue(true);
-    mockUseCurrentUserQuery.mockReturnValue({
-      data: null,
-      isLoading: false,
-    } as never);
-    mockUseQueryClient.mockReturnValue({ clear: jest.fn() } as never);
   });
 
   it("retorna null enquanto o app não estiver pronto", () => {
@@ -111,34 +92,16 @@ describe("_layout render", () => {
     const { toJSON } = render(<AppLayout />);
 
     expect(toJSON()).toBeNull();
-    expect(mockUseCurrentUserQuery).not.toHaveBeenCalled();
     expect(mockAppProviders).not.toHaveBeenCalled();
     expect(mockStack).not.toHaveBeenCalled();
     expect(mockToaster).not.toHaveBeenCalled();
   });
 
-  it("renderiza LoadingScreen quando a autenticação ainda está carregando", () => {
-    mockUseCurrentUserQuery.mockReturnValue({
-      data: null,
-      isLoading: true,
-    } as never);
-
+  it("renderiza Stack quando o app está pronto", () => {
     render(<AppLayout />);
 
     expect(mockAppProviders).toHaveBeenCalledTimes(1);
-    expect(mockLoadingScreen).toHaveBeenCalledTimes(1);
-    expect(mockStack).not.toHaveBeenCalled();
-    expect(mockToaster).toHaveBeenCalledWith(
-      expect.objectContaining({ position: "bottom-center" }),
-      undefined
-    );
-  });
-
-  it("renderiza Stack quando o app está pronto e autenticado", () => {
-    render(<AppLayout />);
-
-    expect(mockAppProviders).toHaveBeenCalledTimes(1);
-    expect(mockLoadingScreen).not.toHaveBeenCalled();
+    expect(mockUseSessionLifecycle).toHaveBeenCalledTimes(1);
     expect(mockStack).toHaveBeenCalledWith(
       expect.objectContaining({
         screenOptions: { headerShown: false },

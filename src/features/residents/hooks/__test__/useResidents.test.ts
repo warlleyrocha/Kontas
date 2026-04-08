@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react-native";
 import {
-  ResidentRole,
   type ResidentResponse,
+  ResidentRole,
 } from "@/src/shared/types/resident.types";
 import { useResidentsByRepublicQuery } from "../useResidentQueries";
 import { useResidents } from "../useResidents";

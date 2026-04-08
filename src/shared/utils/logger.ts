@@ -25,18 +25,19 @@ export const logger = {
   },
 
   /** Alertas não críticos — console.warn + Sentry breadcrumb */
-  warn(tag: string, msg: string, data?: unknown) {
+  warn(tag: string, msg: string, _data?: unknown) {
     if (IS_DEV)
       console.warn(
         `[WARN][${tag}]`,
         msg,
-        data !== undefined ? JSON.stringify(data, null, 2) : ""
+        _data !== undefined ? JSON.stringify(_data, null, 2) : ""
       );
     Sentry.addBreadcrumb({
       category: tag,
       message: msg,
       level: "warning",
-      data: data as Record<string, unknown>,
+      // Never send raw payload data to Sentry — scrubbed by beforeSend anyway,
+      // but keeping data out of breadcrumbs reduces attack surface.
     });
   },
 
@@ -45,7 +46,7 @@ export const logger = {
     tag: string,
     msg: string,
     error?: unknown,
-    extra?: Record<string, unknown>
+    _extra?: Record<string, unknown>
   ) {
     if (IS_DEV) {
       console.error(
@@ -59,7 +60,9 @@ export const logger = {
     }
     Sentry.withScope((scope) => {
       scope.setTag("module", tag);
-      if (extra) scope.setExtra("context", extra);
+      // Never send raw extra/context payloads to Sentry.
+      // All events are scrubbed by beforeSend in initSentry, but defense-in-
+      // depth: we simply don't attach arbitrary data here in the first place.
       const errorMessage = typeof error === "string" ? error : msg;
       const exception =
         error instanceof Error ? error : new Error(errorMessage);

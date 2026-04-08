@@ -2,10 +2,10 @@ import { api } from "@/src/services/api";
 import { toUserFriendlyError } from "@/src/services/httpError";
 import { logger } from "@/src/shared/utils/logger";
 import {
-  MetodoPagamento,
-  StatusConta,
   type Conta,
   type CriarContaRequest,
+  MetodoPagamento,
+  StatusConta,
 } from "../../types/account.types";
 import { accountService } from "../account.service";
 
