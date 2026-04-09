@@ -160,6 +160,17 @@ describe("api service", () => {
     );
   });
 
+  it("lança erro quando API_URL não usa HTTPS em produção (__DEV__ = false)", () => {
+    const originalDev = (global as any).__DEV__;
+    (global as any).__DEV__ = false;
+
+    expect(() => importApiModule("http://api.example.com")).toThrow(
+      "EXPO_PUBLIC_API_URL deve usar HTTPS em produção."
+    );
+
+    (global as any).__DEV__ = originalDev;
+  });
+
   it("cria a instância axios com configuração base do app", () => {
     const { api } = importApiModule("https://contas.example.com");
 

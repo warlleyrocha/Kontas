@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { Image } from "react-native";
-import { InviteModal } from "@/src/features/invites/components/InviteModal";
+import { InvitesModal } from "@/src/features/invites/components/InvitesModal";
 import { EditRepublicModal } from "@/src/features/republic/components/EditRepublicModal";
 import EmptyRepublic from "@/src/features/user/components/CardsProfile/EmptyRepublic";
 import IncompleteProfile from "@/src/features/user/components/CardsProfile/IncompleteProfile";
@@ -12,8 +12,8 @@ import { MenuButton, SideMenu } from "@/src/shared/components/SideMenu";
 import { maskPhone } from "@/src/shared/utils/inputMasks";
 import { ProfileScreen } from "../ProfileScreen";
 
-jest.mock("@/src/features/invites/components/InviteModal", () => ({
-  InviteModal: jest.fn(() => null),
+jest.mock("@/src/features/invites/components/InvitesModal", () => ({
+  InvitesModal: jest.fn().mockImplementation(() => null),
 }));
 jest.mock("@/src/features/republic/components/EditRepublicModal", () => ({
   EditRepublicModal: jest.fn(() => null),
@@ -62,7 +62,7 @@ const mockHandleCloseEditModal = jest.fn();
 const mockHandleSaveRepublicEdit = jest.fn();
 const mockHandleDeleteFromMenu = jest.fn();
 const mockHandleInviteFromMenu = jest.fn();
-const mockHandleCloseInviteModal = jest.fn();
+const mockhandleCloseInviteModal = jest.fn();
 const mockIsAdmin = jest.fn().mockReturnValue(false);
 const mockOnRefresh = jest.fn();
 const mockSendInvite = jest.fn();
@@ -117,7 +117,7 @@ function makeHookReturn(overrides = {}) {
     handleDeleteFromMenu: mockHandleDeleteFromMenu,
     showInviteModal: false,
     handleInviteFromMenu: mockHandleInviteFromMenu,
-    handleCloseInviteModal: mockHandleCloseInviteModal,
+    handleCloseInviteModal: mockhandleCloseInviteModal,
     isAdmin: mockIsAdmin,
     onRefresh: mockOnRefresh,
 
@@ -666,12 +666,12 @@ describe("ProfileScreen — RepublicContextMenu", () => {
   });
 });
 
-// ─── InviteModal ──────────────────────────────────────────────────────────────
+// ─── InvitesModal ──────────────────────────────────────────────────────────────
 
-describe("ProfileScreen — InviteModal", () => {
+describe("ProfileScreen — InvitesModal", () => {
   it("passa open=false quando showInviteModal é false", () => {
     render(<ProfileScreen />);
-    const props = jest.mocked(InviteModal).mock.calls[0][0] as any;
+    const props = jest.mocked(InvitesModal).mock.calls[0][0] as any;
     expect(props.open).toBe(false);
   });
 
@@ -680,17 +680,17 @@ describe("ProfileScreen — InviteModal", () => {
       .mocked(useProfileScreen)
       .mockReturnValue(makeHookReturn({ showInviteModal: true }) as any);
     render(<ProfileScreen />);
-    const props = jest.mocked(InviteModal).mock.calls[0][0] as any;
+    const props = jest.mocked(InvitesModal).mock.calls[0][0] as any;
     expect(props.open).toBe(true);
   });
 
   it("onClose chama handleCloseInviteModal do hook", () => {
     render(<ProfileScreen />);
-    const { onClose } = jest.mocked(InviteModal).mock.calls[0][0] as any;
+    const { onClose } = jest.mocked(InvitesModal).mock.calls[0][0] as any;
     act(() => {
       onClose();
     });
-    expect(mockHandleCloseInviteModal).toHaveBeenCalled();
+    expect(mockhandleCloseInviteModal).toHaveBeenCalled();
   });
 
   it("passa republicaId da república selecionada", () => {
@@ -700,24 +700,24 @@ describe("ProfileScreen — InviteModal", () => {
         makeHookReturn({ selectedRepublic: baseRepublic }) as any
       );
     render(<ProfileScreen />);
-    const props = jest.mocked(InviteModal).mock.calls[0][0] as any;
+    const props = jest.mocked(InvitesModal).mock.calls[0][0] as any;
     expect(props.republicaId).toBe("rep-1");
   });
 
   it("passa republicaId vazio quando selectedRepublic é null", () => {
     render(<ProfileScreen />);
-    const props = jest.mocked(InviteModal).mock.calls[0][0] as any;
+    const props = jest.mocked(InvitesModal).mock.calls[0][0] as any;
     expect(props.republicaId).toBe("");
   });
 
-  it("passa sendInvite, loading e error do hook ao InviteModal", () => {
+  it("passa sendInvite, loading e error do hook ao InvitesModal", () => {
     jest
       .mocked(useProfileScreen)
       .mockReturnValue(
         makeHookReturn({ sendLoading: true, sendError: "Erro de envio" }) as any
       );
     render(<ProfileScreen />);
-    const props = jest.mocked(InviteModal).mock.calls[0][0] as any;
+    const props = jest.mocked(InvitesModal).mock.calls[0][0] as any;
     expect(props.sendInvite).toBe(mockSendInvite);
     expect(props.loading).toBe(true);
     expect(props.error).toBe("Erro de envio");

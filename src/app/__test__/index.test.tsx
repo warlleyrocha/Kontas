@@ -220,4 +220,46 @@ describe("index route", () => {
       undefined
     );
   });
+
+  it("chama refetchSession ao pressionar retry na tela de erro de sessão", () => {
+    const refetchSession = jest.fn();
+    mockUseAuthSession.mockReturnValue({
+      authenticatedUser: null,
+      cachedUser: null,
+      isLoading: false,
+      isError: true,
+      refetch: refetchSession,
+    } as never);
+
+    render(<Index />);
+
+    const { onRetry } = mockSessionErrorScreen.mock.calls[0][0];
+    onRetry();
+
+    expect(refetchSession).toHaveBeenCalledTimes(1);
+  });
+
+  it("chama refetchRepublics ao pressionar retry na tela de erro de repúblicas", () => {
+    const refetchRepublics = jest.fn();
+    mockUseAuthSession.mockReturnValue({
+      authenticatedUser: { perfilCompleto: true },
+      cachedUser: null,
+      isLoading: false,
+      isError: false,
+      refetch: jest.fn(),
+    } as never);
+    mockUseRepublicsQuery.mockReturnValue({
+      data: [],
+      isLoading: false,
+      isError: true,
+      refetch: refetchRepublics,
+    } as never);
+
+    render(<Index />);
+
+    const { onRetry } = mockSessionErrorScreen.mock.calls[0][0];
+    onRetry();
+
+    expect(refetchRepublics).toHaveBeenCalledTimes(1);
+  });
 });

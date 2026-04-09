@@ -10,19 +10,17 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
-  AccountSection,
-  AddAccountModal,
-  PlusButton,
-} from "@/src/features/accounts/components";
-import {
   AccountContextMenu,
   type CardPosition,
 } from "@/src/features/accounts/components/AccountContextMenu";
+import AddAccountModal from "@/src/features/accounts/components/create/AddAccountModal";
+import { AccountSection } from "@/src/features/accounts/components/list/AccountSection";
 import { useAccountsTab } from "@/src/features/accounts/hooks/useAccountsTab";
 import type { Conta } from "@/src/features/accounts/types/account.types";
 import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import { getMoradorStatusVisual } from "@/src/features/accounts/utils/accountStatus.utils";
 import { useTabResidents } from "@/src/features/residents/hooks/useTabResidents";
+import { PlusButton } from "@/src/shared/components/PlusButton";
 import { ToastConfirm } from "@/src/shared/components/ui/toast-custom";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";

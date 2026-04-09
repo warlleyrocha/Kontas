@@ -12,9 +12,9 @@ import { toastErrors } from "@/src/shared/utils/toastMessages";
 import {
   useInvitesByUserQuery,
   useUpdateInviteStatusMutation,
-} from "./useInvitesQueries";
+} from "../../../hooks/useInvitesQueries";
 
-export function useInvitesScreen() {
+export function useInviteInboxScreen() {
   const router = useRouter();
   const { data: user = null } = useCurrentUserQuery();
   const { mutateAsync: logout } = useLogoutMutation();
@@ -103,5 +103,6 @@ export function useInvitesScreen() {
     menuItems,
     footerItems,
     sideMenuUser,
+    pendingCount,
   };
 }

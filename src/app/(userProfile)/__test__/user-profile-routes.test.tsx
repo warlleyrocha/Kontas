@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react-native";
 import type { ErrorBoundaryProps } from "expo-router";
-import { InvitesScreen } from "@/src/features/invites";
+import { InviteInboxScreen } from "@/src/features/invites";
 import { ProfileScreen } from "@/src/features/user";
 import { RouteErrorFallback } from "@/src/shared/components/error-boundary/RouteErrorFallback";
 import InvitesRoute, {
@@ -10,7 +10,7 @@ import ProfileRoute from "../profile";
 
 jest.mock("@/src/features/invites", () => ({
   __esModule: true,
-  InvitesScreen: jest.fn(() => null),
+  InviteInboxScreen: jest.fn(() => null),
 }));
 
 jest.mock("@/src/features/user", () => ({
@@ -23,7 +23,7 @@ jest.mock("@/src/shared/components/error-boundary/RouteErrorFallback", () => ({
   RouteErrorFallback: jest.fn(() => null),
 }));
 
-const mockInvitesScreen = jest.mocked(InvitesScreen);
+const mockInviteInboxScreen = jest.mocked(InviteInboxScreen);
 const mockProfileScreen = jest.mocked(ProfileScreen);
 const mockRouteErrorFallback = jest.mocked(RouteErrorFallback);
 
@@ -32,10 +32,10 @@ describe("userProfile routes", () => {
     jest.clearAllMocks();
   });
 
-  it("renderiza InvitesScreen na rota invites", () => {
+  it("renderiza InviteInboxScreen na rota invites", () => {
     render(<InvitesRoute />);
 
-    expect(mockInvitesScreen).toHaveBeenCalledTimes(1);
+    expect(mockInviteInboxScreen).toHaveBeenCalledTimes(1);
   });
 
   it("renderiza RouteErrorFallback com domain Invites na rota invites", () => {

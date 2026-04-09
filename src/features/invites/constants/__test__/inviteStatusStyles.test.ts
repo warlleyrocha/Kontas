@@ -33,8 +33,8 @@ describe("INVITE_STATUS_STYLES", () => {
   it("ACEITO tem as propriedades de estilo corretas", () => {
     const style = INVITE_STATUS_STYLES[StatusInvite.ACEITO];
     expect(style.badgeColorClass).toBe("bg-green-100");
-    expect(style.textColorClass).toBe("text-green-800");
-    expect(style.iconColor).toBe("#10B981");
+    expect(style.textColorClass).toBe("text-teal");
+    expect(style.iconColor).toBe("#337176");
     expect(style.iconName).toBe("checkmark-circle-outline");
     expect(style.label).toBe("Aceito");
     expect(style.badgeStyle).toBeUndefined();

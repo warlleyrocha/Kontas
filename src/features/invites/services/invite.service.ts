@@ -1,6 +1,5 @@
 import { isAxiosError } from "axios";
 import {
-  GetInvitesByUser,
   Invite,
   InviteRequest,
   PatchInviteStatusResponse,
@@ -55,12 +54,10 @@ export const inviteService = {
   },
 
   // Método para listar convites por usuario
-  getInvitesByUser: async (
-    signal?: AbortSignal
-  ): Promise<GetInvitesByUser[]> => {
+  getInvitesByUser: async (signal?: AbortSignal): Promise<Invite[]> => {
     logger.info("Invites", "Buscando convites do usuário");
     try {
-      const response = await api.get<GetInvitesByUser[]>("/convites/me", {
+      const response = await api.get<Invite[]>("/convites/me", {
         signal,
       });
       return response.data;

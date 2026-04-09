@@ -9,8 +9,8 @@ import { toastErrors } from "@/src/shared/utils/toastMessages";
 import {
   useInvitesByUserQuery,
   useUpdateInviteStatusMutation,
-} from "../useInvitesQueries";
-import { useInvitesScreen } from "../useInvitesScreen";
+} from "../../../../hooks/useInvitesQueries";
+import { useInviteInboxScreen } from "../useInviteInboxScreen";
 
 jest.mock("expo-router", () => ({ useRouter: jest.fn() }));
 jest.mock("@/src/features/auth/hooks/useAuthMutations", () => ({
@@ -85,9 +85,9 @@ afterEach(() => {
 
 // ─── Estado inicial ───────────────────────────────────────────────────────────
 
-describe("useInvitesScreen — estado inicial", () => {
+describe("useInviteInboxScreen — estado inicial", () => {
   it("retorna as propriedades esperadas", () => {
-    const { result } = renderHook(() => useInvitesScreen());
+    const { result } = renderHook(() => useInviteInboxScreen());
 
     expect(result.current.isMenuOpen).toBe(false);
     expect(result.current.invitesByUser).toEqual([]);
@@ -110,7 +110,7 @@ describe("useInvitesScreen — estado inicial", () => {
       refetch: mockRefetch,
     } as any);
 
-    renderHook(() => useInvitesScreen());
+    renderHook(() => useInviteInboxScreen());
 
     expect(jest.mocked(useSideMenu)).toHaveBeenCalledWith(
       "invite",
@@ -127,7 +127,7 @@ describe("useInvitesScreen — estado inicial", () => {
       refetch: mockRefetch,
     } as any);
 
-    const { result } = renderHook(() => useInvitesScreen());
+    const { result } = renderHook(() => useInviteInboxScreen());
 
     expect(jest.mocked(getErrorMessage)).toHaveBeenCalledWith(
       error,
@@ -139,11 +139,11 @@ describe("useInvitesScreen — estado inicial", () => {
 
 // ─── handleSignOut ────────────────────────────────────────────────────────────
 
-describe("useInvitesScreen — handleSignOut", () => {
+describe("useInviteInboxScreen — handleSignOut", () => {
   it("chama logout com sucesso sem lançar erros", async () => {
     mockLogout.mockResolvedValue(undefined);
 
-    renderHook(() => useInvitesScreen());
+    renderHook(() => useInviteInboxScreen());
     const handleSignOut = (
       jest.mocked(useSideMenu).mock.calls[0] as unknown[]
     )[1] as () => Promise<void>;
@@ -160,7 +160,7 @@ describe("useInvitesScreen — handleSignOut", () => {
     const error = new Error("logout fail");
     mockLogout.mockRejectedValue(error);
 
-    renderHook(() => useInvitesScreen());
+    renderHook(() => useInviteInboxScreen());
     const handleSignOut = (
       jest.mocked(useSideMenu).mock.calls[0] as unknown[]
     )[1] as () => Promise<void>;
@@ -181,10 +181,10 @@ describe("useInvitesScreen — handleSignOut", () => {
 
 // ─── fetchInvitesByUser ───────────────────────────────────────────────────────
 
-describe("useInvitesScreen — fetchInvitesByUser", () => {
+describe("useInviteInboxScreen — fetchInvitesByUser", () => {
   it("chama refetch ao ser invocado", async () => {
     mockRefetch.mockResolvedValue(undefined);
-    const { result } = renderHook(() => useInvitesScreen());
+    const { result } = renderHook(() => useInviteInboxScreen());
 
     await act(async () => {
       await result.current.fetchInvitesByUser();
@@ -196,10 +196,10 @@ describe("useInvitesScreen — fetchInvitesByUser", () => {
 
 // ─── handleAcceptInvite ───────────────────────────────────────────────────────
 
-describe("useInvitesScreen — handleAcceptInvite", () => {
+describe("useInviteInboxScreen — handleAcceptInvite", () => {
   it("chama mutateAsync com ACEITO e navega para a república", async () => {
     mockMutateAsync.mockResolvedValue(undefined);
-    const { result } = renderHook(() => useInvitesScreen());
+    const { result } = renderHook(() => useInviteInboxScreen());
 
     await act(async () => {
       await result.current.handleAcceptInvite("inv-1", "rep-1");
@@ -215,7 +215,7 @@ describe("useInvitesScreen — handleAcceptInvite", () => {
   it("loga o erro e não navega quando a mutation falha", async () => {
     const error = new Error("update fail");
     mockMutateAsync.mockRejectedValue(error);
-    const { result } = renderHook(() => useInvitesScreen());
+    const { result } = renderHook(() => useInviteInboxScreen());
 
     await act(async () => {
       await result.current.handleAcceptInvite("inv-1", "rep-1");
@@ -233,10 +233,10 @@ describe("useInvitesScreen — handleAcceptInvite", () => {
 
 // ─── handleRejectInvite ───────────────────────────────────────────────────────
 
-describe("useInvitesScreen — handleRejectInvite", () => {
+describe("useInviteInboxScreen — handleRejectInvite", () => {
   it("chama mutateAsync com RECUSADO", async () => {
     mockMutateAsync.mockResolvedValue(undefined);
-    const { result } = renderHook(() => useInvitesScreen());
+    const { result } = renderHook(() => useInviteInboxScreen());
 
     await act(async () => {
       await result.current.handleRejectInvite("inv-1");
@@ -251,7 +251,7 @@ describe("useInvitesScreen — handleRejectInvite", () => {
   it("loga o erro quando a mutation falha", async () => {
     const error = new Error("reject fail");
     mockMutateAsync.mockRejectedValue(error);
-    const { result } = renderHook(() => useInvitesScreen());
+    const { result } = renderHook(() => useInviteInboxScreen());
 
     await act(async () => {
       await result.current.handleRejectInvite("inv-1");
@@ -268,15 +268,15 @@ describe("useInvitesScreen — handleRejectInvite", () => {
 
 // ─── sideMenuUser ─────────────────────────────────────────────────────────────
 
-describe("useInvitesScreen — sideMenuUser", () => {
+describe("useInviteInboxScreen — sideMenuUser", () => {
   it("retorna nome e foto do usuário", () => {
-    const { result } = renderHook(() => useInvitesScreen());
+    const { result } = renderHook(() => useInviteInboxScreen());
     expect(result.current.sideMenuUser).toEqual({ name: "Ana", photo: null });
   });
 
   it("usa 'Usuário' como fallback quando user.nome é undefined", () => {
     setupMocks({ nome: undefined });
-    const { result } = renderHook(() => useInvitesScreen());
+    const { result } = renderHook(() => useInviteInboxScreen());
     expect(result.current.sideMenuUser.name).toBe("Usuário");
   });
 });

@@ -8,10 +8,7 @@ import { useMemo } from "react";
 
 import { useAuth } from "@/src/features/auth/hooks/useAuth";
 import { inviteService } from "@/src/features/invites/services/invite.service";
-import type {
-  GetInvitesByUser,
-  Invite,
-} from "@/src/features/invites/types/invite.types";
+import type { Invite } from "@/src/features/invites/types/invite.types";
 import { StatusInvite } from "@/src/features/invites/types/invite.types";
 
 import { inviteKeys } from "./invite.keys";
@@ -80,7 +77,7 @@ export function useUpdateInviteStatusMutation() {
       status: StatusInvite;
     }) => inviteService.patchInviteStatus(inviteId, status),
     onSuccess: (_, variables) => {
-      queryClient.setQueryData<GetInvitesByUser[]>(
+      queryClient.setQueryData<Invite[]>(
         inviteKeys.byUser(),
         (currentInvites) =>
           (currentInvites ?? []).filter(

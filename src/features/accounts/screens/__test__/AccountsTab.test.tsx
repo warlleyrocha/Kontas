@@ -1,14 +1,11 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
-
-import {
-  AccountSection,
-  AddAccountModal,
-  PlusButton,
-} from "@/src/features/accounts/components";
 import { AccountContextMenu } from "@/src/features/accounts/components/AccountContextMenu";
+import AddAccountModal from "@/src/features/accounts/components/create/AddAccountModal";
+import { AccountSection } from "@/src/features/accounts/components/list/AccountSection";
 import { useAccountsTab } from "@/src/features/accounts/hooks/useAccountsTab";
 import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import { getMoradorStatusVisual } from "@/src/features/accounts/utils/accountStatus.utils";
+import { PlusButton } from "@/src/shared/components/PlusButton";
 import { ToastConfirm } from "@/src/shared/components/ui/toast-custom";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { ResidentRole } from "@/src/shared/types/resident.types";
@@ -23,10 +20,17 @@ jest.mock("@expo/vector-icons/Feather", () => ({
 jest.mock("react-native-safe-area-context", () => ({
   SafeAreaView: ({ children }: any) => children,
 }));
-jest.mock("@/src/features/accounts/components", () => ({
+jest.mock("@/src/features/accounts/components/list/AccountSection", () => ({
   AccountSection: jest.fn(() => null),
+}));
+
+jest.mock("@/src/shared/components/PlusButton", () => ({
   PlusButton: jest.fn(() => null),
-  AddAccountModal: jest.fn(() => null),
+}));
+
+jest.mock("@/src/features/accounts/components/create/AddAccountModal", () => ({
+  __esModule: true,
+  default: jest.fn(() => null),
 }));
 jest.mock("@/src/features/accounts/components/AccountContextMenu", () => ({
   AccountContextMenu: jest.fn(() => null),
