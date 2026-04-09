@@ -30,7 +30,7 @@ const validateEmail = (value: string): string => {
   return "";
 };
 
-export const InviteModal: React.FC<InviteModalProps> = ({
+export const InvitesModal: React.FC<InviteModalProps> = ({
   open,
   onClose,
   republicaId,

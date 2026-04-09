@@ -2,7 +2,7 @@ import { act, renderHook } from "@testing-library/react-native";
 import { useRouter } from "expo-router";
 import { useInvitesByRepublicQuery } from "@/src/features/invites/hooks/useInvitesQueries";
 import { getErrorMessage } from "@/src/services/httpError";
-import { useInvitesSentScreen } from "../useInvitesSentScreen";
+import { useInvitesSentScreen } from "../../screens/sent/hooks/useInviteSentScreen";
 
 jest.mock("expo-router", () => ({ useRouter: jest.fn() }));
 jest.mock("@/src/features/invites/hooks/useInvitesQueries", () => ({
