@@ -23,7 +23,7 @@ const SENSITIVE_KEYS = [
   "session",
 ];
 
-function scrubPII(obj: unknown): unknown {
+export function scrubPII(obj: unknown): unknown {
   if (obj === null || obj === undefined) return obj;
 
   if (typeof obj === "string") {
