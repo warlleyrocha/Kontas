@@ -2,7 +2,7 @@ import { act, renderHook } from "@testing-library/react-native";
 import { useRouter } from "expo-router";
 import { useInvitesByRepublicQuery } from "@/src/features/invites/hooks/useInvitesQueries";
 import { getErrorMessage } from "@/src/services/httpError";
-import { useInvitesSentScreen } from "../../screens/sent/hooks/useInviteSentScreen";
+import { useInviteSentScreen } from "../useInviteSentScreen";
 
 jest.mock("expo-router", () => ({ useRouter: jest.fn() }));
 jest.mock("@/src/features/invites/hooks/useInvitesQueries", () => ({
@@ -39,11 +39,11 @@ beforeEach(() => {
   setupQuery();
 });
 
-// ─── useInvitesSentScreen ─────────────────────────────────────────────────────
+// ─── useInviteSentScreen ─────────────────────────────────────────────────────
 
-describe("useInvitesSentScreen — estado inicial", () => {
+describe("useInviteSentScreen — estado inicial", () => {
   it("retorna invites=[] quando data é undefined", () => {
-    const { result } = renderHook(() => useInvitesSentScreen("rep-1"));
+    const { result } = renderHook(() => useInviteSentScreen("rep-1"));
 
     expect(result.current.invites).toEqual([]);
   });
@@ -52,13 +52,13 @@ describe("useInvitesSentScreen — estado inicial", () => {
     const mockInvite = { id: "inv-1", email: "a@b.com" };
     setupQuery({ data: [mockInvite] });
 
-    const { result } = renderHook(() => useInvitesSentScreen("rep-1"));
+    const { result } = renderHook(() => useInviteSentScreen("rep-1"));
 
     expect(result.current.invites).toEqual([mockInvite]);
   });
 
   it("retorna error=null quando não há erro", () => {
-    const { result } = renderHook(() => useInvitesSentScreen("rep-1"));
+    const { result } = renderHook(() => useInviteSentScreen("rep-1"));
 
     expect(result.current.error).toBeNull();
   });
@@ -70,7 +70,7 @@ describe("useInvitesSentScreen — estado inicial", () => {
       .mocked(getErrorMessage)
       .mockReturnValue("Não foi possível carregar os convites enviados.");
 
-    const { result } = renderHook(() => useInvitesSentScreen("rep-1"));
+    const { result } = renderHook(() => useInviteSentScreen("rep-1"));
 
     expect(getErrorMessage).toHaveBeenCalledWith(
       error,
@@ -83,25 +83,25 @@ describe("useInvitesSentScreen — estado inicial", () => {
 
   it("loading=true quando isLoading é true", () => {
     setupQuery({ isLoading: true, isFetching: false });
-    const { result } = renderHook(() => useInvitesSentScreen("rep-1"));
+    const { result } = renderHook(() => useInviteSentScreen("rep-1"));
     expect(result.current.loading).toBe(true);
   });
 
   it("loading=true quando isFetching é true", () => {
     setupQuery({ isLoading: false, isFetching: true });
-    const { result } = renderHook(() => useInvitesSentScreen("rep-1"));
+    const { result } = renderHook(() => useInviteSentScreen("rep-1"));
     expect(result.current.loading).toBe(true);
   });
 
   it("loading=false quando ambos são false", () => {
-    const { result } = renderHook(() => useInvitesSentScreen("rep-1"));
+    const { result } = renderHook(() => useInviteSentScreen("rep-1"));
     expect(result.current.loading).toBe(false);
   });
 });
 
-describe("useInvitesSentScreen — handleRetry", () => {
+describe("useInviteSentScreen — handleRetry", () => {
   it("chama invitesQuery.refetch", () => {
-    const { result } = renderHook(() => useInvitesSentScreen("rep-1"));
+    const { result } = renderHook(() => useInviteSentScreen("rep-1"));
 
     act(() => {
       result.current.handleRetry();
@@ -111,9 +111,9 @@ describe("useInvitesSentScreen — handleRetry", () => {
   });
 });
 
-describe("useInvitesSentScreen — handleEmptyStatePress", () => {
+describe("useInviteSentScreen — handleEmptyStatePress", () => {
   it("chama router.back", () => {
-    const { result } = renderHook(() => useInvitesSentScreen("rep-1"));
+    const { result } = renderHook(() => useInviteSentScreen("rep-1"));
 
     act(() => {
       result.current.handleEmptyStatePress();

@@ -8,7 +8,7 @@ import { ScreenLayout } from "@/src/shared/components/ScreenLayout";
 jest.mock("@/src/features/invites/components/InviteList", () => ({
   InviteList: jest.fn(() => null),
 }));
-jest.mock("@/src/features/invites/hooks/useInviteSentScreen", () => ({
+jest.mock("@/src/features/invites/screens/sent/hooks/useInviteSentScreen", () => ({
   useInviteSentScreen: jest.fn(),
 }));
 jest.mock("@/src/shared/components/ScreenLayout", () => ({
@@ -27,6 +27,7 @@ function makeHookReturn(overrides = {}) {
     error: null,
     handleRetry: mockHandleRetry,
     handleEmptyStatePress: mockHandleEmptyStatePress,
+    pendingCount: 0,
     ...overrides,
   };
 }
@@ -58,28 +59,31 @@ describe("InviteSentScreen — ScreenLayout", () => {
     expect(props.title).toBe("Convites Enviados");
   });
 
-  it("subtitle mostra '0 convites' quando não há convites", () => {
-    render(<InviteSentScreen republicId="rep-1" />);
-    const props = jest.mocked(ScreenLayout).mock.calls[0][0] as any;
-    expect(props.subtitle).toBe("0 convites");
-  });
+  it("subtitle mostra '0 pendentes' quando não há convites pendentes", () => {
+  jest
+    .mocked(useInviteSentScreen)
+    .mockReturnValue(makeHookReturn({ pendingCount: 0 }) as any);
+  render(<InviteSentScreen republicId="rep-1" />);
+  const props = jest.mocked(ScreenLayout).mock.calls[0][0] as any;
+  expect(props.subtitle).toBe("0 pendentes");
+});
 
   it("subtitle mostra '1 convite' com um convite", () => {
     jest
       .mocked(useInviteSentScreen)
-      .mockReturnValue(makeHookReturn({ invites: [{}] }) as any);
+      .mockReturnValue(makeHookReturn({ pendingCount: 1 }) as any);
     render(<InviteSentScreen republicId="rep-1" />);
     const props = jest.mocked(ScreenLayout).mock.calls[0][0] as any;
-    expect(props.subtitle).toBe("1 convite");
+    expect(props.subtitle).toBe("1 pendente");
   });
 
-  it("subtitle mostra '2 convites' com múltiplos convites", () => {
+  it("subtitle mostra '2 pendentes' com múltiplos convites", () => {
     jest
       .mocked(useInviteSentScreen)
-      .mockReturnValue(makeHookReturn({ invites: [{}, {}] }) as any);
+      .mockReturnValue(makeHookReturn({ pendingCount: 2 }) as any);
     render(<InviteSentScreen republicId="rep-1" />);
     const props = jest.mocked(ScreenLayout).mock.calls[0][0] as any;
-    expect(props.subtitle).toBe("2 convites");
+    expect(props.subtitle).toBe("2 pendentes");
   });
 
   it("passa handleEmptyStatePress como onBack ao ScreenLayout", () => {

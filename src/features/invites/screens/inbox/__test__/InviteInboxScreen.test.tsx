@@ -10,9 +10,12 @@ jest.mock("expo-router", () => ({ useRouter: jest.fn() }));
 jest.mock("@/src/features/invites/components/InviteList", () => ({
   InviteList: jest.fn(() => null),
 }));
-jest.mock("@/src/features/invites/hooks/useInviteInboxScreen", () => ({
-  useInviteInboxScreen: jest.fn(),
-}));
+jest.mock(
+  "@/src/features/invites/screens/inbox/hooks/useInviteInboxScreen",
+  () => ({
+    useInviteInboxScreen: jest.fn(),
+  })
+);
 jest.mock("@/src/shared/components/ScreenLayout", () => ({
   ScreenLayout: jest.fn(({ children }: any) => children),
 }));
@@ -32,6 +35,7 @@ function makeHookReturn(overrides = {}) {
     handleAcceptInvite: mockHandleAcceptInvite,
     handleRejectInvite: mockHandleRejectInvite,
     error: null,
+    pendingCount: 0,
     ...overrides,
   };
 }
@@ -60,7 +64,7 @@ describe("InviteInboxScreen — ScreenLayout", () => {
   it("subtitle mostra '0 pendentes' quando não há convites", () => {
     jest
       .mocked(useInviteInboxScreen)
-      .mockReturnValue(makeHookReturn({ invitesByUser: [] }) as any);
+      .mockReturnValue(makeHookReturn({ pendingCount: 0 }) as any);
     render(<InviteInboxScreen />);
     const props = jest.mocked(ScreenLayout).mock.calls[0][0] as any;
     expect(props.subtitle).toBe("0 pendentes");
@@ -69,7 +73,7 @@ describe("InviteInboxScreen — ScreenLayout", () => {
   it("subtitle mostra '1 pendente' com um convite", () => {
     jest
       .mocked(useInviteInboxScreen)
-      .mockReturnValue(makeHookReturn({ invitesByUser: [{}] }) as any);
+      .mockReturnValue(makeHookReturn({ pendingCount: 1 }) as any);
     render(<InviteInboxScreen />);
     const props = jest.mocked(ScreenLayout).mock.calls[0][0] as any;
     expect(props.subtitle).toBe("1 pendente");
@@ -78,7 +82,7 @@ describe("InviteInboxScreen — ScreenLayout", () => {
   it("subtitle mostra '2 pendentes' com múltiplos convites", () => {
     jest
       .mocked(useInviteInboxScreen)
-      .mockReturnValue(makeHookReturn({ invitesByUser: [{}, {}] }) as any);
+      .mockReturnValue(makeHookReturn({ pendingCount: 2 }) as any);
     render(<InviteInboxScreen />);
     const props = jest.mocked(ScreenLayout).mock.calls[0][0] as any;
     expect(props.subtitle).toBe("2 pendentes");

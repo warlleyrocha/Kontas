@@ -1,3 +1,5 @@
+process.env.EXPO_PUBLIC_API_URL = "http://localhost:3333";
+
 jest.mock("axios", () => {
   class AxiosError extends Error {
     code?: string;

@@ -1,5 +1,5 @@
 import { act, render, screen } from "@testing-library/react-native";
-import { InviteModal } from "@/src/features/invites/components/InvitesModal";
+import { InvitesModal } from "@/src/features/invites/components/InvitesModal";
 import { useSendInviteMutation } from "@/src/features/invites/hooks/useInvitesQueries";
 import { ResidentCard } from "@/src/features/residents/components/ResidentCard";
 import { useTabResidents } from "@/src/features/residents/hooks/useTabResidents";
@@ -13,8 +13,8 @@ import {
 import { ResidentsTab } from "../ResidentsTab";
 
 jest.mock("@expo/vector-icons/Feather", () => "Feather");
-jest.mock("@/src/features/invites/components/InviteModal", () => ({
-  InviteModal: jest.fn(() => null),
+jest.mock("@/src/features/invites/components/InvitesModal", () => ({
+  InvitesModal: jest.fn(() => null),
 }));
 jest.mock("@/src/features/invites/hooks/useInvitesQueries", () => ({
   useSendInviteMutation: jest.fn(),
@@ -134,9 +134,9 @@ describe("ResidentsTab — controle de admin", () => {
 });
 
 describe("ResidentsTab — modal de convite", () => {
-  it("renderiza InviteModal com open=false inicialmente", () => {
+  it("renderiza InvitesModal com open=false inicialmente", () => {
     render(<ResidentsTab residents={[]} republicId="rep-1" isAdmin={true} />);
-    const props = jest.mocked(InviteModal).mock.calls[0][0] as any;
+    const props = jest.mocked(InvitesModal).mock.calls[0][0] as any;
     expect(props.open).toBe(false);
   });
 
@@ -146,38 +146,38 @@ describe("ResidentsTab — modal de convite", () => {
     act(() => {
       onPress();
     });
-    const lastProps = jest.mocked(InviteModal).mock.calls.at(-1)?.[0] as any;
+    const lastProps = jest.mocked(InvitesModal).mock.calls.at(-1)?.[0] as any;
     expect(lastProps.open).toBe(true);
   });
 
-  it("fecha o modal ao chamar onClose do InviteModal", () => {
+  it("fecha o modal ao chamar onClose do InvitesModal", () => {
     render(<ResidentsTab residents={[]} republicId="rep-1" isAdmin={true} />);
     const { onPress } = jest.mocked(PlusButton).mock.calls[0][0] as any;
     act(() => {
       onPress();
     });
-    const { onClose } = jest.mocked(InviteModal).mock.calls.at(-1)?.[0] as any;
+    const { onClose } = jest.mocked(InvitesModal).mock.calls.at(-1)?.[0] as any;
     act(() => {
       onClose();
     });
-    const lastProps = jest.mocked(InviteModal).mock.calls.at(-1)?.[0] as any;
+    const lastProps = jest.mocked(InvitesModal).mock.calls.at(-1)?.[0] as any;
     expect(lastProps.open).toBe(false);
   });
 
-  it("passa republicaId correto ao InviteModal", () => {
+  it("passa republicaId correto ao InvitesModal", () => {
     render(<ResidentsTab residents={[]} republicId="rep-42" />);
-    const props = jest.mocked(InviteModal).mock.calls[0][0] as any;
+    const props = jest.mocked(InvitesModal).mock.calls[0][0] as any;
     expect(props.republicaId).toBe("rep-42");
   });
 
-  it("passa sendInvite, loading e error do contexto ao InviteModal", () => {
+  it("passa sendInvite, loading e error do contexto ao InvitesModal", () => {
     jest.mocked(useSendInviteMutation).mockReturnValue({
       mutateAsync: mockSendInvite,
       isPending: true,
       error: new Error("Erro de envio"),
     } as any);
     render(<ResidentsTab residents={[]} republicId="rep-1" />);
-    const props = jest.mocked(InviteModal).mock.calls[0][0] as any;
+    const props = jest.mocked(InvitesModal).mock.calls[0][0] as any;
     expect(props.sendInvite).toBe(mockSendInvite);
     expect(props.loading).toBe(true);
     expect(props.error).toBe("Erro de envio");

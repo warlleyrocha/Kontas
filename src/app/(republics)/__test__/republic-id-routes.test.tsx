@@ -2,7 +2,7 @@ import { render } from "@testing-library/react-native";
 import type { ErrorBoundaryProps } from "expo-router";
 import { Redirect, useLocalSearchParams } from "expo-router";
 import PaymentsScreen from "@/src/features/accounts/screens/PaymentsScreen";
-import { InvitesSentScreen } from "@/src/features/invites";
+import { InviteSentScreen } from "@/src/features/invites";
 import { RepublicScreen } from "@/src/features/republic";
 import { RouteErrorFallback } from "@/src/shared/components/error-boundary/RouteErrorFallback";
 import RepublicRoute from "../[id]/index";
@@ -26,7 +26,7 @@ jest.mock("@/src/features/republic", () => ({
 
 jest.mock("@/src/features/invites", () => ({
   __esModule: true,
-  InvitesSentScreen: jest.fn(() => null),
+  InviteSentScreen: jest.fn(() => null),
 }));
 
 jest.mock("@/src/features/accounts/screens/PaymentsScreen", () => ({
@@ -42,7 +42,7 @@ jest.mock("@/src/shared/components/error-boundary/RouteErrorFallback", () => ({
 const mockRedirect = jest.mocked(Redirect);
 const mockUseLocalSearchParams = jest.mocked(useLocalSearchParams);
 const mockRepublicScreen = jest.mocked(RepublicScreen);
-const mockInvitesSentScreen = jest.mocked(InvitesSentScreen);
+const mockInviteSentScreen = jest.mocked(InviteSentScreen);
 const mockPaymentsScreen = jest.mocked(PaymentsScreen);
 const mockRouteErrorFallback = jest.mocked(RouteErrorFallback);
 
@@ -84,15 +84,15 @@ describe("republic [id] routes", () => {
       expect.objectContaining({ href: "/" }),
       undefined
     );
-    expect(mockInvitesSentScreen).not.toHaveBeenCalled();
+    expect(mockInviteSentScreen).not.toHaveBeenCalled();
   });
 
-  it("renderiza InvitesSentScreen quando houver id", () => {
+  it("renderiza InviteSentScreen quando houver id", () => {
     mockUseLocalSearchParams.mockReturnValue({ id: "rep-2" } as never);
 
     render(<InvitesSentRoute />);
 
-    expect(mockInvitesSentScreen).toHaveBeenCalledWith(
+    expect(mockInviteSentScreen).toHaveBeenCalledWith(
       expect.objectContaining({ republicId: "rep-2" }),
       undefined
     );
