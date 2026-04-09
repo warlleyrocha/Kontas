@@ -9,11 +9,9 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  AccountSection,
-  AddAccountModal,
-  PlusButton,
-} from "@/src/features/accounts/components";
+import { AccountSection } from "@/src/features/accounts/components/list/AccountSection";
+import  AddAccountModal  from "@/src/features/accounts/components/create/AddAccountModal";
+import { PlusButton } from "@/src/shared/components/PlusButton";
 import {
   AccountContextMenu,
   type CardPosition,
