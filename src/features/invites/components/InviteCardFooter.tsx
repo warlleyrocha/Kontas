@@ -72,5 +72,22 @@ export function InviteCardFooter({
     );
   }
 
+  if (invite.atualizadoEm !== invite.criadoEm) {
+    return (
+      <View className="border-t border-teal/10 pt-3 flex-row items-center">
+        <Ionicons
+          name={statusStyle.iconName}
+          size={15}
+          color={statusStyle.iconColor}
+        />
+        <Text
+          className={`ml-1 text-sm font-semibold ${statusStyle.textColorClass}`}
+        >
+          {statusStyle.label} em {formatDate(invite.atualizadoEm)}
+        </Text>
+      </View>
+    );
+  }
+
   return null;
 }
