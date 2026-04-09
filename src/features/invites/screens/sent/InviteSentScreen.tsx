@@ -9,13 +9,13 @@ interface InvitesSentScreenProps {
 
 export function InviteSentScreen({ republicId }: InvitesSentScreenProps) {
   useComponentLogger("InviteSentScreen");
-  const { invites, error, handleRetry, handleEmptyStatePress } =
+  const { invites, error, handleRetry, handleEmptyStatePress, pendingCount } =
     useInviteSentScreen(republicId);
 
   return (
     <ScreenLayout
       title="Convites Enviados"
-      subtitle={`${invites.length} ${invites.length === 1 ? "convite" : "convites"}`}
+      subtitle={`${pendingCount} ${pendingCount === 1 ? "pendente" : "pendentes"}`}
       onBack={handleEmptyStatePress}
     >
       <InviteList

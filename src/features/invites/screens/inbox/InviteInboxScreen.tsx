@@ -15,13 +15,15 @@ export function InviteInboxScreen() {
     fetchInvitesByUser,
     handleAcceptInvite,
     handleRejectInvite,
+    pendingCount,
     error,
   } = useInviteInboxScreen();
 
   return (
     <ScreenLayout
       title="Meus Convites"
-      subtitle={`${invitesByUser.length} ${invitesByUser.length === 1 ? "pendente" : "pendentes"}`}
+      subtitle={`${pendingCount} ${pendingCount === 1 ? "pendente" : "pendentes"}`}
+
     >
       <InviteList
         error={error}

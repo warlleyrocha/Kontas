@@ -3,10 +3,17 @@ import { useCallback } from "react";
 
 import { useInvitesByRepublicQuery } from "@/src/features/invites/hooks/useInvitesQueries";
 import { getErrorMessage } from "@/src/services/httpError";
+import { StatusInvite } from "@/src/features/invites/types/invite.types";
+
 
 export function useInviteSentScreen(republicId: string) {
   const router = useRouter();
   const invitesQuery = useInvitesByRepublicQuery(republicId);
+
+  const invites = invitesQuery.data ?? [];
+  const pendingCount = invites.filter(
+    (i) => i.status === StatusInvite.PENDENTE
+  ).length;
 
   const handleRetry = useCallback(() => {
     void invitesQuery.refetch();
@@ -17,7 +24,6 @@ export function useInviteSentScreen(republicId: string) {
   }, [router]);
 
   return {
-    invites: invitesQuery.data ?? [],
     error: invitesQuery.error
       ? getErrorMessage(
           invitesQuery.error,
@@ -27,5 +33,7 @@ export function useInviteSentScreen(republicId: string) {
     loading: invitesQuery.isLoading || invitesQuery.isFetching,
     handleRetry,
     handleEmptyStatePress,
+    invites,
+    pendingCount,
   };
 }
