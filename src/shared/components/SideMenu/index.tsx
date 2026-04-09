@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { APP_INFO } from "@/src/shared/constants/app-info";
 import type { MenuItem, MenuSubItem } from "@/src/shared/types/sideMenu";
 import { useSideMenuAnimation } from "./useSideMenuAnimation";
 
@@ -307,6 +308,9 @@ export function SideMenu({
                     onToggleExpand={handleToggleExpand}
                   />
                 ))}
+                <Text className="px-4 py-2 text-[12px] font-mulish-medium text-gray-400 text-center">
+                  {APP_INFO}
+                </Text>
               </View>
             )}
           </SafeAreaView>
