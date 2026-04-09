@@ -1,5 +1,5 @@
 import { act, render, screen } from "@testing-library/react-native";
-import { InviteModal } from "@/src/features/invites/components/InviteModal";
+import { InviteModal } from "@/src/features/invites/components/InvitesModal";
 import { useSendInviteMutation } from "@/src/features/invites/hooks/useInvitesQueries";
 import { ResidentCard } from "@/src/features/residents/components/ResidentCard";
 import { useTabResidents } from "@/src/features/residents/hooks/useTabResidents";

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
-import { InviteModal } from "@/src/features/invites/components/InviteModal";
+import { InvitesModal } from "@/src/features/invites/components/InvitesModal";
 import { EditRepublicModal } from "@/src/features/republic/components/EditRepublicModal";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import EmptyRepublic from "@/src/features/user/components/CardsProfile/EmptyRepublic";
@@ -226,7 +226,7 @@ export function ProfileScreen() {
       />
 
       {/* MODAL CONVIDAR MORADOR */}
-      <InviteModal
+      <InvitesModal
         open={showInviteModal}
         onClose={handleCloseInviteModal}
         republicaId={selectedRepublic?.id ?? ""}

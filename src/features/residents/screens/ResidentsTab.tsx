@@ -2,7 +2,7 @@ import Feather from "@expo/vector-icons/Feather";
 import { type FC, useState } from "react";
 import { FlatList, RefreshControl, Text, View } from "react-native";
 
-import { InviteModal } from "@/src/features/invites/components/InviteModal";
+import { InvitesModal } from "@/src/features/invites/components/InvitesModal";
 import { useSendInviteMutation } from "@/src/features/invites/hooks/useInvitesQueries";
 import { ResidentCard } from "@/src/features/residents/components/ResidentCard";
 import { useTabResidents } from "@/src/features/residents/hooks/useTabResidents";
@@ -69,7 +69,7 @@ export const ResidentsTab: FC<ResidentsTabProps> = ({
       />
 
       {isAdmin && <PlusButton onPress={() => setModalOpen(true)} />}
-      <InviteModal
+      <InvitesModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         republicaId={republicId}

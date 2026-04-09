@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
 import { Image } from "react-native";
-import { InviteModal } from "@/src/features/invites/components/InviteModal";
+import { InviteModal } from "@/src/features/invites/components/InvitesModal";
 import { EditRepublicModal } from "@/src/features/republic/components/EditRepublicModal";
 import EmptyRepublic from "@/src/features/user/components/CardsProfile/EmptyRepublic";
 import IncompleteProfile from "@/src/features/user/components/CardsProfile/IncompleteProfile";
