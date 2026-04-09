@@ -29,6 +29,7 @@ jest.mock("@/src/shared/components/PlusButton", () => ({
 }));
 
 jest.mock("@/src/features/accounts/components/create/AddAccountModal", () => ({
+  __esModule: true,
   default: jest.fn(() => null),
 }));
 jest.mock("@/src/features/accounts/components/AccountContextMenu", () => ({

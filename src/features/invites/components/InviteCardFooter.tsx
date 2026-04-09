@@ -53,6 +53,10 @@ export function InviteCardFooter({
   }
 
   if (invite.status === StatusInvite.PENDENTE && !isReceived) {
+    const dateLabel =
+      invite.atualizadoEm !== invite.criadoEm
+        ? ` em ${formatDate(invite.atualizadoEm)}`
+        : "";
     return (
       <View className="border-t border-teal/10 gap-1 pt-3 flex-row items-center">
         <Ionicons
@@ -62,23 +66,7 @@ export function InviteCardFooter({
         />
         <Text className={`text-sm font-semibold ${statusStyle.textColorClass}`}>
           {statusStyle.label}
-        </Text>
-      </View>
-    );
-  }
-
-  if (invite.atualizadoEm !== invite.criadoEm) {
-    return (
-      <View className="border-t border-teal/10 pt-3 flex-row items-center">
-        <Ionicons
-          name={statusStyle.iconName}
-          size={15}
-          color={statusStyle.iconColor}
-        />
-        <Text
-          className={`ml-1 text-sm font-semibold ${statusStyle.textColorClass}`}
-        >
-          {statusStyle.label} em {formatDate(invite.atualizadoEm)}
+          {dateLabel}
         </Text>
       </View>
     );

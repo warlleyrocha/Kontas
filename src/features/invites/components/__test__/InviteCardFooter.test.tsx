@@ -123,6 +123,6 @@ describe("InviteCardFooter - sent variant", () => {
         onReject={jest.fn()}
       />
     );
-    expect(screen.getByText("")).toBeTruthy(); // Should render null
+    expect(screen.queryByText(/./)).toBeNull();
   });
 });
