@@ -2,9 +2,8 @@ import type { ComponentProps } from "react";
 import { ScrollView } from "react-native";
 
 import { EmptyState } from "@/src/shared/components/EmptyState";
-
-import { InviteCard } from "./InviteCard";
 import type { Invite } from "../types/invite.types";
+import { InviteCard } from "./InviteCard";
 
 type InviteCardVariant = "received" | "sent";
 

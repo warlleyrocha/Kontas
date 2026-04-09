@@ -1,9 +1,8 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image, Text, TouchableOpacity, View } from "react-native";
-
+import { StatusInvite } from "@/src/features/invites/types/invite.types";
 import { formatDate } from "@/src/shared/utils/formats";
 import { getInitials } from "@/src/shared/utils/getInitials";
-import { StatusInvite } from "@/src/features/invites/types/invite.types";
 
 import { getInviteStatusStyle } from "../constants/inviteStatusStyles";
 import type { Invite } from "../types/invite.types";
@@ -73,7 +72,9 @@ export function InviteCard({
             size={15}
             color={statusStyle.iconColor}
           />
-          <Text className={`text-sm font-semibold ${statusStyle.textColorClass}`}>
+          <Text
+            className={`text-sm font-semibold ${statusStyle.textColorClass}`}
+          >
             {statusStyle.label}
           </Text>
         </View>
@@ -88,7 +89,9 @@ export function InviteCard({
             size={15}
             color={statusStyle.iconColor}
           />
-          <Text className={`ml-1 text-sm font-semibold ${statusStyle.textColorClass}`}>
+          <Text
+            className={`ml-1 text-sm font-semibold ${statusStyle.textColorClass}`}
+          >
             {statusStyle.label} em {formatDate(invite.atualizadoEm)}
           </Text>
         </View>
@@ -117,7 +120,11 @@ export function InviteCard({
 
           <View className="flex-1">
             <View className="flex-row items-center">
-              <Ionicons name={isReceived ? "home-outline" : "person-outline"} size={14} color="#6B7280" />
+              <Ionicons
+                name={isReceived ? "home-outline" : "person-outline"}
+                size={14}
+                color="#6B7280"
+              />
               <Text className="ml-[5px] text-base font-semibold text-teal-dark">
                 {title}
               </Text>

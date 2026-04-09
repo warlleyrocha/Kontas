@@ -4,7 +4,7 @@ import {
   useLocalSearchParams,
 } from "expo-router";
 
-import { InviteSentScreen } from '@/src/features/invites'
+import { InviteSentScreen } from "@/src/features/invites";
 import { RouteErrorFallback } from "@/src/shared/components/error-boundary/RouteErrorFallback";
 
 export default function InvitesSent() {

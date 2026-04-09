@@ -1,6 +1,6 @@
+import { InviteList } from "@/src/features/invites/components/InviteList";
 import { ScreenLayout } from "@/src/shared/components/ScreenLayout";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
-import { InviteList } from "@/src/features/invites/components/InviteList";
 import { useInviteSentScreen } from "./hooks/useInviteSentScreen";
 
 interface InvitesSentScreenProps {

@@ -103,6 +103,6 @@ export function useInviteInboxScreen() {
     menuItems,
     footerItems,
     sideMenuUser,
-    pendingCount
+    pendingCount,
   };
 }

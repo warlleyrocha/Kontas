@@ -54,9 +54,7 @@ export const inviteService = {
   },
 
   // Método para listar convites por usuario
-  getInvitesByUser: async (
-    signal?: AbortSignal
-  ): Promise<Invite[]> => {
+  getInvitesByUser: async (signal?: AbortSignal): Promise<Invite[]> => {
     logger.info("Invites", "Buscando convites do usuário");
     try {
       const response = await api.get<Invite[]>("/convites/me", {

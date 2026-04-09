@@ -231,42 +231,42 @@ describe("useAccountList — registro no RefreshContext", () => {
 
 describe("useAccountList — refresh público", () => {
   it("refresh chama fetchAccounts e depois loadResidents", async () => {
-  const contas = [
-    {
-      id: "acc-1",
-      descricao: "Conta 1",
-      valor: 100,
-      vencimento: "2026-03-20",
-      status: "PENDENTE" as any,
-      republicaId: "rep-1",
-      criadoPorId: "u-1",
-      criadoPorNome: "Admin",
-      metodoPagamento: null,
-      pago: false,
-      criadoEm: "2026-01-01",
-      atualizadoEm: "2026-01-01",
-    },
-  ];
+    const contas = [
+      {
+        id: "acc-1",
+        descricao: "Conta 1",
+        valor: 100,
+        vencimento: "2026-03-20",
+        status: "PENDENTE" as any,
+        republicaId: "rep-1",
+        criadoPorId: "u-1",
+        criadoPorNome: "Admin",
+        metodoPagamento: null,
+        pago: false,
+        criadoEm: "2026-01-01",
+        atualizadoEm: "2026-01-01",
+      },
+    ];
 
-  mockListarContasPorRepublica.mockResolvedValue(contas);
+    mockListarContasPorRepublica.mockResolvedValue(contas);
 
-  const { result } = renderHook(
-    () => useAccountList({ republicId: "rep-1" }),
-    { wrapper }
-  );
+    const { result } = renderHook(
+      () => useAccountList({ republicId: "rep-1" }),
+      { wrapper }
+    );
 
-  await act(async () => {});
+    await act(async () => {});
 
-  mockListarContasPorRepublica.mockClear();
-  mockListarContasMoradores.mockClear();
+    mockListarContasPorRepublica.mockClear();
+    mockListarContasMoradores.mockClear();
 
-  await act(async () => {
-    await result.current.refresh();
+    await act(async () => {
+      await result.current.refresh();
+    });
+
+    await waitFor(() => {
+      expect(mockListarContasPorRepublica).toHaveBeenCalledTimes(1);
+      expect(mockListarContasMoradores).toHaveBeenCalledWith("acc-1");
+    });
   });
-
-  await waitFor(() => {
-    expect(mockListarContasPorRepublica).toHaveBeenCalledTimes(1);
-    expect(mockListarContasMoradores).toHaveBeenCalledWith("acc-1");
-  });
-});
 });

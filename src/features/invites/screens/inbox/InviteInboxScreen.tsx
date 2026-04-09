@@ -1,10 +1,9 @@
 import { useRouter } from "expo-router";
 
 import { InviteList } from "@/src/features/invites/components/InviteList";
+import { useInviteInboxScreen } from "@/src/features/invites/screens/inbox/hooks/useInviteInboxScreen";
 import { ScreenLayout } from "@/src/shared/components/ScreenLayout";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
-
-import { useInviteInboxScreen } from "@/src/features/invites/screens/inbox/hooks/useInviteInboxScreen";
 
 export function InviteInboxScreen() {
   useComponentLogger("InvitesInboxScreen");
@@ -23,7 +22,6 @@ export function InviteInboxScreen() {
     <ScreenLayout
       title="Meus Convites"
       subtitle={`${pendingCount} ${pendingCount === 1 ? "pendente" : "pendentes"}`}
-
     >
       <InviteList
         error={error}
