@@ -1,12 +1,11 @@
 import { act, fireEvent, render, screen } from "@testing-library/react-native";
-
-import { AccountSection } from "@/src/features/accounts/components/list/AccountSection";
-import AddAccountModal from "@/src/features/accounts/components/create/AddAccountModal";
-import { PlusButton } from "@/src/shared/components/PlusButton";
 import { AccountContextMenu } from "@/src/features/accounts/components/AccountContextMenu";
+import AddAccountModal from "@/src/features/accounts/components/create/AddAccountModal";
+import { AccountSection } from "@/src/features/accounts/components/list/AccountSection";
 import { useAccountsTab } from "@/src/features/accounts/hooks/useAccountsTab";
 import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import { getMoradorStatusVisual } from "@/src/features/accounts/utils/accountStatus.utils";
+import { PlusButton } from "@/src/shared/components/PlusButton";
 import { ToastConfirm } from "@/src/shared/components/ui/toast-custom";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { ResidentRole } from "@/src/shared/types/resident.types";
