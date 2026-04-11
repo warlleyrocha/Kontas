@@ -197,10 +197,7 @@ export function useProfileScreen() {
     async (name: string, image?: string) => {
       if (!selectedRepublic) return;
       try {
-        await updateRepublic(selectedRepublic.id, {
-          nome: name,
-          imagemRepublica: image,
-        });
+        await updateRepublic(selectedRepublic.id, selectedRepublic, { nome: name, imagemRepublica: image });
         handleCloseEditModal();
       } catch (error) {
         logger.error(
