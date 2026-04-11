@@ -5,6 +5,7 @@ import {
 import { api } from "@/src/services/api";
 import { toUserFriendlyError } from "@/src/services/httpError";
 import { logger } from "@/src/shared/utils/logger";
+import { buildImageFormData } from "@/src/shared/utils/helpers";
 
 export const republicService = {
   // Método para criar uma nova república
@@ -99,6 +100,41 @@ export const republicService = {
           400: "Requisição inválida.",
           401: "Não autenticado.",
           500: "Erro interno do servidor.",
+        },
+      });
+    }
+  },
+
+  uploadRepublicImage: async (
+    id: string,
+    uri: string
+  ): Promise<RepublicResponse> => {
+    try {
+      const { formData } = buildImageFormData(uri);
+
+      const response = await api.patch<RepublicResponse>(
+        `/republicas/${id}/imagem`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      logger.error(
+        "Republic",
+        "Erro ao fazer upload da imagem",
+        error instanceof Error ? error : undefined
+      );
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao fazer upload da imagem.",
+        statusMessages: {
+          400: "Imagem inválida. Escolha outra foto.",
+          401: "Sessão expirada. Faça login novamente.",
+          500: "Erro no servidor. Tente novamente mais tarde.",
         },
       });
     }

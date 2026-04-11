@@ -6,6 +6,7 @@ import {
   UpdateUserRequest,
   User,
 } from "../types/user.types";
+import { buildImageFormData } from "@/src/shared/utils/helpers";
 
 export interface UploadPhotoApiResponse {
   id: string;
@@ -76,16 +77,7 @@ export const userService = {
 
   uploadProfilePhoto: async (uri: string): Promise<UploadPhotoApiResponse> => {
     try {
-      const filename = uri.split("/").pop() ?? "photo.jpg";
-      const match = /\.(\w+)$/.exec(filename);
-      const type = match ? `image/${match[1]}` : "image/jpeg";
-
-      const formData = new FormData();
-      formData.append("file", {
-        uri,
-        name: filename,
-        type,
-      } as any);
+      const { formData } = buildImageFormData(uri);
 
       const response = await api.patch<UploadPhotoApiResponse>(
         "/usuarios/foto-perfil",
