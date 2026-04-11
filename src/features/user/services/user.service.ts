@@ -7,8 +7,13 @@ import {
   User,
 } from "../types/user.types";
 
-export interface UploadPhotoResponse {
-  url: string;
+export interface UploadPhotoApiResponse {
+  id: string;
+  nome: string;
+  email: string;
+  telefone: string;
+  chavePix: string;
+  fotoPerfil: string;
 }
 
 export const userService = {
@@ -69,7 +74,7 @@ export const userService = {
     }
   },
 
-  uploadProfilePhoto: async (uri: string): Promise<UploadPhotoResponse> => {
+  uploadProfilePhoto: async (uri: string): Promise<UploadPhotoApiResponse> => {
     try {
       const filename = uri.split("/").pop() ?? "photo.jpg";
       const match = /\.(\w+)$/.exec(filename);
@@ -82,7 +87,7 @@ export const userService = {
           type,
         } as any);
 
-      const response = await api.patch<UploadPhotoResponse>(
+      const response = await api.patch<UploadPhotoApiResponse>(
         "/usuarios/foto-perfil",
         formData,
         {

@@ -113,7 +113,7 @@ export function useProfileScreen() {
 
           if (isLocalUri) {
             const uploadResult = await uploadProfilePhoto(photo);
-            fotoPerfilUrl = uploadResult.url;
+            fotoPerfilUrl = uploadResult.fotoPerfil;
           } else {
             fotoPerfilUrl = photo;
           }
