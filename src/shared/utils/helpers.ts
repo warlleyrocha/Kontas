@@ -1,4 +1,7 @@
-import { RepublicPost, RepublicResponse } from "@/src/features/republic/types/republic.types";
+import {
+  RepublicPost,
+  RepublicResponse,
+} from "@/src/features/republic/types/republic.types";
 import { UpdateUserRequest, User } from "@/src/features/user/types/user.types";
 import { showToast } from "@/src/shared/utils/showToast";
 
@@ -55,7 +58,9 @@ export const isLocalPhotoUri = (photo: string): boolean =>
   photo.startsWith("ph://");
 
 // Função para construir o FormData para upload de imagem, extraindo o nome do arquivo e o tipo MIME
-export const buildImageFormData = (uri: string): {
+export const buildImageFormData = (
+  uri: string
+): {
   formData: FormData;
   filename: string;
   type: string;

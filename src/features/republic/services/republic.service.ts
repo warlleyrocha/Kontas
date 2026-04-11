@@ -4,8 +4,8 @@ import {
 } from "@/src/features/republic/types/republic.types";
 import { api } from "@/src/services/api";
 import { toUserFriendlyError } from "@/src/services/httpError";
-import { logger } from "@/src/shared/utils/logger";
 import { buildImageFormData } from "@/src/shared/utils/helpers";
+import { logger } from "@/src/shared/utils/logger";
 
 export const republicService = {
   // Método para criar uma nova república

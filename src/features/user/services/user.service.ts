@@ -1,4 +1,5 @@
 import { toUserFriendlyError } from "@/src/services/httpError";
+import { buildImageFormData } from "@/src/shared/utils/helpers";
 import { logger } from "@/src/shared/utils/logger";
 import { api } from "../../../services/api";
 import {
@@ -6,7 +7,6 @@ import {
   UpdateUserRequest,
   User,
 } from "../types/user.types";
-import { buildImageFormData } from "@/src/shared/utils/helpers";
 
 export interface UploadPhotoApiResponse {
   id: string;
