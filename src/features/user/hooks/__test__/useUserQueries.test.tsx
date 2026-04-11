@@ -12,6 +12,7 @@ import {
   useCompleteProfileMutation,
   useCurrentUserQuery,
   useUpdateCurrentUserMutation,
+  useUploadProfilePhotoMutation,
 } from "../useUserQueries";
 
 // ─── Mocks ────────────────────────────────────────────────────────────────────
@@ -53,6 +54,7 @@ jest.mock("../../services/user.service", () => ({
     fetchUser: jest.fn(),
     completeProfile: jest.fn(),
     updateUser: jest.fn(),
+    uploadProfilePhoto: jest.fn(),
   },
 }));
 
@@ -79,6 +81,7 @@ const mockGetErrorMessage = jest.mocked(httpError.getErrorMessage);
 const mockFetchUser = jest.mocked(userService.fetchUser);
 const mockCompleteProfile = jest.mocked(userService.completeProfile);
 const mockUpdateUser = jest.mocked(userService.updateUser);
+const mockUploadProfilePhoto = jest.mocked(userService.uploadProfilePhoto);
 const mockShowToastSuccess = jest.mocked(showToast.success);
 const mockShowToastError = jest.mocked(showToast.error);
 const mockLoggerWarn = jest.mocked(logger.warn);
@@ -116,6 +119,14 @@ beforeEach(() => {
   mockFetchUser.mockResolvedValue(mockUser);
   mockCompleteProfile.mockResolvedValue(undefined);
   mockUpdateUser.mockResolvedValue(mockUser);
+  mockUploadProfilePhoto.mockResolvedValue({
+    id: "u-1",
+    nome: "Ana",
+    email: "ana@email.com",
+    telefone: "11999999999",
+    chavePix: "ana@pix.com",
+    fotoPerfil: "https://example.com/nova-foto.jpg",
+  });
   mockIsUnauthorized.mockReturnValue(false);
   mockGetErrorMessage.mockImplementation(
     (_err, fallback) => fallback ?? "erro"
@@ -321,5 +332,56 @@ describe("useUpdateCurrentUserMutation", () => {
       "Erro ao atualizar perfil",
       expect.any(Error)
     );
+  });
+});
+
+// ─── useUploadProfilePhotoMutation ─────────────────────────────────────────────
+
+describe("useUploadProfilePhotoMutation", () => {
+  it("mutationFn chama userService.uploadProfilePhoto com uri", async () => {
+    const qc = createQueryClient();
+
+    const { result } = renderHook(() => useUploadProfilePhotoMutation(), {
+      wrapper: setupWrapper(qc),
+    });
+
+    await result.current.mutateAsync("file:///photo.jpg");
+
+    expect(mockUploadProfilePhoto).toHaveBeenCalledWith("file:///photo.jpg");
+  });
+
+  it("retorna resultado do upload em caso de sucesso", async () => {
+    const uploadResult = {
+      id: "u-1",
+      nome: "Ana",
+      email: "ana@email.com",
+      telefone: "11999999999",
+      chavePix: "ana@pix.com",
+      fotoPerfil: "https://example.com/nova-foto.jpg",
+    };
+    mockUploadProfilePhoto.mockResolvedValue(uploadResult);
+    const qc = createQueryClient();
+
+    const { result } = renderHook(() => useUploadProfilePhotoMutation(), {
+      wrapper: setupWrapper(qc),
+    });
+
+    const response = await result.current.mutateAsync("file:///photo.jpg");
+
+    expect(response).toEqual(uploadResult);
+  });
+
+  it("propaga erro em caso de falha", async () => {
+    const error = new Error("upload failed");
+    mockUploadProfilePhoto.mockRejectedValue(error);
+    const qc = createQueryClient();
+
+    const { result } = renderHook(() => useUploadProfilePhotoMutation(), {
+      wrapper: setupWrapper(qc),
+    });
+
+    await expect(
+      result.current.mutateAsync("file:///photo.jpg")
+    ).rejects.toThrow("upload failed");
   });
 });

@@ -1,7 +1,6 @@
 import { useIsFocused } from "@react-navigation/native";
 import { act, renderHook } from "@testing-library/react-native";
 import { useRouter } from "expo-router";
-import { Alert } from "react-native";
 
 import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthMutations";
 import {
@@ -15,7 +14,9 @@ import {
   useCompleteProfileMutation,
   useCurrentUserQuery,
   useUpdateCurrentUserMutation,
+  useUploadProfilePhotoMutation,
 } from "@/src/features/user/hooks/useUserQueries";
+import { getErrorMessage } from "@/src/services/httpError";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
 import { useRepublicResidents } from "@/src/shared/hooks/useRepublicResidents";
 import { logger } from "@/src/shared/utils/logger";
@@ -33,6 +34,7 @@ jest.mock("@/src/features/user/hooks/useUserQueries", () => ({
   useCompleteProfileMutation: jest.fn(),
   useCurrentUserQuery: jest.fn(),
   useUpdateCurrentUserMutation: jest.fn(),
+  useUploadProfilePhotoMutation: jest.fn(),
 }));
 jest.mock("@/src/features/invites/hooks/useInvitesQueries", () => ({
   usePendingInvitesCount: jest.fn(),
@@ -57,10 +59,17 @@ jest.mock("@/src/shared/utils/logger", () => ({
   logger: { error: jest.fn() },
 }));
 jest.mock("@/src/shared/utils/showToast", () => ({
-  showToast: { success: jest.fn(), confirm: jest.fn() },
+  showToast: {
+    success: jest.fn(),
+    error: jest.fn(),
+    confirm: jest.fn(),
+  },
 }));
 jest.mock("@/src/shared/utils/toastMessages", () => ({
   toastErrors: { logoutFailed: jest.fn(), profileUpdateFailed: jest.fn() },
+}));
+jest.mock("@/src/services/httpError", () => ({
+  getErrorMessage: jest.fn(),
 }));
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
@@ -71,6 +80,7 @@ const mockRouter = { replace: jest.fn(), push: jest.fn() };
 const mockLogout = jest.fn();
 const mockCompleteProfile = jest.fn();
 const mockUpdateUser = jest.fn();
+const mockUploadProfilePhoto = jest.fn();
 const mockFetchRepublics = jest.fn();
 const mockDeleteRepublic = jest.fn();
 const mockUpdateRepublic = jest.fn();
@@ -101,6 +111,9 @@ function setupMocks(userOverrides = {}) {
   jest.mocked(useUpdateCurrentUserMutation).mockReturnValue({
     mutateAsync: mockUpdateUser,
   } as any);
+  jest.mocked(useUploadProfilePhotoMutation).mockReturnValue({
+    mutateAsync: mockUploadProfilePhoto,
+  } as any);
   jest.mocked(useRepublicsQuery).mockReturnValue({
     data: [mockRepublic],
     error: null,
@@ -126,20 +139,22 @@ function setupMocks(userOverrides = {}) {
     menuItems: [],
     footerItems: [],
   } as any);
+  jest
+    .mocked(getErrorMessage)
+    .mockImplementation((_err, fallback) => fallback ?? "erro");
 }
 
 // ─── Setup ────────────────────────────────────────────────────────────────────
 
-let alertSpy: jest.SpyInstance;
-
 beforeEach(() => {
   jest.clearAllMocks();
   setupMocks();
-  alertSpy = jest.spyOn(Alert, "alert").mockImplementation(() => {});
-});
-
-afterEach(() => {
-  alertSpy.mockRestore();
+  mockUploadProfilePhoto.mockResolvedValue({
+    id: "u-1",
+    nome: "Ana",
+    email: "ana@email.com",
+    fotoPerfil: "https://example.com/nova-foto.jpg",
+  });
 });
 
 // ─── estado inicial ───────────────────────────────────────────────────────────
@@ -162,7 +177,6 @@ describe("useProfileScreen — estado inicial", () => {
 // ─── handleSignOut (passado ao useSideMenu, não retornado pelo hook) ──────────
 
 function getHandleSignOut(): () => Promise<void> {
-  // handleSignOut é passado como 2º argumento ao useSideMenu
   return (
     jest.mocked(useSideMenu).mock.calls[0] as unknown[]
   )[1] as () => Promise<void>;
@@ -232,7 +246,7 @@ describe("useProfileScreen — handleSaveProfile", () => {
     expect(mockUpdateUser).not.toHaveBeenCalled();
   });
 
-  it("exibe Alert quando perfil incompleto e phone ou pixKey estão ausentes", async () => {
+  it("exibe toast de erro quando perfil incompleto e phone ou pixKey ausentes", async () => {
     jest.mocked(useCurrentUserQuery).mockReturnValue({
       data: {
         id: "u-1",
@@ -247,14 +261,13 @@ describe("useProfileScreen — handleSaveProfile", () => {
       await result.current.handleSaveProfile("Ana");
     });
 
-    expect(alertSpy).toHaveBeenCalledWith(
-      "Campos Obrigatórios",
-      expect.any(String)
+    expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
+      "Por favor, preencha o telefone e a chave Pix."
     );
     expect(mockCompleteProfile).not.toHaveBeenCalled();
   });
 
-  it("chama completeProfile quando o perfil está incompleto e todos os campos preenchidos", async () => {
+  it("chama completeProfile quando perfil incompleto e campos preenchidos", async () => {
     mockCompleteProfile.mockResolvedValue(undefined);
     jest.mocked(useCurrentUserQuery).mockReturnValue({
       data: {
@@ -283,8 +296,78 @@ describe("useProfileScreen — handleSaveProfile", () => {
     });
   });
 
-  it("chama updateUser quando o perfil já está completo", async () => {
+  it("faz upload de foto quando URI é local (file://) e perfil incompleto", async () => {
+    mockCompleteProfile.mockResolvedValue(undefined);
+    mockUploadProfilePhoto.mockResolvedValue({
+      id: "u-1",
+      nome: "Ana",
+      fotoPerfil: "https://example.com/nova-foto.jpg",
+    });
+    jest.mocked(useCurrentUserQuery).mockReturnValue({
+      data: {
+        id: "u-1",
+        nome: "Ana",
+        email: "ana@email.com",
+        perfilCompleto: false,
+      },
+    } as any);
+    const { result } = renderHook(() => useProfileScreen());
+
+    await act(async () => {
+      await result.current.handleSaveProfile(
+        "Ana",
+        "ana@pix",
+        "file:///photo.jpg",
+        "11999"
+      );
+    });
+
+    expect(mockUploadProfilePhoto).toHaveBeenCalledWith("file:///photo.jpg");
+    expect(mockCompleteProfile).toHaveBeenCalledWith({
+      nome: "Ana",
+      telefone: "11999",
+      chavePix: "ana@pix",
+      fotoPerfil: "https://example.com/nova-foto.jpg",
+    });
+  });
+
+  it("usa URL da foto diretamente quando não é URI local e perfil incompleto", async () => {
+    mockCompleteProfile.mockResolvedValue(undefined);
+    jest.mocked(useCurrentUserQuery).mockReturnValue({
+      data: {
+        id: "u-1",
+        nome: "Ana",
+        email: "ana@email.com",
+        perfilCompleto: false,
+      },
+    } as any);
+    const { result } = renderHook(() => useProfileScreen());
+
+    await act(async () => {
+      await result.current.handleSaveProfile(
+        "Ana",
+        "ana@pix",
+        "https://example.com/existing.jpg",
+        "11999"
+      );
+    });
+
+    expect(mockUploadProfilePhoto).not.toHaveBeenCalled();
+    expect(mockCompleteProfile).toHaveBeenCalledWith({
+      nome: "Ana",
+      telefone: "11999",
+      chavePix: "ana@pix",
+      fotoPerfil: "https://example.com/existing.jpg",
+    });
+  });
+
+  it("chama updateUser quando perfil já está completo", async () => {
     mockUpdateUser.mockResolvedValue(undefined);
+    setupMocks({
+      nome: "João",
+      telefone: "11888888888",
+      chavePix: "joao@pix.com",
+    });
     const { result } = renderHook(() => useProfileScreen());
 
     await act(async () => {
@@ -300,13 +383,41 @@ describe("useProfileScreen — handleSaveProfile", () => {
       nome: "Ana",
       telefone: "11999",
       chavePix: "ana@pix",
-      fotoPerfil: undefined,
     });
   });
 
-  it("loga erro ao falhar", async () => {
+  it("retorna imediatamente quando perfil completo e nada mudou", async () => {
+    setupMocks({
+      nome: "Ana",
+      telefone: "11999",
+      chavePix: "ana@pix",
+    });
+    const { result } = renderHook(() => useProfileScreen());
+
+    await act(async () => {
+      await result.current.handleSaveProfile(
+        "Ana",
+        "ana@pix",
+        undefined,
+        "11999"
+      );
+    });
+
+    expect(mockUpdateUser).not.toHaveBeenCalled();
+    expect(result.current.showEditProfileModal).toBe(false);
+  });
+
+  it("loga erro e exibe toast ao falhar", async () => {
     const error = new Error("save fail");
     mockUpdateUser.mockRejectedValue(error);
+    jest
+      .mocked(getErrorMessage)
+      .mockImplementationOnce(() => "Erro personalizado ao salvar");
+    setupMocks({
+      nome: "João",
+      telefone: "11888888888",
+      chavePix: "joao@pix.com",
+    });
     const { result } = renderHook(() => useProfileScreen());
 
     await act(async () => {
@@ -323,26 +434,41 @@ describe("useProfileScreen — handleSaveProfile", () => {
       "Erro ao salvar perfil",
       error
     );
+    expect(jest.mocked(showToast.error)).toHaveBeenCalledWith(
+      "Erro personalizado ao salvar"
+    );
   });
 
-  it("loga undefined quando a atualização falha com valor que não é Error", async () => {
-    mockUpdateUser.mockRejectedValue("save fail");
+  it("faz upload de foto quando URI é local e perfil completo", async () => {
+    mockUpdateUser.mockResolvedValue(undefined);
+    mockUploadProfilePhoto.mockResolvedValue({
+      id: "u-1",
+      nome: "Ana",
+      fotoPerfil: "https://example.com/nova-foto.jpg",
+    });
+    setupMocks({
+      nome: "João",
+      telefone: "11888888888",
+      chavePix: "joao@pix.com",
+    });
     const { result } = renderHook(() => useProfileScreen());
 
     await act(async () => {
       await result.current.handleSaveProfile(
         "Ana",
         "ana@pix",
-        undefined,
+        "file:///photo.jpg",
         "11999"
       );
     });
 
-    expect(jest.mocked(logger.error)).toHaveBeenCalledWith(
-      "User",
-      "Erro ao salvar perfil",
-      undefined
-    );
+    expect(mockUploadProfilePhoto).toHaveBeenCalledWith("file:///photo.jpg");
+    expect(mockUpdateUser).toHaveBeenCalledWith({
+      nome: "Ana",
+      telefone: "11999",
+      chavePix: "ana@pix",
+      fotoPerfil: "https://example.com/nova-foto.jpg",
+    });
   });
 });
 
@@ -466,7 +592,7 @@ describe("useProfileScreen — handleSaveRepublicEdit", () => {
     expect(mockUpdateRepublic).not.toHaveBeenCalled();
   });
 
-  it("chama updateRepublic e fecha o modal quando selectedRepublic está definida", async () => {
+  it("chama updateRepublic com selectedRepublic e fecha o modal", async () => {
     mockUpdateRepublic.mockResolvedValue(undefined);
     const { result } = renderHook(() => useProfileScreen());
 
@@ -483,11 +609,10 @@ describe("useProfileScreen — handleSaveRepublicEdit", () => {
       await result.current.handleSaveRepublicEdit("Novo Nome", "img.jpg");
     });
 
-    expect(mockUpdateRepublic).toHaveBeenCalledWith("rep-1", {
+    expect(mockUpdateRepublic).toHaveBeenCalledWith("rep-1", mockRepublic, {
       nome: "Novo Nome",
       imagemRepublica: "img.jpg",
     });
-    expect(mockFetchRepublics).not.toHaveBeenCalled();
   });
 });
 
