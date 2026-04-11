@@ -135,3 +135,24 @@ export function useDeleteRepublicMutation() {
     },
   });
 }
+
+type UploadRepublicImageVariables = {
+  id: string;
+  uri: string;
+};
+
+export function useUploadRepublicImageMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, uri }: UploadRepublicImageVariables) =>
+      republicService.uploadRepublicImage(id, uri),
+    onSuccess: (republic) => {
+      queryClient.setQueryData(republicKeys.detail(republic.id), republic);
+      queryClient.setQueryData<RepublicResponse[]>(
+        republicKeys.list(),
+        (currentRepublics) => updateRepublicInList(currentRepublics, republic)
+      );
+    },
+  });
+}
