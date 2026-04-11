@@ -16,14 +16,14 @@ import {
   useUpdateCurrentUserMutation,
   useUploadProfilePhotoMutation,
 } from "@/src/features/user/hooks/useUserQueries";
+import { getErrorMessage } from "@/src/services/httpError";
+import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
+import { useRepublicResidents } from "@/src/shared/hooks/useRepublicResidents";
 import {
   buildProfileChanges,
   isLocalPhotoUri,
   validateProfileCompletion,
-} from "@/src/features/user/utils/helpers";
-import { getErrorMessage } from "@/src/services/httpError";
-import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
-import { useRepublicResidents } from "@/src/shared/hooks/useRepublicResidents";
+} from "@/src/shared/utils/helpers";
 import { maskPhone } from "@/src/shared/utils/inputMasks";
 import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";

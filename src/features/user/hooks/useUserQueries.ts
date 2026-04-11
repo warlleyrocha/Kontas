@@ -1,12 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { deleteItemAsync, getItemAsync, setItemAsync } from "expo-secure-store";
-
-import { getErrorMessage, isUnauthorizedError } from "@/src/services/httpError";
 import {
   clearAuthorizationHeader,
   hasAuthorizationHeader,
   hydrateAuthorizationHeader,
 } from "@/src/services/authHeader";
+import { getErrorMessage, isUnauthorizedError } from "@/src/services/httpError";
 import {
   APP_USER_STORAGE_KEY,
   AUTH_TOKEN_STORAGE_KEY,

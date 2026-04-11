@@ -81,11 +81,11 @@ export const userService = {
       const type = match ? `image/${match[1]}` : "image/jpeg";
 
       const formData = new FormData();
-        formData.append('file', {
-          uri,
-          name: filename,
-          type,
-        } as any);
+      formData.append("file", {
+        uri,
+        name: filename,
+        type,
+      } as any);
 
       const response = await api.patch<UploadPhotoApiResponse>(
         "/usuarios/foto-perfil",
