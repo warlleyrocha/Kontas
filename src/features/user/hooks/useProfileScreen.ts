@@ -15,6 +15,7 @@ import {
   useCompleteProfileMutation,
   useCurrentUserQuery,
   useUpdateCurrentUserMutation,
+  useUploadProfilePhotoMutation,
 } from "@/src/features/user/hooks/useUserQueries";
 import { getErrorMessage } from "@/src/services/httpError";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
@@ -39,6 +40,7 @@ export function useProfileScreen() {
   const { mutateAsync: logout } = useLogoutMutation();
   const { mutateAsync: completeProfile } = useCompleteProfileMutation();
   const { mutateAsync: updateCurrentUser } = useUpdateCurrentUserMutation();
+  const { mutateAsync: uploadProfilePhoto } = useUploadProfilePhotoMutation();
   const {
     data: republics = [],
     error: republicsError,
@@ -101,19 +103,35 @@ export function useProfileScreen() {
       }
 
       try {
+        let fotoPerfilUrl: string | undefined;
+
+        if (photo) {
+          const isLocalUri =
+            photo.startsWith("file://") ||
+            photo.startsWith("content://") ||
+            photo.startsWith("ph://");
+
+          if (isLocalUri) {
+            const uploadResult = await uploadProfilePhoto(photo);
+            fotoPerfilUrl = uploadResult.url;
+          } else {
+            fotoPerfilUrl = photo;
+          }
+        }
+
         if (isCompletingProfile) {
           await completeProfile({
             nome: name,
             telefone: phone!,
             chavePix: pixKey!,
-            fotoPerfil: photo,
+            fotoPerfil: fotoPerfilUrl,
           });
         } else {
           await updateCurrentUser({
             nome: name,
             telefone: phone,
             chavePix: pixKey,
-            fotoPerfil: photo,
+            fotoPerfil: fotoPerfilUrl,
           });
         }
 
@@ -126,7 +144,7 @@ export function useProfileScreen() {
         );
       }
     },
-    [user, completeProfile, updateCurrentUser]
+    [user, completeProfile, updateCurrentUser, uploadProfilePhoto]
   );
 
   const handleCreateRepublic = useCallback(() => {

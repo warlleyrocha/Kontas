@@ -7,6 +7,10 @@ import {
   User,
 } from "../types/user.types";
 
+export interface UploadPhotoResponse {
+  url: string;
+}
+
 export const userService = {
   //Método para buscar dados
   fetchUser: async (): Promise<User> => {
@@ -58,6 +62,47 @@ export const userService = {
         defaultMessage: "Erro ao completar perfil.",
         statusMessages: {
           400: "Dados inválidos. Verifique os campos e tente novamente.",
+          401: "Sessão expirada. Faça login novamente.",
+          500: "Erro no servidor. Tente novamente mais tarde.",
+        },
+      });
+    }
+  },
+
+  uploadProfilePhoto: async (uri: string): Promise<UploadPhotoResponse> => {
+    try {
+      const filename = uri.split("/").pop() ?? "photo.jpg";
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : "image/jpeg";
+
+      const formData = new FormData();
+        formData.append('file', {
+          uri,
+          name: filename,
+          type,
+        } as any);
+
+      const response = await api.patch<UploadPhotoResponse>(
+        "/usuarios/foto-perfil",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      logger.error(
+        "User",
+        "Erro ao fazer upload da foto",
+        error instanceof Error ? error : undefined
+      );
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao fazer upload da foto.",
+        statusMessages: {
+          400: "Imagem inválida. Escolha outra foto.",
           401: "Sessão expirada. Faça login novamente.",
           500: "Erro no servidor. Tente novamente mais tarde.",
         },
