@@ -46,9 +46,16 @@ export const toUserFriendlyError = (
     return new AppError(options.defaultMessage, { originalError: error });
   }
 
-  const axiosError = error as AxiosError;
+  const axiosError = error as AxiosError<{ message?: string }>;
   const status = axiosError.response?.status;
   const code = axiosError.code;
+
+  // Prioriza a mensagem do backend se existir
+  const backendMessage = axiosError.response?.data?.message;
+  if (backendMessage) {
+    return new AppError(backendMessage, { status, code, originalError: error });
+  }
+
 
   const messageByStatus = status ? options.statusMessages?.[status] : undefined;
   if (messageByStatus) {
