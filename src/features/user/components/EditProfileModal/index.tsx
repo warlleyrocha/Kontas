@@ -52,22 +52,6 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
     onSave,
   });
 
-  function getPixKeyMaxLength(value: string): number {
-    if (value.includes("@")) return 77; // e-mail (RFC 5321)
-    if (value.startsWith("+")) return 19; // +55 (11) 99999-9999
-    if (/[a-zA-Z]/.test(value)) return 36; // UUID chave aleatória
-    const digits = value.replace(/\D/g, "");
-    return digits.length <= 11 ? 14 : 18; // CPF (14 c/ máscara) ou CNPJ (18)
-  }
-
-  function getPixKeyboardType(
-    value: string
-  ): "default" | "email-address" | "phone-pad" | "number-pad" {
-    if (value.includes("@") || /[a-zA-Z]/.test(value)) return "default";
-    if (value.startsWith("+")) return "phone-pad";
-    return "number-pad"; // CPF / CNPJ
-  }
-
   function getPixKeyType(value: string): string {
     if (!value) return "";
     if (value.includes("@")) return "E-mail";
@@ -147,10 +131,9 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
               </Text>
               <TextInput
                 value={pixKey}
-                maxLength={getPixKeyMaxLength(pixKey)}
                 onChangeText={(t) => setPixKey(maskPixKeyWrite(t))}
                 placeholder="CPF, CNPJ, telefone, e-mail ou chave aleatória"
-                keyboardType={getPixKeyboardType(pixKey)}
+                keyboardType="default"
                 autoCapitalize="none"
                 autoCorrect={false}
                 className="rounded-lg border border-gray-300 bg-white px-4 py-3"

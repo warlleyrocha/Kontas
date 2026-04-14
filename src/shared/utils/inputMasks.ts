@@ -106,6 +106,15 @@ export function maskPixKeyWrite(value: string): string {
   return maskCNPJ(digits);
 }
 
+export function normalizePixKeyRaw(value: string): string {
+  // E-mail, telefone, UUID: preserva raw
+  if (value.includes("@") || value.startsWith("+") || /[a-zA-Z]/.test(value)) {
+    return value;
+  }
+  // CPF / CNPJ: só dígitos
+  return value.replace(/\D/g, "");
+}
+
 // ─── Helpers CPF / CNPJ ──────────────────────────────────────────────────────
 
 function maskCPF(digits: string): string {
@@ -113,6 +122,8 @@ function maskCPF(digits: string): string {
   if (d.length <= 3) return d;
   if (d.length <= 6) return `${d.slice(0, 3)}.${d.slice(3)}`;
   if (d.length <= 9) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`;
+  if (d.length < 11) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`;
+
   return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`;
 }
 
