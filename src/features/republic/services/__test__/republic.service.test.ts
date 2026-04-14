@@ -261,3 +261,74 @@ describe("republicService.deleteRepublic", () => {
     );
   });
 });
+
+// ─── uploadRepublicImage ──────────────────────────────────────────────────────
+
+describe("republicService.uploadRepublicImage", () => {
+  const uri = "file:///data/user/0/photo.jpg";
+
+  it("chama PATCH /republicas/:id/imagem com FormData e retorna response.data", async () => {
+    const updated: RepublicResponse = {
+      id: "rep-1",
+      nome: "Alpha",
+      imagemRepublica: "https://example.com/nova-imagem.jpg",
+    };
+    mockApi.patch.mockResolvedValue({ data: updated });
+
+    const result = await republicService.uploadRepublicImage("rep-1", uri);
+
+    expect(mockApi.patch).toHaveBeenCalledWith(
+      "/republicas/rep-1/imagem",
+      expect.any(FormData),
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    expect(result).toEqual(updated);
+  });
+
+  it("chama toUserFriendlyError com as mensagens corretas ao falhar", async () => {
+    const error = new Error("fail");
+    mockApi.patch.mockRejectedValue(error);
+
+    await expect(
+      republicService.uploadRepublicImage("rep-1", uri)
+    ).rejects.toBeDefined();
+
+    expect(mockToUserFriendlyError).toHaveBeenCalledWith(error, {
+      defaultMessage: "Erro ao fazer upload da imagem.",
+      statusMessages: {
+        400: "Imagem inválida. Escolha outra foto.",
+        401: "Sessão expirada. Faça login novamente.",
+        500: "Erro no servidor. Tente novamente mais tarde.",
+      },
+    });
+  });
+
+  it("propaga o erro retornado por toUserFriendlyError", async () => {
+    const friendly = new Error("amigável");
+    mockApi.patch.mockRejectedValue(new Error("original"));
+    mockToUserFriendlyError.mockReturnValue(friendly);
+
+    await expect(
+      republicService.uploadRepublicImage("rep-1", uri)
+    ).rejects.toBe(friendly);
+  });
+
+  it("loga erro com logger.error ao falhar", async () => {
+    const error = new Error("network");
+    mockApi.patch.mockRejectedValue(error);
+
+    await expect(
+      republicService.uploadRepublicImage("rep-1", uri)
+    ).rejects.toBeDefined();
+
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      "Republic",
+      "Erro ao fazer upload da imagem",
+      error
+    );
+  });
+});

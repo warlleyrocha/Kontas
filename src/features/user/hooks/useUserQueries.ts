@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { deleteItemAsync, getItemAsync, setItemAsync } from "expo-secure-store";
-
 import {
   clearAuthorizationHeader,
   hasAuthorizationHeader,
@@ -140,5 +139,11 @@ export function useUpdateCurrentUserMutation() {
       logger.error("User", "Erro ao atualizar perfil", new Error(message));
       showToast.error(message);
     },
+  });
+}
+
+export function useUploadProfilePhotoMutation() {
+  return useMutation({
+    mutationFn: (uri: string) => userService.uploadProfilePhoto(uri),
   });
 }

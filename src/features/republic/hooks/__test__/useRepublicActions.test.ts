@@ -10,6 +10,7 @@ import {
   useCreateRepublicMutation,
   useDeleteRepublicMutation,
   useUpdateRepublicMutation,
+  useUploadRepublicImageMutation,
 } from "../useRepublicQueries";
 
 jest.mock("expo-router", () => ({
@@ -27,12 +28,14 @@ jest.mock("../useRepublicQueries", () => ({
   useCreateRepublicMutation: jest.fn(),
   useUpdateRepublicMutation: jest.fn(),
   useDeleteRepublicMutation: jest.fn(),
+  useUploadRepublicImageMutation: jest.fn(),
 }));
 
 const mockReplace = jest.fn();
 const mockCreateRepublic = jest.fn();
 const mockUpdateRepublic = jest.fn();
 const mockDeleteRepublic = jest.fn();
+const mockUploadRepublicImage = jest.fn();
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -46,11 +49,18 @@ beforeEach(() => {
   jest.mocked(useDeleteRepublicMutation).mockReturnValue({
     mutateAsync: mockDeleteRepublic,
   } as any);
+  jest.mocked(useUploadRepublicImageMutation).mockReturnValue({
+    mutateAsync: mockUploadRepublicImage,
+  } as any);
 });
 
 const payload: RepublicPost = { nome: "República Alpha" };
 
-const mockRepublic: RepublicResponse = { id: "rep-1", nome: "República Alpha" };
+const mockRepublic: RepublicResponse = {
+  id: "rep-1",
+  nome: "República Alpha",
+  imagemRepublica: "https://example.com/foto.jpg",
+};
 
 describe("useRepublicActions", () => {
   it("retorna showEditModal=false e as funções no estado inicial", () => {
@@ -74,7 +84,7 @@ describe("useRepublicActions", () => {
   });
 
   describe("createRepublic", () => {
-    it("chama republicService.createRepublic e retorna a república criada", async () => {
+    it("chama createRepublicMutation e retorna a república criada", async () => {
       mockCreateRepublic.mockResolvedValue(mockRepublic);
 
       const { result } = renderHook(() => useRepublicActions());
@@ -86,6 +96,35 @@ describe("useRepublicActions", () => {
 
       expect(mockCreateRepublic).toHaveBeenCalledWith(payload);
       expect(returned).toEqual(mockRepublic);
+    });
+
+    it("faz upload da imagem quando URI é local (file://)", async () => {
+      const republicWithImage: RepublicResponse = {
+        id: "rep-1",
+        nome: "República Alpha",
+      };
+      const uploadedRepublic: RepublicResponse = {
+        ...republicWithImage,
+        imagemRepublica: "https://example.com/nova-foto.jpg",
+      };
+      mockCreateRepublic.mockResolvedValue(republicWithImage);
+      mockUploadRepublicImage.mockResolvedValue(uploadedRepublic);
+
+      const { result } = renderHook(() => useRepublicActions());
+      let returned: RepublicResponse | undefined;
+
+      await act(async () => {
+        returned = await result.current.createRepublic({
+          nome: "República Alpha",
+          imagemRepublica: "file:///data/photo.jpg",
+        });
+      });
+
+      expect(mockUploadRepublicImage).toHaveBeenCalledWith({
+        id: "rep-1",
+        uri: "file:///data/photo.jpg",
+      });
+      expect(returned).toEqual(uploadedRepublic);
     });
 
     it("exibe toast de sucesso e navega para a república", async () => {
@@ -105,35 +144,173 @@ describe("useRepublicActions", () => {
   });
 
   describe("updateRepublic", () => {
-    it("chama republicService.updateRepublic com id e payload", async () => {
-      const updated: RepublicResponse = { id: "rep-1", nome: "Nova" };
-      mockUpdateRepublic.mockResolvedValue(updated);
+    it("retorna currentRepublic imediatamente quando nada mudou", async () => {
+      const currentRepublic: RepublicResponse = {
+        id: "rep-1",
+        nome: "República Alpha",
+        imagemRepublica: "https://example.com/foto.jpg",
+      };
+      const data: RepublicPost = {
+        nome: "República Alpha",
+        imagemRepublica: "https://example.com/foto.jpg",
+      };
+
+      const { result } = renderHook(() => useRepublicActions());
+      let returned: RepublicResponse | undefined;
+
+      await act(async () => {
+        returned = await result.current.updateRepublic(
+          "rep-1",
+          currentRepublic,
+          data
+        );
+      });
+
+      expect(returned).toEqual(currentRepublic);
+      expect(mockUpdateRepublic).not.toHaveBeenCalled();
+      expect(mockUploadRepublicImage).not.toHaveBeenCalled();
+    });
+
+    it("chama updateRepublicMutation quando nome mudou", async () => {
+      const currentRepublic: RepublicResponse = {
+        id: "rep-1",
+        nome: "República Alpha",
+      };
+      const updatedRepublic: RepublicResponse = {
+        id: "rep-1",
+        nome: "Nova República",
+      };
+      mockUpdateRepublic.mockResolvedValue(updatedRepublic);
 
       const { result } = renderHook(() => useRepublicActions());
 
       await act(async () => {
-        await result.current.updateRepublic("rep-1", { nome: "Nova" });
+        await result.current.updateRepublic("rep-1", currentRepublic, {
+          nome: "Nova República",
+        });
       });
 
       expect(mockUpdateRepublic).toHaveBeenCalledWith({
         id: "rep-1",
-        data: { nome: "Nova" },
+        data: { nome: "Nova República" },
       });
     });
 
-    it("exibe toast de sucesso", async () => {
-      mockUpdateRepublic.mockResolvedValue({
+    it("chama uploadRepublicImageMutation quando imagem é URI local", async () => {
+      const currentRepublic: RepublicResponse = {
         id: "rep-1",
-        nome: "Nova",
-      });
+        nome: "República Alpha",
+      };
+      const uploadedRepublic: RepublicResponse = {
+        id: "rep-1",
+        nome: "República Alpha",
+        imagemRepublica: "https://example.com/nova-foto.jpg",
+      };
+      mockUploadRepublicImage.mockResolvedValue(uploadedRepublic);
 
       const { result } = renderHook(() => useRepublicActions());
 
       await act(async () => {
-        await result.current.updateRepublic("rep-1", { nome: "Nova" });
+        await result.current.updateRepublic("rep-1", currentRepublic, {
+          nome: "República Alpha",
+          imagemRepublica: "file:///data/photo.jpg",
+        });
+      });
+
+      expect(mockUploadRepublicImage).toHaveBeenCalledWith({
+        id: "rep-1",
+        uri: "file:///data/photo.jpg",
+      });
+    });
+
+    it("chama ambos update e upload quando nome e imagem mudaram", async () => {
+      const currentRepublic: RepublicResponse = {
+        id: "rep-1",
+        nome: "República Alpha",
+      };
+      const updatedRepublic: RepublicResponse = {
+        id: "rep-1",
+        nome: "Nova República",
+      };
+      const uploadedRepublic: RepublicResponse = {
+        id: "rep-1",
+        nome: "Nova República",
+        imagemRepublica: "https://example.com/nova-foto.jpg",
+      };
+      mockUpdateRepublic.mockResolvedValue(updatedRepublic);
+      mockUploadRepublicImage.mockResolvedValue(uploadedRepublic);
+
+      const { result } = renderHook(() => useRepublicActions());
+
+      await act(async () => {
+        await result.current.updateRepublic("rep-1", currentRepublic, {
+          nome: "Nova República",
+          imagemRepublica: "file:///data/photo.jpg",
+        });
+      });
+
+      expect(mockUpdateRepublic).toHaveBeenCalledWith({
+        id: "rep-1",
+        data: {
+          nome: "Nova República",
+          imagemRepublica: "file:///data/photo.jpg",
+        },
+      });
+      expect(mockUploadRepublicImage).toHaveBeenCalledWith({
+        id: "rep-1",
+        uri: "file:///data/photo.jpg",
+      });
+    });
+
+    it("exibe toast de sucesso após atualizar", async () => {
+      const currentRepublic: RepublicResponse = {
+        id: "rep-1",
+        nome: "República Alpha",
+      };
+      const updatedRepublic: RepublicResponse = {
+        id: "rep-1",
+        nome: "Nova República",
+      };
+      mockUpdateRepublic.mockResolvedValue(updatedRepublic);
+
+      const { result } = renderHook(() => useRepublicActions());
+
+      await act(async () => {
+        await result.current.updateRepublic("rep-1", currentRepublic, {
+          nome: "Nova República",
+        });
       });
 
       expect(showToast.success).toHaveBeenCalledWith("República atualizada");
+    });
+
+    it("retorna república atualizada após upload de imagem", async () => {
+      const currentRepublic: RepublicResponse = {
+        id: "rep-1",
+        nome: "República Alpha",
+      };
+      const uploadedRepublic: RepublicResponse = {
+        id: "rep-1",
+        nome: "República Alpha",
+        imagemRepublica: "https://example.com/nova-foto.jpg",
+      };
+      mockUploadRepublicImage.mockResolvedValue(uploadedRepublic);
+
+      const { result } = renderHook(() => useRepublicActions());
+      let returned: RepublicResponse | undefined;
+
+      await act(async () => {
+        returned = await result.current.updateRepublic(
+          "rep-1",
+          currentRepublic,
+          {
+            nome: "República Alpha",
+            imagemRepublica: "file:///data/photo.jpg",
+          }
+        );
+      });
+
+      expect(returned).toEqual(uploadedRepublic);
     });
   });
 

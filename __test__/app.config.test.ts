@@ -322,7 +322,7 @@ describe("app.config.ts", () => {
     });
 
     expect(result.extra).toEqual({
-      env:"development",
+      env: "development",
       router: {},
       eas: {
         projectId: "024de3bb-27e4-4a7c-ac6f-e32a95eaa23a",

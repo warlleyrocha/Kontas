@@ -340,7 +340,7 @@ describe("useRepublicScreen — handleSaveRepublic", () => {
     expect(mockUpdateRepublic).not.toHaveBeenCalled();
   });
 
-  it("chama updateRepublic com o payload correto", async () => {
+  it("chama updateRepublic com republic e payload correto", async () => {
     mockUpdateRepublic.mockResolvedValue(undefined);
     const { result } = renderHook(() => useRepublicScreen("rep-1"));
     await act(async () => {});
@@ -349,7 +349,7 @@ describe("useRepublicScreen — handleSaveRepublic", () => {
       await result.current.handleSaveRepublic("Novo Nome", "img.jpg");
     });
 
-    expect(mockUpdateRepublic).toHaveBeenCalledWith("rep-1", {
+    expect(mockUpdateRepublic).toHaveBeenCalledWith("rep-1", mockRepublic, {
       nome: "Novo Nome",
       imagemRepublica: "img.jpg",
     });

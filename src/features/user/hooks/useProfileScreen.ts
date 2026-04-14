@@ -1,7 +1,6 @@
 import { useIsFocused } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Alert } from "react-native";
 
 import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthMutations";
 import {
@@ -15,14 +14,21 @@ import {
   useCompleteProfileMutation,
   useCurrentUserQuery,
   useUpdateCurrentUserMutation,
+  useUploadProfilePhotoMutation,
 } from "@/src/features/user/hooks/useUserQueries";
 import { getErrorMessage } from "@/src/services/httpError";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
 import { useRepublicResidents } from "@/src/shared/hooks/useRepublicResidents";
+import {
+  buildProfileChanges,
+  isLocalPhotoUri,
+  validateProfileCompletion,
+} from "@/src/shared/utils/helpers";
 import { maskPhone } from "@/src/shared/utils/inputMasks";
 import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
 import { toastErrors } from "@/src/shared/utils/toastMessages";
+import { UpdateUserRequest } from "../types/user.types";
 
 interface CardPosition {
   x: number;
@@ -39,6 +45,7 @@ export function useProfileScreen() {
   const { mutateAsync: logout } = useLogoutMutation();
   const { mutateAsync: completeProfile } = useCompleteProfileMutation();
   const { mutateAsync: updateCurrentUser } = useUpdateCurrentUserMutation();
+  const { mutateAsync: uploadProfilePhoto } = useUploadProfilePhotoMutation();
   const {
     data: republics = [],
     error: republicsError,
@@ -92,29 +99,42 @@ export function useProfileScreen() {
 
       const isCompletingProfile = !user.perfilCompleto;
 
-      if (isCompletingProfile && (!phone || !pixKey)) {
-        Alert.alert(
-          "Campos Obrigatórios",
-          "Por favor, preencha o telefone e a chave Pix."
-        );
+      if (!validateProfileCompletion(isCompletingProfile, phone, pixKey))
         return;
-      }
 
       try {
+        let fotoPerfilUrl: string | undefined;
+
+        if (photo) {
+          if (isLocalPhotoUri(photo)) {
+            const uploadResult = await uploadProfilePhoto(photo);
+            fotoPerfilUrl = uploadResult.fotoPerfil;
+          } else {
+            fotoPerfilUrl = photo;
+          }
+        }
+
         if (isCompletingProfile) {
           await completeProfile({
             nome: name,
             telefone: phone!,
             chavePix: pixKey!,
-            fotoPerfil: photo,
+            fotoPerfil: fotoPerfilUrl,
           });
         } else {
-          await updateCurrentUser({
-            nome: name,
-            telefone: phone,
-            chavePix: pixKey,
-            fotoPerfil: photo,
-          });
+          const changes: UpdateUserRequest = buildProfileChanges(
+            user,
+            name,
+            phone,
+            pixKey,
+            fotoPerfilUrl
+          );
+
+          if (Object.keys(changes).length === 0) {
+            setShowEditProfileModal(false);
+            return;
+          }
+          await updateCurrentUser(changes);
         }
 
         setShowEditProfileModal(false);
@@ -124,9 +144,15 @@ export function useProfileScreen() {
           "Erro ao salvar perfil",
           error instanceof Error ? error : undefined
         );
+        showToast.error(
+          getErrorMessage(
+            error,
+            "Não foi possível salvar as alterações do perfil."
+          )
+        );
       }
     },
-    [user, completeProfile, updateCurrentUser]
+    [user, completeProfile, updateCurrentUser, uploadProfilePhoto]
   );
 
   const handleCreateRepublic = useCallback(() => {
@@ -171,7 +197,7 @@ export function useProfileScreen() {
     async (name: string, image?: string) => {
       if (!selectedRepublic) return;
       try {
-        await updateRepublic(selectedRepublic.id, {
+        await updateRepublic(selectedRepublic.id, selectedRepublic, {
           nome: name,
           imagemRepublica: image,
         });

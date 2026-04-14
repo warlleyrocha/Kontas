@@ -189,3 +189,64 @@ describe("userService.completeProfile", () => {
     );
   });
 });
+
+// ─── uploadProfilePhoto ────────────────────────────────────────────────────────
+
+describe("userService.uploadProfilePhoto", () => {
+  const uri = "file:///data/user/0/photo.jpg";
+
+  const mockUploadResponse = {
+    id: "u-1",
+    nome: "Ana",
+    email: "ana@email.com",
+    telefone: "11999999999",
+    chavePix: "ana@pix.com",
+    fotoPerfil: "https://example.com/nova-foto.jpg",
+  };
+
+  it("chama PATCH /usuarios/foto-perfil com FormData e retorna response.data", async () => {
+    mockApi.patch.mockResolvedValue({ data: mockUploadResponse });
+
+    const result = await userService.uploadProfilePhoto(uri);
+
+    expect(mockApi.patch).toHaveBeenCalledWith(
+      "/usuarios/foto-perfil",
+      expect.any(FormData),
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    expect(result).toEqual(mockUploadResponse);
+  });
+
+  it("chama toUserFriendlyError com as mensagens corretas ao falhar", async () => {
+    const error = new Error("fail");
+    mockApi.patch.mockRejectedValue(error);
+    const friendly = new Error("Erro ao fazer upload da foto.");
+    mockToUserFriendlyError.mockReturnValue(friendly);
+
+    await expect(userService.uploadProfilePhoto(uri)).rejects.toThrow(friendly);
+
+    expect(mockToUserFriendlyError).toHaveBeenCalledWith(error, {
+      defaultMessage: "Erro ao fazer upload da foto.",
+      statusMessages: {
+        400: "Imagem inválida. Escolha outra foto.",
+        401: "Sessão expirada. Faça login novamente.",
+        500: "Erro no servidor. Tente novamente mais tarde.",
+      },
+    });
+  });
+
+  it("propaga o erro retornado por toUserFriendlyError", async () => {
+    const originalError = new Error("original");
+    const friendlyError = new Error("amigável");
+    mockApi.patch.mockRejectedValue(originalError);
+    mockToUserFriendlyError.mockReturnValue(friendlyError);
+
+    await expect(userService.uploadProfilePhoto(uri)).rejects.toBe(
+      friendlyError
+    );
+  });
+});

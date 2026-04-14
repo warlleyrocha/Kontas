@@ -130,7 +130,7 @@ export function useRepublicScreen(republicId: string) {
       if (!republic) return;
 
       try {
-        await updateRepublic(republic.id, {
+        await updateRepublic(republic.id, republic, {
           nome,
           imagemRepublica: imagem,
         });
