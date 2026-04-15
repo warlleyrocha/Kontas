@@ -121,29 +121,36 @@ export function useAccountForm({ republicId, onClose }: UseAccountFormParams) {
     });
   };
 
-  const handleMoradorValorChange = (moradorId: string, value: string) => {
-    const sanitized = value.replace(/[^\d.,]/g, "");
-    setFormData((prev) => {
-      const valorTotal = parseCurrencyValue(prev.valorTotal);
-      const somaOutros = prev.moradoresDivisao.reduce((acc, m) => {
-        if (!m.checked || m.moradorId === moradorId) return acc;
-        return acc + parseCurrencyValue(m.valor);
-      }, 0);
-      const maxPermitido = Math.max(valorTotal - somaOutros, 0);
-      const valorDigitado = parseCurrencyValue(sanitized);
-      const valorFinal =
-        valorDigitado > maxPermitido ? formatBRL(maxPermitido) : sanitized;
+const handleMoradorValorChange = (moradorId: string, value: string) => {
+  const sanitized = value.replace(/[^\d.,]/g, "");
+  setFormData((prev) => {
+    const valorTotal = parseCurrencyValue(prev.valorTotal);
+    const somaOutros = prev.moradoresDivisao.reduce((acc, m) => {
+      if (!m.checked || m.moradorId === moradorId) return acc;
+      return acc + parseCurrencyValue(m.valor);
+    }, 0);
+    const maxPermitido = Math.max(valorTotal - somaOutros, 0);
+    const valorDigitado = parseCurrencyValue(sanitized);
+    const valorFinal =
+      valorDigitado > maxPermitido ? formatBRL(maxPermitido) : sanitized;
 
-      return {
-        ...prev,
-        moradoresDivisao: prev.moradoresDivisao.map((morador) =>
-          morador.moradorId === moradorId
-            ? { ...morador, valor: valorFinal }
-            : morador
-        ),
-      };
-    });
-  };
+    const moradoresAtualizados = prev.moradoresDivisao.map((morador) =>
+      morador.moradorId === moradorId
+        ? { ...morador, valor: valorFinal }
+        : morador
+    );
+
+    const algumTemValorCustomizado = moradoresAtualizados.some(
+      (m) => m.checked && parseCurrencyValue(m.valor) > 0
+    );
+
+    return {
+      ...prev,
+      tipoDivisao: algumTemValorCustomizado ? "custom" : "equal",
+      moradoresDivisao: moradoresAtualizados,
+    };
+  });
+};
 
   const handleValorTotalChange = (value: string) => {
     setFormData((prev) => ({

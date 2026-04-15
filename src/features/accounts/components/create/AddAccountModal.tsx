@@ -72,6 +72,7 @@ export default function AddAccountModal({
     vencimento,
     metodoPagamento,
     moradoresDivisao,
+    tipoDivisao,
   } = formData;
 
   const valorTotalNumerico = parseCurrencyValue(valorTotal);
@@ -92,21 +93,33 @@ export default function AddAccountModal({
     // Converte a data para formato ISO string
     const vencimentoISO = vencimento.toISOString();
 
-    // Monta o payload no formato REST
-    const moradorIds = moradoresDivisao
+   const moradoresIgual = tipoDivisao === "equal"
+  ? moradoresDivisao
       .filter((morador) => morador.checked)
-      .map((morador) => String(morador.moradorId));
+      .map((morador) => String(morador.moradorId))
+  : [];
+
+const moradoresCustomizados = tipoDivisao === "custom"
+  ? moradoresDivisao
+      .filter((morador) => morador.checked)
+      .map((morador) => ({
+        moradorId: String(morador.moradorId),
+        valor: parseCurrencyValue(morador.valor),
+      }))
+  : [];
 
     const payload: CriarContaComMoradoresRequest = {
-      descricao,
-      valor: valorTotalNumerico,
-      vencimento: vencimentoISO,
-      metodoPagamento,
-      republicaId: republicId,
-      status: StatusConta.PENDENTE,
-      moradorIds,
-    };
-
+    descricao,
+    valor: valorTotalNumerico,
+    vencimento: vencimentoISO,
+    metodoPagamento,
+    republicaId: republicId,
+    status: StatusConta.PENDENTE,
+    moradores: {
+      igual: moradoresIgual,
+      customizados: moradoresCustomizados,
+    },
+  };
     await onSubmit(payload);
   };
 
