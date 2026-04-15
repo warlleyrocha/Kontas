@@ -5,9 +5,12 @@ import {
 import { useState } from "react";
 import { Alert } from "react-native";
 import { getErrorMessage } from "@/src/services/httpError";
+import {
+  maskPixKeyWrite,
+  normalizePixKeyRaw,
+} from "@/src/shared/utils/inputMasks";
 import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
-import { maskPixKeyWrite, normalizePixKeyRaw } from "@/src/shared/utils/inputMasks";
 
 export interface EditProfileFormValues {
   onClose: () => void;
@@ -38,14 +41,13 @@ export function useEditProfile({
 
   // Estado interno armazena dígitos puros (ou raw para e-mail/UUID/telefone)
   const [pixKeyRaw, setPixKeyRaw] = useState(
-  normalizePixKeyRaw(currentPixKey ?? "")
-);
+    normalizePixKeyRaw(currentPixKey ?? "")
+  );
 
   // Valor exibido é sempre derivado — máscara nunca aplicada sobre si mesma
   const pixKey = maskPixKeyWrite(pixKeyRaw);
 
   const setPixKey = (value: string) => setPixKeyRaw(normalizePixKeyRaw(value));
-
 
   const handleClose = () => {
     setName(currentName);

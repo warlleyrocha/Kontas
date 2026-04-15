@@ -56,7 +56,6 @@ export const toUserFriendlyError = (
     return new AppError(backendMessage, { status, code, originalError: error });
   }
 
-
   const messageByStatus = status ? options.statusMessages?.[status] : undefined;
   if (messageByStatus) {
     return new AppError(messageByStatus, {

@@ -1,11 +1,7 @@
 import Feather from "@expo/vector-icons/Feather";
 import { Image, Text, TextInput, TouchableOpacity, View } from "react-native";
-import {
-  maskCurrencyBRL,
-} from "@/src/shared/utils/inputMasks";
-import type {
-  MoradorDivisao,
-} from "../../types/accountForm.types";
+import { maskCurrencyBRL } from "@/src/shared/utils/inputMasks";
+import type { MoradorDivisao } from "../../types/accountForm.types";
 
 interface ResidentRowProps {
   readonly morador: MoradorDivisao;
@@ -46,14 +42,14 @@ export default function ResidentRow({
       </View>
 
       <View className="flex-row items-center gap-1 mr-3">
-          <Text className="font-inter-semibold">R$</Text>
-          <TextInput
-            value={morador.valor}
-            onChangeText={(text) => onValorChange(maskCurrencyBRL(text))}
-            keyboardType="numeric"
-            placeholder="0,00"
-            className="min-w-[65px] rounded-lg border border-gray-200 bg-gray-50 px-2 py-1 text-right text-sm font-semibold text-teal"
-          />
+        <Text className="font-inter-semibold">R$</Text>
+        <TextInput
+          value={morador.valor}
+          onChangeText={(text) => onValorChange(maskCurrencyBRL(text))}
+          keyboardType="numeric"
+          placeholder="0,00"
+          className="min-w-[65px] rounded-lg border border-gray-200 bg-gray-50 px-2 py-1 text-right text-sm font-semibold text-teal"
+        />
       </View>
 
       <TouchableOpacity

@@ -93,33 +93,35 @@ export default function AddAccountModal({
     // Converte a data para formato ISO string
     const vencimentoISO = vencimento.toISOString();
 
-   const moradoresIgual = tipoDivisao === "equal"
-  ? moradoresDivisao
-      .filter((morador) => morador.checked)
-      .map((morador) => String(morador.moradorId))
-  : [];
+    const moradoresIgual =
+      tipoDivisao === "equal"
+        ? moradoresDivisao
+            .filter((morador) => morador.checked)
+            .map((morador) => String(morador.moradorId))
+        : [];
 
-const moradoresCustomizados = tipoDivisao === "custom"
-  ? moradoresDivisao
-      .filter((morador) => morador.checked)
-      .map((morador) => ({
-        moradorId: String(morador.moradorId),
-        valor: parseCurrencyValue(morador.valor),
-      }))
-  : [];
+    const moradoresCustomizados =
+      tipoDivisao === "custom"
+        ? moradoresDivisao
+            .filter((morador) => morador.checked)
+            .map((morador) => ({
+              moradorId: String(morador.moradorId),
+              valor: parseCurrencyValue(morador.valor),
+            }))
+        : [];
 
     const payload: CriarContaComMoradoresRequest = {
-    descricao,
-    valor: valorTotalNumerico,
-    vencimento: vencimentoISO,
-    metodoPagamento,
-    republicaId: republicId,
-    status: StatusConta.PENDENTE,
-    moradores: {
-      igual: moradoresIgual,
-      customizados: moradoresCustomizados,
-    },
-  };
+      descricao,
+      valor: valorTotalNumerico,
+      vencimento: vencimentoISO,
+      metodoPagamento,
+      republicaId: republicId,
+      status: StatusConta.PENDENTE,
+      moradores: {
+        igual: moradoresIgual,
+        customizados: moradoresCustomizados,
+      },
+    };
     await onSubmit(payload);
   };
 

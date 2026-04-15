@@ -1,4 +1,7 @@
-import { ContaMorador, MoradorCustomizado } from "@/src/features/accounts/types/accountResidents.types";
+import {
+  ContaMorador,
+  MoradorCustomizado,
+} from "@/src/features/accounts/types/accountResidents.types";
 
 // Enums
 export enum StatusConta {

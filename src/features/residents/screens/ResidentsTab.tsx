@@ -72,10 +72,10 @@ export const ResidentsTab: FC<ResidentsTabProps> = ({
       {isAdmin && <PlusButton onPress={() => setModalOpen(true)} />}
       <InvitesModal
         open={modalOpen}
-        onClose={() =>
-          {  resetSendInvite();
-            setModalOpen(false)
-          }}
+        onClose={() => {
+          resetSendInvite();
+          setModalOpen(false);
+        }}
         republicaId={republicId}
         sendInvite={sendInvite}
         loading={sendLoading}
