@@ -1,4 +1,3 @@
-import Feather from "@expo/vector-icons/Feather";
 import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -63,7 +62,6 @@ export default function AddAccountModal({
     handleOpenDatepicker,
     handleDateChange,
     handleValorTotalChange,
-    handleSetTipoDivisao,
     handleToggleMorador,
     handleMoradorValorChange,
   } = useAccountForm({ onClose, republicId, visible });
@@ -73,7 +71,6 @@ export default function AddAccountModal({
     valorTotal,
     vencimento,
     metodoPagamento,
-    tipoDivisao,
     moradoresDivisao,
   } = formData;
 
@@ -119,23 +116,6 @@ export default function AddAccountModal({
         {/* Header — fixo, bg white */}
         <AddAccountModalHeader onClose={handleCloseModal} />
 
-        {/* Card informativo */}
-        <View className="w-full bg-[#EFF1F0] px-6 py-6">
-          <View className="flex-row items-center rounded-2xl bg-teal px-5 py-5">
-            <View className="flex-1">
-              <Text className="text-lg font-inter-bold text-white">
-                Informações Básicas
-              </Text>
-              <Text className="mt-1 text-sm text-teal-200">
-                Preencha os dados da conta{"\n"}para dividir com a república.
-              </Text>
-            </View>
-            <View className="ml-3 opacity-30">
-              <Feather name="file-text" size={48} color="#fff" />
-            </View>
-          </View>
-        </View>
-
         {/* Body — scrollável, bg cinza */}
         <KeyboardAvoidingView
           className="w-full flex-1 bg-[#EFF1F0]"
@@ -166,12 +146,7 @@ export default function AddAccountModal({
 
             {activeTab === "residents" && (
               <AddAccountModalResidentsSection
-                tipoDivisao={tipoDivisao}
                 moradoresDivisao={moradoresDivisao}
-                totalDivisaoPreenchido={totalDivisaoPreenchido}
-                valorTotalNumerico={valorTotalNumerico}
-                restante={restante}
-                onSetTipoDivisao={handleSetTipoDivisao}
                 onToggleMorador={handleToggleMorador}
                 onMoradorValorChange={handleMoradorValorChange}
               />
