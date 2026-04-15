@@ -1,4 +1,4 @@
-import { ContaMorador } from "@/src/features/accounts/types/accountResidents.types";
+import { ContaMorador, MoradorCustomizado } from "@/src/features/accounts/types/accountResidents.types";
 
 // Enums
 export enum StatusConta {
@@ -41,7 +41,10 @@ export type CriarContaRequest = {
 };
 
 export type CriarContaComMoradoresRequest = CriarContaRequest & {
-  moradorIds: string[];
+  moradores: {
+    igual: string[];
+    customizados: MoradorCustomizado[];
+  };
 };
 
 export type ListarContasResponse = ContaMorador[];

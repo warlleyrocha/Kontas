@@ -12,9 +12,9 @@ import { logger } from "@/src/shared/utils/logger";
 export const accountResidentsService = {
   vincularMoradores: async (
     data: VincularMoradoresRequest
-  ): Promise<ContaMorador[]> => {
+  ): Promise<VincularMoradoresRequest[]> => {
     try {
-      const response = await api.post<ContaMorador[]>(
+      const response = await api.post<VincularMoradoresRequest[]>(
         "/contas-moradores",
         data
       );
