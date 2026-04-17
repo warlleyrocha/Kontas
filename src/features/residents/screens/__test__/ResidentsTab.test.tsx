@@ -66,6 +66,7 @@ beforeEach(() => {
     mutateAsync: mockSendInvite,
     isPending: false,
     error: null,
+    reset: jest.fn(),
   } as any);
   jest
     .mocked(useTabResidents)
@@ -175,6 +176,7 @@ describe("ResidentsTab — modal de convite", () => {
       mutateAsync: mockSendInvite,
       isPending: true,
       error: new Error("Erro de envio"),
+      reset: jest.fn(),
     } as any);
     render(<ResidentsTab residents={[]} republicId="rep-1" />);
     const props = jest.mocked(InvitesModal).mock.calls[0][0] as any;

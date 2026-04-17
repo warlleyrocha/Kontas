@@ -90,7 +90,7 @@ function createPayload(
     republicaId: "republica-1",
     status: StatusConta.PENDENTE,
     metodoPagamento: MetodoPagamento.PIX,
-    moradorIds: [],
+    moradores: { igual: [], customizados: [] },
     ...overrides,
   };
 }
@@ -256,7 +256,10 @@ describe("useAccountActions", () => {
   it("submete uma conta e vincula moradores quando houver ids", async () => {
     const payload = createPayload({
       valor: 320,
-      moradorIds: ["resident-1", "resident-2"],
+      moradores: {
+        igual: ["resident-1", "resident-2"],
+        customizados: [],
+      },
     });
     mockAccountService.criarConta.mockResolvedValue({
       id: "account-9",

@@ -274,7 +274,7 @@ describe("AddAccountModal", () => {
       metodoPagamento: MetodoPagamento.PIX,
       republicaId: "rep-1",
       status: StatusConta.PENDENTE,
-      moradorIds: ["1"],
+      moradores: { igual: ["1"], customizados: [] },
     });
   });
 
