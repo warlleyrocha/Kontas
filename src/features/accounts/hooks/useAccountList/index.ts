@@ -152,6 +152,7 @@ export function useAccountList({ republicId }: UseAccountListProps) {
     loading: accountsQuery.isLoading,
     error: accountsQuery.error instanceof Error ? accountsQuery.error : null,
     refresh,
+    contas,
     mesSelecionado,
     mostrarContasAbertas,
     mostrarContasPagas,
