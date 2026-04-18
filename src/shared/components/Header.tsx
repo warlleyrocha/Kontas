@@ -8,7 +8,7 @@ interface HeaderProps {
 
 export default function Header({ title }: HeaderProps) {
   return (
-    <View className="mb-[24px] mt-[32px] px-4 py-[8px]">
+    <View className="mb-[24px] mt-[38px] px-5 py-[8px]">
       <View className="flex-row items-center justify-between">
         <TouchableOpacity
           onPress={goBack}
