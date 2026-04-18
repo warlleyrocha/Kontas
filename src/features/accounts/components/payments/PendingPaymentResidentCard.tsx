@@ -1,6 +1,6 @@
+import Feather from "@expo/vector-icons/Feather";
 import { useState } from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
-
 import {
   type ContaMorador,
   StatusPagamento,
@@ -12,7 +12,6 @@ import {
 import { formatPaymentMethodLabel } from "@/src/features/accounts/utils/paymentMethod.utils";
 import { formatCurrency } from "@/src/shared/utils/formats";
 import { getInitials } from "@/src/shared/utils/getInitials";
-import Feather from "@expo/vector-icons/Feather";
 
 interface PendingPaymentResidentCardProps {
   readonly accountId: string;
@@ -104,9 +103,10 @@ export function PendingPaymentResidentCard({
             ) : (
               <View className="flex-row items-center justify-center gap-1">
                 <Feather name="x" size={16} color="#E53935" className="mr-1" />
-                <Text className="text-sm font-semibold text-[#E53935]">Recusar</Text>
+                <Text className="text-sm font-semibold text-[#E53935]">
+                  Recusar
+                </Text>
               </View>
-              
             )}
           </TouchableOpacity>
 
@@ -129,10 +129,15 @@ export function PendingPaymentResidentCard({
               <ActivityIndicator size="small" color="#FFFFFF" />
             ) : (
               <View className="flex-row items-center justify-center gap-1">
-                <Feather name="check" size={16} color="#FFFFFF" className="mr-1" />
-              <Text className="text-sm font-semibold text-white">
-                Confirmar
-              </Text>
+                <Feather
+                  name="check"
+                  size={16}
+                  color="#FFFFFF"
+                  className="mr-1"
+                />
+                <Text className="text-sm font-semibold text-white">
+                  Confirmar
+                </Text>
               </View>
             )}
           </TouchableOpacity>

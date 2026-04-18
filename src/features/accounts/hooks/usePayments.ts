@@ -1,7 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
-import { useResidents } from "@/src/features/residents/hooks/useResidents";
-import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 import { accountKeys } from "@/src/features/accounts/hooks/account.keys";
 import { accountResidentKeys } from "@/src/features/accounts/hooks/accountResident.keys";
 import {
@@ -16,9 +14,11 @@ import type {
   PaymentStatusFilter,
 } from "@/src/features/accounts/types/payments.types";
 import { getMoradorStatusVisual } from "@/src/features/accounts/utils/accountStatus.utils";
+import { useResidents } from "@/src/features/residents/hooks/useResidents";
+import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 import { getErrorMessage } from "@/src/services/httpError";
-import { ResidentRole } from "@/src/shared/types/resident.types";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
+import { ResidentRole } from "@/src/shared/types/resident.types";
 import { showToast } from "@/src/shared/utils/showToast";
 
 interface UsePaymentsScreenParams {
@@ -38,9 +38,7 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
   const currentResident = useMemo(() => {
     if (!user?.email) return null;
     const normalizedEmail = user.email.toLowerCase();
-    return residents.find(
-      (r) => r.email.toLowerCase() === normalizedEmail
-    );
+    return residents.find((r) => r.email.toLowerCase() === normalizedEmail);
   }, [residents, user?.email]);
 
   const isAdmin = currentResident?.role === ResidentRole.ADMIN;

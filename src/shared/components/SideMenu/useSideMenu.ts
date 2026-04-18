@@ -122,8 +122,7 @@ export function useSideMenu(
     switch (context) {
       case "home": {
         const showPayments =
-          currentUserRole !== ResidentRole.USER ||
-          currentUserHasCreatedAccount;
+          currentUserRole !== ResidentRole.USER || currentUserHasCreatedAccount;
         return [
           base.profile,
           base.switchRepublic,
