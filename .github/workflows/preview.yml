@@ -1,155 +1,162 @@
-name: Expo CI
+  name: Expo CI
 
-on:
-  pull_request:
-    branches: [develop]
-    types:
-      - opened
-      - reopened
-      - synchronize
-      - ready_for_review
+  on:
+    pull_request:
+      branches: [develop]
+      types:
+        - opened
+        - reopened
+        - synchronize
+        - ready_for_review
 
-  workflow_dispatch:
+    workflow_dispatch:
 
-permissions:
-  contents: read
-  pull-requests: write
+  permissions:
+    contents: read
+    pull-requests: write
 
-concurrency:
-  group: expo-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  concurrency:
+    group: expo-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
 
-env:
-  NODE_VERSION: 20
+  env:
+    NODE_VERSION: 20
 
-jobs:
+  jobs:
 
-  quality:
-    name: Code Quality
+    quality:
+      name: Code Quality
 
-    runs-on: ubuntu-latest
+      runs-on: ubuntu-latest
 
-    steps:
+      steps:
 
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        - name: Checkout
+          uses: actions/checkout@v4
+          with:
+            fetch-depth: 0
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: package-lock.json
+        - name: Setup Node
+          uses: actions/setup-node@v4
+          with:
+            node-version: ${{ env.NODE_VERSION }}
+            cache: npm
+            cache-dependency-path: package-lock.json
 
-      - name: Install dependencies
-        run: npm ci
+        - name: Install dependencies
+          run: npm ci
 
-      - name: Expo doctor
-        run: npx expo-doctor
+        - name: Expo doctor
+          run: npx expo-doctor
 
-      - name: Expo lint
-        run: npm run lint
+        - name: Expo lint
+          run: npm run lint
 
-      - name: Tests coverage
-        run: npm run test:coverage
+        - name: Tests coverage
+          run: npm run test:coverage
 
 
-  preview-android:
-    name: Android Preview Build
+    preview-android:
+      name: Android Preview Build
 
-    needs: quality
+      needs: quality
 
-    if: |
-      github.event.action == 'ready_for_review' ||
-      (github.event.action == 'opened' && github.event.pull_request.draft == false) ||
-      github.event_name == 'workflow_dispatch'
+      if: |
+        github.event.action == 'ready_for_review' ||
+        (github.event.action == 'opened' && github.event.pull_request.draft == false) ||
+        github.event_name == 'workflow_dispatch'
 
-    runs-on: ubuntu-latest
+      runs-on: ubuntu-latest
 
-    env:
-      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      env:
+        EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-    steps:
+      steps:
 
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        - name: Checkout
+          uses: actions/checkout@v4
+          with:
+            fetch-depth: 0
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: package-lock.json
+        - name: Setup Node
+          uses: actions/setup-node@v4
+          with:
+            node-version: ${{ env.NODE_VERSION }}
+            cache: npm
+            cache-dependency-path: package-lock.json
 
-      - name: Install dependencies
-        run: npm ci
+        - name: Install dependencies
+          run: npm ci
 
-      - name: Setup Expo / EAS
-        uses: expo/expo-github-action@v8
-        with:
-          token: ${{ secrets.EXPO_TOKEN }}
-          eas-version: latest
+        - name: Setup Expo / EAS
+          uses: expo/expo-github-action@v8
+          with:
+            token: ${{ secrets.EXPO_TOKEN }}
+            eas-version: latest
 
-      - name: Validate project
-        run: npx expo-doctor
+        - name: Validate project
+          run: npx expo-doctor
 
-      - name: Build Android Preview
-        id: build
-        run: |
-          BUILD=$(eas build \
-            --platform android \
-            --profile preview \
-            --non-interactive \
-            --json 2>&1)
+        - name: Build Android Preview
+          id: build
+          run: |
+            set -e
 
-          echo "$BUILD"
+            BUILD_RAW=$(eas build \
+              --platform android \
+              --profile preview \
+              --non-interactive \
+              --json 2>/dev/null)
 
-          # EAS pode retornar array ou objeto direto dependendo da versão
-          BUILD_URL=$(echo "$BUILD" | jq -r 'if type == "array" then .[0].buildDetailsPageUrl else .buildDetailsPageUrl end')
+            # Extrai apenas o JSON (remove lixo antes do array)
+            BUILD_JSON=$(echo "$BUILD_RAW" | sed -n '/^\[/,$p')
 
-          if [ -z "$BUILD_URL" ] || [ "$BUILD_URL" = "null" ]; then
-            echo "❌ Não foi possível extrair a URL da build"
-            echo "Output completo: $BUILD"
-            exit 1
-          fi
+            echo "===== JSON EXTRAÍDO ====="
+            echo "$BUILD_JSON"
 
-          echo "✅ Build URL: $BUILD_URL"
-          echo "BUILD_URL=$BUILD_URL" >> $GITHUB_ENV
+            # Extrai URL do APK
+            BUILD_URL=$(echo "$BUILD_JSON" | jq -r '.[0].artifacts.buildUrl')
 
-      - name: Comment build link
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const url = process.env.BUILD_URL;
+            if [ -z "$BUILD_URL" ] || [ "$BUILD_URL" = "null" ]; then
+              echo "❌ Falha ao extrair buildUrl"
+              echo "RAW OUTPUT:"
+              echo "$BUILD_RAW"
+              exit 1
+            fi
 
-            const comments = await github.rest.issues.listComments({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo
-            });
+            echo "✅ Build URL: $BUILD_URL"
+            echo "BUILD_URL=$BUILD_URL" >> $GITHUB_ENV
 
-            const existing = comments.data.find(c =>
-              c.body.includes("Android preview build")
-            );
+        - name: Comment build link
+          uses: actions/github-script@v7
+          with:
+            script: |
+              const url = process.env.BUILD_URL;
 
-            const body = `📱 Android preview build disponível:\n${url}`;
-
-            if (existing) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: existing.id,
-                body
-              });
-            } else {
-              await github.rest.issues.createComment({
+              const comments = await github.rest.issues.listComments({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
-                repo: context.repo.repo,
-                body
+                repo: context.repo.repo
               });
-            }
+
+              const existing = comments.data.find(c =>
+                c.body.includes("Android preview build")
+              );
+
+              const body = `📱 Android preview build disponível:\n${url}`;
+
+              if (existing) {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: existing.id,
+                  body
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body
+                });
+              }
