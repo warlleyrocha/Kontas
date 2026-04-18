@@ -519,6 +519,54 @@ describe("AccountsTab — AccountContextMenu", () => {
     expect(props.isAdmin).toBe(true);
   });
 
+  it("passa isOwner=false quando nenhuma conta está selecionada", () => {
+    render(
+      <AccountsTab republicId="rep-1" currentResidentId="r-1" residents={[]} />
+    );
+    const props = jest.mocked(AccountContextMenu).mock.calls[0][0] as any;
+    expect(props.isOwner).toBe(false);
+  });
+
+  it("passa isOwner=true quando a conta selecionada foi criada pelo usuário atual", () => {
+    jest.mocked(useAccountsTab).mockReturnValue(
+      makeTabReturn({
+        contasOrdenadas: {
+          abertas: [{ id: "a-1", criadoPorId: "r-1" }],
+          pagas: [],
+        },
+      }) as any
+    );
+    render(
+      <AccountsTab republicId="rep-1" currentResidentId="r-1" residents={[]} />
+    );
+    const { onLongPress } = jest.mocked(AccountSection).mock.calls[0][0] as any;
+    act(() => {
+      onLongPress("a-1", { x: 0, y: 0, width: 0, height: 0 });
+    });
+    const props = jest.mocked(AccountContextMenu).mock.calls.at(-1)?.[0] as any;
+    expect(props.isOwner).toBe(true);
+  });
+
+  it("passa isOwner=false quando a conta selecionada pertence a outro usuário", () => {
+    jest.mocked(useAccountsTab).mockReturnValue(
+      makeTabReturn({
+        contasOrdenadas: {
+          abertas: [{ id: "a-2", criadoPorId: "outro-morador" }],
+          pagas: [],
+        },
+      }) as any
+    );
+    render(
+      <AccountsTab republicId="rep-1" currentResidentId="r-1" residents={[]} />
+    );
+    const { onLongPress } = jest.mocked(AccountSection).mock.calls[0][0] as any;
+    act(() => {
+      onLongPress("a-2", { x: 0, y: 0, width: 0, height: 0 });
+    });
+    const props = jest.mocked(AccountContextMenu).mock.calls.at(-1)?.[0] as any;
+    expect(props.isOwner).toBe(false);
+  });
+
   it("onClose do AccountContextMenu fecha o menu", () => {
     render(
       <AccountsTab republicId="rep-1" currentResidentId="r-1" residents={[]} />

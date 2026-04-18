@@ -42,7 +42,7 @@ describe("AccountContextMenu", () => {
     render(<AccountContextMenu {...createProps()} />);
   });
 
-  it('não exibe "Deletar conta" para não-admin', () => {
+  it('não exibe "Deletar conta" quando nem admin nem owner', () => {
     render(<AccountContextMenu {...createProps()} />);
     expect(screen.queryByText("Deletar conta")).toBeNull();
   });
@@ -52,7 +52,17 @@ describe("AccountContextMenu", () => {
     expect(screen.getByText("Deletar conta")).toBeTruthy();
   });
 
-  it("chama onDelete ao pressionar Deletar conta", () => {
+  it('exibe "Deletar conta" quando isOwner é true', () => {
+    render(<AccountContextMenu {...createProps({ isOwner: true })} />);
+    expect(screen.getByText("Deletar conta")).toBeTruthy();
+  });
+
+  it('exibe "Deletar conta" quando isAdmin e isOwner são true', () => {
+    render(<AccountContextMenu {...createProps({ isAdmin: true, isOwner: true })} />);
+    expect(screen.getByText("Deletar conta")).toBeTruthy();
+  });
+
+  it("chama onDelete ao pressionar Deletar conta (admin)", () => {
     const props = createProps({ isAdmin: true });
     render(<AccountContextMenu {...props} />);
 
@@ -61,13 +71,27 @@ describe("AccountContextMenu", () => {
     expect(props.onDelete).toHaveBeenCalledTimes(1);
   });
 
-  it("passa menuTotalHeight correto para não-admin (52)", () => {
+  it("chama onDelete ao pressionar Deletar conta (owner)", () => {
+    const props = createProps({ isOwner: true });
+    render(<AccountContextMenu {...props} />);
+
+    fireEvent.press(screen.getByRole("button", { name: "Deletar conta" }));
+
+    expect(props.onDelete).toHaveBeenCalledTimes(1);
+  });
+
+  it("passa menuTotalHeight correto quando não pode deletar (52)", () => {
     render(<AccountContextMenu {...createProps()} />);
     expect(screen.getByTestId("menu-height-52")).toBeTruthy();
   });
 
   it("passa menuTotalHeight correto para admin (105)", () => {
     render(<AccountContextMenu {...createProps({ isAdmin: true })} />);
+    expect(screen.getByTestId("menu-height-105")).toBeTruthy();
+  });
+
+  it("passa menuTotalHeight correto para owner (105)", () => {
+    render(<AccountContextMenu {...createProps({ isOwner: true })} />);
     expect(screen.getByTestId("menu-height-105")).toBeTruthy();
   });
 });

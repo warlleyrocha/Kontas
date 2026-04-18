@@ -14,6 +14,7 @@ interface AccountContextMenuProps {
   readonly onEdit: () => void;
   readonly onDelete: () => void;
   readonly isAdmin?: boolean;
+  readonly isOwner?: boolean;
 }
 
 export function AccountContextMenu({
@@ -23,8 +24,10 @@ export function AccountContextMenu({
   onEdit,
   onDelete,
   isAdmin = false,
+  isOwner = false,
 }: AccountContextMenuProps) {
-  const menuTotalHeight = isAdmin ? MENU_ITEM_HEIGHT * 2 + 1 : MENU_ITEM_HEIGHT;
+  const canDelete = isAdmin || isOwner;
+  const menuTotalHeight = canDelete ? MENU_ITEM_HEIGHT * 2 + 1 : MENU_ITEM_HEIGHT;
 
   return (
     <ContextMenu
@@ -56,8 +59,8 @@ export function AccountContextMenu({
           </TouchableOpacity>
           */}
 
-          {/* Deletar — visível apenas para admins */}
-          {isAdmin && (
+          {/* Deletar — visível para admins e criadores da conta */}
+          {canDelete && (
             <>
               <View className="h-px bg-[#E5E5EA]" />
               <TouchableOpacity

@@ -127,6 +127,13 @@ export function AccountsTab({
     });
   }, [contextMenu.accountId, contasOrdenadas, handleContextMenuClose]);
 
+  const isContextMenuOwner = useMemo(() => {
+    const account =
+      contasOrdenadas.abertas.find((c) => c.id === contextMenu.accountId) ??
+      contasOrdenadas.pagas.find((c) => c.id === contextMenu.accountId);
+    return account?.criadoPorId === currentResidentId;
+  }, [contextMenu.accountId, contasOrdenadas, currentResidentId]);
+
   const { refreshing, onRefresh } = useRefresh();
   const pendingPaymentsCount = useMemo(() => {
     const ownedAccountIds = isAdmin
@@ -356,6 +363,7 @@ export function AccountsTab({
         visible={contextMenu.visible}
         position={contextMenu.position}
         isAdmin={isAdmin}
+        isOwner={isContextMenuOwner}
         onClose={handleContextMenuClose}
         onEdit={() => {}}
         onDelete={handleContextMenuDelete}
