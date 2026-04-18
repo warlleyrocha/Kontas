@@ -1,9 +1,9 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image, Text, View } from "react-native";
 import { formatDate } from "@/src/shared/utils/formats";
-import { getInitials } from "@/src/shared/utils/getInitials";
 import type { Invite } from "../types/invite.types";
 import { InviteCardFooter } from "./InviteCardFooter";
+import { Feather } from "@expo/vector-icons";
 
 type InviteCardVariant = "received" | "sent";
 
@@ -41,9 +41,7 @@ export function InviteCard({
             />
           ) : (
             <View className="mr-3 h-16 w-16 items-center justify-center rounded-xl border border-teal/20 bg-teal/10">
-              <Text className="text-lg font-bold text-teal">
-                {getInitials(title)}
-              </Text>
+              <Feather name="image" size={24} color="#6b7280" />
             </View>
           )}
 
