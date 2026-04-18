@@ -23,7 +23,11 @@
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/$1"
     },
-    "testPathIgnorePatterns": ["/node_modules/", "/android/", "/dist/"],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/android/",
+      "/dist/"
+    ],
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg)"
     ],
@@ -31,7 +35,10 @@
       "<rootDir>/src/test/jest.setup.ts",
       "react-native-reanimated/mock"
     ],
-    "coverageReporters": ["lcov", "text"],
+    "coverageReporters": [
+      "lcov",
+      "text"
+    ],
     "coverageDirectory": "coverage",
     "collectCoverageFrom": [
       "**/*.{ts,tsx}",
@@ -60,6 +67,7 @@
     "axios": "^1.13.2",
     "expo": "~54.0.33",
     "expo-application": "~7.0.8",
+    "expo-blur": "~15.0.8",
     "expo-clipboard": "^8.0.7",
     "expo-constants": "~18.0.10",
     "expo-crypto": "~15.0.8",
