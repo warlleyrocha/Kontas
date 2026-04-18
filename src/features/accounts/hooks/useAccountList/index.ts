@@ -129,12 +129,12 @@ export function useAccountList({ republicId }: UseAccountListProps) {
           accountId,
           accountResidentId,
         });
-        showToast.success("Pagamento do morador enviado para confirmação.");
+        showToast.success("Pagamento enviado para confirmação");
       } catch (error) {
         showToast.error(
           getErrorMessage(
             error,
-            "Não foi possível confirmar pagamento do morador."
+            "Não foi possível enviar confirmação do pagamento"
           )
         );
       } finally {

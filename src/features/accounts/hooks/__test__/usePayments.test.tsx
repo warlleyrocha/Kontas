@@ -360,7 +360,7 @@ describe("usePaymentsScreen — subtitle", () => {
       result.current.setSelectedStatus(StatusPagamento.PAGO);
     });
 
-    expect(result.current.subtitle).toBe("Nenhum pagamento marcado como PAGO");
+    expect(result.current.subtitle).toBe("Nenhum pagamento aprovado");
   });
 
   it("retorna subtítulo para PAGO com 1 pagamento", async () => {
@@ -377,7 +377,7 @@ describe("usePaymentsScreen — subtitle", () => {
       result.current.setSelectedStatus(StatusPagamento.PAGO);
     });
 
-    expect(result.current.subtitle).toBe("1 pagamento marcado como PAGO");
+    expect(result.current.subtitle).toBe("1 pagamento aprovado");
   });
 
   it("retorna subtítulo para PAGO com múltiplos pagamentos", async () => {
@@ -474,7 +474,7 @@ describe("usePaymentsScreen — handleConfirmResidentPayment", () => {
     ).toHaveBeenCalledWith({ id: "cm-1" });
     expect(jest.mocked(showToast.success)).toHaveBeenCalled();
     expect(jest.mocked(showToast.success)).toHaveBeenCalledWith(
-      "Pagamento marcado como PAGO."
+      "Pagamento aprovado."
     );
   });
 

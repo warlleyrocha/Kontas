@@ -132,10 +132,10 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
           accountId,
           accountResidentId: residentId,
         });
-        showToast.success("Pagamento marcado como PAGO.");
+        showToast.success("Pagamento aprovado");
       } catch (error) {
         showToast.error(
-          getErrorMessage(error, "Não foi possível atualizar o pagamento.")
+          getErrorMessage(error, "Não foi possível atualizar o pagamento")
         );
       } finally {
         delete confirmingRef.current[residentId];
@@ -155,10 +155,10 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
           accountId,
           accountResidentId: residentId,
         });
-        showToast.success("Pagamento recusado.");
+        showToast.warning("Pagamento recusado");
       } catch (error) {
         showToast.error(
-          getErrorMessage(error, "Não foi possível recusar o pagamento.")
+          getErrorMessage(error, "Não foi possível recusar o pagamento")
         );
       } finally {
         delete refusingRef.current[residentId];
@@ -205,9 +205,9 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
   const subtitle = useMemo(() => {
     if (selectedStatus === StatusPagamento.PAGO) {
       if (filteredResidentsCount === 0)
-        return "Nenhum pagamento marcado como PAGO";
-      if (filteredResidentsCount === 1) return "1 pagamento marcado como PAGO";
-      return `${filteredResidentsCount} pagamentos marcados como PAGO`;
+        return "Nenhum pagamento aprovado";
+      if (filteredResidentsCount === 1) return "1 pagamento aprovado";
+      return `${filteredResidentsCount} pagamentos aprovados`;
     }
 
     if (selectedStatus === StatusPagamento.AGUARDANDO_CONFIRMACAO) {
