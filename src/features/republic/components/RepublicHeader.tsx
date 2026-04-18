@@ -26,7 +26,7 @@ export function RepublicHeader({
   return (
     <View className="mt-[32px] flex-row gap-3 border-b border-b-black/10 bg-[#FAFAFA] px-[16px] py-4">
       {/* Imagem */}
-      <View className="h-[50px] w-[50px] items-center justify-center rounded-full bg-gray-300">
+      <View className="h-[50px] w-[50px] items-center justify-center rounded-full bg-gray-200">
         {republic.imagemRepublica && !imageError ? (
           <Image
             source={{ uri: republic.imagemRepublica }}

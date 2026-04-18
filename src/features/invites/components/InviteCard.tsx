@@ -40,7 +40,7 @@ export function InviteCard({
               className="mr-3 h-16 w-16 rounded-xl border border-teal/20"
             />
           ) : (
-            <View className="mr-3 h-16 w-16 items-center justify-center rounded-xl border border-teal/20 bg-teal/10">
+            <View className="mr-3 h-16 w-16 items-center justify-center rounded-xl border border-teal/20 bg-gray-200">
               <Feather name="image" size={24} color="#6b7280" />
             </View>
           )}

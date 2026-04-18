@@ -97,7 +97,7 @@ export default function RepublicCard({
         className="mb-4 h-64 w-44 overflow-hidden rounded-3xl bg-white shadow-sm"
       >
         {/* Imagem */}
-        <View className="h-36 w-full items-center justify-center overflow-hidden bg-gray-100">
+        <View className="h-36 w-full items-center justify-center overflow-hidden bg-gray-200">
           {republic.imagemRepublica && !imageError ? (
             <Image
               source={{ uri: republic.imagemRepublica }}
