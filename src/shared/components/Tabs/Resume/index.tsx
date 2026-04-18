@@ -59,7 +59,8 @@ export const ResumeTab = ({ residents, republicId }: Props) => {
 
   return (
     <ScrollView
-      contentContainerStyle={{ paddingVertical: 12 }}
+      contentContainerStyle={{ paddingVertical: 12, paddingBottom: 50 }}
+      showsVerticalScrollIndicator={false}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }

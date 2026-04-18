@@ -225,6 +225,7 @@ export function AccountsTab({
     <View className="flex-1">
       <ScrollView
         contentContainerStyle={{ paddingVertical: 12, paddingBottom: 88 }}
+        showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
