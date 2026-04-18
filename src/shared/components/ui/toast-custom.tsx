@@ -11,7 +11,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-export type ToastVariant = "success" | "error" | "info";
+export type ToastVariant = "success" | "error" | "info" | "warning";
 
 export interface ToastProps {
   readonly message: string;
@@ -31,6 +31,10 @@ const variants = {
   info: {
     icon: <Feather name="info" size={20} color="#2563eb" />,
     textColor: "text-blue-600",
+  },
+  warning: {
+    icon: <MaterialCommunityIcons name="close-circle" size={20} color="#dc2626" />,
+    textColor: "text-red-600",
   },
 };
 
