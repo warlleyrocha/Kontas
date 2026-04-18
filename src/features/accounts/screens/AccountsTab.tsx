@@ -34,6 +34,7 @@ interface AccountsTabProps {
   readonly residents: ResidentResponse[];
   readonly isAdmin?: boolean;
   readonly onPendingPaymentsCountChange?: (count: number) => void;
+  readonly onCurrentUserCreatedAccountChange?: (hasCreated: boolean) => void;
 }
 
 export function AccountsTab({
@@ -42,6 +43,7 @@ export function AccountsTab({
   residents,
   isAdmin = false,
   onPendingPaymentsCountChange,
+  onCurrentUserCreatedAccountChange,
 }: AccountsTabProps) {
   useComponentLogger("AccountsTab");
   const { copiarChavePix } = useTabResidents();
@@ -63,6 +65,7 @@ export function AccountsTab({
     accountResidentsById,
     closeAccountModal,
     confirmResidentPayment,
+    contas,
     contasOrdenadas,
     error,
     errorResidentsById,
@@ -124,24 +127,40 @@ export function AccountsTab({
   }, [contextMenu.accountId, contasOrdenadas, handleContextMenuClose]);
 
   const { refreshing, onRefresh } = useRefresh();
-  const pendingPaymentsCount = useMemo(
-    () =>
-      Object.values(accountResidentsById).reduce(
-        (total, residents) =>
+  const pendingPaymentsCount = useMemo(() => {
+    const ownedAccountIds = isAdmin
+      ? null
+      : new Set(
+          contas
+            .filter((c) => c.criadoPorId === currentResidentId)
+            .map((c) => c.id)
+        );
+
+    return Object.entries(accountResidentsById).reduce(
+      (total, [accountId, residents]) => {
+        if (ownedAccountIds && !ownedAccountIds.has(accountId)) return total;
+        return (
           total +
           residents.filter(
             (resident) =>
               getMoradorStatusVisual(resident) ===
               StatusPagamento.AGUARDANDO_CONFIRMACAO
-          ).length,
-        0
-      ),
-    [accountResidentsById]
-  );
+          ).length
+        );
+      },
+      0
+    );
+  }, [accountResidentsById, contas, currentResidentId, isAdmin]);
 
   useEffect(() => {
     onPendingPaymentsCountChange?.(pendingPaymentsCount);
   }, [onPendingPaymentsCountChange, pendingPaymentsCount]);
+
+  useEffect(() => {
+    if (!currentResidentId) return;
+    const hasCreated = contas.some((c) => c.criadoPorId === currentResidentId);
+    onCurrentUserCreatedAccountChange?.(hasCreated);
+  }, [contas, currentResidentId, onCurrentUserCreatedAccountChange]);
 
   if (loading) {
     return (

@@ -11,6 +11,7 @@ interface UseAccountsTabParams {
 export function useAccountsTab({ republicId }: UseAccountsTabParams) {
   const {
     refresh,
+    contas,
     contasOrdenadas,
     mesesDisponiveis,
     mesSelecionado,
@@ -70,6 +71,7 @@ export function useAccountsTab({ republicId }: UseAccountsTabParams) {
     accountResidentsById,
     closeAccountModal,
     confirmResidentPayment,
+    contas,
     contasOrdenadas,
     error,
     errorResidentsById,
