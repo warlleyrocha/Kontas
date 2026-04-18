@@ -89,6 +89,7 @@ function makeTabReturn(overrides = {}) {
     accountResidentsById: {},
     closeAccountModal: mockCloseAccountModal,
     confirmResidentPayment: mockConfirmResidentPayment,
+    contas: [],
     contasOrdenadas: { abertas: [], pagas: [] },
     error: null,
     errorResidentsById: {},
@@ -713,6 +714,10 @@ describe("AccountsTab — pendingPaymentsCount", () => {
           "a-1": [{ id: "r-1" }, { id: "r-2" }],
           "a-2": [{ id: "r-3" }],
         },
+        contas: [
+          { id: "a-1", criadoPorId: "r-1" },
+          { id: "a-2", criadoPorId: "r-1" },
+        ],
       }) as any
     );
 

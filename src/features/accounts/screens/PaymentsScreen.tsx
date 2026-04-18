@@ -28,11 +28,15 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
     handleConfirmResidentPayment,
     handleRefuseResidentPayment,
     setSelectedStatus,
+    confirmingResidentById,
+    refusingResidentById,
   } = usePaymentsScreen({ republicId });
 
   let content = (
     <PendingPaymentsList
       paymentAccounts={filteredPaymentAccounts}
+      confirmingResidentById={confirmingResidentById}
+      refusingResidentById={refusingResidentById}
       isRefreshing={isRefreshing}
       onConfirmResidentPayment={handleConfirmResidentPayment}
       onRefuseResidentPayment={handleRefuseResidentPayment}

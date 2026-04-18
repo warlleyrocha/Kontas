@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { accountKeys } from "@/src/features/accounts/hooks/account.keys";
 import { accountResidentKeys } from "@/src/features/accounts/hooks/accountResident.keys";
 import {
@@ -69,6 +69,15 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
     StatusPagamento.AGUARDANDO_CONFIRMACAO
   );
 
+  const confirmingRef = useRef<Record<string, boolean>>({});
+  const refusingRef = useRef<Record<string, boolean>>({});
+  const [confirmingResidentById, setConfirmingResidentById] = useState<
+    Record<string, boolean>
+  >({});
+  const [refusingResidentById, setRefusingResidentById] = useState<
+    Record<string, boolean>
+  >({});
+
   const loadPayments = useCallback(
     async (_isManualRefresh = false) => {
       await Promise.all([
@@ -115,6 +124,9 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
 
   const handleConfirmResidentPayment = useCallback(
     async (accountId: string, residentId: string) => {
+      if (confirmingRef.current[residentId]) return;
+      confirmingRef.current[residentId] = true;
+      setConfirmingResidentById({ ...confirmingRef.current });
       try {
         await confirmResidentMutation.mutateAsync({
           accountId,
@@ -125,6 +137,9 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
         showToast.error(
           getErrorMessage(error, "Não foi possível atualizar o pagamento.")
         );
+      } finally {
+        delete confirmingRef.current[residentId];
+        setConfirmingResidentById({ ...confirmingRef.current });
       }
     },
     [confirmResidentMutation]
@@ -132,6 +147,9 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
 
   const handleRefuseResidentPayment = useCallback(
     async (accountId: string, residentId: string) => {
+      if (refusingRef.current[residentId]) return;
+      refusingRef.current[residentId] = true;
+      setRefusingResidentById({ ...refusingRef.current });
       try {
         await refuseResidentMutation.mutateAsync({
           accountId,
@@ -142,6 +160,9 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
         showToast.error(
           getErrorMessage(error, "Não foi possível recusar o pagamento.")
         );
+      } finally {
+        delete refusingRef.current[residentId];
+        setRefusingResidentById({ ...refusingRef.current });
       }
     },
     [refuseResidentMutation]
@@ -224,5 +245,7 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
     handleConfirmResidentPayment,
     handleRefuseResidentPayment,
     setSelectedStatus,
+    confirmingResidentById,
+    refusingResidentById,
   };
 }

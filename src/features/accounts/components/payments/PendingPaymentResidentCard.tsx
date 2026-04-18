@@ -1,5 +1,4 @@
 import Feather from "@expo/vector-icons/Feather";
-import { useState } from "react";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import {
   type ContaMorador,
@@ -15,25 +14,27 @@ import { getInitials } from "@/src/shared/utils/getInitials";
 
 interface PendingPaymentResidentCardProps {
   readonly accountId: string;
+  readonly isConfirming: boolean;
+  readonly isRefusing: boolean;
   readonly onConfirmResidentPayment: (
     accountId: string,
     residentId: string
-  ) => Promise<void> | void;
+  ) => void;
   readonly onRefuseResidentPayment: (
     accountId: string,
     residentId: string
-  ) => Promise<void> | void;
+  ) => void;
   readonly resident: ContaMorador;
 }
 
 export function PendingPaymentResidentCard({
   accountId,
+  isConfirming,
+  isRefusing,
   onConfirmResidentPayment,
   onRefuseResidentPayment,
   resident,
 }: PendingPaymentResidentCardProps) {
-  const [isConfirming, setIsConfirming] = useState(false);
-  const [isRefusing, setIsRefusing] = useState(false);
   const residentStatus = getMoradorStatusVisual(resident);
   const residentPaid = residentStatus === StatusPagamento.PAGO;
   const {
@@ -86,13 +87,8 @@ export function PendingPaymentResidentCard({
           <TouchableOpacity
             activeOpacity={0.85}
             disabled={isRefusing || isConfirming}
-            onPress={async () => {
-              setIsRefusing(true);
-              try {
-                await onRefuseResidentPayment(accountId, resident.id);
-              } finally {
-                setIsRefusing(false);
-              }
+            onPress={() => {
+              onRefuseResidentPayment(accountId, resident.id);
             }}
             className={`min-h-11 flex-1 flex-row items-center border border-[#E53935] justify-center rounded-full px-4 bg-transparent ${
               isRefusing ? "opacity-50" : "opacity-100"
@@ -113,13 +109,8 @@ export function PendingPaymentResidentCard({
           <TouchableOpacity
             activeOpacity={0.85}
             disabled={isConfirming || isRefusing}
-            onPress={async () => {
-              setIsConfirming(true);
-              try {
-                await onConfirmResidentPayment(accountId, resident.id);
-              } finally {
-                setIsConfirming(false);
-              }
+            onPress={() => {
+              onConfirmResidentPayment(accountId, resident.id);
             }}
             className={`min-h-11 flex-1 flex-row items-center justify-center rounded-full px-4 bg-teal ${
               isConfirming ? "opacity-50" : "opacity-100"
