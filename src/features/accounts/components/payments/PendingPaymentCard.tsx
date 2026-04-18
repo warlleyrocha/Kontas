@@ -12,8 +12,6 @@ import { PendingPaymentResidentCard } from "./PendingPaymentResidentCard";
 
 interface PendingPaymentCardProps {
   readonly account: PaymentAccount;
-  readonly confirmingResidentById: Record<string, boolean>;
-  readonly refusingResidentById: Record<string, boolean>;
   readonly onConfirmResidentPayment: (
     accountId: string,
     residentId: string
@@ -47,8 +45,6 @@ function getSectionTitle(selectedStatus: PaymentStatusFilter) {
 
 export function PendingPaymentCard({
   account,
-  confirmingResidentById,
-  refusingResidentById,
   onConfirmResidentPayment,
   onRefuseResidentPayment,
   selectedStatus,
@@ -116,8 +112,6 @@ export function PendingPaymentCard({
                 key={resident.id}
                 accountId={account.id}
                 resident={resident}
-                isConfirming={Boolean(confirmingResidentById[resident.id])}
-                isRefusing={Boolean(refusingResidentById[resident.id])}
                 onConfirmResidentPayment={onConfirmResidentPayment}
                 onRefuseResidentPayment={onRefuseResidentPayment}
               />
