@@ -1,5 +1,6 @@
 import Feather from "@expo/vector-icons/Feather";
 import {
+  ActivityIndicator,
   Image,
   ImageBackground,
   KeyboardAvoidingView,
@@ -28,7 +29,7 @@ export function RegisterRepublicScreen() {
     handleSelectImageRepublic,
   } = useRepublicForm();
 
-  const { createRepublic } = useRepublicActions();
+  const { createRepublic, isCreating } = useRepublicActions();
 
   async function handleSubmit() {
     await createRepublic({
@@ -37,7 +38,7 @@ export function RegisterRepublicScreen() {
     });
   }
 
-  const isButtonDisabled = !republicName.trim();
+  const isButtonDisabled = !republicName.trim() || isCreating;
 
   return (
     <KeyboardAvoidingView
@@ -118,14 +119,19 @@ export function RegisterRepublicScreen() {
           <View className="flex-1" />
 
           <TouchableOpacity
-            className={`w-full rounded-xl px-4 py-4 ${isButtonDisabled ? "bg-gray-300" : "bg-teal"}`}
+            className={`w-full rounded-xl px-4 py-4 ${isButtonDisabled ? "bg-gray-300" : "bg-teal"} ${isCreating ? "opacity-60" : ""}`}
             onPress={handleSubmit}
             disabled={isButtonDisabled}
             activeOpacity={0.85}
+            accessibilityLabel="Cadastrar República"
           >
-            <Text className="text-center font-inter-semibold text-base text-white">
-              Cadastrar República
-            </Text>
+            {isCreating ? (
+              <ActivityIndicator size="small" color="white" />
+            ) : (
+              <Text className="text-center font-inter-semibold text-base text-white">
+                Cadastrar República
+              </Text>
+            )}
           </TouchableOpacity>
         </SafeAreaView>
       </ScrollView>

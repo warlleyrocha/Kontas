@@ -84,5 +84,7 @@ export function useRepublicActions() {
     deleteRepublic,
     showEditModal,
     setShowEditModal,
+    isCreating:
+      createRepublicMutation.isPending || uploadRepublicImageMutation.isPending,
   };
 }
