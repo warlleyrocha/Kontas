@@ -1,5 +1,4 @@
 import { fireEvent, render, screen } from "@testing-library/react-native";
-import type { SharedValue } from "react-native-reanimated";
 import type { OnboardingSlide } from "../../constants/slides";
 import OnboardingButtons from "../onboarding/OnboardingButtons";
 
@@ -20,16 +19,11 @@ const mockSlides: OnboardingSlide[] = [
   },
 ];
 
-const scrollX = { value: 0 } as SharedValue<number>;
-
 const createProps = (overrides = {}) => ({
   isLastSlide: false,
   currentIndex: 0,
   slides: mockSlides,
   handleNext: jest.fn(),
-  handleSkip: jest.fn(),
-  scrollX,
-  width: 390,
   ...overrides,
 });
 
@@ -48,16 +42,6 @@ describe("OnboardingButtons", () => {
     expect(screen.getByText("Começar Agora")).toBeTruthy();
   });
 
-  it("exibe o botão 'Pular' quando currentIndex é 0", () => {
-    render(<OnboardingButtons {...createProps({ currentIndex: 0 })} />);
-    expect(screen.getByText("Pular")).toBeTruthy();
-  });
-
-  it("não exibe o botão 'Pular' quando currentIndex > 0", () => {
-    render(<OnboardingButtons {...createProps({ currentIndex: 1 })} />);
-    expect(screen.queryByText("Pular")).toBeNull();
-  });
-
   it("chama handleNext ao pressionar o botão principal", () => {
     const props = createProps();
     render(<OnboardingButtons {...props} />);
@@ -65,14 +49,5 @@ describe("OnboardingButtons", () => {
     fireEvent.press(screen.getByText("Continuar"));
 
     expect(props.handleNext).toHaveBeenCalledTimes(1);
-  });
-
-  it("chama handleSkip ao pressionar 'Pular'", () => {
-    const props = createProps({ currentIndex: 0 });
-    render(<OnboardingButtons {...props} />);
-
-    fireEvent.press(screen.getByText("Pular"));
-
-    expect(props.handleSkip).toHaveBeenCalledTimes(1);
   });
 });

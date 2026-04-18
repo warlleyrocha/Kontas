@@ -7,6 +7,16 @@ jest.mock("expo-router", () => ({
   router: { replace: jest.fn() },
 }));
 
+jest.mock("expo-blur", () => ({
+  BlurView: ({ children }: any) => children,
+}));
+
+jest.mock("react-native-safe-area-context", () => ({
+  ...jest.requireActual("react-native-safe-area-context"),
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+  SafeAreaView: ({ children }: any) => children,
+}));
+
 jest.mock("@/src/features/auth/constants/slides", () => ({
   slides: [
     {
@@ -30,7 +40,7 @@ jest.mock(
   "@/src/features/auth/components/onboarding/OnboardingButtons",
   () => ({
     __esModule: true,
-    default: ({ handleNext, handleSkip, isLastSlide }: any) => {
+    default: ({ handleNext, isLastSlide }: any) => {
       const { TouchableOpacity, Text, View } =
         jest.requireActual("react-native");
       return (
@@ -42,11 +52,6 @@ jest.mock(
           >
             <Text>{isLastSlide ? "Começar Agora" : "Continuar"}</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handleSkip}
-            accessibilityRole="button"
-            accessibilityLabel="pular"
-          />
         </View>
       );
     },
@@ -83,10 +88,10 @@ describe("OnboardingScreen", () => {
     expect(screen.getByText("Continuar")).toBeTruthy();
   });
 
-  it("chama router.replace ao pressionar Pular (handleSkip)", () => {
+  it("chama router.replace ao pressionar Pular", () => {
     render(<Onboarding />);
 
-    fireEvent.press(screen.getByRole("button", { name: "pular" }));
+    fireEvent.press(screen.getByText("Pular"));
 
     expect(mockReplace).toHaveBeenCalledWith("/(userProfile)/profile");
   });
