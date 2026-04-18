@@ -1,13 +1,15 @@
-import { Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 
 interface AddAccountModalActionsProps {
   readonly onSubmit: () => Promise<void> | void;
   readonly onCancel: () => void;
+  readonly isSubmitting?: boolean;
 }
 
 export function AddAccountModalActions({
   onSubmit,
   onCancel,
+  isSubmitting = false,
 }: AddAccountModalActionsProps) {
   return (
     <View className="mt-[10px] flex-row gap-3">
@@ -22,11 +24,16 @@ export function AddAccountModalActions({
 
       <TouchableOpacity
         onPress={onSubmit}
+        disabled={isSubmitting}
         accessibilityRole="button"
         accessibilityLabel="Adicionar conta"
-        className="flex-1 items-center rounded-2xl bg-teal py-3"
+        className={`flex-1 items-center rounded-2xl bg-teal py-3 ${isSubmitting ? "opacity-60" : ""}`}
       >
-        <Text className="font-medium text-white">Adicionar Conta</Text>
+        {isSubmitting ? (
+          <ActivityIndicator size="small" color="white" />
+        ) : (
+          <Text className="font-medium text-white">Adicionar Conta</Text>
+        )}
       </TouchableOpacity>
     </View>
   );

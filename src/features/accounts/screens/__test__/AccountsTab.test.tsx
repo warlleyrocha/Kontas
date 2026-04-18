@@ -99,6 +99,7 @@ function makeTabReturn(overrides = {}) {
     handleSubmit: mockHandleSubmit,
     handleToggleExpand: mockHandleToggleExpand,
     hasNoAccounts: false,
+    isSubmitting: false,
     loading: false,
     loadingResidentsById: {},
     mesSelecionado: "todos",
@@ -245,6 +246,7 @@ describe("AccountsTab — sem contas (mesSelecionado='todos')", () => {
     expect(props.republicId).toBe("rep-1");
     expect(props.onSubmit).toBe(mockHandleSubmit);
     expect(props.onClose).toBe(mockCloseAccountModal);
+    expect(props.isSubmitting).toBe(false);
   });
 
   it("não renderiza AccountSection no empty state", () => {
@@ -482,6 +484,7 @@ describe("AccountsTab — PlusButton", () => {
     expect(props.republicId).toBe("rep-1");
     expect(props.onSubmit).toBe(mockHandleSubmit);
     expect(props.onClose).toBe(mockCloseAccountModal);
+    expect(props.isSubmitting).toBe(false);
   });
 
   it("não renderiza AddAccountModal quando showAccountModal é false", () => {

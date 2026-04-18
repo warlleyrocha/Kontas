@@ -36,6 +36,7 @@ export function useAccountsTab({ republicId }: UseAccountsTabParams) {
   const {
     showAccountModal,
     setShowAccountModal,
+    isSubmitting,
     handleSubmit,
     handleDelete,
     handlePatch,
@@ -81,6 +82,7 @@ export function useAccountsTab({ republicId }: UseAccountsTabParams) {
     handleSubmit,
     handleToggleExpand,
     hasNoAccounts,
+    isSubmitting,
     loading,
     loadingResidentsById,
     mesSelecionado,

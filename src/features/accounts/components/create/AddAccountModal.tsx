@@ -29,6 +29,7 @@ interface AddAccountModalProps {
   readonly onSubmit: (
     data: CriarContaComMoradoresRequest
   ) => Promise<void> | void;
+  readonly isSubmitting?: boolean;
 }
 
 function getNextPaymentMethod(currentMethod: MetodoPagamento): MetodoPagamento {
@@ -48,6 +49,7 @@ export default function AddAccountModal({
   onClose,
   republicId,
   onSubmit,
+  isSubmitting,
 }: AddAccountModalProps) {
   const [activeTab, setActiveTab] = useState<"form" | "residents">("form");
   const {
@@ -204,6 +206,7 @@ export default function AddAccountModal({
               <AddAccountModalActions
                 onSubmit={handleSubmit}
                 onCancel={() => setActiveTab("form")}
+                isSubmitting={isSubmitting}
               />
             </>
           )}

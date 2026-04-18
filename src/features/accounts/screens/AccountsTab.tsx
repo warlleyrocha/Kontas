@@ -75,6 +75,7 @@ export function AccountsTab({
     handleSubmit,
     handleToggleExpand,
     hasNoAccounts,
+    isSubmitting,
     loading,
     loadingResidentsById,
     mesSelecionado,
@@ -215,6 +216,7 @@ export function AccountsTab({
             onSubmit={handleSubmit}
             onClose={closeAccountModal}
             republicId={republicId}
+            isSubmitting={isSubmitting}
           />
         )}
       </View>
@@ -346,6 +348,7 @@ export function AccountsTab({
           onSubmit={handleSubmit}
           onClose={closeAccountModal}
           republicId={republicId}
+          isSubmitting={isSubmitting}
         />
       )}
 
