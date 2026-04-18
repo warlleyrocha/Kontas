@@ -34,7 +34,7 @@ export function RepublicHeader({
             onError={() => setImageError(true)}
           />
         ) : (
-          <Feather name="image" size={32} color="#6b7280" />
+          <Feather name="image" size={24} color="#6b7280" />
         )}
       </View>
 

@@ -9,6 +9,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
+import { Feather } from "@expo/vector-icons";
 
 interface CardPosition {
   x: number;
@@ -105,7 +106,7 @@ export default function RepublicCard({
               onError={() => setImageError(true)}
             />
           ) : (
-            <Text className="text-5xl">🏠</Text>
+            <Feather name="image" size={48} color="#6b7280" />
           )}
         </View>
 
