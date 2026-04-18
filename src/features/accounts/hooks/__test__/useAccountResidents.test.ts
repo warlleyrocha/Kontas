@@ -237,7 +237,7 @@ describe("useAccountResidents — confirmResidentPayment", () => {
     });
 
     expect(jest.mocked(showToast.success)).toHaveBeenCalledWith(
-      "Pagamento do morador enviado para confirmação."
+      "Pagamento enviado para confirmação"
     );
   });
 

@@ -26,6 +26,12 @@ export const showToast = {
     });
   },
 
+  warning(message: string, icon?: ReactNode) {
+    toast.custom(<Toast variant="warning" message={message} icon={icon} />, {
+      duration: DEFAULT_DURATION,
+    });
+  },
+
   confirm(message: string, onConfirm: () => void) {
     const id = toast.custom(
       <ToastConfirm

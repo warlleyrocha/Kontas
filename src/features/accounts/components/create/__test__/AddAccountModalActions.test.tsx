@@ -36,4 +36,26 @@ describe("AddAccountModalActions", () => {
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
   });
+
+  it("oculta o texto do botão e exibe spinner quando isSubmitting é true", () => {
+    render(
+      <AddAccountModalActions
+        onSubmit={() => {}}
+        onCancel={() => {}}
+        isSubmitting
+      />
+    );
+    expect(screen.queryByText("Adicionar Conta")).toBeNull();
+  });
+
+  it("desabilita o botão Adicionar Conta quando isSubmitting é true", () => {
+    render(
+      <AddAccountModalActions
+        onSubmit={() => {}}
+        onCancel={() => {}}
+        isSubmitting
+      />
+    );
+    expect(screen.getByLabelText("Adicionar conta")).toBeDisabled();
+  });
 });

@@ -3,6 +3,7 @@ import { Platform } from "react-native";
 import { useAccountForm } from "../../../hooks/useAccountForm";
 import { MetodoPagamento, StatusConta } from "../../../types/account.types";
 import AddAccountModal from "../AddAccountModal";
+import { AddAccountModalActions } from "../AddAccountModalActions";
 
 jest.mock("@expo/vector-icons/Feather", () => ({
   __esModule: true,
@@ -68,12 +69,13 @@ jest.mock("../AddAccountModalResidentsSection", () => ({
 }));
 
 jest.mock("../AddAccountModalActions", () => ({
-  AddAccountModalActions: ({
+  AddAccountModalActions: jest.fn(({
     onSubmit,
     onCancel,
   }: {
     onSubmit: () => void;
     onCancel: () => void;
+    isSubmitting?: boolean;
   }) => {
     const { TouchableOpacity, View } = jest.requireActual("react-native");
     return (
@@ -90,7 +92,7 @@ jest.mock("../AddAccountModalActions", () => ({
         />
       </View>
     );
-  },
+  }),
 }));
 
 jest.mock("@/src/shared/components/NextButton", () => ({
@@ -331,5 +333,13 @@ describe("AddAccountModal", () => {
       jest.requireActual("react-native").KeyboardAvoidingView
     );
     expect(keyboardView.props.behavior).toBeUndefined();
+  });
+
+  it("passa isSubmitting para AddAccountModalActions", () => {
+    render(<AddAccountModal {...defaultProps} isSubmitting />);
+    fireEvent.press(screen.getByRole("button", { name: "próximo" }));
+    const calls = jest.mocked(AddAccountModalActions).mock.calls;
+    const lastCall = calls[calls.length - 1][0] as any;
+    expect(lastCall.isSubmitting).toBe(true);
   });
 });

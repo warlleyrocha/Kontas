@@ -15,7 +15,7 @@ jest.mock("@/src/shared/contexts/RefreshContext", () => ({
   useRefresh: jest.fn(),
 }));
 jest.mock("@/src/shared/utils/showToast", () => ({
-  showToast: { success: jest.fn(), error: jest.fn() },
+  showToast: { success: jest.fn(), error: jest.fn(), warning: jest.fn() },
 }));
 jest.mock("@/src/services/httpError", () => ({
   getErrorMessage: jest.fn(),
@@ -360,7 +360,7 @@ describe("usePaymentsScreen — subtitle", () => {
       result.current.setSelectedStatus(StatusPagamento.PAGO);
     });
 
-    expect(result.current.subtitle).toBe("Nenhum pagamento marcado como PAGO");
+    expect(result.current.subtitle).toBe("Nenhum pagamento aprovado");
   });
 
   it("retorna subtítulo para PAGO com 1 pagamento", async () => {
@@ -377,7 +377,7 @@ describe("usePaymentsScreen — subtitle", () => {
       result.current.setSelectedStatus(StatusPagamento.PAGO);
     });
 
-    expect(result.current.subtitle).toBe("1 pagamento marcado como PAGO");
+    expect(result.current.subtitle).toBe("1 pagamento aprovado");
   });
 
   it("retorna subtítulo para PAGO com múltiplos pagamentos", async () => {
@@ -395,7 +395,7 @@ describe("usePaymentsScreen — subtitle", () => {
       result.current.setSelectedStatus(StatusPagamento.PAGO);
     });
 
-    expect(result.current.subtitle).toBe("2 pagamentos marcados como PAGO");
+    expect(result.current.subtitle).toBe("2 pagamentos aprovados");
   });
 
   it("retorna subtítulo para 'todos' com 0 pagamentos", async () => {
@@ -474,7 +474,7 @@ describe("usePaymentsScreen — handleConfirmResidentPayment", () => {
     ).toHaveBeenCalledWith({ id: "cm-1" });
     expect(jest.mocked(showToast.success)).toHaveBeenCalled();
     expect(jest.mocked(showToast.success)).toHaveBeenCalledWith(
-      "Pagamento marcado como PAGO."
+      "Pagamento aprovado"
     );
   });
 
@@ -589,9 +589,9 @@ describe("usePaymentsScreen — handleRefuseResidentPayment", () => {
     expect(
       jest.mocked(accountResidentsService.recusarPagamentoAdmin)
     ).toHaveBeenCalledWith({ id: "cm-1" });
-    expect(jest.mocked(showToast.success)).toHaveBeenCalled();
-    expect(jest.mocked(showToast.success)).toHaveBeenCalledWith(
-      "Pagamento recusado."
+    expect(jest.mocked(showToast.warning)).toHaveBeenCalled();
+    expect(jest.mocked(showToast.warning)).toHaveBeenCalledWith(
+      "Pagamento recusado"
     );
   });
 

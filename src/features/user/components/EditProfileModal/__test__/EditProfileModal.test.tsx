@@ -134,6 +134,28 @@ describe("EditProfileModal", () => {
     Platform.OS = "android";
   });
 
+  it("exibe spinner e oculta texto 'Salvar' quando isUploading é true", () => {
+    mockUseEditProfile.mockReturnValue({
+      ...createHookReturn(),
+      isUploading: true,
+    });
+
+    render(<EditProfileModal {...createProps()} />);
+
+    expect(screen.queryByText("Salvar")).toBeNull();
+  });
+
+  it("desabilita o botão Salvar quando isUploading é true", () => {
+    mockUseEditProfile.mockReturnValue({
+      ...createHookReturn(),
+      isUploading: true,
+    });
+
+    render(<EditProfileModal {...createProps()} />);
+
+    expect(screen.getByLabelText("Salvar perfil")).toBeDisabled();
+  });
+
   it("exibe a imagem quando photoUri está definido", () => {
     mockUseEditProfile.mockReturnValue({
       ...createHookReturn(),

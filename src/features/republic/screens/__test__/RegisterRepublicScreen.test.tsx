@@ -45,6 +45,7 @@ beforeEach(() => {
   jest.mocked(useRepublicForm).mockReturnValue(makeFormReturn() as any);
   jest.mocked(useRepublicActions).mockReturnValue({
     createRepublic: mockCreateRepublic,
+    isCreating: false,
   } as any);
   consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 });
@@ -178,6 +179,31 @@ describe("RegisterRepublicScreen — botão Cadastrar República", () => {
       nome: "Alpha",
       imagemRepublica: undefined,
     });
+  });
+});
+
+// ─── spinner ──────────────────────────────────────────────────────────────────
+
+describe("RegisterRepublicScreen — spinner", () => {
+  it("oculta o texto do botão e exibe spinner quando isCreating é true", () => {
+    jest.mocked(useRepublicActions).mockReturnValue({
+      createRepublic: mockCreateRepublic,
+      isCreating: true,
+    } as any);
+    render(<RegisterRepublicScreen />);
+    expect(screen.queryByText("Cadastrar República")).toBeNull();
+  });
+
+  it("desabilita o botão quando isCreating é true", () => {
+    jest.mocked(useRepublicForm).mockReturnValue(
+      makeFormReturn({ republicName: "Alpha" }) as any
+    );
+    jest.mocked(useRepublicActions).mockReturnValue({
+      createRepublic: mockCreateRepublic,
+      isCreating: true,
+    } as any);
+    render(<RegisterRepublicScreen />);
+    expect(screen.getByLabelText("Cadastrar República")).toBeDisabled();
   });
 });
 

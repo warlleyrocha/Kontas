@@ -1,6 +1,7 @@
 import Feather from "@expo/vector-icons/Feather";
 import type { FC } from "react";
 import {
+  ActivityIndicator,
   Image,
   KeyboardAvoidingView,
   Modal,
@@ -150,11 +151,16 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
             <View className="flex-row gap-3">
               <TouchableOpacity
                 onPress={handleSave}
+                disabled={isUploading}
                 accessibilityRole="button"
                 accessibilityLabel="Salvar perfil"
-                className="flex-1 items-center rounded-lg bg-teal py-3"
+                className={`flex-1 items-center rounded-lg bg-teal py-3 ${isUploading ? "opacity-60" : ""}`}
               >
-                <Text className="font-semibold text-white">Salvar</Text>
+                {isUploading ? (
+                  <ActivityIndicator size="small" color="white" />
+                ) : (
+                  <Text className="font-semibold text-white">Salvar</Text>
+                )}
               </TouchableOpacity>
 
               <TouchableOpacity
