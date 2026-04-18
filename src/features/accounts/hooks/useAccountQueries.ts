@@ -14,7 +14,10 @@ import type {
   CriarContaComMoradoresRequest,
   MarcarContaPaga,
 } from "../types/account.types";
-import type { ContaMorador } from "../types/accountResidents.types";
+import type {
+  ContaMorador,
+  MoradorCustomizado,
+} from "../types/accountResidents.types";
 import { accountKeys } from "./account.keys";
 import { accountResidentKeys } from "./accountResident.keys";
 
@@ -134,19 +137,29 @@ export function useCreateAccountMutation() {
   return useMutation({
     mutationFn: async (
       data: CriarContaComMoradoresRequest
-    ): Promise<Conta & { moradorIds: string[] }> => {
-      const { moradorIds, ...contaPayload } = data;
+    ): Promise<
+      Conta & {
+        moradores: { igual: string[]; customizados: MoradorCustomizado[] };
+      }
+    > => {
+      const { moradores, ...contaPayload } = data;
       const conta = await accountService.criarConta(contaPayload);
 
-      if (moradorIds.length > 0) {
+      const temDivisaoIgual = moradores.igual.length > 0;
+      const temDivisaoCustomizada = moradores.customizados.length > 0;
+
+      if (temDivisaoIgual || temDivisaoCustomizada) {
         await accountResidentsService.vincularMoradores({
           contaId: conta.id,
-          moradorIds,
           valorTotal: contaPayload.valor,
+          ...(temDivisaoIgual && { moradorIds: moradores.igual }),
+          ...(temDivisaoCustomizada && {
+            moradoresCustomizados: moradores.customizados,
+          }),
         });
       }
 
-      return { ...conta, moradorIds };
+      return { ...conta, moradores };
     },
     onSuccess: async ({ republicaId }) => {
       await invalidateAccountFeatureQueries(queryClient, republicaId);

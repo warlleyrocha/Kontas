@@ -31,6 +31,7 @@ export const ResidentsTab: FC<ResidentsTabProps> = ({
     mutateAsync: sendInvite,
     isPending: sendLoading,
     error: sendErrorRaw,
+    reset: resetSendInvite,
   } = useSendInviteMutation();
   const sendError = sendErrorRaw
     ? getErrorMessage(sendErrorRaw, "Erro ao enviar convite.")
@@ -71,7 +72,10 @@ export const ResidentsTab: FC<ResidentsTabProps> = ({
       {isAdmin && <PlusButton onPress={() => setModalOpen(true)} />}
       <InvitesModal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={() => {
+          resetSendInvite();
+          setModalOpen(false);
+        }}
         republicaId={republicId}
         sendInvite={sendInvite}
         loading={sendLoading}

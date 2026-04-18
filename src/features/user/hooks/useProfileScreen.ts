@@ -65,6 +65,7 @@ export function useProfileScreen() {
     mutateAsync: sendInvite,
     isPending: sendLoading,
     error: sendErrorRaw,
+    reset: resetSendInvite,
   } = useSendInviteMutation();
   const sendError = sendErrorRaw
     ? getErrorMessage(sendErrorRaw, "Erro ao enviar convite.")
@@ -246,8 +247,9 @@ export function useProfileScreen() {
   }, []);
 
   const handleCloseInviteModal = useCallback(() => {
+    resetSendInvite(); // reseta o erro da mutation
     setShowInviteModal(false);
-  }, []);
+  }, [resetSendInvite]);
 
   useEffect(() => {
     if (!republicsError) {

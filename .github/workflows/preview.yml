@@ -33,6 +33,8 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -68,12 +70,13 @@ jobs:
 
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      EAS_NO_VCS: 1
 
     steps:
 
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -101,12 +104,20 @@ jobs:
             --platform android \
             --profile preview \
             --non-interactive \
-            --json \
-            2>/dev/null)
+            --json 2>&1)
 
           echo "$BUILD"
 
-          BUILD_URL=$(echo $BUILD | jq -r '.[0].buildDetailsPageUrl')
+          # EAS pode retornar array ou objeto direto dependendo da versão
+          BUILD_URL=$(echo "$BUILD" | jq -r 'if type == "array" then .[0].buildDetailsPageUrl else .buildDetailsPageUrl end')
+
+          if [ -z "$BUILD_URL" ] || [ "$BUILD_URL" = "null" ]; then
+            echo "❌ Não foi possível extrair a URL da build"
+            echo "Output completo: $BUILD"
+            exit 1
+          fi
+
+          echo "✅ Build URL: $BUILD_URL"
           echo "BUILD_URL=$BUILD_URL" >> $GITHUB_ENV
 
       - name: Comment build link

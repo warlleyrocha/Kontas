@@ -14,6 +14,8 @@ interface SideMenuOptions {
   pendingInvitesSentCount?: number;
   /** Badge em "Pagamentos" — moradores aguardando confirmação do admin */
   pendingPaymentsCount?: number;
+  /** Morador criou pelo menos uma conta na república */
+  currentUserHasCreatedAccount?: boolean;
 }
 
 export function useSideMenu(
@@ -28,6 +30,7 @@ export function useSideMenu(
     pendingInvitesCount,
     pendingInvitesSentCount,
     pendingPaymentsCount,
+    currentUserHasCreatedAccount = false,
   } = options;
   const router = useRouter();
 
@@ -117,17 +120,16 @@ export function useSideMenu(
     };
 
     switch (context) {
-      case "home":
-        if (currentUserRole === ResidentRole.USER) {
-          return [base.profile, base.switchRepublic, base.invitesSent];
-        }
+      case "home": {
+        const showPayments =
+          currentUserRole !== ResidentRole.USER || currentUserHasCreatedAccount;
         return [
           base.profile,
           base.switchRepublic,
-
           base.invitesSent,
-          base.payments,
+          ...(showPayments ? [base.payments] : []),
         ];
+      }
 
       case "profile":
         return [base.invites];
@@ -138,6 +140,7 @@ export function useSideMenu(
   }, [
     context,
     currentUserRole,
+    currentUserHasCreatedAccount,
     pendingInvitesCount,
     pendingInvitesSentCount,
     pendingPaymentsCount,

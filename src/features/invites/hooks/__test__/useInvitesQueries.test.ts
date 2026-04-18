@@ -31,6 +31,9 @@ jest.mock("@/src/features/invites/services/invite.service", () => ({
     patchInviteStatus: jest.fn(),
   },
 }));
+jest.mock("@/src/shared/utils/showToast", () => ({
+  showToast: { success: jest.fn(), error: jest.fn() },
+}));
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 

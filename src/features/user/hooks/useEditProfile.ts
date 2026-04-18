@@ -5,6 +5,10 @@ import {
 import { useState } from "react";
 import { Alert } from "react-native";
 import { getErrorMessage } from "@/src/services/httpError";
+import {
+  maskPixKeyWrite,
+  normalizePixKeyRaw,
+} from "@/src/shared/utils/inputMasks";
 import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
 
@@ -31,10 +35,19 @@ export function useEditProfile({
   onSave,
 }: EditProfileFormValues) {
   const [name, setName] = useState(currentName);
-  const [pixKey, setPixKey] = useState(currentPixKey ?? "");
   const [photoUri, setPhotoUri] = useState(currentPhoto);
   const [phone, setPhone] = useState(currentPhone ?? "");
   const [isUploading, setIsUploading] = useState(false);
+
+  // Estado interno armazena dígitos puros (ou raw para e-mail/UUID/telefone)
+  const [pixKeyRaw, setPixKeyRaw] = useState(
+    normalizePixKeyRaw(currentPixKey ?? "")
+  );
+
+  // Valor exibido é sempre derivado — máscara nunca aplicada sobre si mesma
+  const pixKey = maskPixKeyWrite(pixKeyRaw);
+
+  const setPixKey = (value: string) => setPixKeyRaw(normalizePixKeyRaw(value));
 
   const handleClose = () => {
     setName(currentName);

@@ -43,6 +43,8 @@ export function RepublicScreen({ republicId }: Props) {
   const [pendingPaymentsByRepublic, setPendingPaymentsByRepublic] = useState<
     Record<string, number>
   >({});
+  const [currentUserCreatedAccount, setCurrentUserCreatedAccount] =
+    useState(false);
 
   const invitesSentQuery = useInvitesByRepublicQuery(republicId);
 
@@ -79,6 +81,7 @@ export function RepublicScreen({ republicId }: Props) {
     currentUserRole,
     pendingInvitesSentCount,
     pendingPaymentsCount,
+    currentUserHasCreatedAccount: currentUserCreatedAccount,
   });
 
   if (isLoading) {
@@ -119,6 +122,7 @@ export function RepublicScreen({ republicId }: Props) {
             residents={residents}
             isAdmin={currentUserRole === ResidentRole.ADMIN}
             onPendingPaymentsCountChange={handlePendingPaymentsCountChange}
+            onCurrentUserCreatedAccountChange={setCurrentUserCreatedAccount}
           />
         )}
         {tab === "moradores" && (

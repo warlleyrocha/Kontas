@@ -21,8 +21,6 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
     isLoading,
     isRefreshing,
     filteredPaymentAccounts,
-    confirmingResidentById,
-    refusingResidentById,
     selectedStatus,
     subtitle,
     statusOptions,
@@ -30,6 +28,8 @@ export default function PaymentsScreen({ republicId }: PaymentsScreenProps) {
     handleConfirmResidentPayment,
     handleRefuseResidentPayment,
     setSelectedStatus,
+    confirmingResidentById,
+    refusingResidentById,
   } = usePaymentsScreen({ republicId });
 
   let content = (

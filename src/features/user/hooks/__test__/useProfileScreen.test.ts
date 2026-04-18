@@ -134,6 +134,7 @@ function setupMocks(userOverrides = {}) {
     mutateAsync: mockSendInvite,
     isPending: false,
     error: null,
+    reset: jest.fn(),
   } as any);
   jest.mocked(useSideMenu).mockReturnValue({
     menuItems: [],

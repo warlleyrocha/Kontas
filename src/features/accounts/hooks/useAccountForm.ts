@@ -134,13 +134,20 @@ export function useAccountForm({ republicId, onClose }: UseAccountFormParams) {
       const valorFinal =
         valorDigitado > maxPermitido ? formatBRL(maxPermitido) : sanitized;
 
+      const moradoresAtualizados = prev.moradoresDivisao.map((morador) =>
+        morador.moradorId === moradorId
+          ? { ...morador, valor: valorFinal }
+          : morador
+      );
+
+      const algumTemValorCustomizado = moradoresAtualizados.some(
+        (m) => m.checked && parseCurrencyValue(m.valor) > 0
+      );
+
       return {
         ...prev,
-        moradoresDivisao: prev.moradoresDivisao.map((morador) =>
-          morador.moradorId === moradorId
-            ? { ...morador, valor: valorFinal }
-            : morador
-        ),
+        tipoDivisao: algumTemValorCustomizado ? "custom" : "equal",
+        moradoresDivisao: moradoresAtualizados,
       };
     });
   };

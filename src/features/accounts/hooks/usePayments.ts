@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { accountKeys } from "@/src/features/accounts/hooks/account.keys";
 import { accountResidentKeys } from "@/src/features/accounts/hooks/accountResident.keys";
 import {
@@ -14,8 +14,11 @@ import type {
   PaymentStatusFilter,
 } from "@/src/features/accounts/types/payments.types";
 import { getMoradorStatusVisual } from "@/src/features/accounts/utils/accountStatus.utils";
+import { useResidents } from "@/src/features/residents/hooks/useResidents";
+import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 import { getErrorMessage } from "@/src/services/httpError";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
+import { ResidentRole } from "@/src/shared/types/resident.types";
 import { showToast } from "@/src/shared/utils/showToast";
 
 interface UsePaymentsScreenParams {
@@ -26,13 +29,34 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
   useComponentLogger("PaymentsScreen");
 
   const queryClient = useQueryClient();
+  const { data: user = null } = useCurrentUserQuery();
+  const { residents } = useResidents(republicId);
   const accountsQuery = useAccountsByRepublicQuery(republicId);
   const confirmResidentMutation = useConfirmResidentPaymentAdminMutation();
   const refuseResidentMutation = useRefuseResidentPaymentAdminMutation();
-  const accounts = useMemo(
+
+  const currentResident = useMemo(() => {
+    if (!user?.email) return null;
+    const normalizedEmail = user.email.toLowerCase();
+    return residents.find((r) => r.email.toLowerCase() === normalizedEmail);
+  }, [residents, user?.email]);
+
+  const isAdmin = currentResident?.role === ResidentRole.ADMIN;
+  const currentResidentId = currentResident?.id ?? null;
+
+  const allAccounts = useMemo(
     () => accountsQuery.data ?? [],
     [accountsQuery.data]
   );
+
+  const accounts = useMemo(
+    () =>
+      isAdmin
+        ? allAccounts
+        : allAccounts.filter((a) => a.criadoPorId === currentResidentId),
+    [allAccounts, isAdmin, currentResidentId]
+  );
+
   const accountIds = useMemo(
     () => accounts.map((account) => account.id),
     [accounts]
@@ -41,15 +65,18 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
     republicId,
     accountIds
   );
+  const [selectedStatus, setSelectedStatus] = useState<PaymentStatusFilter>(
+    StatusPagamento.AGUARDANDO_CONFIRMACAO
+  );
+
+  const confirmingRef = useRef<Record<string, boolean>>({});
+  const refusingRef = useRef<Record<string, boolean>>({});
   const [confirmingResidentById, setConfirmingResidentById] = useState<
     Record<string, boolean>
   >({});
   const [refusingResidentById, setRefusingResidentById] = useState<
     Record<string, boolean>
   >({});
-  const [selectedStatus, setSelectedStatus] = useState<PaymentStatusFilter>(
-    StatusPagamento.AGUARDANDO_CONFIRMACAO
-  );
 
   const loadPayments = useCallback(
     async (_isManualRefresh = false) => {
@@ -97,15 +124,9 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
 
   const handleConfirmResidentPayment = useCallback(
     async (accountId: string, residentId: string) => {
-      if (confirmingResidentById[residentId]) {
-        return;
-      }
-
-      setConfirmingResidentById((current) => ({
-        ...current,
-        [residentId]: true,
-      }));
-
+      if (confirmingRef.current[residentId]) return;
+      confirmingRef.current[residentId] = true;
+      setConfirmingResidentById({ ...confirmingRef.current });
       try {
         await confirmResidentMutation.mutateAsync({
           accountId,
@@ -117,27 +138,18 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
           getErrorMessage(error, "Não foi possível atualizar o pagamento.")
         );
       } finally {
-        setConfirmingResidentById((current) => {
-          const nextState = { ...current };
-          delete nextState[residentId];
-          return nextState;
-        });
+        delete confirmingRef.current[residentId];
+        setConfirmingResidentById({ ...confirmingRef.current });
       }
     },
-    [confirmResidentMutation, confirmingResidentById]
+    [confirmResidentMutation]
   );
 
   const handleRefuseResidentPayment = useCallback(
     async (accountId: string, residentId: string) => {
-      if (refusingResidentById[residentId]) {
-        return;
-      }
-
-      setRefusingResidentById((current) => ({
-        ...current,
-        [residentId]: true,
-      }));
-
+      if (refusingRef.current[residentId]) return;
+      refusingRef.current[residentId] = true;
+      setRefusingResidentById({ ...refusingRef.current });
       try {
         await refuseResidentMutation.mutateAsync({
           accountId,
@@ -149,14 +161,11 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
           getErrorMessage(error, "Não foi possível recusar o pagamento.")
         );
       } finally {
-        setRefusingResidentById((current) => {
-          const nextState = { ...current };
-          delete nextState[residentId];
-          return nextState;
-        });
+        delete refusingRef.current[residentId];
+        setRefusingResidentById({ ...refusingRef.current });
       }
     },
-    [refuseResidentMutation, refusingResidentById]
+    [refuseResidentMutation]
   );
 
   const filteredPaymentAccounts = useMemo(
@@ -229,8 +238,6 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
       accountsQuery.isRefetching ||
       (residentQueries.isFetching && residentQueries.data.length > 0),
     filteredPaymentAccounts,
-    confirmingResidentById,
-    refusingResidentById,
     selectedStatus,
     subtitle,
     statusOptions,
@@ -238,5 +245,7 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
     handleConfirmResidentPayment,
     handleRefuseResidentPayment,
     setSelectedStatus,
+    confirmingResidentById,
+    refusingResidentById,
   };
 }

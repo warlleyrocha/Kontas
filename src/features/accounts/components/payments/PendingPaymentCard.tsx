@@ -116,8 +116,8 @@ export function PendingPaymentCard({
                 key={resident.id}
                 accountId={account.id}
                 resident={resident}
-                isConfirming={Boolean(confirmingResidentById[resident.id])}
-                isRefusing={Boolean(refusingResidentById[resident.id])}
+                isConfirming={confirmingResidentById[resident.id] ?? false}
+                isRefusing={refusingResidentById[resident.id] ?? false}
                 onConfirmResidentPayment={onConfirmResidentPayment}
                 onRefuseResidentPayment={onRefuseResidentPayment}
               />

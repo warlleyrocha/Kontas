@@ -13,7 +13,7 @@ export function NextButton({
   disabled = false,
 }: NextButtonProps) {
   return (
-    <View className="mt-[10px] flex-col gap-3">
+    <View className="mt-[18px] flex-col gap-3">
       <TouchableOpacity
         onPress={onNext}
         disabled={disabled}

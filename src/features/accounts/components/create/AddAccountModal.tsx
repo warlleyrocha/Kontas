@@ -1,4 +1,3 @@
-import Feather from "@expo/vector-icons/Feather";
 import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -63,7 +62,6 @@ export default function AddAccountModal({
     handleOpenDatepicker,
     handleDateChange,
     handleValorTotalChange,
-    handleSetTipoDivisao,
     handleToggleMorador,
     handleMoradorValorChange,
   } = useAccountForm({ onClose, republicId, visible });
@@ -73,8 +71,8 @@ export default function AddAccountModal({
     valorTotal,
     vencimento,
     metodoPagamento,
-    tipoDivisao,
     moradoresDivisao,
+    tipoDivisao,
   } = formData;
 
   const valorTotalNumerico = parseCurrencyValue(valorTotal);
@@ -95,10 +93,22 @@ export default function AddAccountModal({
     // Converte a data para formato ISO string
     const vencimentoISO = vencimento.toISOString();
 
-    // Monta o payload no formato REST
-    const moradorIds = moradoresDivisao
-      .filter((morador) => morador.checked)
-      .map((morador) => String(morador.moradorId));
+    const moradoresIgual =
+      tipoDivisao === "equal"
+        ? moradoresDivisao
+            .filter((morador) => morador.checked)
+            .map((morador) => String(morador.moradorId))
+        : [];
+
+    const moradoresCustomizados =
+      tipoDivisao === "custom"
+        ? moradoresDivisao
+            .filter((morador) => morador.checked)
+            .map((morador) => ({
+              moradorId: String(morador.moradorId),
+              valor: parseCurrencyValue(morador.valor),
+            }))
+        : [];
 
     const payload: CriarContaComMoradoresRequest = {
       descricao,
@@ -107,9 +117,11 @@ export default function AddAccountModal({
       metodoPagamento,
       republicaId: republicId,
       status: StatusConta.PENDENTE,
-      moradorIds,
+      moradores: {
+        igual: moradoresIgual,
+        customizados: moradoresCustomizados,
+      },
     };
-
     await onSubmit(payload);
   };
 
@@ -118,23 +130,6 @@ export default function AddAccountModal({
       <SafeAreaView className="flex-1 items-center justify-end bg-black/40">
         {/* Header — fixo, bg white */}
         <AddAccountModalHeader onClose={handleCloseModal} />
-
-        {/* Card informativo */}
-        <View className="w-full bg-[#EFF1F0] px-6 py-6">
-          <View className="flex-row items-center rounded-2xl bg-teal px-5 py-5">
-            <View className="flex-1">
-              <Text className="text-lg font-inter-bold text-white">
-                Informações Básicas
-              </Text>
-              <Text className="mt-1 text-sm text-teal-200">
-                Preencha os dados da conta{"\n"}para dividir com a república.
-              </Text>
-            </View>
-            <View className="ml-3 opacity-30">
-              <Feather name="file-text" size={48} color="#fff" />
-            </View>
-          </View>
-        </View>
 
         {/* Body — scrollável, bg cinza */}
         <KeyboardAvoidingView
@@ -166,12 +161,7 @@ export default function AddAccountModal({
 
             {activeTab === "residents" && (
               <AddAccountModalResidentsSection
-                tipoDivisao={tipoDivisao}
                 moradoresDivisao={moradoresDivisao}
-                totalDivisaoPreenchido={totalDivisaoPreenchido}
-                valorTotalNumerico={valorTotalNumerico}
-                restante={restante}
-                onSetTipoDivisao={handleSetTipoDivisao}
                 onToggleMorador={handleToggleMorador}
                 onMoradorValorChange={handleMoradorValorChange}
               />

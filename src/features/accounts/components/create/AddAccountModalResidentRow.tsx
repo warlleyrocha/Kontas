@@ -1,25 +1,16 @@
 import Feather from "@expo/vector-icons/Feather";
 import { Image, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { formatBRL } from "@/src/shared/utils/formats";
-import {
-  maskCurrencyBRL,
-  unmaskCurrencyBRL,
-} from "@/src/shared/utils/inputMasks";
-import type {
-  MoradorDivisao,
-  TipoDivisao,
-} from "../../types/accountForm.types";
+import { maskCurrencyBRL } from "@/src/shared/utils/inputMasks";
+import type { MoradorDivisao } from "../../types/accountForm.types";
 
 interface ResidentRowProps {
   readonly morador: MoradorDivisao;
-  readonly tipoDivisao: TipoDivisao;
   readonly onToggle: () => void;
   readonly onValorChange: (value: string) => void;
 }
 
 export default function ResidentRow({
   morador,
-  tipoDivisao,
   onToggle,
   onValorChange,
 }: ResidentRowProps) {
@@ -50,20 +41,15 @@ export default function ResidentRow({
         <Text className="text-xs text-gray-400">{morador.role}</Text>
       </View>
 
-      <View className="mr-3 items-end">
-        {tipoDivisao === "custom" && morador.checked ? (
-          <TextInput
-            value={morador.valor}
-            onChangeText={(text) => onValorChange(maskCurrencyBRL(text))}
-            keyboardType="numeric"
-            placeholder="0,00"
-            className="min-w-[80px] rounded-lg border border-gray-200 bg-gray-50 px-2 py-1 text-right text-sm font-semibold text-teal"
-          />
-        ) : (
-          <Text className="text-sm font-semibold text-teal">
-            R$ {formatBRL(unmaskCurrencyBRL(morador.valor || "0") / 100)}
-          </Text>
-        )}
+      <View className="flex-row items-center gap-1 mr-3">
+        <Text className="font-inter-semibold">R$</Text>
+        <TextInput
+          value={morador.valor}
+          onChangeText={(text) => onValorChange(maskCurrencyBRL(text))}
+          keyboardType="numeric"
+          placeholder="0,00"
+          className="min-w-[65px] rounded-lg border border-gray-200 bg-gray-50 px-2 py-1 text-right text-sm font-semibold text-teal"
+        />
       </View>
 
       <TouchableOpacity

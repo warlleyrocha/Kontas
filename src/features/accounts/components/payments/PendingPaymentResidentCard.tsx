@@ -1,5 +1,5 @@
+import Feather from "@expo/vector-icons/Feather";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
-
 import {
   type ContaMorador,
   StatusPagamento,
@@ -19,11 +19,11 @@ interface PendingPaymentResidentCardProps {
   readonly onConfirmResidentPayment: (
     accountId: string,
     residentId: string
-  ) => Promise<void> | void;
+  ) => void;
   readonly onRefuseResidentPayment: (
     accountId: string,
     residentId: string
-  ) => Promise<void> | void;
+  ) => void;
   readonly resident: ContaMorador;
 }
 
@@ -87,36 +87,49 @@ export function PendingPaymentResidentCard({
           <TouchableOpacity
             activeOpacity={0.85}
             disabled={isRefusing || isConfirming}
-            onPress={async () => {
-              await onRefuseResidentPayment(accountId, resident.id);
+            onPress={() => {
+              onRefuseResidentPayment(accountId, resident.id);
             }}
-            className={`min-h-11 flex-1 flex-row items-center justify-center rounded-full px-4 ${
-              isRefusing || isConfirming ? "bg-gray-300" : "bg-red-500"
+            className={`min-h-11 flex-1 flex-row items-center border border-[#E53935] justify-center rounded-full px-4 bg-transparent ${
+              isRefusing ? "opacity-50" : "opacity-100"
             }`}
           >
             {isRefusing ? (
-              <ActivityIndicator size="small" color="#FFFFFF" />
+              <ActivityIndicator size="small" color="#E53935" />
             ) : (
-              <Text className="text-sm font-semibold text-white">Recusar</Text>
+              <View className="flex-row items-center justify-center gap-1">
+                <Feather name="x" size={16} color="#E53935" className="mr-1" />
+                <Text className="text-sm font-semibold text-[#E53935]">
+                  Recusar
+                </Text>
+              </View>
             )}
           </TouchableOpacity>
 
           <TouchableOpacity
             activeOpacity={0.85}
             disabled={isConfirming || isRefusing}
-            onPress={async () => {
-              await onConfirmResidentPayment(accountId, resident.id);
+            onPress={() => {
+              onConfirmResidentPayment(accountId, resident.id);
             }}
-            className={`min-h-11 flex-1 flex-row items-center justify-center rounded-full px-4 ${
-              isConfirming || isRefusing ? "bg-gray-300" : "bg-teal-dark"
+            className={`min-h-11 flex-1 flex-row items-center justify-center rounded-full px-4 bg-teal ${
+              isConfirming ? "opacity-50" : "opacity-100"
             }`}
           >
             {isConfirming ? (
               <ActivityIndicator size="small" color="#FFFFFF" />
             ) : (
-              <Text className="text-sm font-semibold text-white">
-                Confirmar
-              </Text>
+              <View className="flex-row items-center justify-center gap-1">
+                <Feather
+                  name="check"
+                  size={16}
+                  color="#FFFFFF"
+                  className="mr-1"
+                />
+                <Text className="text-sm font-semibold text-white">
+                  Confirmar
+                </Text>
+              </View>
             )}
           </TouchableOpacity>
         </View>

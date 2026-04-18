@@ -38,6 +38,28 @@ jest.mock("@/src/shared/hooks/useComponentLogger", () => ({
 jest.mock("@/src/features/auth/hooks/useAuth", () => ({
   useAuth: jest.fn(() => ({ isAuthenticated: true, user: null })),
 }));
+jest.mock("@/src/features/user/hooks/useUserQueries", () => ({
+  useCurrentUserQuery: jest.fn(() => ({
+    data: { email: "admin@test.com" },
+  })),
+}));
+jest.mock("@/src/features/residents/hooks/useResidents", () => ({
+  useResidents: jest.fn(() => ({
+    residents: [
+      {
+        id: "admin-1",
+        email: "admin@test.com",
+        nome: "Admin",
+        role: "ADMIN",
+        fotoPerfil: null,
+        chavePix: null,
+        telefone: null,
+      },
+    ],
+    isLoading: false,
+    fetchResidents: jest.fn(),
+  })),
+}));
 
 const mockRefreshAll = jest.fn();
 const mockListarContasPorRepublica = jest.mocked(
