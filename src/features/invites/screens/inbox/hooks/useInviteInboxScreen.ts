@@ -1,8 +1,10 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 
 import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthMutations";
 import { StatusInvite } from "@/src/features/invites/types/invite.types";
+import { residentKeys } from "@/src/features/residents/hooks/resident.keys";
 import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
 import { getErrorMessage } from "@/src/services/httpError";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
@@ -16,6 +18,7 @@ import {
 
 export function useInviteInboxScreen() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { data: user = null } = useCurrentUserQuery();
   const { mutateAsync: logout } = useLogoutMutation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -57,12 +60,15 @@ export function useInviteInboxScreen() {
           inviteId,
           status: StatusInvite.ACEITO,
         });
+        queryClient.invalidateQueries({
+          queryKey: residentKeys.byRepublic(republicaId),
+        });
         router.replace(`/(republics)/${republicaId}`);
       } catch (error) {
         logger.error("Invites", "Erro ao aceitar convite", error);
       }
     },
-    [router, updateStatusMutation]
+    [router, updateStatusMutation, queryClient]
   );
 
   const handleRejectInvite = useCallback(
