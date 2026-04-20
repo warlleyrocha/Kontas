@@ -1,5 +1,7 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook } from "@testing-library/react-native";
 import { useRouter } from "expo-router";
+import React from "react";
 import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthMutations";
 import { StatusInvite } from "@/src/features/invites/types/invite.types";
 import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
@@ -69,6 +71,15 @@ function setupMocks(userOverrides = {}) {
     .mockImplementation((_err, fallback) => fallback ?? "erro");
 }
 
+function createWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+}
+
 // ─── Setup ────────────────────────────────────────────────────────────────────
 
 let consoleErrorSpy: jest.SpyInstance;
@@ -87,7 +98,9 @@ afterEach(() => {
 
 describe("useInviteInboxScreen — estado inicial", () => {
   it("retorna as propriedades esperadas", () => {
-    const { result } = renderHook(() => useInviteInboxScreen());
+    const { result } = renderHook(() => useInviteInboxScreen(), {
+      wrapper: createWrapper(),
+    });
 
     expect(result.current.isMenuOpen).toBe(false);
     expect(result.current.invitesByUser).toEqual([]);
@@ -110,7 +123,7 @@ describe("useInviteInboxScreen — estado inicial", () => {
       refetch: mockRefetch,
     } as any);
 
-    renderHook(() => useInviteInboxScreen());
+    renderHook(() => useInviteInboxScreen(), { wrapper: createWrapper() });
 
     expect(jest.mocked(useSideMenu)).toHaveBeenCalledWith(
       "invite",
@@ -127,7 +140,9 @@ describe("useInviteInboxScreen — estado inicial", () => {
       refetch: mockRefetch,
     } as any);
 
-    const { result } = renderHook(() => useInviteInboxScreen());
+    const { result } = renderHook(() => useInviteInboxScreen(), {
+      wrapper: createWrapper(),
+    });
 
     expect(jest.mocked(getErrorMessage)).toHaveBeenCalledWith(
       error,
@@ -143,7 +158,7 @@ describe("useInviteInboxScreen — handleSignOut", () => {
   it("chama logout com sucesso sem lançar erros", async () => {
     mockLogout.mockResolvedValue(undefined);
 
-    renderHook(() => useInviteInboxScreen());
+    renderHook(() => useInviteInboxScreen(), { wrapper: createWrapper() });
     const handleSignOut = (
       jest.mocked(useSideMenu).mock.calls[0] as unknown[]
     )[1] as () => Promise<void>;
@@ -160,7 +175,7 @@ describe("useInviteInboxScreen — handleSignOut", () => {
     const error = new Error("logout fail");
     mockLogout.mockRejectedValue(error);
 
-    renderHook(() => useInviteInboxScreen());
+    renderHook(() => useInviteInboxScreen(), { wrapper: createWrapper() });
     const handleSignOut = (
       jest.mocked(useSideMenu).mock.calls[0] as unknown[]
     )[1] as () => Promise<void>;
@@ -184,7 +199,9 @@ describe("useInviteInboxScreen — handleSignOut", () => {
 describe("useInviteInboxScreen — fetchInvitesByUser", () => {
   it("chama refetch ao ser invocado", async () => {
     mockRefetch.mockResolvedValue(undefined);
-    const { result } = renderHook(() => useInviteInboxScreen());
+    const { result } = renderHook(() => useInviteInboxScreen(), {
+      wrapper: createWrapper(),
+    });
 
     await act(async () => {
       await result.current.fetchInvitesByUser();
@@ -199,7 +216,9 @@ describe("useInviteInboxScreen — fetchInvitesByUser", () => {
 describe("useInviteInboxScreen — handleAcceptInvite", () => {
   it("chama mutateAsync com ACEITO e navega para a república", async () => {
     mockMutateAsync.mockResolvedValue(undefined);
-    const { result } = renderHook(() => useInviteInboxScreen());
+    const { result } = renderHook(() => useInviteInboxScreen(), {
+      wrapper: createWrapper(),
+    });
 
     await act(async () => {
       await result.current.handleAcceptInvite("inv-1", "rep-1");
@@ -215,7 +234,9 @@ describe("useInviteInboxScreen — handleAcceptInvite", () => {
   it("loga o erro e não navega quando a mutation falha", async () => {
     const error = new Error("update fail");
     mockMutateAsync.mockRejectedValue(error);
-    const { result } = renderHook(() => useInviteInboxScreen());
+    const { result } = renderHook(() => useInviteInboxScreen(), {
+      wrapper: createWrapper(),
+    });
 
     await act(async () => {
       await result.current.handleAcceptInvite("inv-1", "rep-1");
@@ -236,7 +257,9 @@ describe("useInviteInboxScreen — handleAcceptInvite", () => {
 describe("useInviteInboxScreen — handleRejectInvite", () => {
   it("chama mutateAsync com RECUSADO", async () => {
     mockMutateAsync.mockResolvedValue(undefined);
-    const { result } = renderHook(() => useInviteInboxScreen());
+    const { result } = renderHook(() => useInviteInboxScreen(), {
+      wrapper: createWrapper(),
+    });
 
     await act(async () => {
       await result.current.handleRejectInvite("inv-1");
@@ -251,7 +274,9 @@ describe("useInviteInboxScreen — handleRejectInvite", () => {
   it("loga o erro quando a mutation falha", async () => {
     const error = new Error("reject fail");
     mockMutateAsync.mockRejectedValue(error);
-    const { result } = renderHook(() => useInviteInboxScreen());
+    const { result } = renderHook(() => useInviteInboxScreen(), {
+      wrapper: createWrapper(),
+    });
 
     await act(async () => {
       await result.current.handleRejectInvite("inv-1");
@@ -270,13 +295,17 @@ describe("useInviteInboxScreen — handleRejectInvite", () => {
 
 describe("useInviteInboxScreen — sideMenuUser", () => {
   it("retorna nome e foto do usuário", () => {
-    const { result } = renderHook(() => useInviteInboxScreen());
+    const { result } = renderHook(() => useInviteInboxScreen(), {
+      wrapper: createWrapper(),
+    });
     expect(result.current.sideMenuUser).toEqual({ name: "Ana", photo: null });
   });
 
   it("usa 'Usuário' como fallback quando user.nome é undefined", () => {
     setupMocks({ nome: undefined });
-    const { result } = renderHook(() => useInviteInboxScreen());
+    const { result } = renderHook(() => useInviteInboxScreen(), {
+      wrapper: createWrapper(),
+    });
     expect(result.current.sideMenuUser.name).toBe("Usuário");
   });
 });
