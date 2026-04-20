@@ -106,7 +106,11 @@
               --platform android \
               --profile preview \
               --non-interactive \
-              --json 2>/dev/null)
+              --json 2>&1) || {
+              echo "❌ eas build falhou. Output completo:"
+              echo "$BUILD_RAW"
+              exit 1
+            }
 
             # Extrai apenas o JSON (remove lixo antes do array)
             BUILD_JSON=$(echo "$BUILD_RAW" | sed -n '/^\[/,$p')
