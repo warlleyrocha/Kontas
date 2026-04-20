@@ -66,9 +66,15 @@ export function PendingPaymentCard({
             <Text className="text-xs font-semibold uppercase tracking-wide text-teal-dark/60">
               Pagamento
             </Text>
+
             <Text className="mt-2 text-xl font-semibold text-[#111827]">
               {account.descricao}
             </Text>
+            <View className="pt-[2px]">
+              <Text className="text-xs text-teal">
+                Responsável: {account.criadoPorNome}
+              </Text>
+            </View>
             <View className="mt-4 flex-row flex-wrap gap-2">
               <View className="flex-row items-center gap-2 rounded-full bg-teal/5 px-3 py-2">
                 <Feather name="calendar" size={14} color="#337176" />
