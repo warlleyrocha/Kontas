@@ -1,4 +1,6 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook } from "@testing-library/react-native";
+import React from "react";
 import {
   type ResidentResponse,
   ResidentRole,
@@ -37,6 +39,16 @@ function mockQuery(overrides: object = {}) {
   } as any);
 }
 
+function createWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
+  const Wrapper = ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  );
+  return Wrapper;
+}
+
 // ─── Setup ────────────────────────────────────────────────────────────────────
 
 beforeEach(() => {
@@ -48,14 +60,16 @@ beforeEach(() => {
 
 describe("useResidents — estado inicial", () => {
   it("inicia com residents=[] e isLoading=false", () => {
-    const { result } = renderHook(() => useResidents("rep-1"));
+    const { result } = renderHook(() => useResidents("rep-1"), {
+      wrapper: createWrapper(),
+    });
 
     expect(result.current.residents).toEqual([]);
     expect(result.current.isLoading).toBe(false);
   });
 
   it("passa republicId para useResidentsByRepublicQuery", () => {
-    renderHook(() => useResidents("rep-42"));
+    renderHook(() => useResidents("rep-42"), { wrapper: createWrapper() });
 
     expect(jest.mocked(useResidentsByRepublicQuery)).toHaveBeenCalledWith(
       "rep-42"
@@ -67,7 +81,9 @@ describe("useResidents — dados da query", () => {
   it("repassa residents quando a query retorna dados", () => {
     mockQuery({ data: [mockResident] });
 
-    const { result } = renderHook(() => useResidents("rep-1"));
+    const { result } = renderHook(() => useResidents("rep-1"), {
+      wrapper: createWrapper(),
+    });
 
     expect(result.current.residents).toEqual([mockResident]);
   });
@@ -75,7 +91,9 @@ describe("useResidents — dados da query", () => {
   it("usa [] como fallback quando data for undefined", () => {
     mockQuery({ data: undefined });
 
-    const { result } = renderHook(() => useResidents("rep-1"));
+    const { result } = renderHook(() => useResidents("rep-1"), {
+      wrapper: createWrapper(),
+    });
 
     expect(result.current.residents).toEqual([]);
   });
@@ -83,7 +101,9 @@ describe("useResidents — dados da query", () => {
   it("repassa isFetching como isLoading", () => {
     mockQuery({ isFetching: true });
 
-    const { result } = renderHook(() => useResidents("rep-1"));
+    const { result } = renderHook(() => useResidents("rep-1"), {
+      wrapper: createWrapper(),
+    });
 
     expect(result.current.isLoading).toBe(true);
   });
@@ -93,7 +113,9 @@ describe("useResidents — fetchResidents", () => {
   it("chama refetch e retorna os dados ao resolver com sucesso", async () => {
     mockRefetch.mockResolvedValue({ data: [mockResident] });
 
-    const { result } = renderHook(() => useResidents("rep-1"));
+    const { result } = renderHook(() => useResidents("rep-1"), {
+      wrapper: createWrapper(),
+    });
 
     let returned: ResidentResponse[] | null | undefined;
     await act(async () => {
@@ -107,7 +129,9 @@ describe("useResidents — fetchResidents", () => {
   it("retorna null quando refetch resolve com data undefined", async () => {
     mockRefetch.mockResolvedValue({ data: undefined });
 
-    const { result } = renderHook(() => useResidents("rep-1"));
+    const { result } = renderHook(() => useResidents("rep-1"), {
+      wrapper: createWrapper(),
+    });
 
     let returned: ResidentResponse[] | null | undefined;
     await act(async () => {
