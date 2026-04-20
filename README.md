@@ -260,7 +260,7 @@ Hoje, o redirecionamento automático para uma república depende do cache local 
 
 ### Rotas da república
 
-- `/(republics)/[id]` — tela principal com abas (Resumo / Contas / Moradores)
+- `/(republics)/[id]` — tela principal com abas (Contas / Moradores / Resumo)
 - `/(republics)/[id]/invites-sent` — convites enviados para a república
 - `/(republics)/[id]/payments` — confirmação de pagamentos (admin)
 
