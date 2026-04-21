@@ -2,9 +2,9 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
 
 type CopyHandler = () => boolean | Promise<boolean>;
 
-export type CopyStatus = "idle" | "success" | "error";
+type CopyStatus = "idle" | "success" | "error";
 
-export type CopyFeedbackItem = {
+type CopyFeedbackItem = {
   accessibilityLabel: string;
   icon: ReactNode;
   text: string;

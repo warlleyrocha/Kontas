@@ -11,7 +11,6 @@ import {
 
 interface UseAccountFormParams {
   readonly republicId: string;
-  readonly visible: boolean;
   readonly onClose: () => void;
 }
 

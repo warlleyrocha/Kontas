@@ -8,7 +8,7 @@ import {
   User,
 } from "../types/user.types";
 
-export interface UploadPhotoApiResponse {
+interface UploadPhotoApiResponse {
   id: string;
   nome: string;
   email: string;
