@@ -204,8 +204,7 @@ export function usePaymentsScreen({ republicId }: UsePaymentsScreenParams) {
 
   const subtitle = useMemo(() => {
     if (selectedStatus === StatusPagamento.PAGO) {
-      if (filteredResidentsCount === 0)
-        return "Nenhum pagamento aprovado";
+      if (filteredResidentsCount === 0) return "Nenhum pagamento aprovado";
       if (filteredResidentsCount === 1) return "1 pagamento aprovado";
       return `${filteredResidentsCount} pagamentos aprovados`;
     }

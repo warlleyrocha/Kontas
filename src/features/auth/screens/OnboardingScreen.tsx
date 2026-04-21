@@ -1,3 +1,4 @@
+import { BlurView } from "expo-blur";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
@@ -13,8 +14,10 @@ import Animated, {
   interpolate,
   useAnimatedStyle,
 } from "react-native-reanimated";
-import { BlurView } from "expo-blur";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import OnboardingButtons from "@/src/features/auth/components/onboarding/OnboardingButtons";
 import RenderDots from "@/src/features/auth/components/onboarding/RenderDots";
 import RenderSlide from "@/src/features/auth/components/onboarding/RenderSlide";
@@ -76,17 +79,29 @@ export default function Onboarding() {
         <Animated.View
           style={[
             skipAnimatedStyle,
-            { position: "absolute", top: insets.top + 8, right: 24, zIndex: 10 },
+            {
+              position: "absolute",
+              top: insets.top + 8,
+              right: 24,
+              zIndex: 10,
+            },
           ]}
         >
-          <BlurView intensity={20} tint="systemUltraThinMaterial" style={{ borderRadius: 100, overflow: "hidden" }}>
-            <TouchableOpacity onPress={handleSkip} activeOpacity={0.7} className="py-[5px] px-3 border-2 border-white rounded-full">
+          <BlurView
+            intensity={20}
+            tint="systemUltraThinMaterial"
+            style={{ borderRadius: 100, overflow: "hidden" }}
+          >
+            <TouchableOpacity
+              onPress={handleSkip}
+              activeOpacity={0.7}
+              className="py-[5px] px-3 border-2 border-white rounded-full"
+            >
               <Text className="font-mulish-bold text-[16px] leading-[18px] text-white">
                 Pular
               </Text>
             </TouchableOpacity>
           </BlurView>
-
         </Animated.View>
       )}
 

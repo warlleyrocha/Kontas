@@ -195,9 +195,9 @@ describe("RegisterRepublicScreen — spinner", () => {
   });
 
   it("desabilita o botão quando isCreating é true", () => {
-    jest.mocked(useRepublicForm).mockReturnValue(
-      makeFormReturn({ republicName: "Alpha" }) as any
-    );
+    jest
+      .mocked(useRepublicForm)
+      .mockReturnValue(makeFormReturn({ republicName: "Alpha" }) as any);
     jest.mocked(useRepublicActions).mockReturnValue({
       createRepublic: mockCreateRepublic,
       isCreating: true,

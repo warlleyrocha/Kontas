@@ -27,7 +27,9 @@ export function AccountContextMenu({
   isOwner = false,
 }: AccountContextMenuProps) {
   const canDelete = isAdmin || isOwner;
-  const menuTotalHeight = canDelete ? MENU_ITEM_HEIGHT * 2 + 1 : MENU_ITEM_HEIGHT;
+  const menuTotalHeight = canDelete
+    ? MENU_ITEM_HEIGHT * 2 + 1
+    : MENU_ITEM_HEIGHT;
 
   return (
     <ContextMenu

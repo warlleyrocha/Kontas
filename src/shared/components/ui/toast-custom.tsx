@@ -33,7 +33,9 @@ const variants = {
     textColor: "text-blue-600",
   },
   warning: {
-    icon: <MaterialCommunityIcons name="close-circle" size={20} color="#dc2626" />,
+    icon: (
+      <MaterialCommunityIcons name="close-circle" size={20} color="#dc2626" />
+    ),
     textColor: "text-red-600",
   },
 };
