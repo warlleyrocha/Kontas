@@ -1,3 +1,4 @@
+import { Feather } from "@expo/vector-icons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import React, { useCallback, useRef, useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
@@ -9,7 +10,6 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
-import { Feather } from "@expo/vector-icons";
 
 interface CardPosition {
   x: number;

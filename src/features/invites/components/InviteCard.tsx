@@ -1,9 +1,9 @@
+import { Feather } from "@expo/vector-icons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image, Text, View } from "react-native";
 import { formatDate } from "@/src/shared/utils/formats";
 import type { Invite } from "../types/invite.types";
 import { InviteCardFooter } from "./InviteCardFooter";
-import { Feather } from "@expo/vector-icons";
 
 type InviteCardVariant = "received" | "sent";
 

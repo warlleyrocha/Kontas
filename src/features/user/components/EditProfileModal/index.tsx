@@ -18,7 +18,7 @@ import {
   useEditProfile,
 } from "../../hooks/useEditProfile";
 
-export interface EditProfileModalProps extends EditProfileFormValues {
+interface EditProfileModalProps extends EditProfileFormValues {
   visible: boolean;
   currentPhone?: string;
 }

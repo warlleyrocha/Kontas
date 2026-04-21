@@ -58,7 +58,9 @@ describe("AccountContextMenu", () => {
   });
 
   it('exibe "Deletar conta" quando isAdmin e isOwner são true', () => {
-    render(<AccountContextMenu {...createProps({ isAdmin: true, isOwner: true })} />);
+    render(
+      <AccountContextMenu {...createProps({ isAdmin: true, isOwner: true })} />
+    );
     expect(screen.getByText("Deletar conta")).toBeTruthy();
   });
 

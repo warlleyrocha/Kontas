@@ -69,30 +69,32 @@ jest.mock("../AddAccountModalResidentsSection", () => ({
 }));
 
 jest.mock("../AddAccountModalActions", () => ({
-  AddAccountModalActions: jest.fn(({
-    onSubmit,
-    onCancel,
-  }: {
-    onSubmit: () => void;
-    onCancel: () => void;
-    isSubmitting?: boolean;
-  }) => {
-    const { TouchableOpacity, View } = jest.requireActual("react-native");
-    return (
-      <View>
-        <TouchableOpacity
-          onPress={onSubmit}
-          accessibilityRole="button"
-          accessibilityLabel="adicionar conta"
-        />
-        <TouchableOpacity
-          onPress={onCancel}
-          accessibilityRole="button"
-          accessibilityLabel="voltar"
-        />
-      </View>
-    );
-  }),
+  AddAccountModalActions: jest.fn(
+    ({
+      onSubmit,
+      onCancel,
+    }: {
+      onSubmit: () => void;
+      onCancel: () => void;
+      isSubmitting?: boolean;
+    }) => {
+      const { TouchableOpacity, View } = jest.requireActual("react-native");
+      return (
+        <View>
+          <TouchableOpacity
+            onPress={onSubmit}
+            accessibilityRole="button"
+            accessibilityLabel="adicionar conta"
+          />
+          <TouchableOpacity
+            onPress={onCancel}
+            accessibilityRole="button"
+            accessibilityLabel="voltar"
+          />
+        </View>
+      );
+    }
+  ),
 }));
 
 jest.mock("@/src/shared/components/NextButton", () => ({
