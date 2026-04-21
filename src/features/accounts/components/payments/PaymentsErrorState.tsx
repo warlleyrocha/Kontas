@@ -18,6 +18,8 @@ export function PaymentsErrorState({
 
       <TouchableOpacity
         onPress={onRetry}
+        accessibilityRole="button"
+        accessibilityLabel="Tentar carregar pagamentos novamente"
         className="mt-4 self-start rounded-xl bg-red-600 px-4 py-2"
         activeOpacity={0.8}
       >

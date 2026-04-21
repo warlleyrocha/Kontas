@@ -1,20 +1,34 @@
 import { useIsFocused } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Alert } from "react-native";
 
-import { useAuth } from "@/src/features/auth/contexts";
-import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
+import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthMutations";
+import {
+  usePendingInvitesCount,
+  useSendInviteMutation,
+} from "@/src/features/invites/hooks/useInvitesQueries";
 import { useRepublicActions } from "@/src/features/republic/hooks/useRepublicActions";
-import { useRepublicList } from "@/src/features/republic/hooks/useRepublicList";
+import { useRepublicsQuery } from "@/src/features/republic/hooks/useRepublicQueries";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
+import {
+  useCompleteProfileMutation,
+  useCurrentUserQuery,
+  useUpdateCurrentUserMutation,
+  useUploadProfilePhotoMutation,
+} from "@/src/features/user/hooks/useUserQueries";
+import { getErrorMessage } from "@/src/services/httpError";
 import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
-import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { useRepublicResidents } from "@/src/shared/hooks/useRepublicResidents";
+import {
+  buildProfileChanges,
+  isLocalPhotoUri,
+  validateProfileCompletion,
+} from "@/src/shared/utils/helpers";
 import { maskPhone } from "@/src/shared/utils/inputMasks";
 import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
 import { toastErrors } from "@/src/shared/utils/toastMessages";
+import { UpdateUserRequest } from "../types/user.types";
 
 interface CardPosition {
   x: number;
@@ -27,8 +41,18 @@ export function useProfileScreen() {
   const router = useRouter();
   const isFocused = useIsFocused();
 
-  const { user, logout, completeProfile, updateUser } = useAuth();
-  const { republics, fetchRepublics } = useRepublicList();
+  const { data: user = null } = useCurrentUserQuery();
+  const { mutateAsync: logout } = useLogoutMutation();
+  const { mutateAsync: completeProfile } = useCompleteProfileMutation();
+  const { mutateAsync: updateCurrentUser } = useUpdateCurrentUserMutation();
+  const { mutateAsync: uploadProfilePhoto } = useUploadProfilePhotoMutation();
+  const {
+    data: republics = [],
+    error: republicsError,
+    refetch: refetchRepublics,
+  } = useRepublicsQuery({
+    enabled: Boolean(user?.perfilCompleto),
+  });
   const { deleteRepublic, updateRepublic, showEditModal, setShowEditModal } =
     useRepublicActions();
   const { getResidentsCount, isAdmin } = useRepublicResidents(
@@ -36,10 +60,18 @@ export function useProfileScreen() {
     user?.email,
     isFocused
   );
-  const { pendingCount, sendInvite, sendLoading, sendError } =
-    useInvitesContext();
+  const pendingCount = usePendingInvitesCount();
+  const {
+    mutateAsync: sendInvite,
+    isPending: sendLoading,
+    error: sendErrorRaw,
+    reset: resetSendInvite,
+  } = useSendInviteMutation();
+  const sendError = sendErrorRaw
+    ? getErrorMessage(sendErrorRaw, "Erro ao enviar convite.")
+    : null;
 
-  const { refreshing, onRefresh, registerRefresh } = useRefresh();
+  const [refreshing, setRefreshing] = useState(false);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
@@ -52,7 +84,6 @@ export function useProfileScreen() {
   const handleSignOut = useCallback(async () => {
     try {
       await logout();
-      router.replace("/");
     } catch (error) {
       logger.error(
         "User",
@@ -61,7 +92,7 @@ export function useProfileScreen() {
       );
       toastErrors.logoutFailed(error);
     }
-  }, [logout, router]);
+  }, [logout]);
 
   const handleSaveProfile = useCallback(
     async (name: string, pixKey?: string, photo?: string, phone?: string) => {
@@ -69,47 +100,60 @@ export function useProfileScreen() {
 
       const isCompletingProfile = !user.perfilCompleto;
 
-      if (isCompletingProfile && (!phone || !pixKey)) {
-        Alert.alert(
-          "Campos Obrigatórios",
-          "Por favor, preencha o telefone e a chave Pix."
-        );
+      if (!validateProfileCompletion(isCompletingProfile, phone, pixKey))
         return;
-      }
 
       try {
+        let fotoPerfilUrl: string | undefined;
+
+        if (photo) {
+          if (isLocalPhotoUri(photo)) {
+            const uploadResult = await uploadProfilePhoto(photo);
+            fotoPerfilUrl = uploadResult.fotoPerfil;
+          } else {
+            fotoPerfilUrl = photo;
+          }
+        }
+
         if (isCompletingProfile) {
           await completeProfile({
             nome: name,
             telefone: phone!,
             chavePix: pixKey!,
-            fotoPerfil: photo,
+            fotoPerfil: fotoPerfilUrl,
           });
         } else {
-          await updateUser({
-            nome: name,
-            telefone: phone,
-            chavePix: pixKey,
-            fotoPerfil: photo,
-          });
+          const changes: UpdateUserRequest = buildProfileChanges(
+            user,
+            name,
+            phone,
+            pixKey,
+            fotoPerfilUrl
+          );
+
+          if (Object.keys(changes).length === 0) {
+            setShowEditProfileModal(false);
+            return;
+          }
+          await updateCurrentUser(changes);
         }
 
         setShowEditProfileModal(false);
-        showToast.success(
-          isCompletingProfile
-            ? "Perfil salvo com sucesso!"
-            : "Perfil atualizado com sucesso!"
-        );
       } catch (error) {
         logger.error(
           "User",
           "Erro ao salvar perfil",
           error instanceof Error ? error : undefined
         );
-        toastErrors.profileUpdateFailed(error);
+        showToast.error(
+          getErrorMessage(
+            error,
+            "Não foi possível salvar as alterações do perfil."
+          )
+        );
       }
     },
-    [user, completeProfile, updateUser]
+    [user, completeProfile, updateCurrentUser, uploadProfilePhoto]
   );
 
   const handleCreateRepublic = useCallback(() => {
@@ -153,14 +197,24 @@ export function useProfileScreen() {
   const handleSaveRepublicEdit = useCallback(
     async (name: string, image?: string) => {
       if (!selectedRepublic) return;
-      await updateRepublic(selectedRepublic.id, {
-        nome: name,
-        imagemRepublica: image,
-      });
-      handleCloseEditModal();
-      fetchRepublics();
+      try {
+        await updateRepublic(selectedRepublic.id, selectedRepublic, {
+          nome: name,
+          imagemRepublica: image,
+        });
+        handleCloseEditModal();
+      } catch (error) {
+        logger.error(
+          "Republic",
+          "Erro ao atualizar república",
+          error instanceof Error ? error : undefined
+        );
+        showToast.error(
+          getErrorMessage(error, "Não foi possível atualizar a república.")
+        );
+      }
     },
-    [selectedRepublic, updateRepublic, handleCloseEditModal, fetchRepublics]
+    [selectedRepublic, updateRepublic, handleCloseEditModal]
   );
 
   const handleDeleteFromMenu = useCallback(() => {
@@ -168,13 +222,22 @@ export function useProfileScreen() {
     if (!selectedRepublic) return;
     const republicName = selectedRepublic.nome;
     const republicId = selectedRepublic.id;
-    showToast.confirm(`Excluir "${republicName}"?`, () => {
-      deleteRepublic(republicId).then(() => {
+    showToast.confirm(`Excluir "${republicName}"?`, async () => {
+      try {
+        await deleteRepublic(republicId);
         setSelectedRepublic(null);
-        fetchRepublics();
-      });
+      } catch (error) {
+        logger.error(
+          "Republic",
+          "Erro ao excluir república",
+          error instanceof Error ? error : undefined
+        );
+        showToast.error(
+          getErrorMessage(error, "Não foi possível excluir a república.")
+        );
+      }
     });
-  }, [selectedRepublic, deleteRepublic, fetchRepublics]);
+  }, [selectedRepublic, deleteRepublic]);
 
   const [showInviteModal, setShowInviteModal] = useState(false);
 
@@ -184,17 +247,31 @@ export function useProfileScreen() {
   }, []);
 
   const handleCloseInviteModal = useCallback(() => {
+    resetSendInvite(); // reseta o erro da mutation
     setShowInviteModal(false);
-  }, []);
+  }, [resetSendInvite]);
 
   useEffect(() => {
-    if (!user?.perfilCompleto) return;
-    fetchRepublics();
-  }, [user?.perfilCompleto, fetchRepublics]);
+    if (!republicsError) {
+      return;
+    }
 
-  useEffect(() => {
-    return registerRefresh("profile", fetchRepublics);
-  }, [registerRefresh, fetchRepublics]);
+    showToast.error(
+      getErrorMessage(
+        republicsError,
+        "Não foi possível carregar as repúblicas."
+      )
+    );
+  }, [republicsError]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await refetchRepublics();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refetchRepublics]);
 
   const { menuItems, footerItems } = useSideMenu("profile", handleSignOut, {
     republics,

@@ -48,6 +48,9 @@ export default function Tabs({
           <TouchableOpacity
             key={tab.key}
             onPress={() => onChange(tab.key)}
+            accessibilityRole="button"
+            accessibilityLabel={`Selecionar aba ${tab.label}`}
+            accessibilityState={{ selected: isActive }}
             className={`flex-row items-center gap-[4px] rounded-full p-4 py-2 ${
               isActive ? "bg-white" : "bg-transparent"
             }`}

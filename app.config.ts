@@ -4,12 +4,12 @@ import path from "path";
 import { version } from "./package.json";
 
 /**
- * Carrega `.env.local` manualmente quando necessário (sem depender de dotenv)
+ * Carrega `.env` manualmente quando necessário (sem depender de dotenv)
  * Só carrega se `process.env.APP_ENV` não estiver definido e o arquivo existir.
  */
-(function loadLocalEnv() {
+(function loadEnv() {
   try {
-    const envPath = path.resolve(process.cwd(), ".env.local");
+    const envPath = path.resolve(process.cwd(), ".env");
 
     // ✅ Só carrega em DEV SERVER (expo start / metro)
     const isDevServer =
@@ -49,17 +49,17 @@ import { version } from "./package.json";
         }
       }
 
-      console.log("🔒 .env.local carregado (apenas dev server)");
+      console.log("🔒 .env carregado (apenas dev server)");
     }
   } catch (err) {
-    console.warn("⚠️ Falha ao carregar .env.local:", err);
+    console.warn("⚠️ Falha ao carregar .env:", err);
   }
 })();
 
 // EAS Project Info
-const EAS_PROJECT_ID = "04e033a1-b0fb-4572-9158-cfefac3041cf";
+const EAS_PROJECT_ID = "024de3bb-27e4-4a7c-ac6f-e32a95eaa23a";
 const PROJECT_SLUG = "kontas";
-const OWNER = "warlleyrocha";
+const OWNER = "kontas";
 
 // App production config
 const APP_NAME = "Kontas";
@@ -132,8 +132,13 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       [
         "@react-native-google-signin/google-signin",
         {
-          iosUrlScheme:
-            "com.googleusercontent.apps.475215012202-oq93e4s85f7uuhfji6k2nkhdb7i2dfm3",
+          iosUrlScheme: `com.googleusercontent.apps.${process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID?.split(".")[0]}`,
+        },
+      ],
+      [
+        "expo-secure-store",
+        {
+          configureAndroidBackup: true,
         },
       ],
     ],
@@ -142,6 +147,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       reactCompiler: true,
     },
     extra: {
+      env: appEnv,
       router: {},
       eas: {
         projectId: EAS_PROJECT_ID,

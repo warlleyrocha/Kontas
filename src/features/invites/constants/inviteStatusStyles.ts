@@ -32,8 +32,8 @@ export const INVITE_STATUS_STYLES: Record<StatusInvite, InviteStatusStyle> = {
   },
   [StatusInvite.ACEITO]: {
     badgeColorClass: "bg-green-100",
-    textColorClass: "text-green-800",
-    iconColor: "#10B981",
+    textColorClass: "text-teal",
+    iconColor: "#337176",
     iconName: "checkmark-circle-outline",
     label: "Aceito",
   },

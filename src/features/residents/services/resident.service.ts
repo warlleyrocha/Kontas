@@ -1,3 +1,4 @@
+import { isAxiosError } from "axios";
 import { api } from "@/src/services/api";
 import { toUserFriendlyError } from "@/src/services/httpError";
 import {
@@ -26,13 +27,20 @@ export const residentService = {
   },
 
   // Método para obter a lista de moradores
-  getResidents: async (id: string): Promise<ResidentResponse[]> => {
+  getResidents: async (
+    id: string,
+    signal?: AbortSignal
+  ): Promise<ResidentResponse[]> => {
     try {
       const response = await api.get<ResidentResponse[]>(
-        `/moradores/republica/${id}`
+        `/moradores/republica/${id}`,
+        { signal }
       );
       return response.data;
     } catch (error) {
+      if (isAxiosError(error) && error.code === "ERR_CANCELED") {
+        throw error;
+      }
       throw toUserFriendlyError(error, {
         defaultMessage: "Erro ao obter moradores.",
         statusMessages: {

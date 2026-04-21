@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import useEditRepublicModal from "@/src/features/republic/hooks/useEditRepublicModal";
 
 interface EditRepublicModalProps {
@@ -50,11 +51,12 @@ export const EditRepublicModal: FC<EditRepublicModalProps> = ({
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
-      <View className=" flex-1 justify-end bg-black/40">
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-        >
-          <View className="rounded-xl bg-white px-6 py-6">
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <View className=" flex-1 justify-end bg-black/40">
+          <SafeAreaView className="rounded-xl bg-white px-6 py-6">
             {/* Header */}
             <View className="mb-6 flex-row items-center justify-between">
               <Text className="text-lg font-semibold">Editar República</Text>
@@ -100,7 +102,7 @@ export const EditRepublicModal: FC<EditRepublicModalProps> = ({
             </View>
 
             {/* Botões de Ação */}
-            <View className="flex-row gap-3 pb-6">
+            <View className="flex-row gap-3">
               <TouchableOpacity
                 onPress={salvar}
                 className="flex-1 items-center rounded-lg bg-teal py-3"
@@ -115,9 +117,9 @@ export const EditRepublicModal: FC<EditRepublicModalProps> = ({
                 <Text className="font-semibold text-gray-700">Cancelar</Text>
               </TouchableOpacity>
             </View>
-          </View>
-        </KeyboardAvoidingView>
-      </View>
+          </SafeAreaView>
+        </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };

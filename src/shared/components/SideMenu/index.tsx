@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { APP_INFO } from "@/src/shared/constants/app-info";
 import type { MenuItem, MenuSubItem } from "@/src/shared/types/sideMenu";
 import { useSideMenuAnimation } from "./useSideMenuAnimation";
 
@@ -61,6 +62,8 @@ function MenuSubItemComponent({ item, onClose }: MenuSubItemComponentProps) {
         item.active ? "bg-teal/10" : ""
       }`}
       onPress={handlePress}
+      accessibilityRole="button"
+      accessibilityLabel={item.label}
     >
       <View className="h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-teal/15">
         {item.image && !imageError ? (
@@ -71,9 +74,7 @@ function MenuSubItemComponent({ item, onClose }: MenuSubItemComponentProps) {
             onError={() => setImageError(true)}
           />
         ) : (
-          <Text className="text-sm font-semibold text-teal">
-            {itemInitial}
-          </Text>
+          <Text className="text-sm font-semibold text-teal">{itemInitial}</Text>
         )}
       </View>
 
@@ -97,6 +98,7 @@ function MenuItemComponent({
   onToggleExpand,
 }: MenuItemComponentProps) {
   const isExpandable = !!item.children;
+  const expandActionLabel = isExpanded ? "Recolher" : "Expandir";
 
   const handlePress = useCallback(() => {
     if (isExpandable) {
@@ -112,12 +114,18 @@ function MenuItemComponent({
 
   const iconColor = item.danger ? "#ef4444" : "#337176";
   const textClassName = `text-base ${item.danger ? "text-red-500" : "text-gray-700"}`;
+  const accessibilityLabel = isExpandable
+    ? `${expandActionLabel} ${item.label}`
+    : item.label;
 
   return (
     <View>
       <TouchableOpacity
         className="flex-row items-center px-4 py-3"
         onPress={handlePress}
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel}
+        accessibilityState={isExpandable ? { expanded: isExpanded } : undefined}
       >
         <Ionicons
           name={item.icon}
@@ -195,7 +203,11 @@ export function SideMenu({
   return (
     <Modal transparent animationType="none" onRequestClose={closeMenu}>
       <View className="flex-1 flex-row">
-        <TouchableWithoutFeedback onPress={closeMenu}>
+        <TouchableWithoutFeedback
+          onPress={closeMenu}
+          accessibilityRole="button"
+          accessibilityLabel="Fechar menu lateral"
+        >
           <Animated.View
             className="flex-1 bg-black/50"
             style={backdropAnimatedStyle}
@@ -296,6 +308,9 @@ export function SideMenu({
                     onToggleExpand={handleToggleExpand}
                   />
                 ))}
+                <Text className="px-4 py-2 text-[12px] font-mulish-medium text-gray-400 text-center">
+                  {APP_INFO}
+                </Text>
               </View>
             )}
           </SafeAreaView>
@@ -312,7 +327,15 @@ interface MenuButtonProps {
 
 export function MenuButton({ onPress, hasNotification }: MenuButtonProps) {
   return (
-    <TouchableOpacity onPress={onPress} className="p-2" activeOpacity={0.7}>
+    <TouchableOpacity
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={
+        hasNotification ? "Abrir menu com notificações" : "Abrir menu"
+      }
+      className="p-2"
+      activeOpacity={0.7}
+    >
       <Ionicons name="menu" size={28} color="#337176" />
       {hasNotification && (
         <View className="absolute right-1 top-1 h-3 w-3 rounded-full bg-yellow-400" />

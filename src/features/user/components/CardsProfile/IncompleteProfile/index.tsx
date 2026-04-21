@@ -12,9 +12,7 @@ export default function IncompleteProfile({
       <View className="w-full max-w-md">
         <View className="rounded-3xl bg-white p-8 shadow-2xl shadow-gray-900/5">
           <View className="mb-4 self-start rounded-full bg-teal/10 px-4 py-2">
-            <Text className="text-xs font-semibold text-teal">
-              QUASE LÁ!
-            </Text>
+            <Text className="text-xs font-semibold text-teal">QUASE LÁ!</Text>
           </View>
 
           <Text className="mb-3 text-2xl font-bold leading-tight text-gray-900">
@@ -28,6 +26,8 @@ export default function IncompleteProfile({
 
           <TouchableOpacity
             onPress={onContinue}
+            accessibilityRole="button"
+            accessibilityLabel="Continuar configuração do perfil"
             className="w-full overflow-hidden rounded-2xl bg-teal px-6 py-4 shadow-lg hover:shadow-teal/30 active:scale-95"
             activeOpacity={0.9}
           >

@@ -1,47 +1,71 @@
 import Feather from "@expo/vector-icons/Feather";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  Modal,
   RefreshControl,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-
-import {
-  AccountSection,
-  AddAccountButton,
-  AddAccountModal,
-} from "@/src/features/accounts/components";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   AccountContextMenu,
   type CardPosition,
 } from "@/src/features/accounts/components/AccountContextMenu";
+import AddAccountModal from "@/src/features/accounts/components/create/AddAccountModal";
+import { AccountSection } from "@/src/features/accounts/components/list/AccountSection";
 import { useAccountsTab } from "@/src/features/accounts/hooks/useAccountsTab";
+import type { Conta } from "@/src/features/accounts/types/account.types";
 import { StatusPagamento } from "@/src/features/accounts/types/accountResidents.types";
 import { getMoradorStatusVisual } from "@/src/features/accounts/utils/accountStatus.utils";
+import { useTabResidents } from "@/src/features/residents/hooks/useTabResidents";
+import { PlusButton } from "@/src/shared/components/PlusButton";
+import { ToastConfirm } from "@/src/shared/components/ui/toast-custom";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
+import type { ResidentResponse } from "@/src/shared/types/resident.types";
 import { formatMounthYear } from "@/src/shared/utils/formats";
+import { showToast } from "@/src/shared/utils/showToast";
 
 interface AccountsTabProps {
   readonly republicId: string;
   readonly currentResidentId: string | null;
+  readonly residents: ResidentResponse[];
   readonly isAdmin?: boolean;
   readonly onPendingPaymentsCountChange?: (count: number) => void;
+  readonly onCurrentUserCreatedAccountChange?: (hasCreated: boolean) => void;
 }
 
 export function AccountsTab({
   republicId,
   currentResidentId,
+  residents,
   isAdmin = false,
   onPendingPaymentsCountChange,
+  onCurrentUserCreatedAccountChange,
 }: AccountsTabProps) {
   useComponentLogger("AccountsTab");
+  const { copiarChavePix } = useTabResidents();
+
+  const handleCopyPixFromAccount = useCallback(
+    async (conta: Conta) => {
+      const morador = residents.find((r) => r.id === conta.criadoPorId);
+      if (!morador) {
+        showToast.error("Não foi possível localizar o responsável pela conta.");
+        return false;
+      }
+
+      return copiarChavePix(morador);
+    },
+    [residents, copiarChavePix]
+  );
+
   const {
     accountResidentsById,
     closeAccountModal,
     confirmResidentPayment,
+    contas,
     contasOrdenadas,
     error,
     errorResidentsById,
@@ -51,6 +75,7 @@ export function AccountsTab({
     handleSubmit,
     handleToggleExpand,
     hasNoAccounts,
+    isSubmitting,
     loading,
     loadingResidentsById,
     mesSelecionado,
@@ -71,11 +96,17 @@ export function AccountsTab({
     position: CardPosition | null;
   }>({ visible: false, accountId: null, position: null });
 
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    visible: boolean;
+    accountId: string | null;
+    descricao: string;
+  }>({ visible: false, accountId: null, descricao: "" });
+
   const handleAccountLongPress = useCallback(
     (accountId: string, position: CardPosition) => {
       setContextMenu({ visible: true, accountId, position });
     },
-    [],
+    []
   );
 
   const handleContextMenuClose = useCallback(() => {
@@ -84,30 +115,60 @@ export function AccountsTab({
 
   const handleContextMenuDelete = useCallback(() => {
     handleContextMenuClose();
-    if (contextMenu.accountId) {
-      void handleDelete(contextMenu.accountId);
-    }
-  }, [contextMenu.accountId, handleContextMenuClose, handleDelete]);
+    if (!contextMenu.accountId) return;
+    const accountId = contextMenu.accountId;
+    const conta =
+      contasOrdenadas.abertas.find((c) => c.id === accountId) ??
+      contasOrdenadas.pagas.find((c) => c.id === accountId);
+    setDeleteConfirm({
+      visible: true,
+      accountId,
+      descricao: conta?.descricao ?? "esta conta",
+    });
+  }, [contextMenu.accountId, contasOrdenadas, handleContextMenuClose]);
+
+  const isContextMenuOwner = useMemo(() => {
+    const account =
+      contasOrdenadas.abertas.find((c) => c.id === contextMenu.accountId) ??
+      contasOrdenadas.pagas.find((c) => c.id === contextMenu.accountId);
+    return account?.criadoPorId === currentResidentId;
+  }, [contextMenu.accountId, contasOrdenadas, currentResidentId]);
 
   const { refreshing, onRefresh } = useRefresh();
-  const pendingPaymentsCount = useMemo(
-    () =>
-      Object.values(accountResidentsById).reduce(
-        (total, residents) =>
+  const pendingPaymentsCount = useMemo(() => {
+    const ownedAccountIds = isAdmin
+      ? null
+      : new Set(
+          contas
+            .filter((c) => c.criadoPorId === currentResidentId)
+            .map((c) => c.id)
+        );
+
+    return Object.entries(accountResidentsById).reduce(
+      (total, [accountId, residents]) => {
+        if (ownedAccountIds && !ownedAccountIds.has(accountId)) return total;
+        return (
           total +
           residents.filter(
             (resident) =>
               getMoradorStatusVisual(resident) ===
               StatusPagamento.AGUARDANDO_CONFIRMACAO
-          ).length,
-        0
-      ),
-    [accountResidentsById]
-  );
+          ).length
+        );
+      },
+      0
+    );
+  }, [accountResidentsById, contas, currentResidentId, isAdmin]);
 
   useEffect(() => {
     onPendingPaymentsCountChange?.(pendingPaymentsCount);
   }, [onPendingPaymentsCountChange, pendingPaymentsCount]);
+
+  useEffect(() => {
+    if (!currentResidentId) return;
+    const hasCreated = contas.some((c) => c.criadoPorId === currentResidentId);
+    onCurrentUserCreatedAccountChange?.(hasCreated);
+  }, [contas, currentResidentId, onCurrentUserCreatedAccountChange]);
 
   if (loading) {
     return (
@@ -146,6 +207,8 @@ export function AccountsTab({
         <TouchableOpacity
           className="mt-6 items-center rounded-lg bg-white p-6 shadow-lg"
           onPress={openAccountModal}
+          accessibilityRole="button"
+          accessibilityLabel="Adicionar nova conta"
         >
           <Feather name="dollar-sign" size={48} color="#337176" />
           <Text className="mt-4 text-center text-gray-500">
@@ -160,6 +223,7 @@ export function AccountsTab({
             onSubmit={handleSubmit}
             onClose={closeAccountModal}
             republicId={republicId}
+            isSubmitting={isSubmitting}
           />
         )}
       </View>
@@ -170,6 +234,7 @@ export function AccountsTab({
     <View className="flex-1">
       <ScrollView
         contentContainerStyle={{ paddingVertical: 12, paddingBottom: 88 }}
+        showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
@@ -185,6 +250,9 @@ export function AccountsTab({
           >
             <TouchableOpacity
               onPress={() => setMesSelecionado("todos")}
+              accessibilityRole="button"
+              accessibilityLabel="Mostrar contas de todos os meses"
+              accessibilityState={{ selected: mesSelecionado === "todos" }}
               className={`rounded-full px-4 py-2 ${
                 mesSelecionado === "todos"
                   ? "bg-teal"
@@ -204,6 +272,9 @@ export function AccountsTab({
               <TouchableOpacity
                 key={mesAno}
                 onPress={() => setMesSelecionado(mesAno)}
+                accessibilityRole="button"
+                accessibilityLabel={`Mostrar contas de ${formatMounthYear(mesAno)}`}
+                accessibilityState={{ selected: mesSelecionado === mesAno }}
                 className={`rounded-full px-4 py-2 ${
                   mesSelecionado === mesAno
                     ? "bg-teal"
@@ -249,6 +320,7 @@ export function AccountsTab({
               onLongPress={handleAccountLongPress}
               onConfirmResidentPayment={confirmResidentPayment}
               onPatch={handlePatchAndRefresh}
+              onCopyPix={handleCopyPixFromAccount}
             />
 
             <AccountSection
@@ -269,12 +341,13 @@ export function AccountsTab({
               onLongPress={handleAccountLongPress}
               onConfirmResidentPayment={confirmResidentPayment}
               onPatch={handlePatchAndRefresh}
+              onCopyPix={handleCopyPixFromAccount}
             />
           </View>
         )}
       </ScrollView>
 
-      <AddAccountButton onPress={openAccountModal} />
+      <PlusButton onPress={openAccountModal} />
 
       {showAccountModal && (
         <AddAccountModal
@@ -282,6 +355,7 @@ export function AccountsTab({
           onSubmit={handleSubmit}
           onClose={closeAccountModal}
           republicId={republicId}
+          isSubmitting={isSubmitting}
         />
       )}
 
@@ -289,10 +363,34 @@ export function AccountsTab({
         visible={contextMenu.visible}
         position={contextMenu.position}
         isAdmin={isAdmin}
+        isOwner={isContextMenuOwner}
         onClose={handleContextMenuClose}
         onEdit={() => {}}
         onDelete={handleContextMenuDelete}
       />
+
+      <Modal
+        visible={deleteConfirm.visible}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+      >
+        <SafeAreaView className="flex-1 justify-end pb-[2px]">
+          <ToastConfirm
+            message={deleteConfirm.descricao}
+            duration={8000}
+            onConfirm={() => {
+              setDeleteConfirm((prev) => ({ ...prev, visible: false }));
+              if (deleteConfirm.accountId) {
+                void handleDelete(deleteConfirm.accountId);
+              }
+            }}
+            onCancel={() =>
+              setDeleteConfirm((prev) => ({ ...prev, visible: false }))
+            }
+          />
+        </SafeAreaView>
+      </Modal>
     </View>
   );
 }

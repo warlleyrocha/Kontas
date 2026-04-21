@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
-import { InviteModal } from "@/src/features/invites/components/InviteModal";
+import { InvitesModal } from "@/src/features/invites/components/InvitesModal";
 import { EditRepublicModal } from "@/src/features/republic/components/EditRepublicModal";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import EmptyRepublic from "@/src/features/user/components/CardsProfile/EmptyRepublic";
@@ -12,6 +12,7 @@ import { RepublicContextMenu } from "@/src/features/user/components/RepublicCont
 
 import { MenuButton, SideMenu } from "@/src/shared/components/SideMenu";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
+import { getInitials } from "@/src/shared/utils/getInitials";
 import { maskPhone } from "@/src/shared/utils/inputMasks";
 import { useProfileScreen } from "../hooks/useProfileScreen";
 
@@ -36,7 +37,7 @@ interface ProfileContentProps {
   readonly onSelectRepublic: (republicId: string) => void;
   readonly onLongPressRepublic: (
     republic: RepublicResponse,
-    position: CardPosition,
+    position: CardPosition
   ) => void;
   readonly onRefresh: () => void;
 }
@@ -140,7 +141,7 @@ export function ProfileScreen() {
             />
           ) : (
             <Text className="text-xl font-bold text-teal">
-              {user.nome?.charAt(0).toUpperCase() ?? "?"}
+              {user.nome ? getInitials(user.nome) : "?"}
             </Text>
           )}
         </View>
@@ -148,6 +149,8 @@ export function ProfileScreen() {
         <TouchableOpacity
           className="flex-1"
           onPress={() => setShowEditProfileModal(true)}
+          accessibilityRole="button"
+          accessibilityLabel={`Configurar perfil de ${user.nome ?? "usuário"}`}
         >
           <Text className="text-base font-semibold">
             {user.nome ?? "Sem nome"}
@@ -223,7 +226,7 @@ export function ProfileScreen() {
       />
 
       {/* MODAL CONVIDAR MORADOR */}
-      <InviteModal
+      <InvitesModal
         open={showInviteModal}
         onClose={handleCloseInviteModal}
         republicaId={selectedRepublic?.id ?? ""}

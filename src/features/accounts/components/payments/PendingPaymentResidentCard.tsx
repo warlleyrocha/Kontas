@@ -1,5 +1,5 @@
+import Feather from "@expo/vector-icons/Feather";
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
-
 import {
   type ContaMorador,
   StatusPagamento,
@@ -8,56 +8,31 @@ import {
   getMoradorStatusBadge,
   getMoradorStatusVisual,
 } from "@/src/features/accounts/utils/accountStatus.utils";
+import { formatPaymentMethodLabel } from "@/src/features/accounts/utils/paymentMethod.utils";
+import { formatCurrency } from "@/src/shared/utils/formats";
+import { getInitials } from "@/src/shared/utils/getInitials";
 
 interface PendingPaymentResidentCardProps {
   readonly accountId: string;
   readonly isConfirming: boolean;
+  readonly isRefusing: boolean;
   readonly onConfirmResidentPayment: (
     accountId: string,
     residentId: string
-  ) => Promise<void> | void;
+  ) => void;
+  readonly onRefuseResidentPayment: (
+    accountId: string,
+    residentId: string
+  ) => void;
   readonly resident: ContaMorador;
-}
-
-function formatCurrency(value: number) {
-  return `R$ ${value.toFixed(2).replace(".", ",")}`;
-}
-
-function getInitials(name: string) {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("");
-}
-
-function formatPaymentMethod(method: string | null) {
-  if (!method) {
-    return "Pagamento enviado para confirmação";
-  }
-
-  const normalized = method
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim()
-    .toUpperCase();
-
-  if (normalized === "CARTAO") {
-    return "Via Cartão";
-  }
-
-  if (normalized === "DINHEIRO") {
-    return "Via Dinheiro";
-  }
-
-  return `Via ${normalized}`;
 }
 
 export function PendingPaymentResidentCard({
   accountId,
   isConfirming,
+  isRefusing,
   onConfirmResidentPayment,
+  onRefuseResidentPayment,
   resident,
 }: PendingPaymentResidentCardProps) {
   const residentStatus = getMoradorStatusVisual(resident);
@@ -85,7 +60,7 @@ export function PendingPaymentResidentCard({
               </Text>
 
               <Text className="mt-1 text-xs text-gray-500">
-                {formatPaymentMethod(resident.metodoPagamento)}
+                {formatPaymentMethodLabel(resident.metodoPagamento)}
               </Text>
             </View>
           </View>
@@ -108,24 +83,56 @@ export function PendingPaymentResidentCard({
       </View>
 
       {!residentPaid && (
-        <TouchableOpacity
-          activeOpacity={0.85}
-          disabled={isConfirming}
-          onPress={async () => {
-            await onConfirmResidentPayment(accountId, resident.id);
-          }}
-          className={`mt-4 min-h-11 flex-row items-center justify-center rounded-full px-4 ${
-            isConfirming ? "bg-gray-300" : "bg-teal-dark"
-          }`}
-        >
-          {isConfirming ? (
-            <ActivityIndicator size="small" color="#FFFFFF" />
-          ) : (
-            <Text className="text-sm font-semibold text-white">
-              Marcar como PAGO
-            </Text>
-          )}
-        </TouchableOpacity>
+        <View className="mt-4 flex-row gap-3">
+          <TouchableOpacity
+            activeOpacity={0.85}
+            disabled={isRefusing || isConfirming}
+            onPress={() => {
+              onRefuseResidentPayment(accountId, resident.id);
+            }}
+            className={`min-h-11 flex-1 flex-row items-center border border-[#E53935] justify-center rounded-full px-4 bg-transparent ${
+              isRefusing ? "opacity-50" : "opacity-100"
+            }`}
+          >
+            {isRefusing ? (
+              <ActivityIndicator size="small" color="#E53935" />
+            ) : (
+              <View className="flex-row items-center justify-center gap-1">
+                <Feather name="x" size={16} color="#E53935" className="mr-1" />
+                <Text className="text-sm font-semibold text-[#E53935]">
+                  Recusar
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            activeOpacity={0.85}
+            disabled={isConfirming || isRefusing}
+            onPress={() => {
+              onConfirmResidentPayment(accountId, resident.id);
+            }}
+            className={`min-h-11 flex-1 flex-row items-center justify-center rounded-full px-4 bg-teal ${
+              isConfirming ? "opacity-50" : "opacity-100"
+            }`}
+          >
+            {isConfirming ? (
+              <ActivityIndicator size="small" color="#FFFFFF" />
+            ) : (
+              <View className="flex-row items-center justify-center gap-1">
+                <Feather
+                  name="check"
+                  size={16}
+                  color="#FFFFFF"
+                  className="mr-1"
+                />
+                <Text className="text-sm font-semibold text-white">
+                  Confirmar
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
       )}
     </View>
   );

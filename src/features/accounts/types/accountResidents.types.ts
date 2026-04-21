@@ -18,9 +18,14 @@ export interface ContaMorador {
 }
 
 // POST /contas-moradores
+export interface MoradorCustomizado {
+  moradorId: string;
+  valor: number;
+}
 export interface VincularMoradoresRequest {
   contaId: string;
-  moradorIds: string[];
+  moradorIds?: string[];
+  moradoresCustomizados?: MoradorCustomizado[];
   valorTotal: number;
 }
 
@@ -28,6 +33,7 @@ export interface ContaMoradorIdParams {
   id: string;
 }
 
-export interface AtualizarVisibilidadeContaMoradorRequest extends ContaMoradorIdParams {
+export interface AtualizarVisibilidadeContaMoradorRequest
+  extends ContaMoradorIdParams {
   visivel: boolean;
 }

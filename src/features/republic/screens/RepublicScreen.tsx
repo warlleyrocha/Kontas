@@ -2,7 +2,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useCallback, useMemo, useState } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { AccountsTab } from "@/src/features/accounts";
-import { useInvitesByRepublicQuery } from "@/src/features/invites/contexts/InvitesContext";
+import { useInvitesByRepublicQuery } from "@/src/features/invites/hooks/useInvitesQueries";
 import { StatusInvite } from "@/src/features/invites/types/invite.types";
 import { EditRepublicModal } from "@/src/features/republic/components/EditRepublicModal";
 import { ResidentsTab } from "@/src/features/residents";
@@ -43,6 +43,8 @@ export function RepublicScreen({ republicId }: Props) {
   const [pendingPaymentsByRepublic, setPendingPaymentsByRepublic] = useState<
     Record<string, number>
   >({});
+  const [currentUserCreatedAccount, setCurrentUserCreatedAccount] =
+    useState(false);
 
   const invitesSentQuery = useInvitesByRepublicQuery(republicId);
 
@@ -79,6 +81,7 @@ export function RepublicScreen({ republicId }: Props) {
     currentUserRole,
     pendingInvitesSentCount,
     pendingPaymentsCount,
+    currentUserHasCreatedAccount: currentUserCreatedAccount,
   });
 
   if (isLoading) {
@@ -116,8 +119,10 @@ export function RepublicScreen({ republicId }: Props) {
           <AccountsTab
             republicId={republicId}
             currentResidentId={currentResidentId}
+            residents={residents}
             isAdmin={currentUserRole === ResidentRole.ADMIN}
             onPendingPaymentsCountChange={handlePendingPaymentsCountChange}
+            onCurrentUserCreatedAccountChange={setCurrentUserCreatedAccount}
           />
         )}
         {tab === "moradores" && (

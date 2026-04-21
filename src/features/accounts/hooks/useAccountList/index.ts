@@ -1,9 +1,16 @@
-// orquestrador, interface pública inalterada
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useId, useMemo, useState } from "react";
 
-import { useCallback, useEffect, useId } from "react";
+import { getErrorMessage } from "@/src/services/httpError";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
-import { useAccountResidents } from "../useAccountResidents";
-import { useAccountData } from "./useAccountData";
+import { showToast } from "@/src/shared/utils/showToast";
+import { accountKeys } from "../account.keys";
+import { accountResidentKeys } from "../accountResident.keys";
+import {
+  useAccountResidentsByAccountQueries,
+  useAccountsByRepublicQuery,
+  useConfirmResidentPaymentMutation,
+} from "../useAccountQueries";
 import { useAccountDerivedData } from "./useAccountDerivedData";
 import { useAccountFilters } from "./useAccountFilters";
 
@@ -13,8 +20,18 @@ interface UseAccountListProps {
 
 export function useAccountList({ republicId }: UseAccountListProps) {
   const refreshRegistrationId = useId();
-  const { contas, loading, error, fetchAccounts, fetchAccountResidents } =
-    useAccountData({ republicId });
+  const queryClient = useQueryClient();
+  const accountsQuery = useAccountsByRepublicQuery(republicId);
+  const confirmResidentPaymentMutation = useConfirmResidentPaymentMutation();
+  const contas = useMemo(() => accountsQuery.data ?? [], [accountsQuery.data]);
+  const accountIds = useMemo(() => contas.map((conta) => conta.id), [contas]);
+  const residentQueries = useAccountResidentsByAccountQueries(
+    republicId,
+    accountIds
+  );
+  const [updatingResidentById, setUpdatingResidentById] = useState<
+    Record<string, boolean>
+  >({});
 
   const {
     mesSelecionado,
@@ -30,23 +47,16 @@ export function useAccountList({ republicId }: UseAccountListProps) {
     mesSelecionado,
   });
 
-  const {
-    accountResidentsById,
-    loadingResidentsById,
-    errorResidentsById,
-    updatingResidentById,
-    loadResidents,
-    confirmResidentPayment,
-  } = useAccountResidents({ fetchAccountResidents });
-
   const refresh = useCallback(async () => {
-    const data = await fetchAccounts();
-    await loadResidents(data);
-  }, [fetchAccounts, loadResidents]);
-
-  useEffect(() => {
-    void refresh();
-  }, [refresh]);
+    await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: accountKeys.byRepublic(republicId),
+      }),
+      queryClient.invalidateQueries({
+        queryKey: accountResidentKeys.byRepublic(republicId),
+      }),
+    ]);
+  }, [queryClient, republicId]);
 
   const { registerRefresh } = useRefresh();
 
@@ -55,25 +65,102 @@ export function useAccountList({ republicId }: UseAccountListProps) {
       `accounts-${republicId}-${refreshRegistrationId}`,
       refresh
     );
-  }, [refreshRegistrationId, registerRefresh, republicId, refresh]);
+  }, [refresh, refreshRegistrationId, registerRefresh, republicId]);
+
+  const accountResidentsById = useMemo(
+    () =>
+      Object.fromEntries(
+        accountIds.map((accountId, index) => [
+          accountId,
+          residentQueries.data[index] ?? [],
+        ])
+      ),
+    [accountIds, residentQueries.data]
+  );
+
+  const loadingResidentsById = useMemo(
+    () =>
+      Object.fromEntries(
+        accountIds.map((accountId, index) => {
+          const queryData = residentQueries.data[index];
+          return [
+            accountId,
+            Boolean(
+              residentQueries.isLoading ||
+                (!queryData && !residentQueries.errors[index])
+            ),
+          ];
+        })
+      ),
+    [
+      accountIds,
+      residentQueries.data,
+      residentQueries.isLoading,
+      residentQueries.errors,
+    ]
+  );
+
+  const errorResidentsById = useMemo(
+    () =>
+      Object.fromEntries(
+        accountIds
+          .map((accountId, index) => [
+            accountId,
+            Boolean(residentQueries.errors[index]),
+          ])
+          .filter(([, hasError]) => hasError)
+      ),
+    [accountIds, residentQueries.errors]
+  );
+
+  const confirmResidentPayment = useCallback(
+    async (accountId: string, accountResidentId: string) => {
+      if (updatingResidentById[accountResidentId]) {
+        return;
+      }
+
+      setUpdatingResidentById((current) => ({
+        ...current,
+        [accountResidentId]: true,
+      }));
+
+      try {
+        await confirmResidentPaymentMutation.mutateAsync({
+          accountId,
+          accountResidentId,
+        });
+        showToast.success("Pagamento enviado para confirmação");
+      } catch (error) {
+        showToast.error(
+          getErrorMessage(
+            error,
+            "Não foi possível enviar confirmação do pagamento"
+          )
+        );
+      } finally {
+        setUpdatingResidentById((current) => {
+          const nextState = { ...current };
+          delete nextState[accountResidentId];
+          return nextState;
+        });
+      }
+    },
+    [confirmResidentPaymentMutation, updatingResidentById]
+  );
 
   return {
-    // Estado
-    loading,
-    error,
-    // Ação pública
+    loading: accountsQuery.isLoading,
+    error: accountsQuery.error instanceof Error ? accountsQuery.error : null,
     refresh,
-    // Filtros
+    contas,
     mesSelecionado,
     mostrarContasAbertas,
     mostrarContasPagas,
     setMesSelecionado,
     setMostrarContasAbertas,
     setMostrarContasPagas,
-    // Dados derivados
     mesesDisponiveis,
     contasOrdenadas,
-    // Residents
     accountResidentsById,
     loadingResidentsById,
     errorResidentsById,

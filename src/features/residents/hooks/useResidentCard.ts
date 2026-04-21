@@ -1,19 +1,23 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+import { residentCopyFeedback } from "@/src/shared/constants/pixCopyFeedback";
+import { useCopyFeedback } from "@/src/shared/hooks/useCopyFeedback";
 import type { ResidentResponse } from "@/src/shared/types/resident.types";
 
 export function useResidentCard(
   morador: ResidentResponse,
-  onCopyPix: (morador: ResidentResponse) => void
+  onCopyPix: (morador: ResidentResponse) => boolean | Promise<boolean>
 ) {
   const [expanded, setExpanded] = useState(false);
-  const [copiado, setCopiado] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { handleCopy, copyFeedback } = useCopyFeedback(
+    () => onCopyPix(morador),
+    residentCopyFeedback
+  );
   const animatedHeight = useSharedValue(0);
   const animatedOpacity = useSharedValue(0);
   const animatedStyle = useAnimatedStyle(
@@ -25,12 +29,6 @@ export function useResidentCard(
     [animatedHeight, animatedOpacity]
   );
 
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, []);
-
   function toggleExpanded() {
     const nextExpanded = !expanded;
     setExpanded(nextExpanded);
@@ -40,19 +38,14 @@ export function useResidentCard(
     animatedOpacity.value = withTiming(nextExpanded ? 1 : 0, { duration: 250 });
   }
 
-  function handleCopyPix() {
-    onCopyPix(morador);
-    setCopiado(true);
-    timeoutRef.current = setTimeout(() => setCopiado(false), 2000);
-  }
-
   return {
     expanded,
-    copiado,
+    handleCopyPix: handleCopy,
+    copyFeedback,
     imageError,
     animatedStyle,
     toggleExpanded,
-    handleCopyPix,
+
     setImageError,
   };
 }

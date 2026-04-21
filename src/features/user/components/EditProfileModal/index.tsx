@@ -1,6 +1,7 @@
 import Feather from "@expo/vector-icons/Feather";
 import type { FC } from "react";
 import {
+  ActivityIndicator,
   Image,
   KeyboardAvoidingView,
   Modal,
@@ -10,13 +11,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { maskPhoneWrite } from "@/src/shared/utils/inputMasks";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { maskPhoneWrite, maskPixKeyWrite } from "@/src/shared/utils/inputMasks";
 import {
   EditProfileFormValues,
   useEditProfile,
 } from "../../hooks/useEditProfile";
 
-export interface EditProfileModalProps extends EditProfileFormValues {
+interface EditProfileModalProps extends EditProfileFormValues {
   visible: boolean;
   currentPhone?: string;
 }
@@ -50,6 +52,15 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
     onClose,
     onSave,
   });
+
+  function getPixKeyType(value: string): string {
+    if (!value) return "";
+    if (value.includes("@")) return "E-mail";
+    if (value.startsWith("+")) return "Telefone";
+    if (/[a-zA-Z]/.test(value)) return "Chave aleatória";
+    const digits = value.replace(/\D/g, "");
+    return digits.length <= 11 ? "CPF" : "CNPJ";
+  }
   return (
     <Modal visible={visible} animationType="slide" transparent>
       <KeyboardAvoidingView
@@ -57,7 +68,7 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <View className="flex-1 justify-end bg-black/40">
-          <View className="rounded-xl bg-white px-6 py-6">
+          <SafeAreaView className="rounded-xl bg-white px-6 py-6">
             {/* Header */}
             <View className="mb-6 flex-row items-center justify-between">
               <Text className="text-lg font-semibold">Editar Perfil</Text>
@@ -66,6 +77,8 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
             {/* Foto do Perfil */}
             <TouchableOpacity
               onPress={selectPhoto}
+              accessibilityRole="button"
+              accessibilityLabel="Alterar foto de perfil"
               className="mb-6 items-center"
             >
               <View className="h-28 w-28 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-teal/40 bg-teal/10">
@@ -119,30 +132,47 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
               </Text>
               <TextInput
                 value={pixKey}
-                onChangeText={setPixKey}
-                placeholder="Sua chave Pix"
+                onChangeText={(t) => setPixKey(maskPixKeyWrite(t))}
+                placeholder="CPF, CNPJ, telefone, e-mail ou chave aleatória"
+                keyboardType="default"
+                autoCapitalize="none"
+                autoCorrect={false}
                 className="rounded-lg border border-gray-300 bg-white px-4 py-3"
                 editable={!isUploading}
               />
+              {pixKey ? (
+                <Text className="mt-1 text-xs text-teal">
+                  {getPixKeyType(pixKey)}
+                </Text>
+              ) : null}
             </View>
 
             {/* Botões de Ação */}
             <View className="flex-row gap-3">
               <TouchableOpacity
                 onPress={handleSave}
-                className="flex-1 items-center rounded-lg bg-teal py-3"
+                disabled={isUploading}
+                accessibilityRole="button"
+                accessibilityLabel="Salvar perfil"
+                className={`flex-1 items-center rounded-lg bg-teal py-3 ${isUploading ? "opacity-60" : ""}`}
               >
-                <Text className="font-semibold text-white">Salvar</Text>
+                {isUploading ? (
+                  <ActivityIndicator size="small" color="white" />
+                ) : (
+                  <Text className="font-semibold text-white">Salvar</Text>
+                )}
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={handleClose}
+                accessibilityRole="button"
+                accessibilityLabel="Cancelar edição de perfil"
                 className="flex-1 items-center rounded-lg border border-gray-300 bg-white py-3"
               >
                 <Text className="font-semibold text-gray-700">Cancelar</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </SafeAreaView>
         </View>
       </KeyboardAvoidingView>
     </Modal>

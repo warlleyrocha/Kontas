@@ -1,43 +1,80 @@
-// hooks/useRepublicActions.ts
-
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { useRepublicList } from "@/src/features/republic/hooks/useRepublicList";
+import {
+  buildRepublicChanges,
+  isLocalPhotoUri,
+} from "@/src/shared/utils/helpers";
 import { showToast } from "@/src/shared/utils/showToast";
-import { republicService } from "../services/republic.service";
-import type { RepublicPost } from "../types/republic.types";
+import type { RepublicPost, RepublicResponse } from "../types/republic.types";
+import {
+  useCreateRepublicMutation,
+  useDeleteRepublicMutation,
+  useUpdateRepublicMutation,
+  useUploadRepublicImageMutation,
+} from "./useRepublicQueries";
 
 export function useRepublicActions() {
   const router = useRouter();
-  const { setRepublics } = useRepublicList();
   const [showEditModal, setShowEditModal] = useState(false);
+  const createRepublicMutation = useCreateRepublicMutation();
+  const updateRepublicMutation = useUpdateRepublicMutation();
+  const deleteRepublicMutation = useDeleteRepublicMutation();
+  const uploadRepublicImageMutation = useUploadRepublicImageMutation();
 
   async function createRepublic(data: RepublicPost) {
-    const republic = await republicService.createRepublic(data);
-    setRepublics((current) => {
-      if (current.some((item) => item.id === republic.id)) {
-        return current;
-      }
-      return [...current, republic];
-    });
+    const republic = await createRepublicMutation.mutateAsync(data);
+
+    const result =
+      data.imagemRepublica && isLocalPhotoUri(data.imagemRepublica)
+        ? await uploadRepublicImageMutation.mutateAsync({
+            id: republic.id,
+            uri: data.imagemRepublica,
+          })
+        : republic;
+
     showToast.success("República criada com sucesso");
     router.replace(`/(republics)/${republic.id}`);
-    return republic;
+    return result;
   }
 
-  async function updateRepublic(id: string, data: RepublicPost) {
-    const updatedRepublic = await republicService.updateRepublic(id, data);
-    setRepublics((current) =>
-      current.map((republic) =>
-        republic.id === id ? updatedRepublic : republic
-      )
-    );
+  async function updateRepublic(
+    id: string,
+    currentRepublic: RepublicResponse,
+    data: RepublicPost
+  ) {
+    const changes = buildRepublicChanges(currentRepublic, data);
+    const hasNewImage =
+      data.imagemRepublica && isLocalPhotoUri(data.imagemRepublica);
+
+    // Nada mudou
+    if (Object.keys(changes).length === 0 && !hasNewImage) {
+      return currentRepublic;
+    }
+
+    let updatedRepublic = currentRepublic;
+
+    // Atualizar nome se mudou
+    if (changes.nome) {
+      updatedRepublic = await updateRepublicMutation.mutateAsync({
+        id,
+        data: changes,
+      });
+    }
+
+    // Upload imagem se mudou
+    if (hasNewImage) {
+      updatedRepublic = await uploadRepublicImageMutation.mutateAsync({
+        id: updatedRepublic.id,
+        uri: data.imagemRepublica!,
+      });
+    }
+
     showToast.success("República atualizada");
+    return updatedRepublic;
   }
 
   async function deleteRepublic(id: string) {
-    await republicService.deleteRepublic(id);
-    setRepublics((current) => current.filter((republic) => republic.id !== id));
+    await deleteRepublicMutation.mutateAsync(id);
     showToast.success("República removida");
   }
 
@@ -47,5 +84,7 @@ export function useRepublicActions() {
     deleteRepublic,
     showEditModal,
     setShowEditModal,
+    isCreating:
+      createRepublicMutation.isPending || uploadRepublicImageMutation.isPending,
   };
 }

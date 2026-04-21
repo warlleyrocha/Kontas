@@ -11,6 +11,7 @@ interface UseAccountsTabParams {
 export function useAccountsTab({ republicId }: UseAccountsTabParams) {
   const {
     refresh,
+    contas,
     contasOrdenadas,
     mesesDisponiveis,
     mesSelecionado,
@@ -35,6 +36,7 @@ export function useAccountsTab({ republicId }: UseAccountsTabParams) {
   const {
     showAccountModal,
     setShowAccountModal,
+    isSubmitting,
     handleSubmit,
     handleDelete,
     handlePatch,
@@ -59,9 +61,8 @@ export function useAccountsTab({ republicId }: UseAccountsTabParams) {
   const handlePatchAndRefresh = useCallback(
     async (accountId: string, metodoPagamento: MetodoPagamento) => {
       await handlePatch(accountId, metodoPagamento);
-      await refresh();
     },
-    [handlePatch, refresh]
+    [handlePatch]
   );
 
   const hasNoAccounts =
@@ -71,6 +72,7 @@ export function useAccountsTab({ republicId }: UseAccountsTabParams) {
     accountResidentsById,
     closeAccountModal,
     confirmResidentPayment,
+    contas,
     contasOrdenadas,
     error,
     errorResidentsById,
@@ -80,6 +82,7 @@ export function useAccountsTab({ republicId }: UseAccountsTabParams) {
     handleSubmit,
     handleToggleExpand,
     hasNoAccounts,
+    isSubmitting,
     loading,
     loadingResidentsById,
     mesSelecionado,

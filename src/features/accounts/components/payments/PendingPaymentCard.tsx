@@ -6,22 +6,23 @@ import type {
   PaymentAccount,
   PaymentStatusFilter,
 } from "@/src/features/accounts/types/payments.types";
-import { formatDate } from "@/src/shared/utils/formats";
+import { formatCurrency, formatDate } from "@/src/shared/utils/formats";
 
 import { PendingPaymentResidentCard } from "./PendingPaymentResidentCard";
 
 interface PendingPaymentCardProps {
   readonly account: PaymentAccount;
   readonly confirmingResidentById: Record<string, boolean>;
+  readonly refusingResidentById: Record<string, boolean>;
   readonly onConfirmResidentPayment: (
     accountId: string,
     residentId: string
   ) => Promise<void> | void;
+  readonly onRefuseResidentPayment: (
+    accountId: string,
+    residentId: string
+  ) => Promise<void> | void;
   readonly selectedStatus: PaymentStatusFilter;
-}
-
-function formatCurrency(value: number) {
-  return `R$ ${value.toFixed(2).replace(".", ",")}`;
 }
 
 function getResidentsLabel(total: number) {
@@ -47,7 +48,9 @@ function getSectionTitle(selectedStatus: PaymentStatusFilter) {
 export function PendingPaymentCard({
   account,
   confirmingResidentById,
+  refusingResidentById,
   onConfirmResidentPayment,
+  onRefuseResidentPayment,
   selectedStatus,
 }: PendingPaymentCardProps) {
   const [expanded, setExpanded] = useState(false);
@@ -63,9 +66,15 @@ export function PendingPaymentCard({
             <Text className="text-xs font-semibold uppercase tracking-wide text-teal-dark/60">
               Pagamento
             </Text>
+
             <Text className="mt-2 text-xl font-semibold text-[#111827]">
               {account.descricao}
             </Text>
+            <View className="pt-[2px]">
+              <Text className="text-xs text-teal">
+                Responsável: {account.criadoPorNome}
+              </Text>
+            </View>
             <View className="mt-4 flex-row flex-wrap gap-2">
               <View className="flex-row items-center gap-2 rounded-full bg-teal/5 px-3 py-2">
                 <Feather name="calendar" size={14} color="#337176" />
@@ -113,8 +122,10 @@ export function PendingPaymentCard({
                 key={resident.id}
                 accountId={account.id}
                 resident={resident}
-                isConfirming={Boolean(confirmingResidentById[resident.id])}
+                isConfirming={confirmingResidentById[resident.id] ?? false}
+                isRefusing={refusingResidentById[resident.id] ?? false}
                 onConfirmResidentPayment={onConfirmResidentPayment}
+                onRefuseResidentPayment={onRefuseResidentPayment}
               />
             ))}
           </View>

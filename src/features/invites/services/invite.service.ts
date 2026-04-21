@@ -1,6 +1,5 @@
 import { isAxiosError } from "axios";
 import {
-  GetInvitesByUser,
   Invite,
   InviteRequest,
   PatchInviteStatusResponse,
@@ -55,12 +54,10 @@ export const inviteService = {
   },
 
   // Método para listar convites por usuario
-  getInvitesByUser: async (
-    signal?: AbortSignal
-  ): Promise<GetInvitesByUser[]> => {
+  getInvitesByUser: async (signal?: AbortSignal): Promise<Invite[]> => {
     logger.info("Invites", "Buscando convites do usuário");
     try {
-      const response = await api.get<GetInvitesByUser[]>("/convites/me", {
+      const response = await api.get<Invite[]>("/convites/me", {
         signal,
       });
       return response.data;
@@ -68,7 +65,11 @@ export const inviteService = {
       if (isAxiosError(error) && error.code === "ERR_CANCELED") {
         throw error;
       }
-      logger.error("Invites", "Erro ao buscar convites do usuário", error instanceof Error ? error : undefined);
+      logger.error(
+        "Invites",
+        "Erro ao buscar convites do usuário",
+        error instanceof Error ? error : undefined
+      );
       throw toUserFriendlyError(error, {
         defaultMessage: "Erro ao obter convites.",
         statusMessages: {

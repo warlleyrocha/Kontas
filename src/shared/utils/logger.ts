@@ -1,40 +1,71 @@
 import * as Sentry from "@sentry/react-native";
 
-const IS_DEV = process.env.EXPO_PUBLIC_APP_ENV === "development";
+const IS_DEV =
+  __DEV__ || process.env.EXPO_PUBLIC_APP_ENV?.trim() === "development";
 
 export const logger = {
   /** Mensagens informativas — console.info */
   info(tag: string, msg: string, data?: unknown) {
-    if (IS_DEV) console.info(`[INFO][${tag}]`, msg, data !== undefined ? JSON.stringify(data, null, 2) : "");
+    if (IS_DEV)
+      console.info(
+        `[INFO][${tag}]`,
+        msg,
+        data !== undefined ? JSON.stringify(data, null, 2) : ""
+      );
   },
 
   /** Detalhes de baixo nível (payloads, estados internos) — console.debug */
   debug(tag: string, msg: string, data?: unknown) {
-    if (IS_DEV) console.debug(`[DEBUG][${tag}]`, msg, data !== undefined ? JSON.stringify(data, null, 2) : "");
+    if (IS_DEV)
+      console.debug(
+        `[DEBUG][${tag}]`,
+        msg,
+        data !== undefined ? JSON.stringify(data, null, 2) : ""
+      );
   },
 
   /** Alertas não críticos — console.warn + Sentry breadcrumb */
-  warn(tag: string, msg: string, data?: unknown) {
-    if (IS_DEV) console.warn(`[WARN][${tag}]`, msg, data !== undefined ? JSON.stringify(data, null, 2) : "");
+  warn(tag: string, msg: string, _data?: unknown) {
+    if (IS_DEV)
+      console.warn(
+        `[WARN][${tag}]`,
+        msg,
+        _data !== undefined ? JSON.stringify(_data, null, 2) : ""
+      );
     Sentry.addBreadcrumb({
       category: tag,
       message: msg,
       level: "warning",
-      data: data as Record<string, unknown>,
+      // Never send raw payload data to Sentry — scrubbed by beforeSend anyway,
+      // but keeping data out of breadcrumbs reduces attack surface.
     });
   },
 
   /** Erros e exceções — console.error + Sentry captureException */
-  error(tag: string, msg: string, error?: unknown, extra?: Record<string, unknown>) {
+  error(
+    tag: string,
+    msg: string,
+    error?: unknown,
+    _extra?: Record<string, unknown>
+  ) {
     if (IS_DEV) {
-      console.error(`[ERROR][${tag}]`, msg, error !== undefined ? JSON.stringify(error, Object.getOwnPropertyNames(error), 2) : "");
+      console.error(
+        `[ERROR][${tag}]`,
+        msg,
+        error !== undefined
+          ? JSON.stringify(error, Object.getOwnPropertyNames(error), 2)
+          : ""
+      );
       console.trace(`[TRACE][${tag}]`);
     }
     Sentry.withScope((scope) => {
       scope.setTag("module", tag);
-      if (extra) scope.setExtra("context", extra);
+      // Never send raw extra/context payloads to Sentry.
+      // All events are scrubbed by beforeSend in initSentry, but defense-in-
+      // depth: we simply don't attach arbitrary data here in the first place.
       const errorMessage = typeof error === "string" ? error : msg;
-      const exception = error instanceof Error ? error : new Error(errorMessage);
+      const exception =
+        error instanceof Error ? error : new Error(errorMessage);
       Sentry.captureException(exception);
     });
   },

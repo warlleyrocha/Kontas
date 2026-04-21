@@ -19,6 +19,5 @@ export function useComponentLogger(name: string) {
     return () => {
       logger.info(name, "unmounted");
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [name]);
 }

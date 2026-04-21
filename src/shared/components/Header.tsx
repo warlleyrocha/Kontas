@@ -8,9 +8,13 @@ interface HeaderProps {
 
 export default function Header({ title }: HeaderProps) {
   return (
-    <View className="mb-[24px] mt-[32px] px-4 py-[8px]">
+    <View className="mb-[24px] mt-[38px] px-5 py-[8px]">
       <View className="flex-row items-center justify-between">
-        <TouchableOpacity onPress={goBack}>
+        <TouchableOpacity
+          onPress={goBack}
+          accessibilityRole="button"
+          accessibilityLabel="Voltar para a tela anterior"
+        >
           <ArrowLeftIcon />
         </TouchableOpacity>
         <Text className=" font-inter-bold text-[20px] leading-[22px]">

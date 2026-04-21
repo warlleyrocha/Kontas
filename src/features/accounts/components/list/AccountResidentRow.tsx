@@ -4,6 +4,7 @@ import {
   ContaMorador,
   StatusPagamento,
 } from "@/src/features/accounts/types/accountResidents.types";
+import { formatBRL } from "@/src/shared/utils/formats";
 import {
   getMoradorStatusBadge,
   getMoradorStatusIcon,
@@ -89,7 +90,7 @@ export function AccountResidentRow({
           </Text>
           {morador.valor > 0 && (
             <Text className="mt-1 text-xs text-gray-500">
-              R$ {morador.valor.toFixed(2).replace(".", ",")}
+              R$ {formatBRL(morador.valor)}
             </Text>
           )}
         </View>

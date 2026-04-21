@@ -1,51 +1,102 @@
-# Terms of Use - Kontas
+# Termos de Uso — Kontas
 
-Last updated: 2026-02-03
+**Última atualização:** março de 2026
 
-## 1. Acceptance
+---
 
-By creating an account or using Kontas, you agree to these Terms of Use.
+## 1. Aceitação dos Termos
 
-## 2. Service scope
+Ao criar uma conta, acessar ou utilizar o aplicativo Kontas ("App"), você concorda com estes Termos de Uso. Se não concordar com qualquer parte destes termos, não utilize o App.
 
-Kontas provides tools to manage republic finances, residents, and account responsibilities.
+---
 
-## 3. User account
+## 2. Descrição do Serviço
 
-- You are responsible for account access and credentials.
-- You must provide accurate information.
-- You must not use the app for unlawful activity.
+O Kontas é um aplicativo mobile de gestão financeira colaborativa voltado para repúblicas e moradias compartilhadas. Ele permite que moradores organizem contas coletivas, acompanhem pagamentos individuais e gerenciem a divisão de despesas entre si.
 
-## 4. User responsibilities
+---
 
-- Keep your information up to date
-- Respect applicable law and third-party rights
-- Use the app in good faith
+## 3. Cadastro e Autenticação
 
-## 5. Intellectual property
+3.1. O acesso ao App é feito exclusivamente por meio de login com conta Google (OAuth). Ao autenticar-se, você autoriza o Kontas a receber seu nome, endereço de e-mail e foto de perfil fornecidos pelo Google.
 
-All rights related to software, branding, and platform content remain with Kontas or its licensors.
+3.2. Após o login, você deverá completar seu perfil com informações adicionais, como nome, telefone e chave Pix, necessárias para o funcionamento das funcionalidades colaborativas.
 
-## 6. Privacy and data protection
+3.3. Você é responsável pela veracidade das informações fornecidas e pela segurança do acesso à sua conta.
 
-Personal data processing follows our Privacy Policy available at the public URL informed in the app.
+---
 
-## 7. Availability and changes
+## 4. Funcionalidades e Regras de Uso
 
-We may change, suspend, or discontinue features when needed for legal, technical, or business reasons.
+### 4.1. Repúblicas
 
-## 8. Limitation of liability
+- Qualquer usuário pode criar uma república e se tornar seu administrador.
+- O administrador pode editar dados da república, gerenciar moradores, confirmar pagamentos e excluir a república.
+- A exclusão de uma república é irreversível e elimina todos os dados associados a ela.
 
-To the extent permitted by law, Kontas is not liable for indirect damages, lost profits, or damages resulting from misuse of the platform.
+### 4.2. Convites
 
-## 9. Suspension and termination
+- O administrador pode convidar novos moradores por e-mail.
+- O usuário convidado pode aceitar ou recusar o convite.
+- Ao aceitar um convite, seus dados de perfil (nome, e-mail, telefone e chave Pix) ficam visíveis para os demais moradores da república.
 
-Accounts may be suspended or terminated for Terms violations, fraud indicators, or legal obligations.
+### 4.3. Contas e Pagamentos
 
-## 10. Governing law
+- Contas compartilhadas podem ser cadastradas e associadas a moradores específicos.
+- Moradores podem marcar seus pagamentos como realizados; o administrador confirma o recebimento.
+- O administrador tem permissão exclusiva para remover contas da república.
 
-These terms are governed by the laws applicable to the service provider's jurisdiction, without prejudice to mandatory consumer rights.
+### 4.4. Dados de Contato e Pix
 
-## 11. Contact
+- Ao preencher telefone e chave Pix no perfil, você declara que esses dados são seus e que autoriza sua exibição para os demais moradores das repúblicas das quais faz parte.
+- O Kontas não realiza nem intermedia transações financeiras. A chave Pix é exibida apenas para facilitar a comunicação entre moradores.
 
-Legal contact: [LEGAL CONTACT EMAIL]
+---
+
+## 5. Responsabilidades do Usuário
+
+5.1. Você é o único responsável pelos pagamentos realizados fora do App, utilizando os dados de contato ou Pix de outros moradores.
+
+5.2. Não é permitido utilizar o App para fins ilegais, fraudulentos ou que prejudiquem outros usuários.
+
+5.3. Você concorda em não compartilhar sua conta com terceiros.
+
+---
+
+## 6. Responsabilidades do Kontas
+
+6.1. O Kontas emprega boas práticas de segurança, incluindo autenticação via token JWT, circuit breaker e monitoramento de erros com Sentry.
+
+6.2. O App é fornecido "como está". Não garantimos disponibilidade ininterrupta, sendo possível ocorrer indisponibilidades por manutenção ou falhas técnicas.
+
+6.3. O Kontas não se responsabiliza por disputas financeiras entre moradores, pagamentos realizados incorretamente ou uso indevido de dados de terceiros exibidos no App.
+
+---
+
+## 7. Propriedade Intelectual
+
+Todo o código, design, documentação associada e conteúdo do Kontas são de propriedade exclusiva da Éden. É proibida a reprodução, distribuição, modificação, sublicenciamento ou uso sem autorização prévia e expressa por escrito.
+
+---
+
+## 8. Encerramento de Conta
+
+Você pode solicitar a exclusão da sua conta a qualquer momento. Ao excluir sua conta, seus dados pessoais serão removidos, salvo quando houver obrigação legal de retenção ou quando os dados forem necessários para preservar obrigações de outros moradores da república.
+
+---
+
+## 9. Alterações nos Termos
+
+O Kontas pode atualizar estes Termos a qualquer momento. Notificações sobre mudanças relevantes serão exibidas no App. O uso continuado após a publicação de novos termos implica aceitação.
+
+---
+
+## 10. Legislação Aplicável
+
+Estes Termos são regidos pelas leis brasileiras. Fica eleito o foro da comarca de domicílio do desenvolvedor para resolução de eventuais conflitos.
+
+---
+
+## 11. Contato
+
+Dúvidas ou solicitações relacionadas a estes Termos podem ser enviadas para o desenvolvedor responsável pelo App.

@@ -12,6 +12,6 @@ export default function PaymentsRoute() {
   return <PaymentsScreen republicId={republicId} />;
 }
 
-export function ErrorBoundary(props: ErrorBoundaryProps) {
+export function ErrorBoundary(props: Readonly<ErrorBoundaryProps>) {
   return <RouteErrorFallback domain="Payments" {...props} />;
 }

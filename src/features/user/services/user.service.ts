@@ -1,6 +1,21 @@
 import { toUserFriendlyError } from "@/src/services/httpError";
+import { buildImageFormData } from "@/src/shared/utils/helpers";
+import { logger } from "@/src/shared/utils/logger";
 import { api } from "../../../services/api";
-import { UpdateUserRequest, User } from "../types/user.types";
+import {
+  CompleteProfileRequest,
+  UpdateUserRequest,
+  User,
+} from "../types/user.types";
+
+interface UploadPhotoApiResponse {
+  id: string;
+  nome: string;
+  email: string;
+  telefone: string;
+  chavePix: string;
+  fotoPerfil: string;
+}
 
 export const userService = {
   //Método para buscar dados
@@ -29,11 +44,62 @@ export const userService = {
 
       return response.data;
     } catch (error) {
-      console.error("❌ Erro ao atualizar perfil:", error);
+      logger.error(
+        "User",
+        "Erro ao atualizar perfil",
+        error instanceof Error ? error : undefined
+      );
       throw toUserFriendlyError(error, {
         defaultMessage: "Erro ao atualizar perfil.",
         statusMessages: {
           400: "Dados inválidos. Verifique os campos e tente novamente.",
+          401: "Sessão expirada. Faça login novamente.",
+          500: "Erro no servidor. Tente novamente mais tarde.",
+        },
+      });
+    }
+  },
+
+  completeProfile: async (data: CompleteProfileRequest): Promise<void> => {
+    try {
+      await api.post("/auth/completar-dados", data);
+    } catch (error) {
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao completar perfil.",
+        statusMessages: {
+          400: "Dados inválidos. Verifique os campos e tente novamente.",
+          401: "Sessão expirada. Faça login novamente.",
+          500: "Erro no servidor. Tente novamente mais tarde.",
+        },
+      });
+    }
+  },
+
+  uploadProfilePhoto: async (uri: string): Promise<UploadPhotoApiResponse> => {
+    try {
+      const { formData } = buildImageFormData(uri);
+
+      const response = await api.patch<UploadPhotoApiResponse>(
+        "/usuarios/foto-perfil",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      logger.error(
+        "User",
+        "Erro ao fazer upload da foto",
+        error instanceof Error ? error : undefined
+      );
+      throw toUserFriendlyError(error, {
+        defaultMessage: "Erro ao fazer upload da foto.",
+        statusMessages: {
+          400: "Imagem inválida. Escolha outra foto.",
           401: "Sessão expirada. Faça login novamente.",
           500: "Erro no servidor. Tente novamente mais tarde.",
         },

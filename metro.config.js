@@ -15,5 +15,11 @@ config.resolver = {
   sourceExts: [...config.resolver.sourceExts, "svg"],
 };
 
+config.resolver.blockList = [
+  /.*\/__test__\/.*/,
+  /.*\.test\.[jt]sx?$/,
+  /.*\.spec\.[jt]sx?$/,
+];
+
 // Envolve com nativewind
 module.exports = withNativeWind(config, { input: "./global.css" });

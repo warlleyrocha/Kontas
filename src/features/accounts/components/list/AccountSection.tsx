@@ -29,6 +29,7 @@ interface AccountSectionProps {
     accountId: string,
     metodoPagamento: MetodoPagamento
   ) => Promise<void> | void;
+  readonly onCopyPix: (conta: Conta) => boolean | Promise<boolean>;
 }
 
 export function AccountSection({
@@ -49,6 +50,7 @@ export function AccountSection({
   onLongPress,
   onConfirmResidentPayment,
   onPatch,
+  onCopyPix,
 }: AccountSectionProps) {
   if (contas.length === 0) {
     return null;
@@ -80,11 +82,13 @@ export function AccountSection({
             onToggleExpand={() => onToggleExpand(conta.id)}
             moradores={accountResidentsById[conta.id] ?? []}
             isLoadingMoradores={Boolean(loadingResidentsById[conta.id])}
+            hasError={Boolean(errorResidentsById[conta.id])}
             updatingResidentById={updatingResidentById}
             currentResidentId={currentResidentId}
             onLongPress={(position) => onLongPress(conta.id, position)}
             onConfirmResidentPayment={onConfirmResidentPayment}
             onPatch={onPatch}
+            onCopyPix={onCopyPix}
           />
         ))}
     </View>

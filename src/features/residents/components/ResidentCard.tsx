@@ -1,20 +1,21 @@
-import { Feather, Ionicons } from "@expo/vector-icons";
+import { Feather, FontAwesome } from "@expo/vector-icons";
 import type { FC } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, Linking, Text, TouchableOpacity, View } from "react-native";
 import Animated from "react-native-reanimated";
+import PixIcon from "@/assets/icons/pix-icon.svg";
 import { useResidentCard } from "@/src/features/residents/hooks/useResidentCard";
 import type { ResidentResponse } from "@/src/shared/types/resident.types";
 import { getInitials } from "@/src/shared/utils/getInitials";
 
 interface ResidentCardProps {
   morador: ResidentResponse;
-  onCopyPix: (morador: ResidentResponse) => void;
+  onCopyPix: (morador: ResidentResponse) => boolean | Promise<boolean>;
 }
 
 export const ResidentCard: FC<ResidentCardProps> = ({ morador, onCopyPix }) => {
   const {
     expanded,
-    copiado,
+    copyFeedback,
     imageError,
     animatedStyle,
     toggleExpanded,
@@ -78,21 +79,50 @@ export const ResidentCard: FC<ResidentCardProps> = ({ morador, onCopyPix }) => {
 
           <View className="mt-3 gap-3">
             <View>
-              <Text className="text-xs font-mulish-medium text-teal-dark/100">
-                Email
-              </Text>
-              <Text className="mt-1 text-sm text-[#111827]" numberOfLines={1}>
-                {morador.email || "Não informado"}
-              </Text>
+              {morador.email ? (
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => Linking.openURL(`mailto:${morador.email}`)}
+                  className="mt-1 flex-row items-center gap-2"
+                >
+                  <Feather name="mail" size={16} color="#337176" />
+                  <Text
+                    className="text-sm text-teal underline"
+                    numberOfLines={1}
+                  >
+                    {morador.email}
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <Text className="mt-1 text-sm text-[#111827]">
+                  Não informado
+                </Text>
+              )}
             </View>
 
             <View>
-              <Text className="text-xs font-mulish-medium text-teal-dark/100">
-                Telefone
-              </Text>
-              <Text className="mt-1 text-sm text-[#111827]" numberOfLines={1}>
-                {morador.telefone || "Não informado"}
-              </Text>
+              {morador.telefone ? (
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    const phone = morador.telefone!.replace(/\D/g, "");
+                    Linking.openURL(`https://wa.me/55${phone}`);
+                  }}
+                  className="mt-1 flex-row items-center gap-2"
+                >
+                  <FontAwesome name="whatsapp" size={16} color="#25D366" />
+                  <Text
+                    className="text-sm text-teal underline"
+                    numberOfLines={1}
+                  >
+                    {morador.telefone}
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <Text className="mt-1 text-sm text-[#111827]">
+                  Não informado
+                </Text>
+              )}
             </View>
           </View>
 
@@ -101,8 +131,9 @@ export const ResidentCard: FC<ResidentCardProps> = ({ morador, onCopyPix }) => {
           </Text>
 
           <View className=" flex-row items-center gap-3">
+            <PixIcon width={16} height={16} />
             <Text className="flex-1 text-sm text-[#111827]" numberOfLines={2}>
-              {morador.chavePix || "Não informado"}
+              {morador.chavePix ?? "Não informado"}
             </Text>
 
             {morador.chavePix ? (
@@ -110,16 +141,10 @@ export const ResidentCard: FC<ResidentCardProps> = ({ morador, onCopyPix }) => {
                 activeOpacity={0.85}
                 onPress={handleCopyPix}
                 accessibilityRole="button"
-                accessibilityLabel={
-                  copiado ? "Chave PIX copiada" : "Copiar chave PIX"
-                }
+                accessibilityLabel={copyFeedback.accessibilityLabel}
                 className="min-h-11 min-w-11 flex-row items-center justify-center rounded-full bg-white px-4"
               >
-                {copiado ? (
-                  <Ionicons name="checkmark" size={18} color="#16a34a" />
-                ) : (
-                  <Feather name="copy" size={18} color="#337176" />
-                )}
+                {copyFeedback.icon}
               </TouchableOpacity>
             ) : null}
           </View>

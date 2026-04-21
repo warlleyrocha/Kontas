@@ -1,7 +1,6 @@
 import { useRouter } from "expo-router";
 import { useCallback, useMemo } from "react";
 import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
-import { legalLinks, openLegalLink } from "@/src/shared/constants/legal";
 import { ResidentRole } from "@/src/shared/types/resident.types";
 import { MenuItem, UserMenuContext } from "@/src/shared/types/sideMenu";
 
@@ -15,6 +14,8 @@ interface SideMenuOptions {
   pendingInvitesSentCount?: number;
   /** Badge em "Pagamentos" — moradores aguardando confirmação do admin */
   pendingPaymentsCount?: number;
+  /** Morador criou pelo menos uma conta na república */
+  currentUserHasCreatedAccount?: boolean;
 }
 
 export function useSideMenu(
@@ -29,6 +30,7 @@ export function useSideMenu(
     pendingInvitesCount,
     pendingInvitesSentCount,
     pendingPaymentsCount,
+    currentUserHasCreatedAccount = false,
   } = options;
   const router = useRouter();
 
@@ -118,17 +120,16 @@ export function useSideMenu(
     };
 
     switch (context) {
-      case "home":
-        if (currentUserRole === ResidentRole.USER) {
-          return [base.profile, base.switchRepublic, base.invitesSent];
-        }
+      case "home": {
+        const showPayments =
+          currentUserRole !== ResidentRole.USER || currentUserHasCreatedAccount;
         return [
           base.profile,
           base.switchRepublic,
-
           base.invitesSent,
-          base.payments,
+          ...(showPayments ? [base.payments] : []),
         ];
+      }
 
       case "profile":
         return [base.invites];
@@ -139,6 +140,7 @@ export function useSideMenu(
   }, [
     context,
     currentUserRole,
+    currentUserHasCreatedAccount,
     pendingInvitesCount,
     pendingInvitesSentCount,
     pendingPaymentsCount,
@@ -155,18 +157,13 @@ export function useSideMenu(
         id: "termsOfUse",
         label: "Termos de Uso",
         icon: "document-text-outline" as const,
-        onPress: () =>
-          void openLegalLink(legalLinks.termsOfUse, "Termos de Uso"),
+        onPress: () => router.push("/terms-of-use"),
       },
       {
         id: "privacyPolicy",
         label: "Política de Privacidade",
         icon: "shield-checkmark-outline" as const,
-        onPress: () =>
-          void openLegalLink(
-            legalLinks.privacyPolicy,
-            "Política de Privacidade"
-          ),
+        onPress: () => router.push("/privacy-policy"),
       },
       {
         id: "logout",
@@ -176,7 +173,7 @@ export function useSideMenu(
         danger: true,
       },
     ],
-    [handleSignOut]
+    [handleSignOut, router]
   );
 
   return { menuItems, footerItems };

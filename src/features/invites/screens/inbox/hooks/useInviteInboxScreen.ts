@@ -1,0 +1,114 @@
+import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
+import { useCallback, useMemo, useState } from "react";
+
+import { useLogoutMutation } from "@/src/features/auth/hooks/useAuthMutations";
+import { StatusInvite } from "@/src/features/invites/types/invite.types";
+import { residentKeys } from "@/src/features/residents/hooks/resident.keys";
+import { useCurrentUserQuery } from "@/src/features/user/hooks/useUserQueries";
+import { getErrorMessage } from "@/src/services/httpError";
+import { useSideMenu } from "@/src/shared/components/SideMenu/useSideMenu";
+import { logger } from "@/src/shared/utils/logger";
+import { toastErrors } from "@/src/shared/utils/toastMessages";
+
+import {
+  useInvitesByUserQuery,
+  useUpdateInviteStatusMutation,
+} from "../../../hooks/useInvitesQueries";
+
+export function useInviteInboxScreen() {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const { data: user = null } = useCurrentUserQuery();
+  const { mutateAsync: logout } = useLogoutMutation();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const {
+    data: invitesByUserData,
+    error: invitesByUserError,
+    refetch: refetchInvitesByUser,
+  } = useInvitesByUserQuery();
+  const updateStatusMutation = useUpdateInviteStatusMutation();
+
+  const invitesByUser = useMemo(
+    () => invitesByUserData ?? [],
+    [invitesByUserData]
+  );
+  const pendingCount = useMemo(
+    () =>
+      invitesByUser.filter((i) => i.status === StatusInvite.PENDENTE).length,
+    [invitesByUser]
+  );
+
+  const handleSignOut = useCallback(async () => {
+    try {
+      await logout();
+    } catch (error) {
+      logger.error("Invites", "Erro ao fazer logout", error);
+      toastErrors.logoutFailed(error);
+    }
+  }, [logout]);
+
+  const fetchInvitesByUser = useCallback(async () => {
+    await refetchInvitesByUser();
+  }, [refetchInvitesByUser]);
+
+  const handleAcceptInvite = useCallback(
+    async (inviteId: string, republicaId: string) => {
+      try {
+        await updateStatusMutation.mutateAsync({
+          inviteId,
+          status: StatusInvite.ACEITO,
+        });
+        queryClient.invalidateQueries({
+          queryKey: residentKeys.byRepublic(republicaId),
+        });
+        router.replace(`/(republics)/${republicaId}`);
+      } catch (error) {
+        logger.error("Invites", "Erro ao aceitar convite", error);
+      }
+    },
+    [router, updateStatusMutation, queryClient]
+  );
+
+  const handleRejectInvite = useCallback(
+    async (inviteId: string) => {
+      try {
+        await updateStatusMutation.mutateAsync({
+          inviteId,
+          status: StatusInvite.RECUSADO,
+        });
+      } catch (error) {
+        logger.error("Invites", "Erro ao recusar convite", error);
+      }
+    },
+    [updateStatusMutation]
+  );
+
+  const rawError = invitesByUserError ?? updateStatusMutation.error;
+
+  const { menuItems, footerItems } = useSideMenu("invite", handleSignOut, {
+    pendingInvitesCount: pendingCount,
+  });
+
+  const sideMenuUser = useMemo(
+    () => ({ name: user?.nome ?? "Usuário", photo: user?.fotoPerfil }),
+    [user]
+  );
+
+  return {
+    isMenuOpen,
+    setIsMenuOpen,
+    invitesByUser,
+    fetchInvitesByUser,
+    handleAcceptInvite,
+    handleRejectInvite,
+    error: rawError
+      ? getErrorMessage(rawError, "Não foi possível carregar os convites.")
+      : null,
+    menuItems,
+    footerItems,
+    sideMenuUser,
+    pendingCount,
+  };
+}

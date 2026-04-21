@@ -1,48 +1,45 @@
-import { useCallback, useState } from "react";
-import { residentService } from "@/src/features/residents/services/resident.service";
-import { getErrorMessage } from "@/src/services/httpError";
-import { ResidentResponse } from "@/src/shared/types/resident.types";
-import { showToast } from "@/src/shared/utils/showToast";
+import { useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect } from "react";
 
-type UseResidentState = {
+import { useRefresh } from "@/src/shared/contexts/RefreshContext";
+import type { ResidentResponse } from "@/src/shared/types/resident.types";
+import { residentKeys } from "./resident.keys";
+import { useResidentsByRepublicQuery } from "./useResidentQueries";
+
+type UseResidentsReturn = {
   residents: ResidentResponse[];
   isLoading: boolean;
+  fetchResidents: () => Promise<ResidentResponse[] | null>;
 };
 
-type UseResidentActions = {
-  fetchResidents: (republicId: string) => Promise<ResidentResponse[] | null>;
-  setResidents: (residents: ResidentResponse[]) => void;
-};
+export function useResidents(republicId: string): UseResidentsReturn {
+  const queryClient = useQueryClient();
+  const {
+    data: residents = [],
+    isFetching,
+    refetch,
+  } = useResidentsByRepublicQuery(republicId);
 
-type UseResidentReturn = UseResidentState & UseResidentActions;
+  const fetchResidents = useCallback(async () => {
+    const result = await refetch();
+    return result.data ?? null;
+  }, [refetch]);
 
-export function useResidents(): UseResidentReturn {
-  const [residents, setResidents] = useState<ResidentResponse[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const refresh = useCallback(async () => {
+    await queryClient.invalidateQueries({
+      queryKey: residentKeys.byRepublic(republicId),
+    });
+  }, [queryClient, republicId]);
 
-  const fetchResidents = useCallback(async (republicId: string) => {
-    setIsLoading(true);
-    try {
-      const residentsData = await residentService.getResidents(republicId);
-      setResidents(residentsData);
-      return residentsData;
-    } catch (error) {
-      console.error("Erro ao buscar moradores:", error);
-      showToast.error(
-        getErrorMessage(error, "Não foi possível carregar os moradores.")
-      );
-      return null;
-    } finally {
-      setIsLoading(false); // Adicione isso para sempre desligar o loading
-    }
-  }, []);
+  const { registerRefresh } = useRefresh();
+
+  useEffect(() => {
+    return registerRefresh(`residents-${republicId}`, refresh);
+  }, [refresh, registerRefresh, republicId]);
 
   return {
-    // State
     residents,
-    isLoading,
-    // Actions
+    isLoading: isFetching,
     fetchResidents,
-    setResidents,
   };
 }

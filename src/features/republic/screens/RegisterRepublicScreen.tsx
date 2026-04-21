@@ -1,5 +1,6 @@
 import Feather from "@expo/vector-icons/Feather";
 import {
+  ActivityIndicator,
   Image,
   ImageBackground,
   KeyboardAvoidingView,
@@ -10,10 +11,11 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import ImageDefault from "@/assets/images/image-register.webp";
 import InputField from "@/src/shared/components/ui/input-field";
-import { useRepublicActions } from "../hooks/useRepublicActions";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
+import { useRepublicActions } from "../hooks/useRepublicActions";
 import { useRepublicForm } from "../hooks/useRepublicForm";
 
 export function RegisterRepublicScreen() {
@@ -27,7 +29,7 @@ export function RegisterRepublicScreen() {
     handleSelectImageRepublic,
   } = useRepublicForm();
 
-  const { createRepublic } = useRepublicActions();
+  const { createRepublic, isCreating } = useRepublicActions();
 
   async function handleSubmit() {
     await createRepublic({
@@ -36,7 +38,7 @@ export function RegisterRepublicScreen() {
     });
   }
 
-  const isButtonDisabled = !republicName.trim();
+  const isButtonDisabled = !republicName.trim() || isCreating;
 
   return (
     <KeyboardAvoidingView
@@ -73,12 +75,12 @@ export function RegisterRepublicScreen() {
           </View>
         </ImageBackground>
 
-        <View
+        <SafeAreaView
           className="flex-1 rounded-t-[24px] bg-[#FAFAFA] px-6 pb-8"
           style={{
             width: width,
             marginTop: -20,
-            paddingTop: 32,
+            paddingTop: -22,
           }}
         >
           {/* Seleção de Imagem */}
@@ -117,16 +119,21 @@ export function RegisterRepublicScreen() {
           <View className="flex-1" />
 
           <TouchableOpacity
-            className={`w-full rounded-xl px-4 py-4 ${isButtonDisabled ? "bg-gray-300" : "bg-teal"}`}
+            className={`w-full rounded-xl px-4 py-4 ${isButtonDisabled ? "bg-gray-300" : "bg-teal"} ${isCreating ? "opacity-60" : ""}`}
             onPress={handleSubmit}
             disabled={isButtonDisabled}
             activeOpacity={0.85}
+            accessibilityLabel="Cadastrar República"
           >
-            <Text className="text-center font-inter-semibold text-base text-white">
-              Cadastrar República
-            </Text>
+            {isCreating ? (
+              <ActivityIndicator size="small" color="white" />
+            ) : (
+              <Text className="text-center font-inter-semibold text-base text-white">
+                Cadastrar República
+              </Text>
+            )}
           </TouchableOpacity>
-        </View>
+        </SafeAreaView>
       </ScrollView>
     </KeyboardAvoidingView>
   );

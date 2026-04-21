@@ -25,3 +25,22 @@ export const formatDate = (dateStr: string) => {
     month: "short",
   });
 };
+
+export function formatIntWithDots(intPart: string): string {
+  let result = "";
+  const len = intPart.length;
+  for (let i = 0; i < len; i++) {
+    if (i > 0 && (len - i) % 3 === 0) result += ".";
+    result += intPart[i];
+  }
+  return result;
+}
+
+export function formatBRL(value: number): string {
+  const [intPart, decPart] = value.toFixed(2).split(".");
+  return `${formatIntWithDots(intPart)},${decPart}`;
+}
+
+export function formatCurrency(value: number): string {
+  return `R$ ${formatBRL(value)}`;
+}

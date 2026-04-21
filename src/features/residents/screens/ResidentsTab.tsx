@@ -2,15 +2,15 @@ import Feather from "@expo/vector-icons/Feather";
 import { type FC, useState } from "react";
 import { FlatList, RefreshControl, Text, View } from "react-native";
 
-import { InviteModal } from "@/src/features/invites/components/InviteModal";
-import { useInvitesContext } from "@/src/features/invites/contexts/InvitesContext";
+import { InvitesModal } from "@/src/features/invites/components/InvitesModal";
+import { useSendInviteMutation } from "@/src/features/invites/hooks/useInvitesQueries";
 import { ResidentCard } from "@/src/features/residents/components/ResidentCard";
 import { useTabResidents } from "@/src/features/residents/hooks/useTabResidents";
+import { getErrorMessage } from "@/src/services/httpError";
+import { PlusButton } from "@/src/shared/components/PlusButton";
 import { useRefresh } from "@/src/shared/contexts/RefreshContext";
-import type { ResidentResponse } from "@/src/shared/types/resident.types";
-
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
-import { AddAccountButton } from "../../accounts/components";
+import type { ResidentResponse } from "@/src/shared/types/resident.types";
 
 interface ResidentsTabProps {
   residents: ResidentResponse[];
@@ -27,7 +27,15 @@ export const ResidentsTab: FC<ResidentsTabProps> = ({
   const { copiarChavePix } = useTabResidents();
   const { refreshing, onRefresh } = useRefresh();
 
-  const { sendInvite, sendLoading, sendError } = useInvitesContext();
+  const {
+    mutateAsync: sendInvite,
+    isPending: sendLoading,
+    error: sendErrorRaw,
+    reset: resetSendInvite,
+  } = useSendInviteMutation();
+  const sendError = sendErrorRaw
+    ? getErrorMessage(sendErrorRaw, "Erro ao enviar convite.")
+    : null;
 
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -61,10 +69,13 @@ export const ResidentsTab: FC<ResidentsTabProps> = ({
         }
       />
 
-      {isAdmin && <AddAccountButton onPress={() => setModalOpen(true)} />}
-      <InviteModal
+      {isAdmin && <PlusButton onPress={() => setModalOpen(true)} />}
+      <InvitesModal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={() => {
+          resetSendInvite();
+          setModalOpen(false);
+        }}
         republicaId={republicId}
         sendInvite={sendInvite}
         loading={sendLoading}

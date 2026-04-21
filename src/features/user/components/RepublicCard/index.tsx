@@ -1,3 +1,4 @@
+import { Feather } from "@expo/vector-icons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import React, { useCallback, useRef, useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
@@ -91,10 +92,12 @@ export default function RepublicCard({
         onLongPress={handleLongPress}
         delayLongPress={400}
         activeOpacity={1}
-        className="mb-4 w-44 overflow-hidden rounded-3xl bg-white shadow-sm"
+        accessibilityRole="button"
+        accessibilityLabel={`Abrir república ${republic.nome}`}
+        className="mb-4 h-64 w-44 overflow-hidden rounded-3xl bg-white shadow-sm"
       >
         {/* Imagem */}
-        <View className="h-36 w-full items-center justify-center overflow-hidden bg-gray-100">
+        <View className="h-36 w-full items-center justify-center overflow-hidden bg-gray-200">
           {republic.imagemRepublica && !imageError ? (
             <Image
               source={{ uri: republic.imagemRepublica }}
@@ -103,23 +106,21 @@ export default function RepublicCard({
               onError={() => setImageError(true)}
             />
           ) : (
-            <Text className="text-5xl">🏠</Text>
+            <Feather name="image" size={48} color="#6b7280" />
           )}
         </View>
 
         {/* Info */}
-        <View className="p-4">
+        <View className="flex-1 justify-between p-4">
           <Text className="text-lg font-bold text-gray-800" numberOfLines={2}>
             {republic.nome}
           </Text>
 
-          <View className="mt-2 flex-row items-center justify-between">
-            <View className="flex-row items-center">
-              <Ionicons name="people-outline" size={14} color="#337176" />
-              <Text className="ml-1 text-sm font-medium text-gray-600">
-                {residentsCount} {residentsLabel}
-              </Text>
-            </View>
+          <View className="mt-2 flex-row items-center">
+            <Ionicons name="people-outline" size={14} color="#337176" />
+            <Text className="ml-1 text-sm font-medium text-gray-600">
+              {residentsCount} {residentsLabel}
+            </Text>
           </View>
         </View>
       </TouchableOpacity>

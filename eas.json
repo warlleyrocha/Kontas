@@ -8,21 +8,14 @@
       "developmentClient": true,
       "distribution": "internal",
       "environment": "development",
-      "channel": "development",
-      "env": {
-        "APP_ENV": "development",
-        "EXPO_PUBLIC_API_URL": "http://10.0.2.2:3333"
-      }
+      "channel": "development"
     },
     "preview": {
       "distribution": "internal",
       "environment": "preview",
       "autoIncrement": true,
       "channel": "preview",
-      "env": {
-        "APP_ENV": "preview",
-        "EXPO_PUBLIC_API_URL": "https://kontas-back-end-production.up.railway.app"
-      },
+
       "android": {
         "buildType": "apk",
         "credentialsSource": "remote"
@@ -31,11 +24,7 @@
     "production": {
       "autoIncrement": true,
       "environment": "production",
-      "channel": "production",
-      "env": {
-        "APP_ENV": "production",
-        "EXPO_PUBLIC_API_URL": "https://kontas-back-end-production.up.railway.app"
-      }
+      "channel": "production"
     }
   },
   "submit": {

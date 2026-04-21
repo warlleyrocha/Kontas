@@ -1,18 +1,20 @@
-import { createElement, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
 import { getErrorMessage } from "@/src/services/httpError";
 import { toast } from "@/src/shared/components/ui/sonner";
 import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
-import { AccountRecoveryToast } from "../components";
-import { accountResidentsService } from "../services/account-residents.service";
-import { accountService } from "../services/account.service";
+
 import type {
   CriarContaComMoradoresRequest,
-  ListarContasResponse,
   MetodoPagamento,
 } from "../types/account.types";
-
-const RECOVERY_TOAST_DURATION_MS = 10_000;
+import {
+  useCreateAccountMutation,
+  useDeleteAccountMutation,
+  usePayAccountMutation,
+  useRestoreAccountMutation,
+} from "./useAccountQueries";
 
 interface UseAccountActionsOptions {
   onRefresh?: () => Promise<unknown> | void;
@@ -31,16 +33,16 @@ interface UseAccountActionsReturn {
     metodoPagamento: MetodoPagamento
   ) => Promise<void>;
   handleRecovery: (accountId: string) => Promise<void>;
-  fetchContasPorMorador: (moradorId: string) => Promise<ListarContasResponse>;
 }
 
-export function useAccountActions({
-  onRefresh,
-}: UseAccountActionsOptions = {}): UseAccountActionsReturn {
+export function useAccountActions(
+  _options: UseAccountActionsOptions = {}
+): UseAccountActionsReturn {
   const [showAccountModal, setShowAccountModal] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
+  const createAccountMutation = useCreateAccountMutation();
+  const deleteAccountMutation = useDeleteAccountMutation();
+  const restoreAccountMutation = useRestoreAccountMutation();
+  const payAccountMutation = usePayAccountMutation();
   const pendingDeleteTimeoutsRef = useRef<
     Map<string, ReturnType<typeof setTimeout>>
   >(new Map());
@@ -67,33 +69,22 @@ export function useAccountActions({
 
   const handleSubmit = useCallback(
     async (data: CriarContaComMoradoresRequest) => {
-      setIsSubmitting(true);
-
       try {
-        const { moradorIds, ...contaPayload } = data;
-        logger.debug("Accounts", "Payload de submit", { metodoPagamento: data.metodoPagamento });
-        const conta = await accountService.criarConta(contaPayload);
-
-        if (moradorIds.length > 0) {
-          await accountResidentsService.vincularMoradores({
-            contaId: conta.id,
-            moradorIds,
-            valorTotal: contaPayload.valor,
-          });
-        }
-
-        showToast.success("Conta criada com sucesso.");
+        logger.debug("Accounts", "Payload de submit", {
+          metodoPagamento: data.metodoPagamento,
+        });
+        await createAccountMutation.mutateAsync(data);
         setShowAccountModal(false);
-        await onRefresh?.();
+        setTimeout(() => {
+          showToast.success("Conta criada com sucesso.");
+        }, 300);
       } catch (error) {
         showToast.error(
           getErrorMessage(error, "Não foi possível criar a conta.")
         );
-      } finally {
-        setIsSubmitting(false);
       }
     },
-    [onRefresh]
+    [createAccountMutation]
   );
 
   const handleRecovery = useCallback(
@@ -113,106 +104,56 @@ export function useAccountActions({
         return;
       }
 
-      setIsDeleting(true);
-
       try {
-        await accountService.restaurarConta(accountId);
+        await restoreAccountMutation.mutateAsync(accountId);
         showToast.success("Conta recuperada com sucesso.");
-        await onRefresh?.();
       } catch (error) {
         showToast.error(
           getErrorMessage(error, "Não foi possível recuperar a conta.")
         );
-      } finally {
-        setIsDeleting(false);
       }
     },
-    [onRefresh]
+    [restoreAccountMutation]
   );
 
   const handleDelete = useCallback(
     async (accountId: string) => {
-      if (pendingDeleteTimeoutsRef.current.has(accountId)) {
-        return;
+      try {
+        await deleteAccountMutation.mutateAsync(accountId);
+        showToast.success("Conta removida com sucesso.");
+      } catch (error) {
+        showToast.error(
+          getErrorMessage(error, "Não foi possível remover a conta.")
+        );
       }
-
-      const timeoutId = setTimeout(() => {
-        pendingDeleteTimeoutsRef.current.delete(accountId);
-        const toastId = pendingDeleteToastIdsRef.current.get(accountId);
-        if (toastId !== undefined) {
-          toast.dismiss(toastId);
-        }
-        pendingDeleteToastIdsRef.current.delete(accountId);
-
-        void (async () => {
-          setIsDeleting(true);
-          try {
-            await accountService.removerConta({ id: accountId });
-            showToast.success("Conta removida com sucesso.");
-            await onRefresh?.();
-          } catch (error) {
-            showToast.error(
-              getErrorMessage(error, "Não foi possível remover a conta.")
-            );
-          } finally {
-            setIsDeleting(false);
-          }
-        })();
-      }, RECOVERY_TOAST_DURATION_MS);
-
-      pendingDeleteTimeoutsRef.current.set(accountId, timeoutId);
-
-      const toastId = toast.custom(
-        createElement(AccountRecoveryToast, {
-          message: "Conta apagada",
-          onRecover: () => {
-            void handleRecovery(accountId);
-          },
-          durationMs: RECOVERY_TOAST_DURATION_MS,
-        }),
-        { duration: RECOVERY_TOAST_DURATION_MS }
-      );
-      pendingDeleteToastIdsRef.current.set(accountId, toastId);
     },
-    [handleRecovery, onRefresh]
+    [deleteAccountMutation]
   );
 
   const handlePatch = useCallback(
     async (accountId: string, metodoPagamento: MetodoPagamento) => {
-      setIsUpdating(true);
-
       try {
-        await accountService.pagarConta({ id: accountId, metodoPagamento });
-
+        await payAccountMutation.mutateAsync({ accountId, metodoPagamento });
         showToast.success("Conta marcada como paga com sucesso!");
       } catch (error) {
         showToast.error(
           error instanceof Error ? error.message : "Erro inesperado"
         );
-      } finally {
-        setIsUpdating(false);
       }
     },
-    []
-  );
-
-  const fetchContasPorMorador = useCallback(
-    async (moradorId: string): Promise<ListarContasResponse> => {
-      return accountResidentsService.listarContasPorMorador(moradorId);
-    },
-    []
+    [payAccountMutation]
   );
 
   return {
     showAccountModal,
     setShowAccountModal,
-    isSubmitting,
-    isDeleting,
-    isUpdating,
+    isSubmitting: createAccountMutation.isPending,
+    isDeleting:
+      deleteAccountMutation.isPending || restoreAccountMutation.isPending,
+    isUpdating: payAccountMutation.isPending,
     handleSubmit,
     handleDelete,
     handlePatch,
     handleRecovery,
-    fetchContasPorMorador,
   };
 }

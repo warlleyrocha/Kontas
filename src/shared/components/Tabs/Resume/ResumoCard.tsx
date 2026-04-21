@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
+import { formatBRL } from "@/src/shared/utils/formats";
 
 interface ResumoCardProps {
   label: string;
@@ -26,7 +27,7 @@ export const ResumoCard = ({
         {isLoading ? (
           <ActivityIndicator size="small" color={color} />
         ) : (
-          <Text className="text-lg font-semibold">R$ {value.toFixed(2)}</Text>
+          <Text className="text-lg font-semibold">R$ {formatBRL(value)}</Text>
         )}
       </View>
     </View>

@@ -10,8 +10,13 @@ import { PendingPaymentCard } from "./PendingPaymentCard";
 interface PendingPaymentsListProps {
   readonly paymentAccounts: PaymentAccount[];
   readonly confirmingResidentById: Record<string, boolean>;
+  readonly refusingResidentById: Record<string, boolean>;
   readonly isRefreshing: boolean;
   readonly onConfirmResidentPayment: (
+    accountId: string,
+    residentId: string
+  ) => Promise<void> | void;
+  readonly onRefuseResidentPayment: (
     accountId: string,
     residentId: string
   ) => Promise<void> | void;
@@ -22,8 +27,10 @@ interface PendingPaymentsListProps {
 export function PendingPaymentsList({
   paymentAccounts,
   confirmingResidentById,
+  refusingResidentById,
   isRefreshing,
   onConfirmResidentPayment,
+  onRefuseResidentPayment,
   onRefresh,
   selectedStatus,
 }: PendingPaymentsListProps) {
@@ -40,7 +47,9 @@ export function PendingPaymentsList({
           key={account.id}
           account={account}
           confirmingResidentById={confirmingResidentById}
+          refusingResidentById={refusingResidentById}
           onConfirmResidentPayment={onConfirmResidentPayment}
+          onRefuseResidentPayment={onRefuseResidentPayment}
           selectedStatus={selectedStatus}
         />
       ))}

@@ -1,12 +1,16 @@
-import { useCallback, useEffect, useState } from "react";
-import { useAuth } from "@/src/features/auth/contexts";
-import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
-import { residentService } from "@/src/features/residents/services/resident.service";
-import { ResidentRole } from "@/src/shared/types/resident.types";
-import { logger } from "@/src/shared/utils/logger";
+import { useQueries } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
 
-function isEmptyRecord(record: Record<string, unknown>) {
-  return Object.keys(record).length === 0;
+import { useAuth } from "@/src/features/auth/hooks/useAuth";
+import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
+import { residentKeys } from "@/src/features/residents/hooks/resident.keys";
+import { residentService } from "@/src/features/residents/services/resident.service";
+import type { ResidentResponse } from "@/src/shared/types/resident.types";
+import { ResidentRole } from "@/src/shared/types/resident.types";
+
+interface RepublicResidentsQueryResult {
+  data: ResidentResponse[][];
+  isLoading: boolean;
 }
 
 export function useRepublicResidents(
@@ -15,95 +19,60 @@ export function useRepublicResidents(
   enabled = true
 ) {
   const { isAuthenticated } = useAuth();
-  const [residentsCount, setResidentsCount] = useState<Record<string, number>>(
-    {}
+
+  const queries = useQueries({
+    queries: republics.map((republic) => ({
+      queryKey: residentKeys.byRepublic(republic.id),
+      queryFn: ({ signal }: { signal: AbortSignal }) =>
+        residentService.getResidents(republic.id, signal),
+      enabled: isAuthenticated && enabled,
+      staleTime: 60_000,
+    })),
+    combine: (results): RepublicResidentsQueryResult => ({
+      data: results.map((r) => r.data ?? []),
+      isLoading: results.some((r) => r.isLoading),
+    }),
+  });
+
+  const residentsCount = useMemo(
+    () =>
+      Object.fromEntries(
+        republics.map((republic, index) => [
+          republic.id,
+          queries.data[index]?.length ?? 0,
+        ])
+      ),
+    [republics, queries.data]
   );
-  const [userRolesByRepublic, setUserRolesByRepublic] = useState<
-    Record<string, ResidentRole | null>
-  >({});
 
-  const loadResidentsCount = useCallback(async () => {
-    if (!enabled) {
-      return;
-    }
-
-    if (!isAuthenticated || republics.length === 0) {
-      setResidentsCount((current) => (isEmptyRecord(current) ? current : {}));
-      setUserRolesByRepublic((current) =>
-        isEmptyRecord(current) ? current : {}
-      );
-      return;
-    }
-
-    const counts: Record<string, number> = {};
-    const roles: Record<string, ResidentRole | null> = {};
-
-    try {
-      await Promise.all(
-        republics.map(async (republic) => {
-          try {
-            const residents = await residentService.getResidents(republic.id);
-            counts[republic.id] = residents?.length ?? 0;
-            if (currentUserEmail) {
-              const normalizedEmail = currentUserEmail.toLowerCase();
-              const currentUser = residents?.find(
-                (resident) => resident.email.toLowerCase() === normalizedEmail
-              );
-              roles[republic.id] = currentUser?.role ?? null;
-            }
-          } catch (error) {
-            logger.error(
-              "Residents",
-              `Erro ao buscar moradores da república ${republic.id}`,
-              error instanceof Error ? error : undefined
-            );
-            counts[republic.id] = 0;
-            if (currentUserEmail) {
-              roles[republic.id] = null;
-            }
-          }
-        })
-      );
-
-      setResidentsCount(counts);
-      setUserRolesByRepublic(currentUserEmail ? roles : {});
-    } catch (error) {
-      // Promise.all não deve rejeitar pois cada república trata seu próprio erro,
-      // mas o catch externo satisfaz a análise de fluxo do compiler.
-      logger.error(
-        "Residents",
-        "Erro inesperado ao carregar moradores",
-        error instanceof Error ? error : undefined
-      );
-    }
-  }, [enabled, isAuthenticated, republics, currentUserEmail]);
-
-  useEffect(() => {
-    if (!enabled) {
-      return;
-    }
-
-    void loadResidentsCount();
-  }, [enabled, loadResidentsCount]);
+  const userRolesByRepublic = useMemo(() => {
+    if (!currentUserEmail) return {} as Record<string, ResidentRole | null>;
+    const normalizedEmail = currentUserEmail.toLowerCase();
+    return Object.fromEntries(
+      republics.map((republic, index) => {
+        const residents = queries.data[index] ?? [];
+        const match = residents.find(
+          (r) => r.email.toLowerCase() === normalizedEmail
+        );
+        return [republic.id, match?.role ?? null];
+      })
+    );
+  }, [republics, queries.data, currentUserEmail]);
 
   const getResidentsCount = useCallback(
-    (republicId: string): number => {
-      return residentsCount[republicId] ?? 0;
-    },
+    (republicId: string): number => residentsCount[republicId] ?? 0,
     [residentsCount]
   );
 
   const getUserRole = useCallback(
-    (republicId: string): ResidentRole | null => {
-      return userRolesByRepublic[republicId] ?? null;
-    },
+    (republicId: string): ResidentRole | null =>
+      userRolesByRepublic[republicId] ?? null,
     [userRolesByRepublic]
   );
 
   const isAdmin = useCallback(
-    (republicId: string): boolean => {
-      return userRolesByRepublic[republicId] === ResidentRole.ADMIN;
-    },
+    (republicId: string): boolean =>
+      userRolesByRepublic[republicId] === ResidentRole.ADMIN,
     [userRolesByRepublic]
   );
 
@@ -112,6 +81,5 @@ export function useRepublicResidents(
     getResidentsCount,
     getUserRole,
     isAdmin,
-    refresh: loadResidentsCount,
   };
 }

@@ -9,11 +9,14 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import IconGoogle from "@/assets/images/google-icon.svg";
-import { useAuth } from "@/src/features/auth/contexts/AuthContext";
+import ImageLogin from "@/assets/images/image-login.webp";
+import { useLoginWithGoogleMutation } from "@/src/features/auth/hooks/useAuthMutations";
 import { getErrorMessage } from "@/src/services/httpError";
-import { legalLinks, openLegalLink } from "@/src/shared/constants/legal";
 import { useComponentLogger } from "@/src/shared/hooks/useComponentLogger";
+import { logger } from "@/src/shared/utils/logger";
 import { showToast } from "@/src/shared/utils/showToast";
 
 type GoogleSignInResult = Awaited<ReturnType<typeof GoogleSignin.signIn>>;
@@ -26,7 +29,7 @@ export default function LoginScreen() {
   useComponentLogger("LoginScreen");
   const router = useRouter();
   const [isSigningIn, setIsSigningIn] = useState(false);
-  const { loginWithGoogle, error } = useAuth();
+  const { mutateAsync: loginWithGoogle, error } = useLoginWithGoogleMutation();
   const { height } = useWindowDimensions();
 
   const handleGoogleLogin = async () => {
@@ -51,7 +54,7 @@ export default function LoginScreen() {
         }
       }
     } catch (error) {
-      console.error("Erro no login:", error);
+      logger.error("Login", "Erro no login:", error);
       showToast.error(
         getErrorMessage(
           error,
@@ -70,7 +73,7 @@ export default function LoginScreen() {
   return (
     <View className="flex-1 items-center bg-white">
       <Image
-        source={require("@/assets/images/image-login.webp")}
+        source={ImageLogin}
         style={{
           width: "100%",
           height: height * 0.5,
@@ -78,11 +81,11 @@ export default function LoginScreen() {
         }}
       />
 
-      <View
+      <SafeAreaView
         className="mt-8 w-full flex-1 items-center justify-between overflow-hidden rounded-t-[24px] bg-white px-6 py-8 shadow-lg"
         style={{
           marginTop: -25,
-          paddingTop: 40,
+          paddingTop: 0,
           minHeight: height * 0.5,
         }}
       >
@@ -114,30 +117,26 @@ export default function LoginScreen() {
           )}
         </TouchableOpacity>
 
-        <Text className="px-12 text-center text-xs leading-5 text-gray-500">
+        <Text className="px-20 text-center text-xs leading-5 text-gray-500">
           Ao continuar, você concorda com nossos{" "}
           <Text
             className="font-semibold text-teal"
-            onPress={() =>
-              openLegalLink(legalLinks.termsOfUse, "Termos de Uso")
-            }
+            onPress={() => router.push("/terms-of-use")}
           >
             Termos de Uso
           </Text>{" "}
           e{" "}
           <Text
             className="font-semibold text-teal"
-            onPress={() =>
-              openLegalLink(legalLinks.privacyPolicy, "Política de Privacidade")
-            }
+            onPress={() => router.push("/privacy-policy")}
           >
             Política de Privacidade
           </Text>
           .
         </Text>
 
-        {error && <Text style={{ color: "red" }}>{error}</Text>}
-      </View>
+        {error && <Text style={{ color: "red" }}>{error.message}</Text>}
+      </SafeAreaView>
     </View>
   );
 }

@@ -32,7 +32,7 @@ yarn-error.*
 
 # local env files
 .env
-.env*.local
+.env*.production
 
 /credentials
 
@@ -50,3 +50,6 @@ yarn-error.*
 /android
 
 .env.local
+coverage/
+
+.sonarlint
