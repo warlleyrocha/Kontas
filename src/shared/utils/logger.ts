@@ -17,7 +17,7 @@ export const logger = {
   /** Detalhes de baixo nível (payloads, estados internos) — console.debug */
   debug(tag: string, msg: string, data?: unknown) {
     if (IS_DEV)
-      console.debug(
+      (console.debug || console.log)(
         `[DEBUG][${tag}]`,
         msg,
         data !== undefined ? JSON.stringify(data, null, 2) : ""
